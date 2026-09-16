@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.0.3] - 2026-09-16
+
+### Opgelost
+- **Swipe Acties:** Bij het naar rechts swipen van een rit in het Ritten-overzicht wordt er nu netjes een pop-up menu geopend waarin je direct een keuze kunt maken (Zakelijk, Privé of Woon-werk).
+
 ## [1.0.2] - 2026-09-16
 
 ### Toegevoegd

@@ -1,6 +1,6 @@
 {
-  "versionCode": 3,
-  "versionName": "1.0.2",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.0.2.apk",
-  "releaseNotes": "Systeemdiagnostiek uitgebreid met batterij en actieve werkdag status."
+  "versionCode": 4,
+  "versionName": "1.0.3",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.0.3.apk",
+  "releaseNotes": "Nieuw classificatiemenu toegevoegd bij het naar rechts swipen van een rit op het dashboard."
 }

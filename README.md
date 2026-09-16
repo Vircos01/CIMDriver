@@ -1,10 +1,10 @@
-# CIMDriver v1.0.2
+# CIMDriver v1.0.3
 
 De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), de moderne en slimme ritten- en werkurenregistratie app voor Android. 
 
-## 🆕 Wat is nieuw in v1.0.2
-- **Uitgebreide Systeemdiagnostiek:** Het diagnostisch scherm is volledig vernieuwd! Je kunt nu direct de gezondheid van de applicatie zien, inclusief waarschuwingen voor batterij-optimalisaties, details over je actieve werkdag, en live inzicht in boot recovery pogingen.
-- **In-App Updater:** De app controleert voortaan zelf (via GitHub) of er een nieuwe release beschikbaar is en toont in dat geval een handige download-banner op het Dashboard.
+## 🆕 Wat is nieuw in v1.0.3
+- **Swipe Acties Fix:** Bij het swipen van ritten in het overzicht klapt er nu een mooi menu open om ritten sneller te classificeren.
+- **In-App Updater (1.0.2):** De app controleert voortaan zelf (via GitHub) of er een nieuwe release beschikbaar is en toont in dat geval een handige download-banner op het Dashboard.
 
 ## 🚀 Wat is het?
 - **Volledig Automatische Ritregistratie:** Zodra je Bluetooth (bijv. de carkit) verbindt, begint CIMDriver de rit te loggen. Bij het verbreken van de verbinding wordt de rit netjes gestopt en geclassificeerd (Zakelijk, Privé, of Woon-werk) via slimme locatie-herkenning.
