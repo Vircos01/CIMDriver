@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 30,
-    "identityHash": "5f302c718cb1b5cb97af33a34b03de72",
+    "identityHash": "d82153ae3f5bf2d3213e845d6f9c5e72",
     "entities": [
       {
         "tableName": "trips",
@@ -225,7 +225,7 @@
       },
       {
         "tableName": "settings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `defaultTripType` TEXT NOT NULL, `gracePeriodSec` INTEGER NOT NULL, `defaultBreakMinutes` INTEGER NOT NULL, `workHoursToleranceMinutes` INTEGER NOT NULL, `trackingInterval` INTEGER NOT NULL, `workStartTime` TEXT NOT NULL, `workEndTime` TEXT NOT NULL, `workDays` TEXT NOT NULL, `autoMergeEnabled` INTEGER NOT NULL, `mergeTimeLimitMin` INTEGER NOT NULL, `mergeDistanceM` INTEGER NOT NULL, `odometerReminder` INTEGER NOT NULL, `odometerReminderIntervalDays` INTEGER NOT NULL, `backupReminder` INTEGER NOT NULL, `distanceUnit` TEXT NOT NULL, `themeMode` TEXT NOT NULL, `preferredNavAppPackage` TEXT, `classificationDefault` TEXT NOT NULL, `classifyHomeWorkAsCommute` INTEGER NOT NULL, `classifyCustomerAsBusiness` INTEGER NOT NULL, `locationRetentionDays` INTEGER NOT NULL, `maxRecoveryAttempts` INTEGER NOT NULL, `businessCompensation` REAL NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `defaultTripType` TEXT NOT NULL, `gracePeriodSec` INTEGER NOT NULL, `defaultBreakMinutes` INTEGER NOT NULL, `workHoursToleranceMinutes` INTEGER NOT NULL, `trackingInterval` INTEGER NOT NULL, `workStartTime` TEXT NOT NULL, `workEndTime` TEXT NOT NULL, `workDays` TEXT NOT NULL, `autoMergeEnabled` INTEGER NOT NULL, `mergeTimeLimitMin` INTEGER NOT NULL, `mergeDistanceM` INTEGER NOT NULL, `odometerReminder` INTEGER NOT NULL, `odometerReminderIntervalDays` INTEGER NOT NULL, `backupReminder` INTEGER NOT NULL, `distanceUnit` TEXT NOT NULL, `themeMode` TEXT NOT NULL, `preferredNavAppPackage` TEXT, `classificationDefault` TEXT NOT NULL, `classifyHomeWorkAsCommute` INTEGER NOT NULL, `classifyCustomerAsBusiness` INTEGER NOT NULL, `locationRetentionDays` INTEGER NOT NULL, `maxRecoveryAttempts` INTEGER NOT NULL, `businessCompensation` REAL NOT NULL, `skippedUpdateVersionCode` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -368,6 +368,12 @@
             "fieldPath": "businessCompensation",
             "columnName": "businessCompensation",
             "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "skippedUpdateVersionCode",
+            "columnName": "skippedUpdateVersionCode",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -786,7 +792,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5f302c718cb1b5cb97af33a34b03de72')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd82153ae3f5bf2d3213e845d6f9c5e72')"
     ]
   }
 }

@@ -227,7 +227,7 @@ fun DashboardScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (updateInfo.isUpdateAvailable) {
+            if (updateInfo.isUpdateAvailable && updateInfo.latestVersionCode > (settings?.skippedUpdateVersionCode ?: 0)) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -248,13 +248,21 @@ fun DashboardScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(updateInfo.downloadUrl))
-                                context.startActivity(intent)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { settingsViewModel.skipUpdate(updateInfo.latestVersionCode) },
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onPrimaryContainer)
+                            ) {
+                                Text("Overslaan")
                             }
-                        ) {
-                            Text("Update Nu")
+                            Button(
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(updateInfo.downloadUrl))
+                                    context.startActivity(intent)
+                                }
+                            ) {
+                                Text("Update Nu")
+                            }
                         }
                     }
                 }

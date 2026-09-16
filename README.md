@@ -4,6 +4,7 @@ De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), 
 
 ## 🆕 Wat is nieuw in v1.0.4
 - **Instelbare Vergoeding:** De zakelijke vergoeding per kilometer is nu instelbaar via de instellingenpagina en wordt direct doorgerekend op het dashboard.
+- **Update Overslaan:** Gebruikers kunnen er nu voor kiezen om specifieke nieuwe versies van de app over te slaan als ze de update nog niet direct willen installeren.
 - **Swipe Acties Fix (1.0.3):** Bij het swipen van ritten in het overzicht klapt er nu een mooi menu open om ritten sneller te classificeren.
 
 ## 🚀 Wat is het?

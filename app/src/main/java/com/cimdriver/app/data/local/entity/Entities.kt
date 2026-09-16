@@ -133,7 +133,8 @@ data class Settings(
     val classifyCustomerAsBusiness: Boolean = true,
     val locationRetentionDays: Int = 365,
     val maxRecoveryAttempts: Int = 3,
-    val businessCompensation: Float = 0.23f
+    val businessCompensation: Float = 0.23f,
+    val skippedUpdateVersionCode: Int = 0
 )
 
 @Entity(tableName = "saved_addresses")

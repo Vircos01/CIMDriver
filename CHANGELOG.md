@@ -6,6 +6,7 @@ Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bi
 
 ### Toegevoegd
 - **Instelbare Vergoeding:** De zakelijke vergoeding per kilometer is nu instelbaar via de instellingenpagina en wordt direct doorgerekend op het dashboard.
+- **Update Overslaan:** Het is nu mogelijk om een specifieke app update in de banner te negeren door op "Overslaan" te drukken.
 
 ## [1.0.3] - 2026-09-16
 

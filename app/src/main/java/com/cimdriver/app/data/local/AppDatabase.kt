@@ -189,6 +189,7 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_29_30 = object : Migration(29, 30) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE settings ADD COLUMN businessCompensation REAL NOT NULL DEFAULT 0.23")
+                db.execSQL("ALTER TABLE settings ADD COLUMN skippedUpdateVersionCode INTEGER NOT NULL DEFAULT 0")
             }
         }
 

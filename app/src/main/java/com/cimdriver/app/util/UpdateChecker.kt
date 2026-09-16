@@ -10,6 +10,7 @@ import com.cimdriver.app.BuildConfig
 
 data class UpdateInfo(
     val isUpdateAvailable: Boolean = false,
+    val latestVersionCode: Int = 0,
     val latestVersionName: String = "",
     val downloadUrl: String = "",
     val releaseNotes: String = ""
@@ -42,6 +43,7 @@ object UpdateChecker {
                     if (remoteVersionCode > currentVersionCode) {
                         return@withContext UpdateInfo(
                             isUpdateAvailable = true,
+                            latestVersionCode = remoteVersionCode,
                             latestVersionName = remoteVersionName,
                             downloadUrl = apkUrl,
                             releaseNotes = notes

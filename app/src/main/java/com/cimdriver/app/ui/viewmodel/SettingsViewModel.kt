@@ -115,6 +115,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
     
+    fun skipUpdate(versionCode: Int) {
+        viewModelScope.launch {
+            val currentSettings = settings.value ?: Settings()
+            settingsDao.insertSettings(currentSettings.copy(skippedUpdateVersionCode = versionCode))
+        }
+    }
+    
     fun clearLocationHistory() {
         viewModelScope.launch { locationPointDao.deleteAllPoints() }
     }
