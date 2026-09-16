@@ -93,6 +93,7 @@ fun TripsScreen(
     val classificationSettings = settingsViewModel.settings.collectAsState().value ?: com.cimdriver.app.data.local.entity.Settings()
     val classificationRules by settingsViewModel.classificationRules.collectAsState()
     var tripToDelete by remember { mutableStateOf<Trip?>(null) }
+    var tripToClassify by remember { mutableStateOf<Trip?>(null) }
     
     val currentFilter = uiState.tripFilter
     val selectedYear = uiState.selectedYear
@@ -408,7 +409,7 @@ fun TripsScreen(
                             LaunchedEffect(dismissState.currentValue) {
                                 when (dismissState.currentValue) {
                                     SwipeToDismissBoxValue.StartToEnd -> {
-                                        viewModel.reviewTrip(trip, "Business Meeting")
+                                        tripToClassify = trip
                                         dismissState.snapTo(SwipeToDismissBoxValue.Settled)
                                     }
                                     SwipeToDismissBoxValue.EndToStart -> {
@@ -503,6 +504,46 @@ fun TripsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { tripToDelete = null }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    if (tripToClassify != null) {
+        AlertDialog(
+            onDismissRequest = { tripToClassify = null },
+            title = { Text("Rit Classificeren") },
+            text = {
+                Column {
+                    Text("Hoe wil je deze rit classificeren?")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            tripToClassify?.let { viewModel.reviewTrip(it, "Customer Visit") }
+                            tripToClassify = null
+                        }
+                    ) { Text(stringResource(R.string.business)) }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            tripToClassify?.let { viewModel.reviewTrip(it, "COMMUTE") }
+                            tripToClassify = null
+                        }
+                    ) { Text(stringResource(R.string.commute_short)) }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            tripToClassify?.let { viewModel.reviewTrip(it, "PERSONAL") }
+                            tripToClassify = null
+                        }
+                    ) { Text(stringResource(R.string.private_usage)) }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { tripToClassify = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
