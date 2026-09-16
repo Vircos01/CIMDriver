@@ -108,6 +108,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
     
+    fun updateBusinessCompensation(amount: Float) {
+        viewModelScope.launch {
+            val currentSettings = settings.value ?: Settings()
+            settingsDao.insertSettings(currentSettings.copy(businessCompensation = amount.coerceAtLeast(0f)))
+        }
+    }
+    
     fun clearLocationHistory() {
         viewModelScope.launch { locationPointDao.deleteAllPoints() }
     }

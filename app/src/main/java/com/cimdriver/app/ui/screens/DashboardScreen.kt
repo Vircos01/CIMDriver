@@ -451,7 +451,8 @@ fun DashboardScreen(
                             }
                             
                             Spacer(modifier = Modifier.height(8.dp))
-                            val vergoeding = (stats.zakelijkKm + stats.woonWerkKm) * 0.23
+                            val compensationRate = settings?.businessCompensation ?: 0.23f
+                            val vergoeding = (stats.zakelijkKm + stats.woonWerkKm) * compensationRate
                             Text(text = String.format(locale, "€ %.2f", vergoeding), style = MaterialTheme.typography.bodyMedium, color = androidx.compose.ui.graphics.Color(0xFF2E7D32))
                             
                             Spacer(modifier = Modifier.height(12.dp))

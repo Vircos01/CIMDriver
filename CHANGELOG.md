@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.0.4] - 2026-09-16
+
+### Toegevoegd
+- **Instelbare Vergoeding:** De zakelijke vergoeding per kilometer is nu instelbaar via de instellingenpagina en wordt direct doorgerekend op het dashboard.
+
 ## [1.0.3] - 2026-09-16
 
 ### Opgelost

@@ -119,6 +119,9 @@ fun SettingsScreen(
     var odometerReminder by remember(initialSettings.odometerReminder) { mutableStateOf(initialSettings.odometerReminder) }
     var odometerIntervalStr by remember(initialSettings.odometerReminderIntervalDays) { mutableStateOf(initialSettings.odometerReminderIntervalDays.toString()) }
     
+    // Hoisted states for Compensation
+    var businessCompensationStr by remember(initialSettings.businessCompensation) { mutableStateOf(initialSettings.businessCompensation.toString()) }
+    
 
     // Hoisted states for WorkHours
     val daySettings = remember(initialSettings.workDays) {
@@ -143,6 +146,9 @@ fun SettingsScreen(
 
                     val odoDays = odometerIntervalStr.toIntOrNull() ?: 30
                     viewModel.updateOdometerReminder(odometerReminder, odoDays)
+                    
+                    val comp = businessCompensationStr.replace(',', '.').toFloatOrNull() ?: 0.23f
+                    viewModel.updateBusinessCompensation(comp)
 
                     val serializedDays = com.cimdriver.app.util.WorkHoursUtil.serializeWorkHours(daySettings)
                     val breakMins = breakMinutesStr.toIntOrNull() ?: 30
@@ -194,6 +200,25 @@ fun SettingsScreen(
                             Text(stringResource(R.string.system))
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = "Zakelijke vergoeding", style = MaterialTheme.typography.titleLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Vergoeding per km in euro's (bijv. 0.23)", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = businessCompensationStr,
+                        onValueChange = { businessCompensationStr = it },
+                        label = { Text("Vergoeding per km") },
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
 

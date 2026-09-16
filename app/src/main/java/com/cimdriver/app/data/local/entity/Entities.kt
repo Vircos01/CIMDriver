@@ -132,7 +132,8 @@ data class Settings(
     val classifyHomeWorkAsCommute: Boolean = true,
     val classifyCustomerAsBusiness: Boolean = true,
     val locationRetentionDays: Int = 365,
-    val maxRecoveryAttempts: Int = 3
+    val maxRecoveryAttempts: Int = 3,
+    val businessCompensation: Float = 0.23f
 )
 
 @Entity(tableName = "saved_addresses")
