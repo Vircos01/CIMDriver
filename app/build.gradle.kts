@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
@@ -15,12 +18,17 @@ android {
         applicationId = "com.cimdriver.app"
         minSdk = 29
         targetSdk = 37
-        versionCode = 5
-        versionName = "1.0.4-${getGitHash(providers)}"
+        versionCode = 8
+        versionName = "1.0.7-${getGitHash(providers)}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        
+        ndk {
+            abiFilters.add("armeabi-v7a")
+            abiFilters.add("arm64-v8a")
         }
         
         buildConfigField("String", "GIT_HASH", "\"${getGitHash(providers)}\"")
@@ -28,16 +36,25 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystoreFile = project.findProperty("RELEASE_STORE_FILE") as String? ?: System.getenv("RELEASE_STORE_FILE")
-            val keystorePassword = project.findProperty("RELEASE_STORE_PASSWORD") as String? ?: System.getenv("RELEASE_STORE_PASSWORD")
-            val keystoreKeyAlias = project.findProperty("RELEASE_KEY_ALIAS") as String? ?: System.getenv("RELEASE_KEY_ALIAS")
-            val keystoreKeyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String? ?: System.getenv("RELEASE_KEY_PASSWORD")
+            val keystorePropertiesFile = rootProject.file("keystore.properties")
+            val keystoreProperties = Properties()
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+            }
 
-            if (keystoreFile != null) {
+            val keystoreFile = keystoreProperties.getProperty("RELEASE_STORE_FILE") ?: project.findProperty("RELEASE_STORE_FILE") as String? ?: System.getenv("RELEASE_STORE_FILE")
+            val keystorePassword = keystoreProperties.getProperty("RELEASE_STORE_PASSWORD") ?: project.findProperty("RELEASE_STORE_PASSWORD") as String? ?: System.getenv("RELEASE_STORE_PASSWORD")
+            val keystoreKeyAlias = keystoreProperties.getProperty("RELEASE_KEY_ALIAS") ?: project.findProperty("RELEASE_KEY_ALIAS") as String? ?: System.getenv("RELEASE_KEY_ALIAS")
+            val keystoreKeyPassword = keystoreProperties.getProperty("RELEASE_KEY_PASSWORD") ?: project.findProperty("RELEASE_KEY_PASSWORD") as String? ?: System.getenv("RELEASE_KEY_PASSWORD")
+
+            if (keystoreFile != null && file(keystoreFile).exists()) {
                 storeFile = file(keystoreFile)
                 storePassword = keystorePassword
                 keyAlias = keystoreKeyAlias
                 keyPassword = keystoreKeyPassword
+            } else {
+                // Fallback to debug keystore so release builds can succeed without secrets
+                initWith(getByName("debug"))
             }
         }
     }

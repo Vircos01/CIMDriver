@@ -1,11 +1,10 @@
-# CIMDriver v1.0.4
+# CIMDriver v1.0.7
 
 De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), de moderne en slimme ritten- en werkurenregistratie app voor Android. 
 
-## 🆕 Wat is nieuw in v1.0.4
-- **Instelbare Vergoeding:** De zakelijke vergoeding per kilometer is nu instelbaar via de instellingenpagina en wordt direct doorgerekend op het dashboard.
-- **Update Overslaan:** Gebruikers kunnen er nu voor kiezen om specifieke nieuwe versies van de app over te slaan als ze de update nog niet direct willen installeren.
-- **Swipe Acties Fix (1.0.3):** Bij het swipen van ritten in het overzicht klapt er nu een mooi menu open om ritten sneller te classificeren.
+## 🆕 Wat is nieuw in v1.0.7
+- **Adresherkenning Robuuster:** De adresmatching negeert nu automatisch huisletters in hetzelfde pand (zoals '3b' of '3e') bij het koppelen van GPS aan je adresboek.
+- **APK Optimalisatie:** De Release APK is weer volledig geoptimaliseerd voor ARM-processoren (~48MB).
 
 ## 🚀 Wat is het?
 - **Volledig Automatische Ritregistratie:** Zodra je Bluetooth (bijv. de carkit) verbindt, begint CIMDriver de rit te loggen. Bij het verbreken van de verbinding wordt de rit netjes gestopt en geclassificeerd (Zakelijk, Privé, of Woon-werk) via slimme locatie-herkenning.
@@ -21,7 +20,7 @@ De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), 
 > **Compatibiliteit:** CIMDriver vereist **Android 10 (API 29) of nieuwer**.
 > *Binnenkort:* Volledige integratie voor **Android Auto** volgt zodra de benodigde Google Play Developer licentie is afgerond!
 
-1. [Download het bestand CIMDriver-v1.0.4.apk](release/CIMDriver-v1.0.4.apk) (direct vanuit de repository).
+1. [Download het bestand CIMDriver-v1.0.7.apk](release/CIMDriver-v1.0.7.apk) (direct vanuit de repository).
 2. Open de APK op je telefoon. 
 3. *Opmerking:* Omdat de app nog niet in de Play Store staat, vraagt je telefoon waarschijnlijk om toestemming om "Onbekende bronnen" toe te staan. Accepteer dit om de installatie te voltooien.
 

@@ -10,6 +10,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -252,50 +254,67 @@ fun AddWorkDayScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.other), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Box {
-                        OutlinedTextField(
-                            value = workLocationLabel,
-                            onValueChange = { 
-                                workLocationLabel = it
-                                workLocationExpanded = it.isNotBlank()
-                            },
-                            label = { Text(stringResource(R.string.work_location_optional)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
-                        DropdownMenu(
-                            expanded = workLocationExpanded,
-                            onDismissRequest = { workLocationExpanded = false },
-                            modifier = Modifier.fillMaxWidth(0.9f),
-                            properties = PopupProperties(focusable = false)
-                        ) {
-                            val filteredAddresses = addresses.filter {
-                                it.label.contains(workLocationLabel, ignoreCase = true) ||
-                                it.address.contains(workLocationLabel, ignoreCase = true)
-                            }
-                            if (filteredAddresses.isEmpty()) {
-                                DropdownMenuItem(text = { Text(stringResource(R.string.no_results)) }, onClick = { workLocationExpanded = false })
-                            } else {
-                                filteredAddresses.take(4).forEach { addr ->
-                                    DropdownMenuItem(
-                                        text = { 
-                                            Column {
-                                                Text(addr.label)
-                                                Text(addr.address, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    var workLocationBookExpanded by remember { mutableStateOf(false) }
+                    val isLocationUnknown = workLocationLabel.isNotBlank() && addresses.none { it.address == workLocationLabel || it.label == workLocationLabel }
+
+                    AutoCompleteAddressField(
+                        value = workLocationLabel,
+                        onValueChange = { workLocationLabel = it },
+                        label = stringResource(R.string.work_location_optional),
+                        onSearchAddress = { query -> addressBookViewModel.searchAddress(query) },
+                        trailingIcon = {
+                            Box {
+                                IconButton(onClick = { workLocationBookExpanded = true }) {
+                                    Icon(Icons.Filled.Contacts, contentDescription = stringResource(R.string.address_book))
+                                }
+                                DropdownMenu(expanded = workLocationBookExpanded, onDismissRequest = { workLocationBookExpanded = false }) {
+                                    if (addresses.isEmpty()) {
+                                        DropdownMenuItem(text = { Text(stringResource(R.string.no_saved_addresses)) }, onClick = { workLocationBookExpanded = false })
+                                    }
+                                    addresses.forEach { addr ->
+                                        DropdownMenuItem(
+                                            text = { 
+                                                Column {
+                                                    Text(addr.label)
+                                                    Text(addr.address, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                }
+                                            },
+                                            onClick = {
+                                                workLocationLabel = addr.label
+                                                if (addr.projectCode != null) {
+                                                    projectCode = addr.projectCode
+                                                }
+                                                workLocationBookExpanded = false
                                             }
-                                        },
-                                        onClick = {
-                                            workLocationLabel = addr.label
-                                            if (addr.projectCode != null) {
-                                                projectCode = addr.projectCode
-                                            }
-                                            workLocationExpanded = false
-                                        }
-                                    )
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    }
+                        },
+                        supportingText = if (isLocationUnknown) {
+                            {
+                                TextButton(
+                                    onClick = {
+                                        addressBookViewModel.addAddress(
+                                            label = workLocationLabel.split(",").firstOrNull() ?: workLocationLabel,
+                                            address = workLocationLabel,
+                                            isWorkLocation = true,
+                                            isHomeLocation = false,
+                                            isCustomerLocation = false,
+                                            defaultTripType = null,
+                                            projectCode = projectCode.ifBlank { null },
+                                            notes = null
+                                        )
+                                    },
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Icon(Icons.Filled.Save, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(R.string.save_in_address_book))
+                                }
+                            }
+                        } else null
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = projectCode,

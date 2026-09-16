@@ -1,6 +1,6 @@
 {
-  "versionCode": 5,
-  "versionName": "1.0.4",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.0.4.apk",
-  "releaseNotes": "De zakelijke vergoeding per kilometer is nu instelbaar via de instellingenpagina."
+  "versionCode": 8,
+  "versionName": "1.0.7",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.0.7.apk",
+  "releaseNotes": "Versie bump naar 1.0.7 voor release."
 }

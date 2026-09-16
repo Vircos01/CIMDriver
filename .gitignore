@@ -19,3 +19,4 @@ build/
 *.db-wal
 scratch/cimdriver_database*
 .idea/
+keystore.properties

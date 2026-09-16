@@ -2,6 +2,24 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.0.7] - 2026-09-16
+
+### Gewijzigd
+- **Versie Bump:** Versie verhoogd naar 1.0.7 voor release.
+
+## [1.0.6] - 2026-09-16
+
+### Gewijzigd
+- **Adresherkenning:** De adresmatching is aanzienlijk robuuster gemaakt door automatisch huisletters (zoals 'b' of 'e') te negeren wanneer deze in hetzelfde pand liggen.
+- **UI:** Het toevoegen/bewerken van werkdagen gebruikt nu hetzelfde geavanceerde adres-zoekveld als bij ritten, inclusief snelle toegang tot het adresboek.
+- **APK Optimalisatie:** De Release APK is weer volledig geoptimaliseerd voor ARM-processoren (~48MB).
+
+## [1.0.5] - 2026-09-16
+
+### Opgelost
+- **Urenregistratie:** Uren worden weer correct afgerond op basis van de specifieke werktijden per dag in plaats van de globale standaard instellingen. De puntnotatie (bijv. 8.30) wordt nu ook goed ondersteund.
+- **Adresherkenning:** De zoekradius voor proximity matching is verder verruimd naar 400 meter, wat de herkenning van opgeslagen adressen (zoals kantoorpanden of thuis) verder verbetert.
+
 ## [1.0.4] - 2026-09-16
 
 ### Toegevoegd

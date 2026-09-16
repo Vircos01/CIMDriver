@@ -284,7 +284,7 @@ class TrackingService : Service(), LocationListener {
         fun matchesSavedAddress(pointLat: Double?, pointLon: Double?, resolvedAddress: String?, loc: com.cimdriver.app.data.local.entity.SavedAddress): Boolean {
             // Prefer stored coordinates
             if (pointLat != null && pointLon != null && loc.latitude != null && loc.longitude != null) {
-                if (distanceBetween(pointLat, pointLon, loc.latitude, loc.longitude) <= 200f) {
+                if (distanceBetween(pointLat, pointLon, loc.latitude, loc.longitude) <= 400f) {
                     return true
                 }
             }
@@ -294,7 +294,9 @@ class TrackingService : Service(), LocationListener {
                 if (searchStr.contains(loc.label.lowercase()) || 
                     searchStr.contains(loc.address.lowercase()) ||
                     loc.label.lowercase().contains(searchStr) ||
-                    loc.address.lowercase().contains(searchStr)) {
+                    loc.address.lowercase().contains(searchStr) ||
+                    com.cimdriver.app.util.AddressMatching.matchesBase(resolvedAddress, loc.address) ||
+                    com.cimdriver.app.util.AddressMatching.matchesBase(resolvedAddress, loc.label)) {
                     return true
                 }
             }
@@ -411,8 +413,19 @@ class TrackingService : Service(), LocationListener {
             val settings = database.settingsDao().getSettings().firstOrNull()
             val breakMins = settings?.defaultBreakMinutes ?: 30
             val breakToleranceMins = settings?.workHoursToleranceMinutes ?: 30
-            val configuredStart = settings?.workStartTime ?: "08:00"
-            val configuredEnd = settings?.workEndTime ?: "18:00"
+            
+            val rawDay = cal.get(java.util.Calendar.DAY_OF_WEEK)
+            val dayOfWeek = if (rawDay == java.util.Calendar.SUNDAY) 7 else rawDay - 1
+            val workDaysConfig = com.cimdriver.app.util.WorkHoursUtil.parseWorkHoursString(
+                settings?.workDays ?: "",
+                settings?.workStartTime ?: "08:00",
+                settings?.workEndTime ?: "18:00"
+            )
+            val todayConfig = workDaysConfig.find { it.dayOfWeek == dayOfWeek }
+            
+            val configuredStart = todayConfig?.startTime ?: settings?.workStartTime ?: "08:00"
+            val configuredEnd = todayConfig?.endTime ?: settings?.workEndTime ?: "18:00"
+            
             val endTimeAdjusted = System.currentTimeMillis() - gracePeriodMs
             val normalizedArrival = com.cimdriver.app.util.WorkHoursNormalizer.normalize(
                 endTimeAdjusted,

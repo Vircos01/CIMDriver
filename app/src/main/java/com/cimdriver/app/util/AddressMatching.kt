@@ -21,9 +21,21 @@ object AddressMatching {
         return normalizedInput.isNotEmpty() && normalizedInput == normalize(candidate)
     }
 
+    fun normalizeBase(value: String?): String {
+        val normalized = normalize(value)
+        val match = Regex("^([a-z]+\\d+)[a-z]*$").find(normalized)
+        return match?.groupValues?.get(1) ?: normalized
+    }
+
+    fun matchesBase(input: String?, candidate: String?): Boolean {
+        val normalizedInput = normalizeBase(input)
+        return normalizedInput.isNotEmpty() && normalizedInput == normalizeBase(candidate)
+    }
+
     fun findSavedAddress(input: String?, addresses: List<SavedAddress>): SavedAddress? {
         return addresses.firstOrNull { address ->
-            matches(input, address.label) || matches(input, address.address)
+            matches(input, address.label) || matches(input, address.address) ||
+            matchesBase(input, address.label) || matchesBase(input, address.address)
         }
     }
 
@@ -32,7 +44,7 @@ object AddressMatching {
         lng: Double,
         input: String,
         addresses: List<SavedAddress>,
-        maxDistanceMeters: Float = 250f
+        maxDistanceMeters: Float = 400f
     ): String {
         val exactMatch = findSavedAddress(input, addresses)
         if (exactMatch != null) return exactMatch.address

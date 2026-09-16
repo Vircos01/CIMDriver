@@ -21,8 +21,9 @@ object WorkHoursNormalizer {
 
     private fun configuredTimestamp(dayStart: Long, configuredTime: String): Long? {
         return try {
+            val normalizedTime = configuredTime.replace(".", ":")
             val format = SimpleDateFormat("HH:mm", Locale.ROOT).apply { isLenient = false }
-            val parsed = format.parse(configuredTime) ?: return null
+            val parsed = format.parse(normalizedTime) ?: return null
             val calendar = java.util.Calendar.getInstance().apply {
                 timeInMillis = dayStart
                 val time = java.util.Calendar.getInstance().apply { time = parsed }
