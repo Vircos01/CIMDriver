@@ -71,6 +71,7 @@ data class Trip(
     val isManual: Boolean,
     val odometerStart: Int,
     val odometerEnd: Int?,
+    val expectedDistanceMeters: Int? = null,
     val projectCode: String? = null
 )
 

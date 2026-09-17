@@ -261,6 +261,44 @@ fun TripDetailScreen(
                     mutableStateOf(if (tripOptions.contains(trip!!.tripType)) trip!!.tripType else "Home To Work") 
                 }
                 var typeExpanded by remember { mutableStateOf(false) }
+                var showNoteRequiredDialog by remember { mutableStateOf(false) }
+                var reviewNoteText by remember { mutableStateOf(trip!!.note ?: "") }
+
+                if (showNoteRequiredDialog) {
+                    val expected = trip!!.expectedDistanceMeters ?: 0
+                    AlertDialog(
+                        onDismissRequest = { showNoteRequiredDialog = false },
+                        title = { Text("Afwijkende Route") },
+                        text = {
+                            Column {
+                                Text("De gereden afstand (${String.format(locale, "%.1f km", trip!!.distanceMeters / 1000.0)}) wijkt veel af van de verwachte afstand (${String.format(locale, "%.1f km", expected / 1000.0)}).")
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text("Geef a.u.b. een toelichting (bijv. file, omleiding) in de notitie:")
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = reviewNoteText,
+                                    onValueChange = { reviewNoteText = it },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    label = { Text(stringResource(R.string.note_label)) }
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    viewModel.saveReviewWithNote(selectedType, reviewNoteText)
+                                    showNoteRequiredDialog = false
+                                },
+                                enabled = reviewNoteText.isNotBlank()
+                            ) {
+                                Text(stringResource(R.string.save))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showNoteRequiredDialog = false }) { Text(stringResource(R.string.cancel)) }
+                        }
+                    )
+                }
 
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -298,7 +336,16 @@ fun TripDetailScreen(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
-                            onClick = { viewModel.saveReview(selectedType) },
+                            onClick = {
+                                val expected = trip!!.expectedDistanceMeters
+                                val distance = trip!!.distanceMeters
+                                val diff = java.lang.Math.abs(distance - (expected ?: distance))
+                                if (expected != null && diff > 2000 && diff > (expected * 0.1) && trip!!.note.isNullOrBlank()) {
+                                    showNoteRequiredDialog = true
+                                } else {
+                                    viewModel.saveReview(selectedType)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(stringResource(R.string.save))

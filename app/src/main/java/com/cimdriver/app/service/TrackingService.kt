@@ -317,12 +317,21 @@ class TrackingService : Service(), LocationListener {
             rules = classificationRules
         )
 
+        var expectedDistance: Int? = null
+        if (startLat != null && startLon != null && endLat != null && endLon != null) {
+            val distPair = geocoderService.getOsrmDistance(startLat, startLon, endLat, endLon)
+            if (distPair != null) {
+                expectedDistance = distPair.first.toInt()
+            }
+        }
+
         tripDao.updateTrip(currentTrip.copy(
             endTime = System.currentTimeMillis() - gracePeriodMs,
             startAddress = finalStartAddress,
             endAddress = finalEndAddress,
             distanceMeters = distanceM,
             odometerEnd = odoEnd,
+            expectedDistanceMeters = expectedDistance,
             tripType = finalTripType,
             projectCode = projectCode,
             status = "TO_REVIEW"

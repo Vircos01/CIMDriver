@@ -1,6 +1,6 @@
 {
-  "versionCode": 10,
-  "versionName": "1.0.9",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.0.9.apk",
-  "releaseNotes": "Versie bump naar 1.0.9: Opgeslagen adres-namen zichtbaar in rittenoverzicht en ritdetails."
+  "versionCode": 11,
+  "versionName": "1.1.0",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.1.0.apk",
+  "releaseNotes": "Versie bump naar 1.1.0: Bij een grote afwijking tussen de gereden en verwachte route-afstand wordt nu tijdens de beoordeling automatisch om een toelichting (notitie) gevraagd."
 }

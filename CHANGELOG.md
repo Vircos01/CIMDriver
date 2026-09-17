@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.1.0] - 2026-09-17
+
+### Toegevoegd
+- **Notitie bij afwijkende kilometers:** Als de gereden afstand meer dan 10% (én minimaal 2 km) afwijkt van de verwachte kortste route, wordt er tijdens de beoordeling nu verplicht om een reden (bijv. file, wegafsluiting) in te vullen in het notitieveld.
+
 ## [1.0.9] - 2026-09-17
 
 ### Toegevoegd

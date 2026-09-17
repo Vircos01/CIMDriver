@@ -98,6 +98,19 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun saveReviewWithNote(tripType: String, note: String) {
+        val currentTrip = _trip.value ?: return
+        viewModelScope.launch {
+            val updatedTrip = currentTrip.copy(
+                tripType = tripType,
+                note = note,
+                status = "DONE"
+            )
+            tripDao.updateTrip(updatedTrip)
+            _trip.value = updatedTrip
+        }
+    }
+
     fun recalculateOdometers() {
         val currentTrip = _trip.value ?: return
         val vehicleId = currentTrip.vehicleId ?: return

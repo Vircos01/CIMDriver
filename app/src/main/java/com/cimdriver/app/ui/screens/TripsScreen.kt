@@ -94,6 +94,8 @@ fun TripsScreen(
     val classificationRules by settingsViewModel.classificationRules.collectAsState()
     var tripToDelete by remember { mutableStateOf<Trip?>(null) }
     var tripToClassify by remember { mutableStateOf<Trip?>(null) }
+    var tripToReviewWithNote by remember { mutableStateOf<Pair<Trip, String>?>(null) }
+    var reviewNoteText by remember { mutableStateOf("") }
     
     val currentFilter = uiState.tripFilter
     val selectedYear = uiState.selectedYear
@@ -466,7 +468,17 @@ fun TripsScreen(
                                     savedAddresses = savedAddresses,
                                     classificationSettings = classificationSettings,
                                     classificationRules = classificationRules,
-                                    onQuickReview = { reviewedTrip, tripType -> viewModel.reviewTrip(reviewedTrip, tripType) },
+                                    onQuickReview = { reviewedTrip, tripType -> 
+                                        val expected = reviewedTrip.expectedDistanceMeters
+                                        val distance = reviewedTrip.distanceMeters
+                                        val diff = java.lang.Math.abs(distance - (expected ?: distance))
+                                        if (expected != null && diff > 2000 && diff > (expected * 0.1) && reviewedTrip.note.isNullOrBlank()) {
+                                            tripToReviewWithNote = Pair(reviewedTrip, tripType)
+                                            reviewNoteText = ""
+                                        } else {
+                                            viewModel.reviewTrip(reviewedTrip, tripType)
+                                        }
+                                    },
                                     isSelected = isSelected,
                                     onClick = { 
                                         if (selectedTrips.isNotEmpty()) {
@@ -544,6 +556,47 @@ fun TripsScreen(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = { tripToClassify = null }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    if (tripToReviewWithNote != null) {
+        val trip = tripToReviewWithNote!!.first
+        val tripType = tripToReviewWithNote!!.second
+        val expected = trip.expectedDistanceMeters ?: 0
+        val diff = java.lang.Math.abs(trip.distanceMeters - expected)
+        val locale = Locale.getDefault()
+        
+        AlertDialog(
+            onDismissRequest = { tripToReviewWithNote = null },
+            title = { Text("Afwijkende Route") },
+            text = {
+                Column {
+                    Text("De gereden afstand (${String.format(locale, "%.1f km", trip.distanceMeters / 1000.0)}) wijkt veel af van de verwachte afstand (${String.format(locale, "%.1f km", expected / 1000.0)}).")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Geef a.u.b. een toelichting (bijv. file, omleiding) in de notitie:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = reviewNoteText,
+                        onValueChange = { reviewNoteText = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.note_label)) }
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.reviewTrip(trip.copy(note = reviewNoteText), tripType)
+                        tripToReviewWithNote = null
+                    },
+                    enabled = reviewNoteText.isNotBlank()
+                ) {
+                    Text(stringResource(R.string.save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { tripToReviewWithNote = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
