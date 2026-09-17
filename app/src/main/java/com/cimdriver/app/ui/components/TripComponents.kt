@@ -114,8 +114,14 @@ fun TripItem(
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(R.string.trip_from, trip.startAddress ?: stringResource(R.string.unknown)), style = MaterialTheme.typography.bodyMedium)
-                Text(text = stringResource(R.string.trip_to, trip.endAddress ?: "..."), style = MaterialTheme.typography.bodyMedium)
+                val displayStartAddress = trip.startAddress?.let { addr ->
+                    AddressMatching.findSavedAddress(addr, savedAddresses)?.label ?: addr
+                } ?: stringResource(R.string.unknown)
+                val displayEndAddress = trip.endAddress?.let { addr ->
+                    AddressMatching.findSavedAddress(addr, savedAddresses)?.label ?: addr
+                } ?: "..."
+                Text(text = stringResource(R.string.trip_from, displayStartAddress), style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(R.string.trip_to, displayEndAddress), style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

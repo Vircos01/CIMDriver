@@ -1,6 +1,6 @@
 {
-  "versionCode": 9,
-  "versionName": "1.0.8",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.0.8.apk",
-  "releaseNotes": "Versie bump naar 1.0.8 met stricte adres-matching en fixes."
+  "versionCode": 10,
+  "versionName": "1.0.9",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.0.9.apk",
+  "releaseNotes": "Versie bump naar 1.0.9: Opgeslagen adres-namen zichtbaar in rittenoverzicht en ritdetails."
 }

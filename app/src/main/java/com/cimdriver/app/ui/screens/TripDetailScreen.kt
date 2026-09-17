@@ -64,6 +64,7 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
+import com.cimdriver.app.util.AddressMatching
 
 val osmStyleJson = """
 {
@@ -105,6 +106,7 @@ fun TripDetailScreen(
 
     val trip by viewModel.trip.collectAsState()
     val points by viewModel.points.collectAsState()
+    val savedAddresses by viewModel.savedAddresses.collectAsState()
 
     Scaffold(
         topBar = {
@@ -216,8 +218,16 @@ fun TripDetailScreen(
 
                     Text(stringResource(R.string.date_range, startStr, endStr), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(stringResource(R.string.from_address, trip!!.startAddress ?: stringResource(R.string.unknown)))
-                    Text(stringResource(R.string.to_address, trip!!.endAddress ?: stringResource(R.string.unknown)))
+                    
+                    val displayStartAddress = trip!!.startAddress?.let { addr ->
+                        AddressMatching.findSavedAddress(addr, savedAddresses)?.label ?: addr
+                    } ?: stringResource(R.string.unknown)
+                    val displayEndAddress = trip!!.endAddress?.let { addr ->
+                        AddressMatching.findSavedAddress(addr, savedAddresses)?.label ?: addr
+                    } ?: stringResource(R.string.unknown)
+
+                    Text(stringResource(R.string.from_address, displayStartAddress))
+                    Text(stringResource(R.string.to_address, displayEndAddress))
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {

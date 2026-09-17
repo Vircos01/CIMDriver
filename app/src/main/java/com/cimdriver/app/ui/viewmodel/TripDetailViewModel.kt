@@ -11,13 +11,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import com.cimdriver.app.service.GeocoderService
+import com.cimdriver.app.data.local.entity.SavedAddress
 
 class TripDetailViewModel(application: Application) : AndroidViewModel(application) {
     private val database = AppDatabase.getDatabase(application)
     private val tripDao = database.tripDao()
     private val pointDao = database.locationPointDao()
+    private val savedAddressDao = database.savedAddressDao()
     private val geocoderService = GeocoderService(application)
+
+    val savedAddresses: StateFlow<List<SavedAddress>> = savedAddressDao.getAllAddresses()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _trip = MutableStateFlow<Trip?>(null)
     val trip: StateFlow<Trip?> = _trip.asStateFlow()

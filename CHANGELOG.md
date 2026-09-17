@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.0.9] - 2026-09-17
+
+### Toegevoegd
+- **Adresnamen in Overzichten:** Als een start- of eindlocatie voorkomt in je adresboek, wordt nu netjes de opgeslagen naam (zoals "Kantoor" of "Thuis") getoond in het rittenoverzicht en de ritdetails, in plaats van alleen het straatadres.
+
 ## [1.0.8] - 2026-09-17
 
 ### Gewijzigd
