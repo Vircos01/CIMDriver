@@ -44,7 +44,7 @@ object AddressMatching {
         lng: Double,
         input: String,
         addresses: List<SavedAddress>,
-        maxDistanceMeters: Float = 400f
+        maxDistanceMeters: Float = 200f
     ): String {
         val exactMatch = findSavedAddress(input, addresses)
         if (exactMatch != null) return exactMatch.address

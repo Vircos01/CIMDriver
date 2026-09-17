@@ -284,7 +284,7 @@ class TrackingService : Service(), LocationListener {
         fun matchesSavedAddress(pointLat: Double?, pointLon: Double?, resolvedAddress: String?, loc: com.cimdriver.app.data.local.entity.SavedAddress): Boolean {
             // Prefer stored coordinates
             if (pointLat != null && pointLon != null && loc.latitude != null && loc.longitude != null) {
-                if (distanceBetween(pointLat, pointLon, loc.latitude, loc.longitude) <= 400f) {
+                if (distanceBetween(pointLat, pointLon, loc.latitude, loc.longitude) <= 200f) {
                     return true
                 }
             }
