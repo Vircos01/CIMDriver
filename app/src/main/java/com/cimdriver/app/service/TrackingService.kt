@@ -232,33 +232,31 @@ class TrackingService : Service(), LocationListener {
         var resolvedEndAddress = "Onbekend"
         
         val savedAddressDao = database.savedAddressDao()
-        val allSavedAddresses = savedAddressDao.getAllSavedAddressesSync()
+        val allAddresses = savedAddressDao.getAllAddressesSync()
         
+        // Use trip GPS points for coordinate-based matching when available
+        val startLat = if (points.isNotEmpty()) points.first().latitude else null
+        val startLon = if (points.isNotEmpty()) points.first().longitude else null
+        val endLat = if (points.isNotEmpty()) points.last().latitude else null
+        val endLon = if (points.isNotEmpty()) points.last().longitude else null
+
+        var startMatch: com.cimdriver.app.util.AddressMatching.AddressMatch? = null
+        var endMatch: com.cimdriver.app.util.AddressMatching.AddressMatch? = null
+
         if (points.isNotEmpty()) {
-            val firstPoint = points.first()
-            val lastPoint = points.last()
-            
             if (resolvedStartAddress == getString(R.string.tracking_retrieving_location)) {
-                val rawStart = kotlinx.coroutines.withTimeoutOrNull(5000L) {
-                    geocoderService.getAddressFromLocation(firstPoint.latitude, firstPoint.longitude)
+                resolvedStartAddress = kotlinx.coroutines.withTimeoutOrNull(5000L) {
+                    geocoderService.getAddressFromLocation(startLat!!, startLon!!)
                 } ?: "Onbekend"
-                
-                resolvedStartAddress = AddressMatching.findSavedAddressByProximity(
-                    firstPoint.latitude, firstPoint.longitude, rawStart, allSavedAddresses
-                )
             }
             
-            val rawEnd = kotlinx.coroutines.withTimeoutOrNull(5000L) {
-                geocoderService.getAddressFromLocation(lastPoint.latitude, lastPoint.longitude)
+            resolvedEndAddress = kotlinx.coroutines.withTimeoutOrNull(5000L) {
+                geocoderService.getAddressFromLocation(endLat!!, endLon!!)
             } ?: "Onbekend"
             
-            resolvedEndAddress = AddressMatching.findSavedAddressByProximity(
-                lastPoint.latitude, lastPoint.longitude, rawEnd, allSavedAddresses
-            )
+            startMatch = AddressMatching.findBestMatch(startLat, startLon, resolvedStartAddress, allAddresses)
+            endMatch = AddressMatching.findBestMatch(endLat, endLon, resolvedEndAddress, allAddresses)
         }
-
-        val workLocations = savedAddressDao.getWorkLocationsSync()
-        val homeLocation = savedAddressDao.getHomeLocationSync()
         
         var isCommute = false
         var arrivedAtWork = false
@@ -267,111 +265,46 @@ class TrackingService : Service(), LocationListener {
         var leftHome = false
         var matchedWorkLabel = ""
         
-        // Use trip GPS points for coordinate-based matching when available
-        val startLat = if (points.isNotEmpty()) points.first().latitude else null
-        val startLon = if (points.isNotEmpty()) points.first().longitude else null
-        val endLat = if (points.isNotEmpty()) points.last().latitude else null
-        val endLon = if (points.isNotEmpty()) points.last().longitude else null
+        val finalStartAddress = startMatch?.address?.label ?: resolvedStartAddress
+        val finalEndAddress = endMatch?.address?.label ?: resolvedEndAddress
         
-        // Helper: compute distance between two coordinate pairs (in meters)
-        fun distanceBetween(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
-            val results = FloatArray(1)
-            android.location.Location.distanceBetween(lat1, lon1, lat2, lon2, results)
-            return results[0]
-        }
+        val startLoc = startMatch?.address
+        val endLoc = endMatch?.address
         
-        // Helper: check if a saved address matches a given GPS point (within 200m) or text
-        fun matchesSavedAddress(pointLat: Double?, pointLon: Double?, resolvedAddress: String?, loc: com.cimdriver.app.data.local.entity.SavedAddress): Boolean {
-            // Prefer stored coordinates
-            if (pointLat != null && pointLon != null && loc.latitude != null && loc.longitude != null) {
-                if (distanceBetween(pointLat, pointLon, loc.latitude, loc.longitude) <= 200f) {
-                    return true
-                }
-            }
-            // Fall back to label/address text matching
-            if (!resolvedAddress.isNullOrBlank()) {
-                val searchStr = resolvedAddress.lowercase()
-                if (searchStr.contains(loc.label.lowercase()) || 
-                    searchStr.contains(loc.address.lowercase()) ||
-                    loc.label.lowercase().contains(searchStr) ||
-                    loc.address.lowercase().contains(searchStr) ||
-                    com.cimdriver.app.util.AddressMatching.matchesBase(resolvedAddress, loc.address) ||
-                    com.cimdriver.app.util.AddressMatching.matchesBase(resolvedAddress, loc.label)) {
-                    return true
-                }
-            }
-            return false
-        }
-        
-        if (homeLocation != null) {
-            if (matchesSavedAddress(endLat, endLon, resolvedEndAddress, homeLocation)) {
-                arrivedAtHome = true
-            }
-            if (matchesSavedAddress(startLat, startLon, resolvedStartAddress, homeLocation)) {
-                leftHome = true
-            }
-        }
-
-        for (workLoc in workLocations) {
-            if (matchesSavedAddress(endLat, endLon, resolvedEndAddress, workLoc)) {
-                arrivedAtWork = true
-                matchedWorkLabel = workLoc.label
-                
-                if (homeLocation != null && matchesSavedAddress(startLat, startLon, resolvedStartAddress, homeLocation)) {
-                    isCommute = true
-                }
-            }
-            
-            if (matchesSavedAddress(startLat, startLon, resolvedStartAddress, workLoc)) {
+        if (startLoc != null) {
+            if (startLoc.isHomeLocation) leftHome = true
+            if (startLoc.isWorkLocation) {
                 leftWork = true
-                matchedWorkLabel = workLoc.label
-                
-                if (arrivedAtHome) {
-                    isCommute = true
-                }
+                matchedWorkLabel = startLoc.label
             }
         }
         
-        var projectCode: String? = null
-        var isCustomerTrip = false
-        var defaultTripType: String? = null
-        var startAddressType: String? = null
-        var endAddressType: String? = null
-        val allAddresses = savedAddressDao.getAllAddressesSync()
-        
-        var finalStartAddress = resolvedStartAddress
-        var finalEndAddress = resolvedEndAddress
-        
-        for (loc in allAddresses) {
-            val matchesEnd = matchesSavedAddress(endLat, endLon, resolvedEndAddress, loc)
-            val matchesStart = matchesSavedAddress(startLat, startLon, resolvedStartAddress, loc)
-            
-            if (matchesStart) finalStartAddress = loc.label
-            if (matchesEnd) finalEndAddress = loc.label
-            val resolvedAddressType = loc.addressType ?: when {
-                loc.isHomeLocation -> "THUIS"
-                loc.isWorkLocation -> "WERK"
-                loc.isCustomerLocation -> "KLANT"
-                else -> null
+        if (endLoc != null) {
+            if (endLoc.isHomeLocation) arrivedAtHome = true
+            if (endLoc.isWorkLocation) {
+                arrivedAtWork = true
+                matchedWorkLabel = endLoc.label
             }
-            if (matchesStart) startAddressType = resolvedAddressType
-            if (matchesEnd) endAddressType = resolvedAddressType
-            
-            if (matchesEnd || matchesStart) {
-                if (loc.isCustomerLocation) {
-                    isCustomerTrip = true
-                }
-
-                if (matchesEnd && !loc.defaultTripType.isNullOrBlank()) {
-                    defaultTripType = loc.defaultTripType
-                } else if (matchesStart && defaultTripType == null && !loc.defaultTripType.isNullOrBlank()) {
-                    defaultTripType = loc.defaultTripType
-                }
-
-                if (!loc.projectCode.isNullOrBlank() && projectCode == null) {
-                    projectCode = loc.projectCode
-                }
-            }
+        }
+        
+        if (leftHome && arrivedAtWork) isCommute = true
+        if (leftWork && arrivedAtHome) isCommute = true
+        
+        val projectCode: String? = endLoc?.projectCode?.takeIf { it.isNotBlank() } ?: startLoc?.projectCode?.takeIf { it.isNotBlank() }
+        val isCustomerTrip = endLoc?.isCustomerLocation == true || startLoc?.isCustomerLocation == true
+        val defaultTripType: String? = endLoc?.defaultTripType?.takeIf { it.isNotBlank() } ?: startLoc?.defaultTripType?.takeIf { it.isNotBlank() }
+        
+        val startAddressType = startLoc?.addressType ?: when {
+            startLoc?.isHomeLocation == true -> "THUIS"
+            startLoc?.isWorkLocation == true -> "WERK"
+            startLoc?.isCustomerLocation == true -> "KLANT"
+            else -> null
+        }
+        val endAddressType = endLoc?.addressType ?: when {
+            endLoc?.isHomeLocation == true -> "THUIS"
+            endLoc?.isWorkLocation == true -> "WERK"
+            endLoc?.isCustomerLocation == true -> "KLANT"
+            else -> null
         }
         
         val baseTripType = defaultTripType ?: if (isCustomerTrip) "Customer Visit" else if (isCommute) "Home To Work" else currentTrip.tripType

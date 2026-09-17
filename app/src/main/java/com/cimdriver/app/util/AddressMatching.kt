@@ -39,31 +39,47 @@ object AddressMatching {
         }
     }
 
-    fun findSavedAddressByProximity(
-        lat: Double,
-        lng: Double,
-        input: String,
+    enum class MatchReason {
+        EXACT_TEXT,
+        COORDINATE
+    }
+
+    data class AddressMatch(
+        val address: SavedAddress,
+        val distanceMeters: Float,
+        val reason: MatchReason
+    )
+
+    fun findBestMatch(
+        lat: Double?,
+        lon: Double?,
+        input: String?,
         addresses: List<SavedAddress>,
         maxDistanceMeters: Float = 200f
-    ): String {
+    ): AddressMatch? {
         val exactMatch = findSavedAddress(input, addresses)
-        if (exactMatch != null) return exactMatch.address
+        if (exactMatch != null) {
+            return AddressMatch(exactMatch, 0f, MatchReason.EXACT_TEXT)
+        }
 
-        var closestAddress: SavedAddress? = null
+        if (lat == null || lon == null) return null
+
+        var bestMatch: SavedAddress? = null
         var minDistance = Float.MAX_VALUE
-
         val results = FloatArray(1)
+
         for (address in addresses) {
-            if (address.latitude != null && address.longitude != null) {
-                Location.distanceBetween(lat, lng, address.latitude, address.longitude, results)
-                val distance = results[0]
-                if (distance < maxDistanceMeters && distance < minDistance) {
-                    minDistance = distance
-                    closestAddress = address
-                }
+            val addrLat = address.latitude ?: continue
+            val addrLon = address.longitude ?: continue
+
+            Location.distanceBetween(lat, lon, addrLat, addrLon, results)
+            val distance = results[0]
+            if (distance <= maxDistanceMeters && distance < minDistance) {
+                minDistance = distance
+                bestMatch = address
             }
         }
 
-        return closestAddress?.address ?: input
+        return bestMatch?.let { AddressMatch(it, minDistance, MatchReason.COORDINATE) }
     }
 }
