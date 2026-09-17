@@ -1,10 +1,9 @@
-# CIMDriver v1.0.7
+# CIMDriver v1.0.8
 
 De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), de moderne en slimme ritten- en werkurenregistratie app voor Android. 
 
-## 🆕 Wat is nieuw in v1.0.7
-- **Adresherkenning Robuuster:** De adresmatching negeert nu automatisch huisletters in hetzelfde pand (zoals '3b' of '3e') bij het koppelen van GPS aan je adresboek.
-- **APK Optimalisatie:** De Release APK is weer volledig geoptimaliseerd voor ARM-processoren (~48MB).
+## 🆕 Wat is nieuw in v1.0.8
+- **Stricte Adres Matching:** De logica voor het koppelen van start/eind locaties aan je adresboek is volledig herschreven met een prioriteitenmodel. Het willekeurig overschrijven van adressen bij meerdere matches in de buurt is opgelost: de dichtstbijzijnde kandidaat wint nu áltijd.
 
 ## 🚀 Wat is het?
 - **Volledig Automatische Ritregistratie:** Zodra je Bluetooth (bijv. de carkit) verbindt, begint CIMDriver de rit te loggen. Bij het verbreken van de verbinding wordt de rit netjes gestopt en geclassificeerd (Zakelijk, Privé, of Woon-werk) via slimme locatie-herkenning.
@@ -20,7 +19,7 @@ De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), 
 > **Compatibiliteit:** CIMDriver vereist **Android 10 (API 29) of nieuwer**.
 > *Binnenkort:* Volledige integratie voor **Android Auto** volgt zodra de benodigde Google Play Developer licentie is afgerond!
 
-1. [Download het bestand CIMDriver-v1.0.7.apk](release/CIMDriver-v1.0.7.apk) (direct vanuit de repository).
+1. [Download het bestand CIMDriver-v1.0.8.apk](release/CIMDriver-v1.0.8.apk) (direct vanuit de repository).
 2. Open de APK op je telefoon. 
 3. *Opmerking:* Omdat de app nog niet in de Play Store staat, vraagt je telefoon waarschijnlijk om toestemming om "Onbekende bronnen" toe te staan. Accepteer dit om de installatie te voltooien.
 

@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.0.8] - 2026-09-17
+
+### Gewijzigd
+- **Stricte Adres Matching:** De logica voor het koppelen van start/eind locaties aan je adresboek is volledig herschreven met een prioriteitenmodel. Het willekeurig overschrijven van adressen bij meerdere matches in de buurt is opgelost: de dichtstbijzijnde kandidaat wint nu áltijd.
+
 ## [1.0.7] - 2026-09-16
 
 ### Gewijzigd
