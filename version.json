@@ -1,6 +1,6 @@
 {
-  "versionCode": 11,
-  "versionName": "1.1.0",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.1.0.apk",
-  "releaseNotes": "Versie bump naar 1.1.0: Bij een grote afwijking tussen de gereden en verwachte route-afstand wordt nu tijdens de beoordeling automatisch om een toelichting (notitie) gevraagd."
+  "versionCode": 12,
+  "versionName": "1.1.1",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/release/CIMDriver-v1.1.1.apk",
+  "releaseNotes": "Versie bump naar 1.1.1: Slimme patronen toegevoegd. Ritten buiten werkuren worden standaard privé, en bekende routes worden na 3 keer herkend met een suggestie voor een vaste regel."
 }

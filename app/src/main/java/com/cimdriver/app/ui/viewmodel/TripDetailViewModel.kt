@@ -32,6 +32,28 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
     private val _points = MutableStateFlow<List<LocationPoint>>(emptyList())
     val points: StateFlow<List<LocationPoint>> = _points.asStateFlow()
 
+    private val _suggestRuleState = MutableStateFlow<Triple<String, String, String>?>(null)
+    val suggestRuleState: StateFlow<Triple<String, String, String>?> = _suggestRuleState.asStateFlow()
+
+    fun dismissRuleSuggestion() {
+        _suggestRuleState.value = null
+    }
+
+    fun saveRuleSuggestion(name: String, category: String) {
+        val suggestion = _suggestRuleState.value ?: return
+        viewModelScope.launch {
+            val rule = com.cimdriver.app.data.local.entity.ClassificationRule(
+                name = name,
+                startAddress = suggestion.first,
+                endAddress = suggestion.second,
+                tripType = suggestion.third,
+                category = category
+            )
+            database.classificationRuleDao().insertRule(rule)
+            _suggestRuleState.value = null
+        }
+    }
+
     fun loadTrip(tripId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             val loadedTrip = tripDao.getTripById(tripId)
@@ -95,6 +117,7 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
             )
             tripDao.updateTrip(updatedTrip)
             _trip.value = updatedTrip
+            checkRuleSuggestion(updatedTrip, tripType)
         }
     }
 
@@ -108,6 +131,25 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
             )
             tripDao.updateTrip(updatedTrip)
             _trip.value = updatedTrip
+            checkRuleSuggestion(updatedTrip, tripType)
+        }
+    }
+
+    private suspend fun checkRuleSuggestion(trip: Trip, tripType: String) {
+        val startAddress = trip.startAddress ?: return
+        val endAddress = trip.endAddress ?: return
+        if (startAddress.isBlank() || endAddress.isBlank()) return
+
+        // First check if a rule already exists for this exact route
+        val existingRules = database.classificationRuleDao().getAllRulesSync()
+        val ruleExists = existingRules.any {
+            it.startAddress == startAddress && it.endAddress == endAddress && it.tripType == tripType
+        }
+        if (ruleExists) return
+
+        val count = tripDao.getTripCountForRoute(startAddress, endAddress, tripType)
+        if (count >= 3) {
+            _suggestRuleState.value = Triple(startAddress, endAddress, tripType)
         }
     }
 

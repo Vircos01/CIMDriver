@@ -309,11 +309,32 @@ class TrackingService : Service(), LocationListener {
         
         val baseTripType = defaultTripType ?: if (isCustomerTrip) "Customer Visit" else if (isCommute) "Home To Work" else currentTrip.tripType
         val classificationRules = database.classificationRuleDao().getAllRules().firstOrNull() ?: emptyList()
-        val finalTripType = TripClassification.resolveTripType(baseTripType, startAddressType, endAddressType, classificationRules) ?: baseTripType
+        val settings = database.settingsDao().getSettingsSync()
+
+        var finalTripType = TripClassification.resolveTripType(baseTripType, startAddressType, endAddressType, finalStartAddress, finalEndAddress, classificationRules) ?: baseTripType
+        
+        // Time-based classification check
+        if (settings != null) {
+            val isOutsideHours = TripClassification.isOutsideWorkHours(
+                timestamp = currentTrip.startTime,
+                workDaysStr = settings.workDays,
+                workStartTime = settings.workStartTime,
+                workEndTime = settings.workEndTime
+            )
+            val hasWorkLocation = startAddressType == "WERK" || endAddressType == "WERK"
+            val ruleMatched = TripClassification.resolveTripType(baseTripType, startAddressType, endAddressType, finalStartAddress, finalEndAddress, classificationRules) != baseTripType
+            
+            if (isOutsideHours && !hasWorkLocation && !ruleMatched) {
+                finalTripType = TripClassification.DYNAMICS_PERSONAL
+            }
+        }
+
         val finalCategory = TripClassification.classify(
             finalTripType,
             startAddressType,
             endAddressType,
+            startAddress = finalStartAddress,
+            endAddress = finalEndAddress,
             rules = classificationRules
         )
 

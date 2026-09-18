@@ -111,6 +111,51 @@ fun TripsScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     var isSearchVisible by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    
+    val suggestRuleState by viewModel.suggestRuleState.collectAsState()
+
+    if (suggestRuleState != null) {
+        val (startAddr, endAddr, tripType) = suggestRuleState!!
+        var ruleName by remember { mutableStateOf("") }
+        
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissRuleSuggestion() },
+            title = { Text(stringResource(R.string.suggest_rule_title)) },
+            text = { 
+                Column {
+                    Text(stringResource(R.string.suggest_rule_message, tripType))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = ruleName,
+                        onValueChange = { ruleName = it },
+                        label = { Text(stringResource(R.string.suggest_rule_name_hint)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val category = when(tripType) {
+                            "BUSINESS", "Business Meeting", "Customer Visit", "Customer Billable", "Commissioned By CIMSOLUTIONS", "Exam Course", "Car Maintenance" -> "BUSINESS"
+                            "Home To Work", "COMMUTE" -> "COMMUTE"
+                            else -> "PRIVATE"
+                        }
+                        val finalName = if (ruleName.isNotBlank()) ruleName else "$tripType route"
+                        viewModel.saveRuleSuggestion(finalName, category)
+                    }
+                ) {
+                    Text(stringResource(R.string.suggest_rule_accept))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.dismissRuleSuggestion() }) {
+                    Text(stringResource(R.string.suggest_rule_decline))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {

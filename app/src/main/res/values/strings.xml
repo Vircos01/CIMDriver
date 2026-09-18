@@ -413,4 +413,11 @@
     <string name="verify_odometer_title">Verify odometer</string>
     <string name="verify_odometer_desc">Verify the odometer of %1$s %2$s (%3$s).</string>
     <string name="new_odometer">New odometer:</string>
+    <!-- Smart Features -->
+    <string name="suggest_rule_title">Route Recognized</string>
+    <string name="suggest_rule_message">You have driven this route 3 times as %1$s. Would you like to create an automatic rule so we can classify this immediately in the future?</string>
+    <string name="suggest_rule_accept">Yes, create rule</string>
+    <string name="suggest_rule_decline">No, thanks</string>
+    <string name="suggest_rule_name_hint">Name for this rule (e.g. Regular route)</string>
+    
 </resources>

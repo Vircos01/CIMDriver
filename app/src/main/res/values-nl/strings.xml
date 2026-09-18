@@ -415,4 +415,11 @@
     <string name="verify_odometer_title">Km-stand controleren</string>
     <string name="verify_odometer_desc">Controleer de km-stand van %1$s %2$s (%3$s).</string>
     <string name="new_odometer">Nieuwe km-stand:</string>
+    <!-- Smart Features -->
+    <string name="suggest_rule_title">Bekende route herkend</string>
+    <string name="suggest_rule_message">Je hebt deze route nu 3 keer gereden als %1$s. Wil je hiervoor een automatische regel aanmaken zodat we dit in het vervolg direct goed classificeren?</string>
+    <string name="suggest_rule_accept">Ja, maak regel</string>
+    <string name="suggest_rule_decline">Nee, bedankt</string>
+    <string name="suggest_rule_name_hint">Naam voor deze regel (bijv. Vaste route)</string>
+
 </resources>

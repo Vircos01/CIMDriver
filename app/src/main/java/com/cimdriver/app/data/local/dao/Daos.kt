@@ -63,6 +63,9 @@ interface TripDao {
     @Query("SELECT COUNT(*) FROM trips WHERE startAddress = :address OR endAddress = :address")
     suspend fun getTripCountForAddress(address: String): Int
 
+    @Query("SELECT COUNT(*) FROM trips WHERE startAddress = :startAddress AND endAddress = :endAddress AND tripType = :tripType AND status = 'DONE'")
+    suspend fun getTripCountForRoute(startAddress: String, endAddress: String, tripType: String): Int
+
     @Delete
     suspend fun deleteTrip(trip: Trip)
 }

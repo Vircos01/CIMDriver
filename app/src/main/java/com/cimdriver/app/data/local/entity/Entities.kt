@@ -176,6 +176,8 @@ data class ClassificationRule(
     val name: String,
     val startAddressType: String? = null,
     val endAddressType: String? = null,
+    val startAddress: String? = null,
+    val endAddress: String? = null,
     val tripType: String? = null,
     val category: String
 )

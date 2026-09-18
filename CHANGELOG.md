@@ -2,6 +2,13 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.1.1] - 2026-09-18
+
+### Toegevoegd
+- **Tijdgebonden classificatie:** Ritten buiten je ingestelde werkuren (bijv. weekend) worden nu standaard gemarkeerd als privérit (`PERSONAL`).
+- **Routeherkenning:** Wanneer je 3 keer exact dezelfde route rijdt met dezelfde classificatie, zal de app automatisch suggereren hier een vaste regel voor aan te maken.
+- **UI:** Het Instellingen-scherm toont nu ook expliciet de exacte start- en eindadressen bij classificatieregels in plaats van alleen het type, zodat deze beter beheerd en verwijderd kunnen worden.
+
 ## [1.1.0] - 2026-09-17
 
 ### Toegevoegd

@@ -200,8 +200,10 @@ fun ClassificationSettingsCard(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(rule.name, style = MaterialTheme.typography.bodyMedium)
+                            val startStr = rule.startAddressType ?: rule.startAddress ?: "*"
+                            val endStr = rule.endAddressType ?: rule.endAddress ?: "*"
                             Text(
-                                "${rule.startAddressType ?: "*"} <-> ${rule.endAddressType ?: "*"} | ${rule.tripType ?: "*"} | ${rule.category}",
+                                "$startStr <-> $endStr | ${rule.tripType ?: "*"} | ${rule.category}",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -221,6 +223,8 @@ fun ClassificationSettingsCard(
         var name by remember(rule) { mutableStateOf(rule.name) }
         var startType by remember(rule) { mutableStateOf(rule.startAddressType.orEmpty()) }
         var endType by remember(rule) { mutableStateOf(rule.endAddressType.orEmpty()) }
+        var startAddr by remember(rule) { mutableStateOf(rule.startAddress.orEmpty()) }
+        var endAddr by remember(rule) { mutableStateOf(rule.endAddress.orEmpty()) }
         var tripType by remember(rule) { mutableStateOf(rule.tripType.orEmpty()) }
         var category by remember(rule) { mutableStateOf(rule.category) }
 
@@ -232,6 +236,8 @@ fun ClassificationSettingsCard(
                     OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.name_label)) }, singleLine = true)
                     OutlinedTextField(startType, { startType = it }, label = { Text(stringResource(R.string.start_address_type_optional)) }, singleLine = true)
                     OutlinedTextField(endType, { endType = it }, label = { Text(stringResource(R.string.end_address_type_optional)) }, singleLine = true)
+                    OutlinedTextField(startAddr, { startAddr = it }, label = { Text("Exact Start Adres (optioneel)") }, singleLine = true)
+                    OutlinedTextField(endAddr, { endAddr = it }, label = { Text("Exact Eind Adres (optioneel)") }, singleLine = true)
                     OutlinedTextField(tripType, { tripType = it }, label = { Text(stringResource(R.string.dynamics_trip_type_optional)) }, singleLine = true)
                     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                         listOf("BUSINESS" to stringResource(R.string.business), "PRIVATE" to stringResource(R.string.private_usage), "COMMUTE" to "Woon-werk").forEachIndexed { index, option ->
@@ -253,6 +259,8 @@ fun ClassificationSettingsCard(
                                     name = name.trim(),
                                     startAddressType = startType.trim().ifBlank { null },
                                     endAddressType = endType.trim().ifBlank { null },
+                                    startAddress = startAddr.trim().ifBlank { null },
+                                    endAddress = endAddr.trim().ifBlank { null },
                                     tripType = tripType.trim().ifBlank { null },
                                     category = category
                                 )
