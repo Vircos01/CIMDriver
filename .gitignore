@@ -20,3 +20,5 @@ build/
 scratch/cimdriver_database*
 .idea/
 keystore.properties
+
+.agents/
