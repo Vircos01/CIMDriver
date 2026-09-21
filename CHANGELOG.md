@@ -4,6 +4,8 @@ Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bi
 
 ## [1.1.3] - 2026-09-21
 
+> **LET OP:** Door vernieuwde, veiligere ondertekeningscertificaten vereist versie 1.1.3 een schone installatie. Maak **eerst een backup of export** via de oude versie, de-installeer deze volledig, en installeer pas daarna versie 1.1.3 om je data niet te verliezen!
+
 ### Gewijzigd
 - **UI:** Het menu-item "Mijn auto's" is verplaatst uit het Instellingen-scherm naar het hoofdmenu (hamburger menu) voor een netter overzicht.
 
