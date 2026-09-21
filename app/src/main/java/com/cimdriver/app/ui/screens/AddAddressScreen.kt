@@ -17,6 +17,18 @@ import com.cimdriver.app.ui.viewmodel.SettingsViewModel
 import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
 
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import android.graphics.Color
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.annotations.PolygonOptions
+import org.maplibre.android.camera.CameraUpdateFactory
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAddressScreen(
@@ -146,6 +158,30 @@ fun AddAddressScreen(
                         label = stringResource(R.string.full_address),
                         onSearchAddress = { query -> viewModel.searchAddress(query) }
                     )
+                }
+            }
+
+            val lat = existingAddress?.latitude
+            val lon = existingAddress?.longitude
+            if (lat != null && lon != null) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("GPS Locatie (200m radius)", style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SinglePointMapView(lat, lon)
+                    }
+                }
+            } else {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Geen GPS locatie gevonden", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Pas de tekst van het adresveld lichtjes aan (bijv. voeg woonplaats toe) en sla op. De app zoekt dan automatisch de GPS locatie erbij, waarna locatie-gebaseerd matchen werkt.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
 
@@ -298,4 +334,61 @@ fun AddAddressScreen(
             }
         }
     }
+}
+
+fun getCirclePoints(position: LatLng, radius: Double): List<LatLng> {
+    val points = mutableListOf<LatLng>()
+    val earthRadius = 6371000.0
+    val lat = Math.toRadians(position.latitude)
+    val lon = Math.toRadians(position.longitude)
+    val d = radius / earthRadius
+    for (i in 0..360 step 10) {
+        val brng = Math.toRadians(i.toDouble())
+        val latPoint = Math.asin(Math.sin(lat) * Math.cos(d) + Math.cos(lat) * Math.sin(d) * Math.cos(brng))
+        val lonPoint = lon + Math.atan2(Math.sin(brng) * Math.sin(d) * Math.cos(lat), Math.cos(d) - Math.sin(lat) * Math.sin(latPoint))
+        points.add(LatLng(Math.toDegrees(latPoint), Math.toDegrees(lonPoint)))
+    }
+    return points
+}
+
+@Composable
+@Suppress("DEPRECATION")
+fun SinglePointMapView(latitude: Double, longitude: Double) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val mapView = remember { MapView(context) }
+
+    DisposableEffect(lifecycleOwner, mapView) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> mapView.onStart()
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    AndroidView(
+        factory = { mapView },
+        modifier = Modifier.fillMaxWidth().height(200.dp),
+        update = { map ->
+            map.getMapAsync { mapboxMap ->
+                mapboxMap.setStyle(Style.Builder().fromJson(osmStyleJson)) { _ ->
+                    mapboxMap.clear()
+                    val point = LatLng(latitude, longitude)
+                    mapboxMap.addMarker(MarkerOptions().position(point).title("Opgeslagen Locatie"))
+                    
+                    val circlePoints = getCirclePoints(point, 200.0)
+                    mapboxMap.addPolygon(PolygonOptions().addAll(circlePoints).fillColor(Color.parseColor("#400000FF")).strokeColor(Color.BLUE))
+                    
+                    mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(point, 15.0), 1000)
+                }
+            }
+        }
+    )
 }

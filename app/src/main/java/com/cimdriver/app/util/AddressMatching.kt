@@ -66,6 +66,7 @@ object AddressMatching {
 
         var bestMatch: SavedAddress? = null
         var minDistance = Float.MAX_VALUE
+        var bestPriority = -1
         val results = FloatArray(1)
 
         for (address in addresses) {
@@ -74,9 +75,18 @@ object AddressMatching {
 
             Location.distanceBetween(lat, lon, addrLat, addrLon, results)
             val distance = results[0]
-            if (distance <= maxDistanceMeters && distance < minDistance) {
-                minDistance = distance
-                bestMatch = address
+            if (distance <= maxDistanceMeters) {
+                val priority = when {
+                    address.isHomeLocation -> 2
+                    address.isWorkLocation -> 1
+                    else -> 0
+                }
+                
+                if (priority > bestPriority || (priority == bestPriority && distance < minDistance)) {
+                    bestPriority = priority
+                    minDistance = distance
+                    bestMatch = address
+                }
             }
         }
 

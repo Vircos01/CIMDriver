@@ -2,6 +2,14 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.1.2] - 2026-09-21
+
+### Gewijzigd
+- **Robuuste adres-matching:** Het matchingsysteem rondom kantoor- en thuislocaties is sterk verbeterd via GPS met slimme prioriteiten, waardoor ritten veel preciezer aan je werk/woonadres gekoppeld worden (in plaats van aan andere gebouwen binnen dezelfde straal).
+
+### Toegevoegd
+- **GPS Kaartweergave in Adresboek:** Bij het beheren van adressen zie je nu exact op de kaart welke pin (met een 200m actieradius) de app hanteert.
+
 ## [1.1.1] - 2026-09-18
 
 ### Toegevoegd

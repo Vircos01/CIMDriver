@@ -1,10 +1,10 @@
-# CIMDriver v1.1.1
+# CIMDriver v1.1.2
 
 De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), de moderne en slimme ritten- en werkurenregistratie app voor Android. 
 
-## 🆕 Wat is nieuw in v1.1.1
-- **Tijdgebonden classificatie:** Ritten buiten je ingestelde werkuren (bijv. weekend) worden nu standaard gemarkeerd als privérit (`PERSONAL`).
-- **Routeherkenning:** Wanneer je 3 keer exact dezelfde route rijdt met dezelfde classificatie, zal de app automatisch suggereren hier een vaste regel voor aan te maken.
+## 🆕 Wat is nieuw in v1.1.2
+- **Robuuste adres-matching:** Het matchingsysteem rondom kantoor- en thuislocaties is sterk verbeterd via GPS met slimme prioriteiten, waardoor ritten veel preciezer aan je werk/woonadres gekoppeld worden (in plaats van aan andere gebouwen binnen dezelfde straal).
+- **GPS Kaartweergave in Adresboek:** Bij het beheren van adressen zie je nu exact op de kaart welke pin (met een 200m actieradius) de app hanteert!
 
 ## 🚀 Wat is het?
 - **Volledig Automatische Ritregistratie:** Zodra je Bluetooth (bijv. de carkit) verbindt, begint CIMDriver de rit te loggen. Bij het verbreken van de verbinding wordt de rit netjes gestopt en geclassificeerd (Zakelijk, Privé, of Woon-werk) via slimme locatie-herkenning.
@@ -20,7 +20,7 @@ De eerste officiële release van **CIMDriver** (*Car In-route Metrics Driver*), 
 > **Compatibiliteit:** CIMDriver vereist **Android 10 (API 29) of nieuwer**.
 > *Binnenkort:* Volledige integratie voor **Android Auto** volgt zodra de benodigde Google Play Developer licentie is afgerond!
 
-1. [Download het bestand CIMDriver-v1.1.1.apk](release/CIMDriver-v1.1.1.apk) (direct vanuit de repository).
+1. [Download het bestand CIMDriver-v1.1.2.apk](release/CIMDriver-v1.1.2.apk) (direct vanuit de repository).
 2. Open de APK op je telefoon. 
 3. *Opmerking:* Omdat de app nog niet in de Play Store staat, vraagt je telefoon waarschijnlijk om toestemming om "Onbekende bronnen" toe te staan. Accepteer dit om de installatie te voltooien.
 
