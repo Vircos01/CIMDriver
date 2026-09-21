@@ -32,15 +32,17 @@ class RecentTripsCarScreen(carContext: CarContext) : Screen(carContext) {
                 db.vehicleDao().getAllVehicles(),
                 db.tripDao().getAllTrips(),
                 db.classificationRuleDao().getAllRules(),
-                db.savedAddressDao().getAllAddresses()
-            ) { vehicles, trips, rules, addresses ->
+                db.savedAddressDao().getAllAddresses(),
+                db.settingsDao().getSettings()
+            ) { vehicles, trips, rules, addresses, settings ->
                 val activeVehicleId = CarUtil.getContextVehicleId(carContext, db, vehicles)
+                val currentSettings = settings ?: com.cimdriver.app.data.local.entity.Settings()
                 if (activeVehicleId != null) {
                     val filtered = trips.filter { it.vehicleId == activeVehicleId }
                     val active = trips.find { it.status == "ACTIVE" }
-                    listOf(trips, filtered, active ?: filtered.find { it.status == "ACTIVE" }, rules, addresses)
+                    listOf(trips, filtered, active ?: filtered.find { it.status == "ACTIVE" }, rules, addresses, currentSettings)
                 } else {
-                    listOf(trips, emptyList<Trip>(), trips.find { it.status == "ACTIVE" }, rules, addresses)
+                    listOf(trips, emptyList<Trip>(), trips.find { it.status == "ACTIVE" }, rules, addresses, currentSettings)
                 }
             }.collect { values ->
                 @Suppress("UNCHECKED_CAST")
@@ -52,10 +54,13 @@ class RecentTripsCarScreen(carContext: CarContext) : Screen(carContext) {
                 classificationRules = values[3] as List<com.cimdriver.app.data.local.entity.ClassificationRule>
                 @Suppress("UNCHECKED_CAST")
                 savedAddresses = values[4] as List<com.cimdriver.app.data.local.entity.SavedAddress>
+                appSettings = values[5] as com.cimdriver.app.data.local.entity.Settings
                 invalidate() // Refresh the screen when data changes
             }
         }
     }
+
+    private var appSettings: com.cimdriver.app.data.local.entity.Settings = com.cimdriver.app.data.local.entity.Settings()
 
     override fun onGetTemplate(): Template {
         val currentActiveTrip = activeTrip
@@ -116,10 +121,17 @@ class RecentTripsCarScreen(carContext: CarContext) : Screen(carContext) {
                     var iconRes = com.cimdriver.app.R.drawable.ic_car_person
                     var carColor = CarColor.BLUE
                     val category = TripClassification.classify(
-                        trip.tripType,
-                        addressType(trip.startAddress),
-                        addressType(trip.endAddress),
-                        rules = classificationRules
+                        tripType = trip.tripType,
+                        startAddressType = addressType(trip.startAddress),
+                        endAddressType = addressType(trip.endAddress),
+                        defaultCategory = if (appSettings.classificationDefault == "BUSINESS") TripCategory.BUSINESS else TripCategory.PRIVATE,
+                        homeWorkAsCommute = appSettings.classifyHomeWorkAsCommute,
+                        customerAsBusiness = appSettings.classifyCustomerAsBusiness,
+                        rules = classificationRules,
+                        timestamp = trip.startTime,
+                        workDaysStr = appSettings.workDays,
+                        workStartTime = appSettings.workStartTime,
+                        workEndTime = appSettings.workEndTime
                     )
                     
                     if (category == TripCategory.BUSINESS) {

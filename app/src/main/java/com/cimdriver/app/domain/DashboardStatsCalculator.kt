@@ -19,7 +19,8 @@ object DashboardStatsCalculator {
     fun classifyTrip(
         trip: Trip,
         addresses: List<SavedAddress>,
-        rules: List<ClassificationRule>
+        rules: List<ClassificationRule>,
+        settings: com.cimdriver.app.data.local.entity.Settings? = null
     ): TripCategory? {
         fun addressType(address: String?): String? = AddressMatching.findSavedAddress(address, addresses)?.let { savedAddress ->
             savedAddress.addressType ?: when {
@@ -29,7 +30,19 @@ object DashboardStatsCalculator {
                 else -> null
             }
         }
-        return TripClassification.classify(trip.tripType, addressType(trip.startAddress), addressType(trip.endAddress), rules = rules)
+        return TripClassification.classify(
+            tripType = trip.tripType,
+            startAddressType = addressType(trip.startAddress),
+            endAddressType = addressType(trip.endAddress),
+            rules = rules,
+            defaultCategory = if (settings?.classificationDefault == "BUSINESS") TripCategory.BUSINESS else TripCategory.PRIVATE,
+            homeWorkAsCommute = settings?.classifyHomeWorkAsCommute ?: true,
+            customerAsBusiness = settings?.classifyCustomerAsBusiness ?: true,
+            timestamp = trip.startTime,
+            workDaysStr = settings?.workDays,
+            workStartTime = settings?.workStartTime,
+            workEndTime = settings?.workEndTime
+        )
     }
 
     fun calculateDashboardStats(
@@ -38,7 +51,8 @@ object DashboardStatsCalculator {
         selectedVehicleId: Long?,
         vehicleList: List<Vehicle>,
         rules: List<ClassificationRule>,
-        addresses: List<SavedAddress>
+        addresses: List<SavedAddress>,
+        settings: com.cimdriver.app.data.local.entity.Settings? = null
     ): DashboardStats {
         val calNow = Calendar.getInstance()
         val currentWeek = calNow.get(Calendar.WEEK_OF_YEAR)
@@ -92,7 +106,7 @@ object DashboardStatsCalculator {
                 
                 if (isMatch || isPrevMatch || cal.get(Calendar.YEAR) == currentYear) {
                     val durationMs = (trip.endTime ?: trip.startTime) - trip.startTime
-                    val category = classifyTrip(trip, addresses, rules)
+                    val category = classifyTrip(trip, addresses, rules, settings)
                     
                     if (cal.get(Calendar.YEAR) == currentYear && category == TripCategory.PRIVATE) {
                         ytdPriveMeters += trip.distanceMeters
@@ -197,7 +211,8 @@ object DashboardStatsCalculator {
         selectedVehicleId: Long?,
         vehicleList: List<Vehicle>,
         rules: List<ClassificationRule>,
-        addresses: List<SavedAddress>
+        addresses: List<SavedAddress>,
+        settings: com.cimdriver.app.data.local.entity.Settings? = null
     ): List<DistanceChartItem> {
         val calNow = Calendar.getInstance()
         calNow.firstDayOfWeek = Calendar.MONDAY
@@ -226,7 +241,7 @@ object DashboardStatsCalculator {
                             cal.timeInMillis = trip.startTime
                             if (cal.get(Calendar.YEAR) == currentYear && cal.get(Calendar.WEEK_OF_YEAR) == currentWeek && cal.get(Calendar.DAY_OF_WEEK) == i) {
                                 val km = trip.distanceMeters / 1000.0
-                                val category = classifyTrip(trip, addresses, rules)
+                                val category = classifyTrip(trip, addresses, rules, settings)
                                 
                                 if (category == TripCategory.BUSINESS) zKm += km
                                 if (category == TripCategory.COMMUTE) {
@@ -256,7 +271,7 @@ object DashboardStatsCalculator {
                             tCal.timeInMillis = trip.startTime
                             if (tCal.get(Calendar.YEAR) == currentYear && tCal.get(Calendar.MONTH) == currentMonth && tCal.get(Calendar.DAY_OF_MONTH) == i) {
                                 val km = trip.distanceMeters / 1000.0
-                                val category = classifyTrip(trip, addresses, rules)
+                                val category = classifyTrip(trip, addresses, rules, settings)
                                 
                                 if (category == TripCategory.BUSINESS) zKm += km
                                 if (category == TripCategory.COMMUTE) {
@@ -285,7 +300,7 @@ object DashboardStatsCalculator {
                             tCal.timeInMillis = trip.startTime
                             if (tCal.get(Calendar.YEAR) == currentYear && tCal.get(Calendar.WEEK_OF_YEAR) == i) {
                                 val km = trip.distanceMeters / 1000.0
-                                val category = classifyTrip(trip, addresses, rules)
+                                val category = classifyTrip(trip, addresses, rules, settings)
                                 
                                 if (category == TripCategory.BUSINESS) zKm += km
                                 if (category == TripCategory.COMMUTE) {

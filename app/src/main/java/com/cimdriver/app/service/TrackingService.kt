@@ -330,12 +330,16 @@ class TrackingService : Service(), LocationListener {
         }
 
         val finalCategory = TripClassification.classify(
-            finalTripType,
-            startAddressType,
-            endAddressType,
+            tripType = finalTripType,
+            startAddressType = startAddressType,
+            endAddressType = endAddressType,
             startAddress = finalStartAddress,
             endAddress = finalEndAddress,
-            rules = classificationRules
+            rules = classificationRules,
+            timestamp = currentTrip.startTime,
+            workDaysStr = settings?.workDays,
+            workStartTime = settings?.workStartTime,
+            workEndTime = settings?.workEndTime
         )
 
         var expectedDistance: Int? = null
@@ -626,11 +630,22 @@ class TrackingService : Service(), LocationListener {
     }
 
     private fun createNotification(contentText: String): Notification {
+        val stopIntent = Intent(this, TrackingService::class.java).apply {
+            action = "STOP_TRACKING"
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this,
+            0,
+            stopIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.cimdriver_active))
             .setContentText(contentText)
             .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .addAction(0, getString(R.string.stop_trip), stopPendingIntent)
             .build()
     }
 

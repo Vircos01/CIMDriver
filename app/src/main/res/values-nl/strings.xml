@@ -186,6 +186,14 @@
     <string name="help_backup_desc">Een backup bevat de volledige database, inclusief ritten, adressen, werkuren, instellingen en classificatieregels. Na restore wordt een oudere database automatisch gemigreerd naar de huidige versie. Android-permissies worden niet meegenomen en moeten opnieuw worden gegeven. GPS-punten worden volgens de ingestelde bewaartermijn opgeruimd.</string>
     <!-- Settings Screen Strings -->
     <string name="settings_saved">Instellingen opgeslagen</string>
+    <string name="notifications">Notificaties</string>
+    <string name="tracking_and_privacy">Tracking &amp; Privacy</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_desc">Beheer hoe lang je locatiegegevens bewaard blijven.</string>
+    <string name="retention_period">Bewaartermijn</string>
+    <string name="retention_30_days">30 Dagen</string>
+    <string name="retention_90_days">90 Dagen</string>
+    <string name="retention_1_year">1 Jaar</string>
     <string name="appearance">Weergave</string>
     <string name="appearance_desc">Kies het thema van de app.</string>
     <string name="data_management">Databeheer &amp; Back-ups</string>
@@ -248,6 +256,7 @@
     <string name="bluetooth_permission_desc">Nodig om automatisch ritten te starten.</string>
     <string name="battery_optimization">Batterij Optimalisatie</string>
     <string name="battery_optimization_desc">Voorkomt afsluiten door Android.</string>
+
     <string name="work_hours_settings">Werktijden</string>
     <string name="work_hours_desc">Stel per dag je werktijden in om gemengde auto\'s automatisch als zakelijk of privé te classificeren.</string>
     <string name="work_time_tolerance">Tolerantie werktijd (minuten)</string>

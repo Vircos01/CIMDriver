@@ -67,6 +67,7 @@ class CIMDriverWidget : GlanceAppWidget() {
             val vehicles = db.vehicleDao().getAllVehiclesSync()
             val addresses = db.savedAddressDao().getAllSavedAddressesSync()
             val rules = db.classificationRuleDao().getAllRulesSync()
+            val settings = db.settingsDao().getSettingsSync()
             
             val stats = DashboardStatsCalculator.calculateDashboardStats(
                 tripList = monthTrips,
@@ -74,7 +75,8 @@ class CIMDriverWidget : GlanceAppWidget() {
                 selectedVehicleId = null,
                 vehicleList = vehicles,
                 rules = rules,
-                addresses = addresses
+                addresses = addresses,
+                settings = settings
             )
             
             WidgetData(

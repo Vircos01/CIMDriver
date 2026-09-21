@@ -186,6 +186,14 @@
     <string name="help_backup_desc">A backup contains the full database, including trips, addresses, work hours, settings and classification rules. After a restore, an older database is automatically migrated to the current version. Android permissions are not included and must be granted again. GPS points are cleaned up according to the configured retention period.</string>
     <!-- Settings Screen Strings -->
     <string name="settings_saved">Settings saved</string>
+    <string name="notifications">Notifications</string>
+    <string name="tracking_and_privacy">Tracking &amp; Privacy</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_desc">Manage how long your location data is kept.</string>
+    <string name="retention_period">Retention Period</string>
+    <string name="retention_30_days">30 Days</string>
+    <string name="retention_90_days">90 Days</string>
+    <string name="retention_1_year">1 Year</string>
     <string name="appearance">Appearance</string>
     <string name="appearance_desc">Choose the app theme.</string>
     <string name="data_management">Data Management &amp; Backups</string>
@@ -248,6 +256,7 @@
     <string name="bluetooth_permission_desc">Required to start trips automatically.</string>
     <string name="battery_optimization">Battery Optimization</string>
     <string name="battery_optimization_desc">Prevents Android from closing the app.</string>
+
     <string name="work_hours_settings">Work Hours</string>
     <string name="work_hours_desc">Set your work hours per day to automatically classify mixed cars as business or private.</string>
     <string name="work_time_tolerance">Work time tolerance (minutes)</string>

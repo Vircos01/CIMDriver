@@ -18,6 +18,21 @@ object WorkHoursRoute
 object SettingsRoute
 
 @Serializable
+object TripClassificationSettingsRoute
+
+@Serializable
+object TrackingPrivacySettingsRoute
+
+@Serializable
+object NotificationSettingsRoute
+
+@Serializable
+object DataManagementRoute
+
+@Serializable
+object WorkDaysEditorRoute
+
+@Serializable
 object AddressBookRoute
 
 @Serializable

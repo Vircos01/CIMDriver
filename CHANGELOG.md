@@ -2,6 +2,15 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.1.3] - 2026-09-21
+
+### Gewijzigd
+- **UI:** Het menu-item "Mijn auto's" is verplaatst uit het Instellingen-scherm naar het hoofdmenu (hamburger menu) voor een netter overzicht.
+
+### Toegevoegd
+- **Buiten werktijden ritclassificatie:** Ritten die buiten kantooruren vallen worden nu beter ondersteund door rekening te houden met specifieke werkdagen, start- en eindtijden per dag voor geautomatiseerde privé-classificatie.
+- **Interactieve Notificatie:** Tijdens het rijden toont de tracking notificatie nu een handige "Stop Rit" (Stop Trip) knop waarmee de rit direct afgesloten kan worden zonder de app te hoeven openen.
+
 ## [1.1.2] - 2026-09-21
 
 ### Gewijzigd

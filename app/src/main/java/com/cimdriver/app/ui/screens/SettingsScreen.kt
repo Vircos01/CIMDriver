@@ -75,108 +75,102 @@ import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
 
 
+import androidx.navigation.NavController
+import com.cimdriver.app.ui.navigation.*
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.CarRepair
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Storage
+
+@Composable
+fun SettingsListItem(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(end = 16.dp)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun SettingsSectionHeader(title: String) {
+    Text(
+        text = title.uppercase(),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onOpenDrawer: () -> Unit = {},
-    onNavigateToDiagnostics: () -> Unit = {},
+    navController: NavController,
     viewModel: com.cimdriver.app.ui.viewmodel.SettingsViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 ) {
     val context = LocalContext.current
-    var showRestartDialog by remember { mutableStateOf(false) }
-    var showClearLocationDialog by remember { mutableStateOf(false) }
-    var showResetAllDataDialog by remember { mutableStateOf(false) }
-
-    val backupLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/zip")
-    ) { uri ->
-        if (uri != null) {
-            com.cimdriver.app.util.BackupUtil.createBackup(context, uri)
-        }
-    }
-
-    val restoreLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            val success = com.cimdriver.app.util.BackupUtil.restoreBackup(context, uri)
-            if (success) {
-                showRestartDialog = true
-            }
-        }
-    }
-
     val settings by viewModel.settings.collectAsState()
-    val classificationRules by viewModel.classificationRules.collectAsState()
-    
     val initialSettings = settings ?: com.cimdriver.app.data.local.entity.Settings()
     val themeMode = initialSettings.themeMode
 
-    // Hoisted states for Tracking
-    var gracePeriodMinsStr by remember(initialSettings.gracePeriodSec) { mutableStateOf((initialSettings.gracePeriodSec / 60).toString()) }
-
-    // Hoisted states for Odometer
-    var odometerReminder by remember(initialSettings.odometerReminder) { mutableStateOf(initialSettings.odometerReminder) }
-    var odometerIntervalStr by remember(initialSettings.odometerReminderIntervalDays) { mutableStateOf(initialSettings.odometerReminderIntervalDays.toString()) }
-    
-    // Hoisted states for Compensation
-    var businessCompensationStr by remember(initialSettings.businessCompensation) { mutableStateOf(initialSettings.businessCompensation.toString()) }
-    
-
-    // Hoisted states for WorkHours
-    val daySettings = remember(initialSettings.workDays) {
-        val parsed = com.cimdriver.app.util.WorkHoursUtil.parseWorkHoursString(
-            initialSettings.workDays, 
-            initialSettings.workStartTime, 
-            initialSettings.workEndTime
-        )
-        androidx.compose.runtime.mutableStateListOf(*parsed.toTypedArray())
-    }
-    var breakMinutesStr by remember(initialSettings.defaultBreakMinutes) { mutableStateOf(initialSettings.defaultBreakMinutes.toString()) }
-    var toleranceMinutesStr by remember(initialSettings.workHoursToleranceMinutes) { mutableStateOf(initialSettings.workHoursToleranceMinutes.toString()) }
-
     Scaffold(
-        topBar = { CimDriverTopAppBar(
-            onOpenDrawer = onOpenDrawer,
-            title = { Text(stringResource(R.string.settings), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-            actions = {
-                IconButton(onClick = {
-                    val graceSec = (gracePeriodMinsStr.toIntOrNull() ?: 3) * 60
-                    viewModel.updateGracePeriod(graceSec)
-
-                    val odoDays = odometerIntervalStr.toIntOrNull() ?: 30
-                    viewModel.updateOdometerReminder(odometerReminder, odoDays)
-                    
-                    val comp = businessCompensationStr.replace(',', '.').toFloatOrNull() ?: 0.23f
-                    viewModel.updateBusinessCompensation(comp)
-
-                    val serializedDays = com.cimdriver.app.util.WorkHoursUtil.serializeWorkHours(daySettings)
-                    val breakMins = breakMinutesStr.toIntOrNull() ?: 30
-                    val toleranceMins = toleranceMinutesStr.toIntOrNull() ?: 30
-                    viewModel.updateWorkingHours(initialSettings.workStartTime, initialSettings.workEndTime, serializedDays, breakMins, toleranceMins)
-                    
-                    android.widget.Toast.makeText(context, context.getString(R.string.settings_saved), android.widget.Toast.LENGTH_SHORT).show()
-                }) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Check, stringResource(R.string.save), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                }
-            }
-        ) }
+        topBar = { 
+            CimDriverTopAppBar(
+                onOpenDrawer = onOpenDrawer,
+                title = { Text(stringResource(R.string.settings), color = com.cimdriver.app.ui.theme.CIMDriverWhite) }
+            ) 
+        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Card(modifier = Modifier.fillMaxWidth()) {
+            // Algemeen
+            SettingsSectionHeader(title = "Algemeen")
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(R.string.appearance), style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(R.string.appearance_desc), style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
+                    Text(text = stringResource(R.string.appearance), style = MaterialTheme.typography.bodyLarge)
+                    Spacer(modifier = Modifier.height(12.dp))
                     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                         SegmentedButton(
                             shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
@@ -203,174 +197,58 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "Zakelijke vergoeding", style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Vergoeding per km in euro's (bijv. 0.23)", style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(
-                        value = businessCompensationStr,
-                        onValueChange = { businessCompensationStr = it },
-                        label = { Text("Vergoeding per km") },
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TrackingSettingsCard(
-                gracePeriodMinsStr = gracePeriodMinsStr,
-                onGracePeriodChange = { gracePeriodMinsStr = it }
+            // App Gedrag
+            SettingsSectionHeader(title = "App Gedrag")
+            SettingsListItem(
+                title = "Rit & Classificatie",
+                icon = Icons.Filled.Settings,
+                onClick = { navController.navigate(TripClassificationSettingsRoute) }
             )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            WorkHoursSettingsCard(
-                daySettings = daySettings,
-                breakMinutesStr = breakMinutesStr,
-                onBreakMinutesChange = { breakMinutesStr = it },
-                toleranceMinutesStr = toleranceMinutesStr,
-                onToleranceMinutesChange = { toleranceMinutesStr = it }
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            SettingsListItem(
+                title = "Tracking & Privacy",
+                icon = Icons.Filled.Security,
+                onClick = { navController.navigate(TrackingPrivacySettingsRoute) }
             )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ClassificationSettingsCard(viewModel, initialSettings, classificationRules)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OdometerSettingsCard(
-                isEnabled = odometerReminder,
-                onEnabledChange = { odometerReminder = it },
-                intervalDaysStr = odometerIntervalStr,
-                onIntervalDaysChange = { odometerIntervalStr = it }
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            SettingsListItem(
+                title = "Notificaties",
+                icon = Icons.Filled.Notifications,
+                onClick = { navController.navigate(NotificationSettingsRoute) }
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
-            PrivacySettingsCard(
-                settings = initialSettings,
-                onRetentionDaysChanged = viewModel::updateLocationRetentionDays,
-                onClearLocationHistory = { showClearLocationDialog = true },
-                onResetAllData = { showResetAllDataDialog = true }
+            // Werkuren
+            SettingsSectionHeader(title = "Werkuren")
+            SettingsListItem(
+                title = "Werkdagen & Tijden",
+                icon = Icons.Filled.DateRange,
+                onClick = { navController.navigate(WorkDaysEditorRoute) }
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
-            PermissionsSettingsCard()
+            // Diagnostiek & Systeem
+            SettingsSectionHeader(title = "Diagnostiek & Systeem")
+            SettingsListItem(
+                title = "Data Beheer & Backup",
+                icon = Icons.Filled.Storage,
+                onClick = { navController.navigate(DataManagementRoute) }
+            )
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            SettingsListItem(
+                title = "App Diagnostiek",
+                icon = Icons.Filled.Build,
+                onClick = { navController.navigate(DiagnosticsRoute) }
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Over
+            SettingsSectionHeader(title = "Over")
+            SettingsListItem(
+                title = "Over CIMDriver",
+                icon = Icons.Filled.Info,
+                onClick = { navController.navigate(AboutRoute) }
+            )
             
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onNavigateToDiagnostics
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(R.string.system_diagnostics), style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(R.string.system_diagnostics_desc), style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(R.string.data_management), style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = stringResource(R.string.backup_desc), style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Button(
-                        onClick = { backupLauncher.launch("cimdriver_backup.zip") },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.create_backup))
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    Text(text = stringResource(R.string.restore_desc), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    OutlinedButton(
-                        onClick = { restoreLauncher.launch(arrayOf("application/zip")) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.restore_backup), color = MaterialTheme.colorScheme.error)
-                    }
-                }
-            }
+            Spacer(modifier = Modifier.height(32.dp))
         }
-    }
-
-    if (showRestartDialog) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = { Text(stringResource(R.string.restore_completed)) },
-            text = { Text(stringResource(R.string.backup_restored_msg)) },
-            confirmButton = {
-                Button(onClick = { kotlin.system.exitProcess(0) }) {
-                    Text(stringResource(R.string.understood_close))
-                }
-            }
-        )
-    }
-
-    if (showClearLocationDialog) {
-        AlertDialog(
-            onDismissRequest = { showClearLocationDialog = false },
-            title = { Text(stringResource(R.string.clear_location_history_title)) },
-            text = { Text(stringResource(R.string.clear_location_history_desc)) },
-            confirmButton = {
-                Button(onClick = {
-                    viewModel.clearLocationHistory()
-                    showClearLocationDialog = false
-                }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) {
-                    Text(stringResource(R.string.clear))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showClearLocationDialog = false }) { Text(stringResource(R.string.cancel)) }
-            }
-        )
-    }
-
-    if (showResetAllDataDialog) {
-        var resetConfirmation by remember { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { showResetAllDataDialog = false },
-            title = { Text(stringResource(R.string.reset_all_data_title)) },
-            text = {
-                Column {
-                    Text(stringResource(R.string.reset_all_data_desc))
-                    Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = resetConfirmation,
-                        onValueChange = { resetConfirmation = it },
-                        label = { Text(stringResource(R.string.type_delete_all)) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    enabled = resetConfirmation == stringResource(R.string.type_delete_all).removePrefix("Typ "),
-                    onClick = {
-                    viewModel.resetAllData()
-                    showResetAllDataDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(stringResource(R.string.clear_all))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showResetAllDataDialog = false }) { Text(stringResource(R.string.cancel)) }
-            }
-        )
     }
 }
 

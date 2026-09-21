@@ -72,7 +72,8 @@ object ExportUtil {
     private fun classifyForExport(
         trip: Trip,
         savedAddresses: List<SavedAddress>,
-        rules: List<ClassificationRule>
+        rules: List<ClassificationRule>,
+        settings: com.cimdriver.app.data.local.entity.Settings? = null
     ): TripCategory? {
         fun addressType(address: String?): String? {
             val saved = AddressMatching.findSavedAddress(address, savedAddresses) ?: return null
@@ -84,10 +85,17 @@ object ExportUtil {
             }
         }
         return TripClassification.classify(
-            trip.tripType,
-            addressType(trip.startAddress),
-            addressType(trip.endAddress),
-            rules = rules
+            tripType = trip.tripType,
+            startAddressType = addressType(trip.startAddress),
+            endAddressType = addressType(trip.endAddress),
+            rules = rules,
+            defaultCategory = if (settings?.classificationDefault == "BUSINESS") TripCategory.BUSINESS else TripCategory.PRIVATE,
+            homeWorkAsCommute = settings?.classifyHomeWorkAsCommute ?: true,
+            customerAsBusiness = settings?.classifyCustomerAsBusiness ?: true,
+            timestamp = trip.startTime,
+            workDaysStr = settings?.workDays,
+            workStartTime = settings?.workStartTime,
+            workEndTime = settings?.workEndTime
         )
     }
 
@@ -130,7 +138,8 @@ object ExportUtil {
         uri: Uri,
         trips: List<Trip>,
         savedAddresses: List<SavedAddress> = emptyList(),
-        rules: List<ClassificationRule> = emptyList()
+        rules: List<ClassificationRule> = emptyList(),
+        settings: com.cimdriver.app.data.local.entity.Settings? = null
     ) {
         val outputStream = context.contentResolver.openOutputStream(uri) ?: return
         
@@ -179,7 +188,7 @@ object ExportUtil {
             val startAddr = trip.startAddress?.take(20) ?: ""
             val endAddr = trip.endAddress?.take(20) ?: ""
             val distanceKm = String.format(Locale.getDefault(), "%.1f", trip.distanceMeters / 1000.0)
-            val typeStr = when (classifyForExport(trip, savedAddresses, rules)) {
+            val typeStr = when (classifyForExport(trip, savedAddresses, rules, settings)) {
                 TripCategory.BUSINESS -> "Z"
                 TripCategory.PRIVATE -> "P"
                 TripCategory.COMMUTE -> "W"

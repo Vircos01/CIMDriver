@@ -33,10 +33,18 @@ object TripClassification {
         defaultCategory: TripCategory = TripCategory.PRIVATE,
         homeWorkAsCommute: Boolean = true,
         customerAsBusiness: Boolean = true,
-        rules: List<ClassificationRule> = emptyList()
+        rules: List<ClassificationRule> = emptyList(),
+        timestamp: Long? = null,
+        workDaysStr: String? = null,
+        workStartTime: String? = null,
+        workEndTime: String? = null
     ): TripCategory? {
         val isCommuteAddressPair = (startAddressType == "THUIS" && endAddressType == "WERK") ||
             (startAddressType == "WERK" && endAddressType == "THUIS")
+
+        val outsideHours = if (timestamp != null && workDaysStr != null && workStartTime != null && workEndTime != null) {
+            isOutsideWorkHours(timestamp, workDaysStr, workStartTime, workEndTime)
+        } else false
 
         val matchingRule = findMatchingRule(tripType, startAddressType, endAddressType, startAddress, endAddress, rules)
         if (matchingRule != null) {
@@ -55,6 +63,7 @@ object TripClassification {
             customerAsBusiness && (startAddressType == "KLANT" || endAddressType == "KLANT") -> TripCategory.BUSINESS
             tripType in businessTripTypes -> TripCategory.BUSINESS
             tripType == "PRIVATE" || tripType == DYNAMICS_PERSONAL -> TripCategory.PRIVATE
+            outsideHours -> TripCategory.PRIVATE
             else -> defaultCategory
         }
     }

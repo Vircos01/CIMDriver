@@ -67,13 +67,17 @@ fun TripItem(
     val startAddressType = addressTypeFor(trip.startAddress)
     val endAddressType = addressTypeFor(trip.endAddress)
     val displayTripCategory = when (TripClassification.classify(
-        trip.tripType,
-        startAddressType,
-        endAddressType,
+        tripType = trip.tripType,
+        startAddressType = startAddressType,
+        endAddressType = endAddressType,
         defaultCategory = if (classificationSettings.classificationDefault == "BUSINESS") TripCategory.BUSINESS else TripCategory.PRIVATE,
         homeWorkAsCommute = classificationSettings.classifyHomeWorkAsCommute,
         customerAsBusiness = classificationSettings.classifyCustomerAsBusiness,
-        rules = classificationRules
+        rules = classificationRules,
+        timestamp = trip.startTime,
+        workDaysStr = classificationSettings.workDays,
+        workStartTime = classificationSettings.workStartTime,
+        workEndTime = classificationSettings.workEndTime
     )) {
         TripCategory.COMMUTE -> "Woon-werk"
         TripCategory.BUSINESS -> "Zakelijk"

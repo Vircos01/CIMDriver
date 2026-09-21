@@ -343,8 +343,23 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
             composable<SettingsRoute> { 
                 SettingsScreen(
                     onOpenDrawer = onOpenDrawer,
-                    onNavigateToDiagnostics = { navController.navigate(DiagnosticsRoute) }
+                    navController = navController
                 ) 
+            }
+            composable<TripClassificationSettingsRoute> {
+                com.cimdriver.app.ui.screens.settings.TripClassificationSettingsScreen(onBack = { navController.popBackStack() })
+            }
+            composable<TrackingPrivacySettingsRoute> {
+                com.cimdriver.app.ui.screens.settings.TrackingPrivacySettingsScreen(onBack = { navController.popBackStack() })
+            }
+            composable<NotificationSettingsRoute> {
+                com.cimdriver.app.ui.screens.settings.NotificationSettingsScreen(onBack = { navController.popBackStack() })
+            }
+            composable<DataManagementRoute> {
+                com.cimdriver.app.ui.screens.settings.DataManagementScreen(onBack = { navController.popBackStack() })
+            }
+            composable<WorkDaysEditorRoute> {
+                com.cimdriver.app.ui.screens.settings.WorkDaysEditorScreen(onBack = { navController.popBackStack() })
             }
             composable<WorkHoursRoute> { 
                 com.cimdriver.app.ui.screens.WorkHoursScreen(

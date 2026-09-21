@@ -66,16 +66,17 @@ class TripsViewModel @Inject constructor(
 ) : ViewModel() {
     private data class ClassificationContext(
         val rules: List<com.cimdriver.app.data.local.entity.ClassificationRule>,
-        val addresses: List<com.cimdriver.app.data.local.entity.SavedAddress>
+        val addresses: List<com.cimdriver.app.data.local.entity.SavedAddress>,
+        val settings: com.cimdriver.app.data.local.entity.Settings
     )
 
     private val classificationRules = tripRepository.getClassificationRules()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     private val savedAddresses = tripRepository.getSavedAddresses()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-    private val classificationContext = kotlinx.coroutines.flow.combine(classificationRules, savedAddresses) { rules, addresses ->
-        ClassificationContext(rules, addresses)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ClassificationContext(emptyList(), emptyList()))
+    private val classificationContext = kotlinx.coroutines.flow.combine(classificationRules, savedAddresses, database.settingsDao().getSettings()) { rules, addresses, settings ->
+        ClassificationContext(rules, addresses, settings ?: com.cimdriver.app.data.local.entity.Settings())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ClassificationContext(emptyList(), emptyList(), com.cimdriver.app.data.local.entity.Settings()))
 
     val trips: StateFlow<List<Trip>> = tripRepository.getAllTrips()
         .stateIn(
@@ -258,7 +259,7 @@ class TripsViewModel @Inject constructor(
             val isYearMatch = cal.get(Calendar.YEAR) == year
             
             val isFilterMatch = if (filter == "ALLE") true else {
-                val category = DashboardStatsCalculator.classifyTrip(it, addresses, rules)
+                val category = DashboardStatsCalculator.classifyTrip(it, addresses, rules, context.settings)
                 
                 when (filter) {
                     "BUSINESS" -> category == TripCategory.BUSINESS
@@ -286,7 +287,7 @@ class TripsViewModel @Inject constructor(
     )
 
     val dashboardStats = kotlinx.coroutines.flow.combine(trips, _dashboardTimeFilter, _globalSelectedVehicleId, vehicles, classificationContext) { tripList: List<Trip>, timeFilter: TimeFilter, selectedVehicleId: Long?, vehicleList: List<Vehicle>, context ->
-        DashboardStatsCalculator.calculateDashboardStats(tripList, timeFilter, selectedVehicleId, vehicleList, context.rules, context.addresses)
+        DashboardStatsCalculator.calculateDashboardStats(tripList, timeFilter, selectedVehicleId, vehicleList, context.rules, context.addresses, context.settings)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -294,7 +295,7 @@ class TripsViewModel @Inject constructor(
     )
 
     val dashboardDistanceChartData = kotlinx.coroutines.flow.combine(trips, _dashboardTimeFilter, _globalSelectedVehicleId, vehicles, classificationContext) { tripList: List<Trip>, timeFilter: TimeFilter, selectedVehicleId: Long?, vehicleList: List<Vehicle>, context ->
-        DashboardStatsCalculator.calculateDistanceChartData(tripList, timeFilter, selectedVehicleId, vehicleList, context.rules, context.addresses)
+        DashboardStatsCalculator.calculateDistanceChartData(tripList, timeFilter, selectedVehicleId, vehicleList, context.rules, context.addresses, context.settings)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
