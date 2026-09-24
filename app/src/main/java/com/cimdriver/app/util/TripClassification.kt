@@ -77,7 +77,7 @@ object TripClassification {
         rules: List<ClassificationRule>
     ): String? = findMatchingRule(tripType, startAddressType, endAddressType, startAddress, endAddress, rules)?.tripType ?: tripType
 
-    private fun findMatchingRule(
+    fun findMatchingRule(
         tripType: String?,
         startAddressType: String?,
         endAddressType: String?,

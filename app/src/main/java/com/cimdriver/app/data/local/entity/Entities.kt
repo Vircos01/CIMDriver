@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
 import androidx.room.Index
+import androidx.room.ColumnInfo
 
 @Entity(tableName = "vehicles")
 data class Vehicle(
@@ -72,7 +73,8 @@ data class Trip(
     val odometerStart: Int,
     val odometerEnd: Int?,
     val expectedDistanceMeters: Int? = null,
-    val projectCode: String? = null
+    val projectCode: String? = null,
+    val appliedRuleName: String? = null
 )
 
 @Entity(
@@ -176,8 +178,11 @@ data class ClassificationRule(
     val name: String,
     val startAddressType: String? = null,
     val endAddressType: String? = null,
-    val startAddress: String? = null,
-    val endAddress: String? = null,
+    @ColumnInfo(defaultValue = "NULL") val startAddress: String? = null,
+    @ColumnInfo(defaultValue = "NULL") val endAddress: String? = null,
     val tripType: String? = null,
-    val category: String
+    val category: String,
+    @ColumnInfo(defaultValue = "0") val orderIndex: Int = 0,
+    @ColumnInfo(defaultValue = "1") val isEnabled: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val autoApprove: Boolean = false
 )

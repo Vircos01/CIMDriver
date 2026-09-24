@@ -61,6 +61,8 @@ fun TripClassificationSettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            com.cimdriver.app.ui.components.TripTypeSettingsCard(viewModel, classificationRules)
+            Spacer(modifier = Modifier.height(16.dp))
             ClassificationSettingsCard(viewModel, initialSettings, classificationRules)
             
             Spacer(modifier = Modifier.height(16.dp))

@@ -329,6 +329,16 @@ class TrackingService : Service(), LocationListener {
             }
         }
 
+        val matchingRule = TripClassification.findMatchingRule(
+            tripType = finalTripType,
+            startAddressType = startAddressType,
+            endAddressType = endAddressType,
+            startAddress = finalStartAddress,
+            endAddress = finalEndAddress,
+            rules = classificationRules
+        )
+        val autoApprove = matchingRule?.autoApprove ?: false
+
         val finalCategory = TripClassification.classify(
             tripType = finalTripType,
             startAddressType = startAddressType,
@@ -359,7 +369,8 @@ class TrackingService : Service(), LocationListener {
             expectedDistanceMeters = expectedDistance,
             tripType = finalTripType,
             projectCode = projectCode,
-            status = "TO_REVIEW"
+            status = if (autoApprove) "DONE" else "TO_REVIEW",
+            appliedRuleName = matchingRule?.name
         ))
         
         // Work Day Logic

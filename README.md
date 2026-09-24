@@ -6,7 +6,7 @@
 
 *De moderne en slimme ritten- en werkurenregistratie app voor Android*
 
-[![Release](https://img.shields.io/badge/release-v1.1.3-blue)](https://github.com/Vircos01/CIMDriver/releases)
+[![Release](https://img.shields.io/badge/release-v1.1.4-blue)](https://github.com/Vircos01/CIMDriver/releases)
 [![Platform](https://img.shields.io/badge/platform-Android%2010%2B-green)](https://developer.android.com/about/versions/10)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 [![Built with Kotlin](https://img.shields.io/badge/built%20with-Kotlin-purple)](https://kotlinlang.org/)
@@ -21,7 +21,7 @@
 - [Functionaliteiten](#-functionaliteiten)
 - [Screenshots](#-screenshots)
 - [Installatie](#-installatie)
-- [Wat is nieuw](#-wat-is-nieuw-in-v113)
+- [Wat is nieuw](#-wat-is-nieuw-in-v114)
 - [Support](#-support)
 
 ---
@@ -62,7 +62,7 @@ CIMDriver is een volledig automatische ritten- en werkurenregistratie app voor A
 
 De app is momenteel niet beschikbaar via de Google Play Store. Installatie verloopt via de APK:
 
-1. [Download `CIMDriver-v1.1.3.apk`](release/CIMDriver-v1.1.3.apk) direct vanuit de repository.
+1. [Download `CIMDriver-v1.1.4.apk`](release/CIMDriver-v1.1.4.apk) direct vanuit de repository.
 2. Open de APK op je Android-telefoon.
 3. Accepteer de melding om installatie vanuit **Onbekende bronnen** toe te staan.
 
@@ -70,12 +70,11 @@ De app is momenteel niet beschikbaar via de Google Play Store. Installatie verlo
 
 ---
 
-## 🆕 Wat is nieuw in v1.1.3
+## 🆕 Wat is nieuw in v1.1.4
 
-- **Buiten Werktijden Classificatie** — Ritten buiten je kantooruren worden nu automatisch als Privé aangemerkt.
-- **Interactieve Notificatie** — Stop ritten direct vanuit de tracking notificatie.
-- **Opgeruimde Instellingen** — "Mijn auto's" is verplaatst naar het hoofdmenu.
-- **Alle wijzigingen van v1.1.2** — Robuuste adres-matching en GPS-kaartweergave in het adresboek.
+- **Database Migratie Fix** — Oplossing voor een crash bij het opstarten of herstellen van backups vanaf oudere versies.
+- **Sneller Opstarten** — Het custom splash screen is verwijderd, waardoor de app direct start.
+- **Alle wijzigingen van v1.1.3** — Buiten werktijden classificatie, interactieve notificaties, en meer.
 
 Zie [CHANGELOG.md](CHANGELOG.md) voor de volledige versiegeschiedenis.
 

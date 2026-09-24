@@ -139,6 +139,14 @@ fun TripItem(
                         Text(text = displayTripCategory, style = MaterialTheme.typography.bodySmall)
                     }
                 }
+                if (!trip.appliedRuleName.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Regel: ${trip.appliedRuleName}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start

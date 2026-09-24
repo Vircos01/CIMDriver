@@ -2,6 +2,14 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.1.4] - 2026-09-24
+
+### Opgelost
+- **Crash bij opstarten:** Oplossing voor een `IllegalStateException` database crash (Room migratiefout) die kon optreden bij het updaten van de app of het herstellen van een backup afkomstig van een eerdere versie.
+
+### Verwijderd
+- **Splash Screen:** Het custom splash screen (met de extra 2 seconden vertraging) is verwijderd, waardoor de app nu direct opstart naar het dashboard.
+
 ## [1.1.3] - 2026-09-21
 
 > **LET OP:** Door vernieuwde, veiligere ondertekeningscertificaten vereist versie 1.1.3 een schone installatie. Maak **eerst een backup of export** via de oude versie, de-installeer deze volledig, en installeer pas daarna versie 1.1.3 om je data niet te verliezen!

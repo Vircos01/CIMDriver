@@ -280,6 +280,14 @@ fun TripDetailScreen(
                         }
                         Text(stringResource(R.string.type_format, trip!!.tripType ?: stringResource(R.string.unknown)))
                     }
+                    if (!trip!!.appliedRuleName.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Regel toegepast: ${trip!!.appliedRuleName}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
                     Spacer(modifier = Modifier.height(4.dp))
                     val odoStartStr = String.format(locale, "%,d", trip!!.odometerStart).replace(',', '.')
                     val odoEndStr = trip!!.odometerEnd?.let { String.format(locale, "%,d", it).replace(',', '.') } ?: "..."

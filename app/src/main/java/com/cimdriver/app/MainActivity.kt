@@ -59,29 +59,11 @@ class MainActivity : ComponentActivity() {
             }
 
             CIMDriverTheme(useDarkTheme = useDarkTheme) {
-                var showSplash by remember { mutableStateOf(true) }
-
-                LaunchedEffect(Unit) {
-                    delay(2000)
-                    showSplash = false
-                }
-
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (showSplash) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Image(
-                                painter = painterResource(id = R.drawable.splash_screen_full),
-                                contentDescription = "CIMDriver Splash Screen",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.matchParentSize()
-                            )
-                        }
-                    } else {
-                        MainScreen()
-                    }
+                    MainScreen()
                 }
             }
         }

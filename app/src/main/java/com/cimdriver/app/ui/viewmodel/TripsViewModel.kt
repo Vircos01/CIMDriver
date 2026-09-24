@@ -70,7 +70,7 @@ class TripsViewModel @Inject constructor(
         val settings: com.cimdriver.app.data.local.entity.Settings
     )
 
-    private val classificationRules = tripRepository.getClassificationRules()
+    val classificationRules = tripRepository.getClassificationRules()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     private val savedAddresses = tripRepository.getSavedAddresses()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

@@ -126,6 +126,118 @@ fun PrivacySettingsCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun TripTypeSettingsCard(
+    viewModel: SettingsViewModel,
+    rules: List<com.cimdriver.app.data.local.entity.ClassificationRule>
+) {
+    var editingRule by remember { mutableStateOf<com.cimdriver.app.data.local.entity.ClassificationRule?>(null) }
+    
+    // Only show rules that define a trip type without address specifics
+    val tripTypeRules = rules.filter { 
+        it.startAddressType.isNullOrBlank() && it.endAddressType.isNullOrBlank() && 
+        it.startAddress.isNullOrBlank() && it.endAddress.isNullOrBlank() && 
+        !it.tripType.isNullOrBlank() 
+    }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Rit Typen", style = MaterialTheme.typography.titleLarge)
+                TextButton(onClick = {
+                    editingRule = com.cimdriver.app.data.local.entity.ClassificationRule(
+                        name = "Nieuw Rit Type",
+                        category = "BUSINESS"
+                    )
+                }) { Text(stringResource(R.string.add)) }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Beheer hier de beschikbare rit typen en hun standaard classificatie.", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            if (tripTypeRules.isEmpty()) {
+                Text("Geen rit typen gedefinieerd.", style = MaterialTheme.typography.bodySmall)
+            } else {
+                tripTypeRules.forEach { rule ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(rule.tripType ?: "", style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                rule.category,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        IconButton(onClick = { editingRule = rule }) {
+                            Icon(Icons.Filled.Edit, contentDescription = "Bewerken")
+                        }
+                        IconButton(onClick = { viewModel.deleteClassificationRule(rule) }) {
+                            Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    editingRule?.let { rule ->
+        var tripType by remember(rule) { mutableStateOf(rule.tripType.orEmpty()) }
+        var category by remember(rule) { mutableStateOf(rule.category) }
+        var autoApprove by remember(rule) { mutableStateOf(rule.autoApprove) }
+
+        AlertDialog(
+            onDismissRequest = { editingRule = null },
+            title = { Text(if (rule.id == 0L) "Rit Type Toevoegen" else "Rit Type Bewerken") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(tripType, { tripType = it }, label = { Text("Naam Rit Type (bijv. Dokter)") }, singleLine = true)
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        listOf("BUSINESS" to stringResource(R.string.business), "PRIVATE" to stringResource(R.string.private_usage), "COMMUTE" to "Woon-werk").forEachIndexed { index, option ->
+                            SegmentedButton(
+                                shape = SegmentedButtonDefaults.itemShape(index = index, count = 3),
+                                selected = category == option.first,
+                                onClick = { category = option.first }
+                            ) { Text(option.second) }
+                        }
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = autoApprove, onCheckedChange = { autoApprove = it })
+                        Text("Automatisch akkoord", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (tripType.isNotBlank()) {
+                            viewModel.saveClassificationRule(
+                                rule.copy(
+                                    name = "Rit Type: ${tripType.trim()}",
+                                    tripType = tripType.trim(),
+                                    category = category,
+                                    autoApprove = autoApprove,
+                                    startAddressType = null,
+                                    endAddressType = null,
+                                    startAddress = null,
+                                    endAddress = null
+                                )
+                            )
+                        }
+                        editingRule = null
+                    }
+                ) { Text(stringResource(R.string.save)) }
+            },
+            dismissButton = { TextButton(onClick = { editingRule = null }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+}
+
+@Composable
 fun ClassificationSettingsCard(
     viewModel: SettingsViewModel,
     settings: com.cimdriver.app.data.local.entity.Settings,
@@ -227,6 +339,7 @@ fun ClassificationSettingsCard(
         var endAddr by remember(rule) { mutableStateOf(rule.endAddress.orEmpty()) }
         var tripType by remember(rule) { mutableStateOf(rule.tripType.orEmpty()) }
         var category by remember(rule) { mutableStateOf(rule.category) }
+        var autoApprove by remember(rule) { mutableStateOf(rule.autoApprove) }
 
         AlertDialog(
             onDismissRequest = { editingRule = null },
@@ -248,6 +361,10 @@ fun ClassificationSettingsCard(
                             ) { Text(option.second) }
                         }
                     }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = autoApprove, onCheckedChange = { autoApprove = it })
+                        Text("Automatisch akkoord", style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             },
             confirmButton = {
@@ -262,7 +379,8 @@ fun ClassificationSettingsCard(
                                     startAddress = startAddr.trim().ifBlank { null },
                                     endAddress = endAddr.trim().ifBlank { null },
                                     tripType = tripType.trim().ifBlank { null },
-                                    category = category
+                                    category = category,
+                                    autoApprove = autoApprove
                                 )
                             )
                         }

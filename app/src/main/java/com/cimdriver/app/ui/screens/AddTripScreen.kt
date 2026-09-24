@@ -64,8 +64,13 @@ fun AddTripScreen(
     var distance by remember(refTrip) { 
         mutableStateOf(existingTrip?.let { String.format(Locale.getDefault(), "%.1f", it.distanceMeters / 1000.0) } ?: copyTrip?.let { String.format(Locale.getDefault(), "%.1f", it.distanceMeters / 1000.0) } ?: "") 
     }
-    val tripOptions = listOf("Home To Work", "Business Meeting", "Customer Visit", "Customer Billable", "Commissioned By CIMSOLUTIONS", "Exam Course", "Car Maintenance")
-    var tripType by remember(refTrip) { 
+    val classificationRules by viewModel.classificationRules.collectAsState()
+    val tripOptions = remember(classificationRules) {
+        classificationRules.mapNotNull { it.tripType }.distinct().ifEmpty { 
+            listOf("Home To Work", "Business Meeting", "Customer Visit", "Customer Billable", "Commissioned By CIMSOLUTIONS", "Exam Course", "Car Maintenance") 
+        }
+    }
+    var tripType by remember(refTrip, tripOptions) { 
         mutableStateOf(if (refTrip?.tripType != null && tripOptions.contains(refTrip.tripType)) refTrip.tripType else "Home To Work") 
     }
     var typeExpanded by remember { mutableStateOf(false) }
