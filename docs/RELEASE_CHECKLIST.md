@@ -16,9 +16,9 @@ Dit document bevat de harde lessen en de vaste checklist voor het succesvol uitb
 
 Volg bij elke nieuwe release stipt deze stappen:
 
-### 1. Versienummers Ophogen (4 plekken!)
+### 1. Versienummers Ophogen (5 plekken!)
 - [ ] **`android/app/build.gradle.kts`**: Verhoog `versionCode` (bijv. 7 -> 8) en pas `versionName` aan (bijv. "1.0.6" -> "1.0.7").
-- [ ] **`android/version.json`**: Werk `versionCode` en `versionName` bij. Pas ook de bestandsnaam in de `apkUrl` URL aan (bijv. `CIMDriver-v1.0.7.apk`).
+- [ ] **`version.json` (in de root) EN `android/version.json`**: Werk in beide bestanden `versionCode` en `versionName` bij. Pas ook de bestandsnaam in de `apkUrl` URL aan.
 - [ ] **`README.md`**: Werk de versienummers bij in de tekst en de download-link.
 - [ ] **Website Changelog (`docs/changelog/android.md`)**: Voeg een nieuwe sectie toe voor de nieuwe release en documenteer de wijzigingen op basis van de git geschiedenis.
 
@@ -45,7 +45,7 @@ Volg bij elke nieuwe release stipt deze stappen:
   ```
 - [ ] Voeg de nieuwe/gewijzigde bestanden toe:
   ```bash
-  git add android/release/CIMDriver-v1.0.X.apk android/app/build.gradle.kts android/version.json README.md android/CHANGELOG.md docs/
+  git add android/release/CIMDriver-v1.0.X.apk android/app/build.gradle.kts version.json android/version.json README.md android/CHANGELOG.md docs/
   ```
 - [ ] Push naar de main branch:
   ```bash
@@ -54,5 +54,5 @@ Volg bij elke nieuwe release stipt deze stappen:
 *(Let op: `--force` is nodig als je commits hebt gesquashed die al gepusht waren).*
 
 Zodra de push op GitHub staat, gebeuren er twee dingen:
-1. De In-App Updater op de telefoons leest de nieuwe `android/version.json` uit en downloadt de verse APK uit de `android/release/` map.
+1. De In-App Updater op de telefoons leest de nieuwe `version.json` uit de root en downloadt de verse APK uit de `android/release/` map.
 2. De GitHub Action (`mkdocs-pages.yml`) bouwt en publiceert automatisch de nieuwste versie van de documentatie-website (inclusief de actuele changelog).

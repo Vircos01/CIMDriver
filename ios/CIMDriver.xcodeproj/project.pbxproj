@@ -1,0 +1,871 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0234900830C8404528756174 /* ClassificationRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC6FD3A17F5204E40FA960D /* ClassificationRulesView.swift */; };
+		050C9F23A3FA0536939582DE /* Vehicle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13EA46F909F3FC9D3D80D22 /* Vehicle.swift */; };
+		05AAA15FB066B44976CBDE57 /* DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C4FD9554B67CFB71D2EE23 /* DashboardWidget.swift */; };
+		08E98902FEDCB1E4D40F319A /* BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E4A9C98CC597C4D26883D1 /* BluetoothDevice.swift */; };
+		0AB38023D2B4E85612B645B5 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9883D3B3B4C90A7F848C6749 /* DashboardView.swift */; };
+		0D1D5CAEA749650D2047B7B0 /* SavedAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A07621028FC2304C57F43C4 /* SavedAddress.swift */; };
+		143F6719FB543ED24A01CADC /* CIMDriverWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333A9B8F91A86F595F76041C /* CIMDriverWidgetBundle.swift */; };
+		1E6364C35011DCB0504D27C3 /* GeocoderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591C5D6C84265B6C61B5021E /* GeocoderService.swift */; };
+		2002D5F6CDF2059755CDD821 /* AddressListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B15FB6EA070D185D3D4000B /* AddressListView.swift */; };
+		20E4E80CBF9F198CAD2AF1DD /* DashboardStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B910BE207AC49CFDB7768B /* DashboardStats.swift */; };
+		24DB4F8833385A61E767B584 /* LocationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */; };
+		258FC2D1EFEEF1EE9C5E55A2 /* DashboardStatsCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3EBA862BF6E73DBE7B9C23 /* DashboardStatsCalculator.swift */; };
+		2772A3015F076FCA9779502E /* TripsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246321B84451354E540BC461 /* TripsView.swift */; };
+		2D3B4C34CA0EB10A7D03D99E /* BluetoothService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076D609D3F91A3AEA955B1E0 /* BluetoothService.swift */; };
+		2DBFCAFC4518AF0176F9F190 /* WorkHoursNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 593BD8FD220E74E8600D4E04 /* WorkHoursNormalizer.swift */; };
+		3124A9A3BF18DD59E69E01FC /* WidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130ADCAF6FDD59D315146325 /* WidgetManager.swift */; };
+		3400DD39A1EC487B6E0FB056 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9C9436354CC5107B4BC18CA /* Assets.xcassets */; };
+		360408C90855CFE2F4D436F2 /* ExportUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C9D9EA8AF0A98E7C7A609E2 /* ExportUtil.swift */; };
+		38F2CF464B5709C50EB5E948 /* ManualWorkDayEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A11D0103E807E977ECA7609 /* ManualWorkDayEntryView.swift */; };
+		3904C7925C884DCE5289454A /* AddressMatchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9E3893C011580CC1912EB0 /* AddressMatchingTests.swift */; };
+		4F2C9B707B9F4139B7AD130B /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE595306EA41A3F24E3B4FA0 /* AboutView.swift */; };
+		55F1D11DFE019AFA79677125 /* LicenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9788B7B502CE09826157524D /* LicenseView.swift */; };
+		571CA11270CC7D27B15B65F0 /* RecoveryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2402D8498ECE60C4FA70BC /* RecoveryManager.swift */; };
+		5BE77C8889F3E89E5F1F5556 /* CIMDriverWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0E72AC1D743E615A0912E5B7 /* CIMDriverWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5C9D755446017C2D1C71DF03 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0851EBBBA4FDBC3FC8D12720 /* ContentView.swift */; };
+		5F5B9187DDC5D435EFCB15EA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66B1CB897772F32F6FEBDBB2 /* Assets.xcassets */; };
+		64721F651CC8045492543C5B /* WorkHoursNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB4DB75F74E40A92DC2438C /* WorkHoursNormalizerTests.swift */; };
+		69C02E33C3E97C0BF973DD11 /* TrackingLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBAD76699A491F8B011DD3BF /* TrackingLiveActivity.swift */; };
+		70EC732C4E1173105386F4DD /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A343F289004F7B4FE49346A9 /* Localizable.strings */; };
+		79103165CBB57C3593F488F0 /* TrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1180C7AE09AE0FAC852A323 /* TrackingManager.swift */; };
+		8DF178910B86DC56826056A2 /* AddressSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0442975784DD40204073573 /* AddressSearchViewModel.swift */; };
+		8E3DF2D78AC4C14BA1600C6D /* TripClassification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B773B4B97CB18A63CD3E6C1 /* TripClassification.swift */; };
+		8F207F538A0CB454DA81F7E0 /* ManualTripEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940C786EDE09CDA677B3A6A6 /* ManualTripEntryView.swift */; };
+		93B0229820809AE1B42CFCD9 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BE69B5F1775BFE41BC8CE77 /* AppSettings.swift */; };
+		97563AB8E3EA8E3B7F81BA8D /* AddressSelectionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D0248C488F6B2CC190EFC1 /* AddressSelectionSheet.swift */; };
+		9C7666701E2BF0C4CCAECA5D /* ClassificationRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB7F443236B0C89A3600816 /* ClassificationRule.swift */; };
+		9DF702952E1EE07436584A21 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55E7602225BC0CECB3BB9EB /* LocationService.swift */; };
+		A225BB36B90226D6C748B64A /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7B5B36CBDB2CF2D2B9C49B /* Trip.swift */; };
+		A67D4E4072F550B134C9CD01 /* Date+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3322E5982DC0605FCC79513D /* Date+Formatting.swift */; };
+		A7E78D53C71B7838FFBE78EF /* DashboardStatsCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A88ADB337BB974C46585D19 /* DashboardStatsCalculatorTests.swift */; };
+		A90B56409E9C548456C66941 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F31C4CEFBD0B33D3E41FB69 /* SettingsView.swift */; };
+		A954146D6ABEF5AC7D19C10B /* VehicleSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D177D6920682FDD9279E7579 /* VehicleSelectionView.swift */; };
+		AEFB23AF8B03F92A3A4DF4D9 /* DataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F5D9123C44B9096C4489 /* DataManagementView.swift */; };
+		B149FE30CB0B53B758D9EA64 /* Color+CIMDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31079D71E0F81FBBD170E7D3 /* Color+CIMDriver.swift */; };
+		B80D31FF07593491ADBCE63C /* WorkHoursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCE9548F1A17BD62B7BE3DFB /* WorkHoursView.swift */; };
+		C1C2FDD82E7A28AF52083590 /* TripDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E43D8518F2C320B8C88C017 /* TripDetailView.swift */; };
+		CA6BD2A965D6AAD54EE98930 /* EditClassificationRuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9585770616888E9E1ECB75 /* EditClassificationRuleView.swift */; };
+		D62D0F76F0BD393C66F5D024 /* DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3E595ECF51B91E536B442F2 /* DiagnosticsView.swift */; };
+		D74C4899BABB9B200556D069 /* CIMDriverApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCFEBBF95715F69EC5E9416 /* CIMDriverApp.swift */; };
+		E7FC34E75E17E6422499F4D4 /* TripClassificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */; };
+		E8589E61ADA4202B0246AB90 /* Charts.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE683ADFEE7F43C24325CE5 /* Charts.swift */; };
+		F0E5613CF4EDBA46D96B2EE4 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EAD0D5EFFCDC3EA7024D07 /* PreviewContainer.swift */; };
+		F7CEC0D3E62C668FE988E096 /* AddressMatching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FD64C61936699E2D7CEDDFA /* AddressMatching.swift */; };
+		FA2CCB26617AB3562F7AE2C7 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49894BF1458B3FFF48A75B5 /* BackupManager.swift */; };
+		FCA90E12EA0EE7A980446800 /* VehicleBluetoothView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14538E4755BB6AF13228E162 /* VehicleBluetoothView.swift */; };
+		FD2823B6EEC9F6D9BA57CE36 /* WorkDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9A9442B18494001CCE4C6E /* WorkDay.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		47E936E912B2D68E66BE6001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DCEC47B96495828DE828BCEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 789C5C659A25CB9B45750379;
+			remoteInfo = CIMDriverWidget;
+		};
+		B34C1D6A2A3F6B86EB646BE0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DCEC47B96495828DE828BCEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3219F467C43D31F940B4EA4;
+			remoteInfo = CIMDriver;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1AD3A6142B1826450F937E5A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5BE77C8889F3E89E5F1F5556 /* CIMDriverWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		076D609D3F91A3AEA955B1E0 /* BluetoothService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothService.swift; sourceTree = "<group>"; };
+		0851EBBBA4FDBC3FC8D12720 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0E43D8518F2C320B8C88C017 /* TripDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailView.swift; sourceTree = "<group>"; };
+		0E72AC1D743E615A0912E5B7 /* CIMDriverWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CIMDriverWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		0EC6FD3A17F5204E40FA960D /* ClassificationRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationRulesView.swift; sourceTree = "<group>"; };
+		0F2402D8498ECE60C4FA70BC /* RecoveryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryManager.swift; sourceTree = "<group>"; };
+		130ADCAF6FDD59D315146325 /* WidgetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetManager.swift; sourceTree = "<group>"; };
+		14538E4755BB6AF13228E162 /* VehicleBluetoothView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleBluetoothView.swift; sourceTree = "<group>"; };
+		16C4FD9554B67CFB71D2EE23 /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
+		174BF299555097EF06882B3B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		1A88ADB337BB974C46585D19 /* DashboardStatsCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatsCalculatorTests.swift; sourceTree = "<group>"; };
+		1C9D9EA8AF0A98E7C7A609E2 /* ExportUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportUtil.swift; sourceTree = "<group>"; };
+		1F31C4CEFBD0B33D3E41FB69 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripClassificationTests.swift; sourceTree = "<group>"; };
+		1F9585770616888E9E1ECB75 /* EditClassificationRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditClassificationRuleView.swift; sourceTree = "<group>"; };
+		246321B84451354E540BC461 /* TripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripsView.swift; sourceTree = "<group>"; };
+		2A07621028FC2304C57F43C4 /* SavedAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAddress.swift; sourceTree = "<group>"; };
+		2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPoint.swift; sourceTree = "<group>"; };
+		31079D71E0F81FBBD170E7D3 /* Color+CIMDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+CIMDriver.swift"; sourceTree = "<group>"; };
+		3322E5982DC0605FCC79513D /* Date+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Formatting.swift"; sourceTree = "<group>"; };
+		333A9B8F91A86F595F76041C /* CIMDriverWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIMDriverWidgetBundle.swift; sourceTree = "<group>"; };
+		3BE69B5F1775BFE41BC8CE77 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		3C7B5B36CBDB2CF2D2B9C49B /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
+		41D0248C488F6B2CC190EFC1 /* AddressSelectionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSelectionSheet.swift; sourceTree = "<group>"; };
+		4A11D0103E807E977ECA7609 /* ManualWorkDayEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualWorkDayEntryView.swift; sourceTree = "<group>"; };
+		4B15FB6EA070D185D3D4000B /* AddressListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressListView.swift; sourceTree = "<group>"; };
+		4B773B4B97CB18A63CD3E6C1 /* TripClassification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripClassification.swift; sourceTree = "<group>"; };
+		591C5D6C84265B6C61B5021E /* GeocoderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeocoderService.swift; sourceTree = "<group>"; };
+		593BD8FD220E74E8600D4E04 /* WorkHoursNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkHoursNormalizer.swift; sourceTree = "<group>"; };
+		5C3EBA862BF6E73DBE7B9C23 /* DashboardStatsCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatsCalculator.swift; sourceTree = "<group>"; };
+		5E9E3893C011580CC1912EB0 /* AddressMatchingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressMatchingTests.swift; sourceTree = "<group>"; };
+		66B1CB897772F32F6FEBDBB2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6FD64C61936699E2D7CEDDFA /* AddressMatching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressMatching.swift; sourceTree = "<group>"; };
+		7B511A551216BC532004C19C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7BB4DB75F74E40A92DC2438C /* WorkHoursNormalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkHoursNormalizerTests.swift; sourceTree = "<group>"; };
+		7BB7F443236B0C89A3600816 /* ClassificationRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationRule.swift; sourceTree = "<group>"; };
+		7D25F5D9123C44B9096C4489 /* DataManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementView.swift; sourceTree = "<group>"; };
+		7D9A9442B18494001CCE4C6E /* WorkDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkDay.swift; sourceTree = "<group>"; };
+		82E4A9C98CC597C4D26883D1 /* BluetoothDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothDevice.swift; sourceTree = "<group>"; };
+		940C786EDE09CDA677B3A6A6 /* ManualTripEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualTripEntryView.swift; sourceTree = "<group>"; };
+		9788B7B502CE09826157524D /* LicenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseView.swift; sourceTree = "<group>"; };
+		9883D3B3B4C90A7F848C6749 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		A49894BF1458B3FFF48A75B5 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
+		A6EAD0D5EFFCDC3EA7024D07 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
+		B13EA46F909F3FC9D3D80D22 /* Vehicle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vehicle.swift; sourceTree = "<group>"; };
+		B7B423957D9D990FCB0215B1 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C3E595ECF51B91E536B442F2 /* DiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsView.swift; sourceTree = "<group>"; };
+		C55E7602225BC0CECB3BB9EB /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		CCE9548F1A17BD62B7BE3DFB /* WorkHoursView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkHoursView.swift; sourceTree = "<group>"; };
+		CE595306EA41A3F24E3B4FA0 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		D1180C7AE09AE0FAC852A323 /* TrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingManager.swift; sourceTree = "<group>"; };
+		D177D6920682FDD9279E7579 /* VehicleSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleSelectionView.swift; sourceTree = "<group>"; };
+		D8B910BE207AC49CFDB7768B /* DashboardStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStats.swift; sourceTree = "<group>"; };
+		D9C9436354CC5107B4BC18CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DAB389E5DC8F3A1AEF6E1EB9 /* CIMDriverTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CIMDriverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBAD76699A491F8B011DD3BF /* TrackingLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingLiveActivity.swift; sourceTree = "<group>"; };
+		E677294ADA606565D97B1360 /* CIMDriver.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CIMDriver.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0442975784DD40204073573 /* AddressSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSearchViewModel.swift; sourceTree = "<group>"; };
+		F9DDF851B13572CF4254C867 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		FBE683ADFEE7F43C24325CE5 /* Charts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Charts.swift; sourceTree = "<group>"; };
+		FCCFEBBF95715F69EC5E9416 /* CIMDriverApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIMDriverApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		03A36209D6BEDD8C63EB4393 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				6FD64C61936699E2D7CEDDFA /* AddressMatching.swift */,
+				5C3EBA862BF6E73DBE7B9C23 /* DashboardStatsCalculator.swift */,
+				1C9D9EA8AF0A98E7C7A609E2 /* ExportUtil.swift */,
+				A6EAD0D5EFFCDC3EA7024D07 /* PreviewContainer.swift */,
+				DBAD76699A491F8B011DD3BF /* TrackingLiveActivity.swift */,
+				4B773B4B97CB18A63CD3E6C1 /* TripClassification.swift */,
+				130ADCAF6FDD59D315146325 /* WidgetManager.swift */,
+				593BD8FD220E74E8600D4E04 /* WorkHoursNormalizer.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		0AF8612CE79E2FAFA5D65EBE /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				FBE683ADFEE7F43C24325CE5 /* Charts.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		103895574AFCE3A47674ABB5 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				CE595306EA41A3F24E3B4FA0 /* AboutView.swift */,
+				4B15FB6EA070D185D3D4000B /* AddressListView.swift */,
+				0EC6FD3A17F5204E40FA960D /* ClassificationRulesView.swift */,
+				7D25F5D9123C44B9096C4489 /* DataManagementView.swift */,
+				C3E595ECF51B91E536B442F2 /* DiagnosticsView.swift */,
+				1F9585770616888E9E1ECB75 /* EditClassificationRuleView.swift */,
+				9788B7B502CE09826157524D /* LicenseView.swift */,
+				1F31C4CEFBD0B33D3E41FB69 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		2E2930D9AE811E0791001552 /* Trips */ = {
+			isa = PBXGroup;
+			children = (
+				41D0248C488F6B2CC190EFC1 /* AddressSelectionSheet.swift */,
+				940C786EDE09CDA677B3A6A6 /* ManualTripEntryView.swift */,
+				0E43D8518F2C320B8C88C017 /* TripDetailView.swift */,
+				246321B84451354E540BC461 /* TripsView.swift */,
+			);
+			path = Trips;
+			sourceTree = "<group>";
+		};
+		4598A5FCAAD1D27E0B7D9116 /* WorkHours */ = {
+			isa = PBXGroup;
+			children = (
+				4A11D0103E807E977ECA7609 /* ManualWorkDayEntryView.swift */,
+				CCE9548F1A17BD62B7BE3DFB /* WorkHoursView.swift */,
+			);
+			path = WorkHours;
+			sourceTree = "<group>";
+		};
+		491708DC3B4E2869108B73B0 /* CIMDriverWidget */ = {
+			isa = PBXGroup;
+			children = (
+				D9C9436354CC5107B4BC18CA /* Assets.xcassets */,
+				333A9B8F91A86F595F76041C /* CIMDriverWidgetBundle.swift */,
+				16C4FD9554B67CFB71D2EE23 /* DashboardWidget.swift */,
+				F9DDF851B13572CF4254C867 /* Info.plist */,
+			);
+			path = CIMDriverWidget;
+			sourceTree = "<group>";
+		};
+		5FEA263069D096FFFA8EBEF8 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				F0442975784DD40204073573 /* AddressSearchViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		6EA027A6A9AFD37CC37BBADF /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				31079D71E0F81FBBD170E7D3 /* Color+CIMDriver.swift */,
+				3322E5982DC0605FCC79513D /* Date+Formatting.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		7C43A457242A19A7A73B7D76 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E677294ADA606565D97B1360 /* CIMDriver.app */,
+				DAB389E5DC8F3A1AEF6E1EB9 /* CIMDriverTests.xctest */,
+				0E72AC1D743E615A0912E5B7 /* CIMDriverWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7FFF5AD520191758A1146FE5 /* CIMDriver */ = {
+			isa = PBXGroup;
+			children = (
+				66B1CB897772F32F6FEBDBB2 /* Assets.xcassets */,
+				FCCFEBBF95715F69EC5E9416 /* CIMDriverApp.swift */,
+				0851EBBBA4FDBC3FC8D12720 /* ContentView.swift */,
+				174BF299555097EF06882B3B /* Info.plist */,
+				6EA027A6A9AFD37CC37BBADF /* Extensions */,
+				A343F289004F7B4FE49346A9 /* Localizable.strings */,
+				F15CAF004BEEC231FDEF6B92 /* Models */,
+				BA8D04DE133D21DBAB8A517F /* Services */,
+				03A36209D6BEDD8C63EB4393 /* Utilities */,
+				5FEA263069D096FFFA8EBEF8 /* ViewModels */,
+				C589C6435C3BD48035E3E170 /* Views */,
+			);
+			path = CIMDriver;
+			sourceTree = "<group>";
+		};
+		933CB056D89A1E63F8729434 = {
+			isa = PBXGroup;
+			children = (
+				7FFF5AD520191758A1146FE5 /* CIMDriver */,
+				AB071987146549369874AC04 /* CIMDriverTests */,
+				491708DC3B4E2869108B73B0 /* CIMDriverWidget */,
+				7C43A457242A19A7A73B7D76 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AB071987146549369874AC04 /* CIMDriverTests */ = {
+			isa = PBXGroup;
+			children = (
+				5E9E3893C011580CC1912EB0 /* AddressMatchingTests.swift */,
+				1A88ADB337BB974C46585D19 /* DashboardStatsCalculatorTests.swift */,
+				1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */,
+				7BB4DB75F74E40A92DC2438C /* WorkHoursNormalizerTests.swift */,
+			);
+			path = CIMDriverTests;
+			sourceTree = "<group>";
+		};
+		BA8D04DE133D21DBAB8A517F /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A49894BF1458B3FFF48A75B5 /* BackupManager.swift */,
+				076D609D3F91A3AEA955B1E0 /* BluetoothService.swift */,
+				591C5D6C84265B6C61B5021E /* GeocoderService.swift */,
+				C55E7602225BC0CECB3BB9EB /* LocationService.swift */,
+				0F2402D8498ECE60C4FA70BC /* RecoveryManager.swift */,
+				D1180C7AE09AE0FAC852A323 /* TrackingManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		C589C6435C3BD48035E3E170 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0AF8612CE79E2FAFA5D65EBE /* Components */,
+				E469B8A4A45C6C1506CA66D9 /* Dashboard */,
+				103895574AFCE3A47674ABB5 /* Settings */,
+				2E2930D9AE811E0791001552 /* Trips */,
+				DE126860F9370680C052768A /* Vehicles */,
+				4598A5FCAAD1D27E0B7D9116 /* WorkHours */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		DE126860F9370680C052768A /* Vehicles */ = {
+			isa = PBXGroup;
+			children = (
+				14538E4755BB6AF13228E162 /* VehicleBluetoothView.swift */,
+				D177D6920682FDD9279E7579 /* VehicleSelectionView.swift */,
+			);
+			path = Vehicles;
+			sourceTree = "<group>";
+		};
+		E469B8A4A45C6C1506CA66D9 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				9883D3B3B4C90A7F848C6749 /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		F15CAF004BEEC231FDEF6B92 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3BE69B5F1775BFE41BC8CE77 /* AppSettings.swift */,
+				82E4A9C98CC597C4D26883D1 /* BluetoothDevice.swift */,
+				7BB7F443236B0C89A3600816 /* ClassificationRule.swift */,
+				D8B910BE207AC49CFDB7768B /* DashboardStats.swift */,
+				2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */,
+				2A07621028FC2304C57F43C4 /* SavedAddress.swift */,
+				3C7B5B36CBDB2CF2D2B9C49B /* Trip.swift */,
+				B13EA46F909F3FC9D3D80D22 /* Vehicle.swift */,
+				7D9A9442B18494001CCE4C6E /* WorkDay.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		789C5C659A25CB9B45750379 /* CIMDriverWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 67D352DFC71D549133464B6A /* Build configuration list for PBXNativeTarget "CIMDriverWidget" */;
+			buildPhases = (
+				0CDA82B3FD373808D4E9C243 /* Sources */,
+				829C83A1616540583B467353 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CIMDriverWidget;
+			packageProductDependencies = (
+			);
+			productName = CIMDriverWidget;
+			productReference = 0E72AC1D743E615A0912E5B7 /* CIMDriverWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		89D3690DCA9A835FAC8298E1 /* CIMDriverTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E98B6DF37960C669E7EF3874 /* Build configuration list for PBXNativeTarget "CIMDriverTests" */;
+			buildPhases = (
+				AC7C9225505D383158765904 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A6A53C6C1CC700F54BE84145 /* PBXTargetDependency */,
+			);
+			name = CIMDriverTests;
+			packageProductDependencies = (
+			);
+			productName = CIMDriverTests;
+			productReference = DAB389E5DC8F3A1AEF6E1EB9 /* CIMDriverTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D3219F467C43D31F940B4EA4 /* CIMDriver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 99C976F37EAAED148CE793C0 /* Build configuration list for PBXNativeTarget "CIMDriver" */;
+			buildPhases = (
+				866AD24C34233784C754A0B6 /* Sources */,
+				985D980F50309FA213EAE114 /* Resources */,
+				1AD3A6142B1826450F937E5A /* Embed Foundation Extensions */,
+				A1B2C3D4E5F60718293A4B5C /* Set Git Commit */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				01B109E159E837DD95225129 /* PBXTargetDependency */,
+			);
+			name = CIMDriver;
+			packageProductDependencies = (
+			);
+			productName = CIMDriver;
+			productReference = E677294ADA606565D97B1360 /* CIMDriver.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DCEC47B96495828DE828BCEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 1A31145576DD5C21F29E5615 /* Build configuration list for PBXProject "CIMDriver" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				nl,
+			);
+			mainGroup = 933CB056D89A1E63F8729434;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7C43A457242A19A7A73B7D76 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D3219F467C43D31F940B4EA4 /* CIMDriver */,
+				789C5C659A25CB9B45750379 /* CIMDriverWidget */,
+				89D3690DCA9A835FAC8298E1 /* CIMDriverTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		829C83A1616540583B467353 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3400DD39A1EC487B6E0FB056 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		985D980F50309FA213EAE114 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5F5B9187DDC5D435EFCB15EA /* Assets.xcassets in Resources */,
+				70EC732C4E1173105386F4DD /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1B2C3D4E5F60718293A4B5C /* Set Git Commit */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/.git/HEAD",
+				"$(SRCROOT)/.git/index",
+			);
+			name = "Set Git Commit";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SHORT_VERSION=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/CIMDriver/Info.plist\" 2>/dev/null || echo 1.0.0)\nCOMMIT=$(git -C \"$SRCROOT\" rev-parse --short HEAD 2>/dev/null)\nif [ -z \"$COMMIT\" ]; then\n  COMMIT=$(/usr/bin/env GIT_DIR=\"$SRCROOT/.git\" git rev-parse --short HEAD 2>/dev/null)\nfi\nif [ -z \"$COMMIT\" ] || [ \"$COMMIT\" = \"$(GIT_COMMIT)\" ] || [ \"$COMMIT\" = \"unknown\" ]; then\n  COMMIT=$(defaults read \"$SRCROOT/.git/FETCH_HEAD\" 2>/dev/null | head -n 1)
+fi\nif [ -z \"$COMMIT\" ] || [ \"$COMMIT\" = \"$(GIT_COMMIT)\" ] || [ \"$COMMIT\" = \"unknown\" ]; then\n  COMMIT=$(/bin/cat \"$SRCROOT/.git/HEAD\" 2>/dev/null | sed -n 's#ref: ##p' | while read ref; do /bin/cat \"$SRCROOT/.git/$ref\" 2>/dev/null; done | cut -c1-7)\nfi\nDISPLAY_VERSION=\"$SHORT_VERSION\"\nif [ -n \"$COMMIT\" ] && [ \"$COMMIT\" != \"$(GIT_COMMIT)\" ] && [ \"$COMMIT\" != \"unknown\" ]; then\n  DISPLAY_VERSION=\"$SHORT_VERSION-$COMMIT\"\nfi\n/usr/libexec/PlistBuddy -c \"Set :GIT_COMMIT $COMMIT\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Add :GIT_COMMIT string $COMMIT\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n/usr/libexec/PlistBuddy -c \"Set :APP_DISPLAY_VERSION $DISPLAY_VERSION\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Add :APP_DISPLAY_VERSION string $DISPLAY_VERSION\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0CDA82B3FD373808D4E9C243 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				143F6719FB543ED24A01CADC /* CIMDriverWidgetBundle.swift in Sources */,
+				05AAA15FB066B44976CBDE57 /* DashboardWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		866AD24C34233784C754A0B6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F2C9B707B9F4139B7AD130B /* AboutView.swift in Sources */,
+				2002D5F6CDF2059755CDD821 /* AddressListView.swift in Sources */,
+				F7CEC0D3E62C668FE988E096 /* AddressMatching.swift in Sources */,
+				8DF178910B86DC56826056A2 /* AddressSearchViewModel.swift in Sources */,
+				97563AB8E3EA8E3B7F81BA8D /* AddressSelectionSheet.swift in Sources */,
+				93B0229820809AE1B42CFCD9 /* AppSettings.swift in Sources */,
+				FA2CCB26617AB3562F7AE2C7 /* BackupManager.swift in Sources */,
+				08E98902FEDCB1E4D40F319A /* BluetoothDevice.swift in Sources */,
+				2D3B4C34CA0EB10A7D03D99E /* BluetoothService.swift in Sources */,
+				D74C4899BABB9B200556D069 /* CIMDriverApp.swift in Sources */,
+				E8589E61ADA4202B0246AB90 /* Charts.swift in Sources */,
+				9C7666701E2BF0C4CCAECA5D /* ClassificationRule.swift in Sources */,
+				0234900830C8404528756174 /* ClassificationRulesView.swift in Sources */,
+				B149FE30CB0B53B758D9EA64 /* Color+CIMDriver.swift in Sources */,
+				5C9D755446017C2D1C71DF03 /* ContentView.swift in Sources */,
+				20E4E80CBF9F198CAD2AF1DD /* DashboardStats.swift in Sources */,
+				258FC2D1EFEEF1EE9C5E55A2 /* DashboardStatsCalculator.swift in Sources */,
+				0AB38023D2B4E85612B645B5 /* DashboardView.swift in Sources */,
+				AEFB23AF8B03F92A3A4DF4D9 /* DataManagementView.swift in Sources */,
+				A67D4E4072F550B134C9CD01 /* Date+Formatting.swift in Sources */,
+				D62D0F76F0BD393C66F5D024 /* DiagnosticsView.swift in Sources */,
+				CA6BD2A965D6AAD54EE98930 /* EditClassificationRuleView.swift in Sources */,
+				360408C90855CFE2F4D436F2 /* ExportUtil.swift in Sources */,
+				1E6364C35011DCB0504D27C3 /* GeocoderService.swift in Sources */,
+				55F1D11DFE019AFA79677125 /* LicenseView.swift in Sources */,
+				24DB4F8833385A61E767B584 /* LocationPoint.swift in Sources */,
+				9DF702952E1EE07436584A21 /* LocationService.swift in Sources */,
+				8F207F538A0CB454DA81F7E0 /* ManualTripEntryView.swift in Sources */,
+				38F2CF464B5709C50EB5E948 /* ManualWorkDayEntryView.swift in Sources */,
+				F0E5613CF4EDBA46D96B2EE4 /* PreviewContainer.swift in Sources */,
+				571CA11270CC7D27B15B65F0 /* RecoveryManager.swift in Sources */,
+				0D1D5CAEA749650D2047B7B0 /* SavedAddress.swift in Sources */,
+				A90B56409E9C548456C66941 /* SettingsView.swift in Sources */,
+				69C02E33C3E97C0BF973DD11 /* TrackingLiveActivity.swift in Sources */,
+				79103165CBB57C3593F488F0 /* TrackingManager.swift in Sources */,
+				A225BB36B90226D6C748B64A /* Trip.swift in Sources */,
+				8E3DF2D78AC4C14BA1600C6D /* TripClassification.swift in Sources */,
+				C1C2FDD82E7A28AF52083590 /* TripDetailView.swift in Sources */,
+				2772A3015F076FCA9779502E /* TripsView.swift in Sources */,
+				050C9F23A3FA0536939582DE /* Vehicle.swift in Sources */,
+				FCA90E12EA0EE7A980446800 /* VehicleBluetoothView.swift in Sources */,
+				A954146D6ABEF5AC7D19C10B /* VehicleSelectionView.swift in Sources */,
+				3124A9A3BF18DD59E69E01FC /* WidgetManager.swift in Sources */,
+				FD2823B6EEC9F6D9BA57CE36 /* WorkDay.swift in Sources */,
+				2DBFCAFC4518AF0176F9F190 /* WorkHoursNormalizer.swift in Sources */,
+				B80D31FF07593491ADBCE63C /* WorkHoursView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC7C9225505D383158765904 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3904C7925C884DCE5289454A /* AddressMatchingTests.swift in Sources */,
+				A7E78D53C71B7838FFBE78EF /* DashboardStatsCalculatorTests.swift in Sources */,
+				E7FC34E75E17E6422499F4D4 /* TripClassificationTests.swift in Sources */,
+				64721F651CC8045492543C5B /* WorkHoursNormalizerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		01B109E159E837DD95225129 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 789C5C659A25CB9B45750379 /* CIMDriverWidget */;
+			targetProxy = 47E936E912B2D68E66BE6001 /* PBXContainerItemProxy */;
+		};
+		A6A53C6C1CC700F54BE84145 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D3219F467C43D31F940B4EA4 /* CIMDriver */;
+			targetProxy = B34C1D6A2A3F6B86EB646BE0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		A343F289004F7B4FE49346A9 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7B511A551216BC532004C19C /* en */,
+				B7B423957D9D990FCB0215B1 /* nl */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		02734281F210DBA18C61A358 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
+				GIT_COMMIT = "$(GIT_COMMIT)";
+				MARKETING_VERSION = 0.0.5;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = CIMDriver/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		0B7F3D23342B7ADB283749C2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		122A07B77FD9AFB0CAC60AE1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
+				GIT_COMMIT = "$(GIT_COMMIT)";
+				MARKETING_VERSION = 0.0.5;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = CIMDriver/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		21BD7B814CE86905E6E2056A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "";
+				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
+				PRODUCT_NAME = CIMDriverWidget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6A917FF7D0ED1E93FBB8FE16 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriverTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CIMDriver.app/CIMDriver";
+			};
+			name = Release;
+		};
+		8581D4CA59315069070F6B23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E84033326664E57624182E6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "";
+				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
+				PRODUCT_NAME = CIMDriverWidget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FE56A613F5D7BC07ECB52907 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriverTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CIMDriver.app/CIMDriver";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A31145576DD5C21F29E5615 /* Build configuration list for PBXProject "CIMDriver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B7F3D23342B7ADB283749C2 /* Debug */,
+				8581D4CA59315069070F6B23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		67D352DFC71D549133464B6A /* Build configuration list for PBXNativeTarget "CIMDriverWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E84033326664E57624182E6F /* Debug */,
+				21BD7B814CE86905E6E2056A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		99C976F37EAAED148CE793C0 /* Build configuration list for PBXNativeTarget "CIMDriver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				122A07B77FD9AFB0CAC60AE1 /* Debug */,
+				02734281F210DBA18C61A358 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E98B6DF37960C669E7EF3874 /* Build configuration list for PBXNativeTarget "CIMDriverTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE56A613F5D7BC07ECB52907 /* Debug */,
+				6A917FF7D0ED1E93FBB8FE16 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DCEC47B96495828DE828BCEA /* Project object */;
+}

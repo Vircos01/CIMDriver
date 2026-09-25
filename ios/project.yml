@@ -1,0 +1,48 @@
+name: CIMDriver
+options:
+  bundleIdPrefix: com.cimsolutions
+  deploymentTarget:
+    iOS: 17.0
+targets:
+  CIMDriver:
+    type: application
+    platform: iOS
+    sources:
+      - path: CIMDriver
+    info:
+      path: CIMDriver/Info.plist
+      properties:
+        UILaunchScreen: {}
+        UIBackgroundModes: 
+          - location
+          - bluetooth-central
+        NSLocationWhenInUseUsageDescription: CIMDriver heeft locatie nodig om ritten te registreren.
+        NSLocationAlwaysAndWhenInUseUsageDescription: CIMDriver heeft locatie op de achtergrond nodig om ritten te registreren.
+        NSBluetoothAlwaysUsageDescription: CIMDriver gebruikt Bluetooth om automatisch ritten te starten zodra u met de carkit verbindt.
+    dependencies:
+      - target: CIMDriverWidget
+        embed: true
+
+  CIMDriverWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: CIMDriverWidget
+    info:
+      path: CIMDriverWidget/Info.plist
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.cimsolutions.CIMDriver.widget
+      PRODUCT_NAME: CIMDriverWidget
+      SWIFT_VERSION: 5.0
+      CODE_SIGN_ENTITLEMENTS: ""
+      INFOPLIST_KEY_NSHumanReadableCopyright: ""
+
+  CIMDriverTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: CIMDriverTests
+    dependencies:
+      - target: CIMDriver
+    settings:
+      GENERATE_INFOPLIST_FILE: YES

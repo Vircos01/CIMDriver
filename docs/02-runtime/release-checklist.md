@@ -17,13 +17,13 @@ Wanneer er een nieuwe versie van CIMDriver wordt uitgebracht (bijvoorbeeld van v
    ```bash
    ./gradlew assembleRelease -PRELEASE_STORE_FILE=../release.jks -PRELEASE_STORE_PASSWORD=<Wachtwoord> -PRELEASE_KEY_ALIAS=<Alias> -PRELEASE_KEY_PASSWORD=<Wachtwoord>
    ```
-2. Verplaats en hernoem de resulterende APK vanuit `app/build/outputs/apk/release/app-release.apk` naar de root-map `release/CIMDriver-v1.X.X.apk`.
-3. Verwijder indien gewenst de oude APK uit de `release/` map om opslagruimte in de repository te besparen.
+2. Verplaats en hernoem de resulterende APK vanuit `android/app/build/outputs/apk/release/app-release.apk` naar de root-map `android/release/CIMDriver-v1.X.X.apk`.
+3. Verwijder indien gewenst de oude APK uit de `android/release/` map om opslagruimte in de repository te besparen.
 
 ## 4. Update de In-App Updater trigger (`version.json`)
 1. Open `version.json` in de root van de repository.
 2. Pas de `versionCode` en `versionName` aan naar de waardes die je in stap 1 hebt ingesteld.
-3. Update de `apkUrl` zodat deze exact verwijst naar de bestandsnaam van je nieuwe APK uit stap 3. (bijv. `.../main/release/CIMDriver-v1.0.3.apk`).
+3. Update de `apkUrl` zodat deze exact verwijst naar de bestandsnaam van je nieuwe APK uit stap 3. (bijv. `.../main/android/release/CIMDriver-v1.0.3.apk`).
 4. Pas de `releaseNotes` tekst aan (deze tekst zien gebruikers live in de app in de blauwe banner verschijnen).
 
 ## 5. Commit en Push naar GitHub

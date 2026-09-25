@@ -1,0 +1,5 @@
+"dashboard_title" = "Dashboard";
+"dashboard_status_idle" = "Klaar voor vertrek";
+"dashboard_status_active" = "Rit bezig...";
+"dashboard_status_grace" = "Bluetooth verbroken. Rit stopt in 3 minuten.";
+"dashboard_total_trips" = "Totaal Ritten Deze Maand";

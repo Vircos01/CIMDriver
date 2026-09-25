@@ -1,0 +1,5 @@
+"dashboard_title" = "Dashboard";
+"dashboard_status_idle" = "Ready to depart";
+"dashboard_status_active" = "Trip in progress...";
+"dashboard_status_grace" = "Bluetooth disconnected. Trip ends in 3 minutes.";
+"dashboard_total_trips" = "Total Trips This Month";

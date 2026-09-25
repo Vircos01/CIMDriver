@@ -31,18 +31,17 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: cp -R release docs/release
+      - run: cp -R android/release docs/release
       - run: |
-          git clone https://github.com/Vircos01/CIMDriver-iOS.git /tmp/ios-repo
           mkdir -p docs/ios
-          cp -R /tmp/ios-repo/docs/* docs/ios/
-          sed -i '/<div align="center">/d' /tmp/ios-repo/README.md
-          sed -i '/<\/div>/d' /tmp/ios-repo/README.md
-          sed -i 's|src="docs/screenshots/|src="../ios/screenshots/|g' /tmp/ios-repo/README.md
-          sed -i 's/> \[\!IMPORTANT\]/> **BELANGRIJK:**/g' /tmp/ios-repo/README.md
-          cp /tmp/ios-repo/README.md docs/over-de-app/ios.md
-          sed -i '/## 📸 Screenshots/,/^---$/d' docs/over-de-app/ios.md
-          sed -i '/## Inhoudsopgave/,/^---$/d' docs/over-de-app/ios.md
-          sed -i '/## ❤️ Support/,$d' docs/over-de-app/ios.md
+          cp -R ios/docs/* docs/ios/ || true
+          sed -i '' -e '/<div align="center">/d' ios/README.md || sed -i '/<div align="center">/d' ios/README.md
+          sed -i '' -e '/<\/div>/d' ios/README.md || sed -i '/<\/div>/d' ios/README.md
+          sed -i '' -e 's|src="docs/screenshots/|src="../ios/screenshots/|g' ios/README.md || sed -i 's|src="docs/screenshots/|src="../ios/screenshots/|g' ios/README.md
+          sed -i '' -e 's/> \[\!IMPORTANT\]/> **BELANGRIJK:**/g' ios/README.md || sed -i 's/> \[\!IMPORTANT\]/> **BELANGRIJK:**/g' ios/README.md
+          cp ios/README.md docs/over-de-app/ios.md
+          sed -i '' -e '/## 📸 Screenshots/,/^---$/d' docs/over-de-app/ios.md || sed -i '/## 📸 Screenshots/,/^---$/d' docs/over-de-app/ios.md
+          sed -i '' -e '/## Inhoudsopgave/,/^---$/d' docs/over-de-app/ios.md || sed -i '/## Inhoudsopgave/,/^---$/d' docs/over-de-app/ios.md
+          sed -i '' -e '/## ❤️ Support/,$d' docs/over-de-app/ios.md || sed -i '/## ❤️ Support/,$d' docs/over-de-app/ios.md
       - run: pip install mkdocs-material 
       - run: mkdocs gh-deploy --force
