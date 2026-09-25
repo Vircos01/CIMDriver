@@ -17,25 +17,25 @@ Dit document bevat de harde lessen en de vaste checklist voor het succesvol uitb
 Volg bij elke nieuwe release stipt deze stappen:
 
 ### 1. Versienummers Ophogen (4 plekken!)
-- [ ] **`app/build.gradle.kts`**: Verhoog `versionCode` (bijv. 7 -> 8) en pas `versionName` aan (bijv. "1.0.6" -> "1.0.7").
-- [ ] **`version.json`**: Werk `versionCode` en `versionName` bij. Pas ook de bestandsnaam in de `apkUrl` URL aan (bijv. `CIMDriver-v1.0.7.apk`).
+- [ ] **`android/app/build.gradle.kts`**: Verhoog `versionCode` (bijv. 7 -> 8) en pas `versionName` aan (bijv. "1.0.6" -> "1.0.7").
+- [ ] **`android/version.json`**: Werk `versionCode` en `versionName` bij. Pas ook de bestandsnaam in de `apkUrl` URL aan (bijv. `CIMDriver-v1.0.7.apk`).
 - [ ] **`README.md`**: Werk de versienummers bij in de tekst en de download-link.
-- [ ] **`CHANGELOG.md`**: Voeg een nieuwe sectie toe voor de nieuwe versie en documenteer de wijzigingen.
+- [ ] **Website Changelog (`docs/changelog/android.md`)**: Voeg een nieuwe sectie toe voor de nieuwe release en documenteer de wijzigingen op basis van de git geschiedenis.
 
 ### 2. Voorbereiden & Bouwen
-- [ ] Zorg dat `keystore.properties` aanwezig is in de root, lokaal goed is ingevuld, én is genegeerd in `.gitignore`.
-- [ ] Draai een **schone** build om caching problemen te voorkomen:
+- [ ] Zorg dat `android/keystore.properties` aanwezig is, lokaal goed is ingevuld, én is genegeerd in `.gitignore`.
+- [ ] Draai een **schone** build om caching problemen te voorkomen vanuit de `android/` map:
   ```bash
-  ./gradlew clean assembleRelease
+  cd android && ./gradlew clean assembleRelease && cd ..
   ```
 - [ ] Verifieer dat de build succesvol is afgerond.
 
 ### 3. In-App Updater Voorbereiden (GitHub Release folder)
-- [ ] Kopieer de zojuist gegenereerde APK naar de `release/` map in de repository en geef hem de naam die overeenkomt met `version.json`:
+- [ ] Kopieer de zojuist gegenereerde APK naar de `android/release/` map in de repository en geef hem de naam die overeenkomt met `version.json`:
   ```bash
-  cp app/build/outputs/apk/release/app-release.apk release/CIMDriver-v1.0.X.apk
+  cp android/app/build/outputs/apk/release/app-release.apk android/release/CIMDriver-v1.0.X.apk
   ```
-- [ ] (Optioneel maar netjes) Verwijder oudere `.apk` bestanden uit de `release/` map om de repo klein te houden.
+- [ ] (Optioneel maar netjes) Verwijder oudere `.apk` bestanden uit de `android/release/` map om de repo klein te houden.
 
 ### 4. Git History (Squash & Push)
 - [ ] Als je veel iteratieve commits hebt gedaan (bijv. fix build, fix typo), squash deze dan tot één schone commit:
@@ -43,9 +43,9 @@ Volg bij elke nieuwe release stipt deze stappen:
   git reset --soft [COMMIT_HASH_VAN_VORIGE_RELEASE]
   git commit -m "Release: Versie 1.0.X (Beschrijving van features)"
   ```
-- [ ] Voeg de nieuwe/gewijzigde bestanden toe (inclusief de APK in de `release/` map):
+- [ ] Voeg de nieuwe/gewijzigde bestanden toe:
   ```bash
-  git add release/CIMDriver-v1.0.X.apk app/build.gradle.kts version.json README.md CHANGELOG.md
+  git add android/release/CIMDriver-v1.0.X.apk android/app/build.gradle.kts android/version.json README.md android/CHANGELOG.md docs/
   ```
 - [ ] Push naar de main branch:
   ```bash
@@ -53,4 +53,6 @@ Volg bij elke nieuwe release stipt deze stappen:
   ```
 *(Let op: `--force` is nodig als je commits hebt gesquashed die al gepusht waren).*
 
-Zodra de push op GitHub staat, zal de In-App Updater op de telefoons de nieuwe `version.json` uitlezen en de verse APK uit de `release/` map downloaden!
+Zodra de push op GitHub staat, gebeuren er twee dingen:
+1. De In-App Updater op de telefoons leest de nieuwe `android/version.json` uit en downloadt de verse APK uit de `android/release/` map.
+2. De GitHub Action (`mkdocs-pages.yml`) bouwt en publiceert automatisch de nieuwste versie van de documentatie-website (inclusief de actuele changelog).

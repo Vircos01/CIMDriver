@@ -1,0 +1,48 @@
+name: Deploy MkDocs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/mkdocs-pages.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+      - uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: cp -R release docs/release
+      - run: |
+          git clone https://github.com/Vircos01/CIMDriver-iOS.git /tmp/ios-repo
+          mkdir -p docs/ios
+          cp -R /tmp/ios-repo/docs/* docs/ios/
+          sed -i '/<div align="center">/d' /tmp/ios-repo/README.md
+          sed -i '/<\/div>/d' /tmp/ios-repo/README.md
+          sed -i 's|src="docs/screenshots/|src="../ios/screenshots/|g' /tmp/ios-repo/README.md
+          sed -i 's/> \[\!IMPORTANT\]/> **BELANGRIJK:**/g' /tmp/ios-repo/README.md
+          cp /tmp/ios-repo/README.md docs/over-de-app/ios.md
+          sed -i '/## 📸 Screenshots/,/^---$/d' docs/over-de-app/ios.md
+          sed -i '/## Inhoudsopgave/,/^---$/d' docs/over-de-app/ios.md
+          sed -i '/## ❤️ Support/,$d' docs/over-de-app/ios.md
+      - run: pip install mkdocs-material 
+      - run: mkdocs gh-deploy --force

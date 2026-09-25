@@ -18,7 +18,7 @@ data class UpdateInfo(
 
 object UpdateChecker {
 
-    private const val VERSION_URL = "https://raw.githubusercontent.com/Vircos01/CIMDriver-Public/main/version.json"
+    private const val VERSION_URL = "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/version.json"
 
     suspend fun checkForUpdates(): UpdateInfo {
         return withContext(Dispatchers.IO) {

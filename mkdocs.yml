@@ -1,0 +1,163 @@
+site_name: CIMDriver
+site_description: De moderne en slimme ritten- en werkurenregistratie app voor Android
+site_author: Remco Visser
+repo_url: https://github.com/Vircos01/CIMDriver
+site_url: https://vircos01.github.io/CIMDriver/
+copyright: Copyright &copy; 2026 CIMDriver
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Vircos01/CIMDriver
+      name: Bekijk CIMDriver op GitHub
+    - icon: fontawesome/solid/envelope
+      link: mailto:support@cimdriver.com
+      name: Neem contact op met support
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  language: nl
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css?v=4
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+
+nav:
+  - Home: index.md
+  - Download & Installatie:
+      - Android: download/android.md
+      - iOS: download/ios.md
+  - Screenshots: screenshots.md
+  - Over de App:
+      - Android: over-de-app/android.md
+      - iOS: over-de-app/ios.md
+  - Documentatie:
+      - Android:
+          - Onboarding:
+              - Startgids: 00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS.md
+              - Documentatie Overzicht: intro.md
+              - Overzicht: 00-intro/overview.md
+              - Begrippenlijst: 00-intro/glossary.md
+          - Architectuur:
+              - Architectuur: 01-architecture/architecture.md
+              - Architectuurdiagram: 01-architecture/architecture-diagram.md
+              - Manifest en permissies: 01-architecture/manifest-permissions.md
+              - State- en lifecyclemodellen: 01-architecture/state-models.md
+              - Procesflows: 01-architecture/flows.md
+          - Runtime:
+              - Tracking en herstel: 02-runtime/tracking.md
+              - Achtergrondtaken: 02-runtime/background-jobs.md
+              - Diagnostiek: 02-runtime/diagnostics.md
+              - Runbooks: 02-runtime/runbooks.md
+              - Teststrategie: 02-runtime/testing.md
+          - Data:
+              - Gegevensmodel: 03-data/data-model.md
+              - Data-referentie: 03-data/data-reference.md
+              - Entity & DAO: 03-data/entity-dao-reference.md
+          - UI:
+              - Schermen en navigatie: 04-ui/ui-navigation.md
+              - UI-referentie: 04-ui/ui-reference.md
+              - ViewModel-referentie: 04-ui/viewmodel-reference.md
+              - Widgets: 04-ui/widgets.md
+              - Widget-referentie: 04-ui/widget-reference.md
+          - Integraties:
+              - Android Auto: 05-integrations/android-auto.md
+              - Car-referentie: 05-integrations/car-reference.md
+          - Referentie:
+              - Core: 06-reference/core-reference.md
+              - Service: 06-reference/service-reference.md
+              - Utility: 06-reference/util-reference.md
+              - Worker: 06-reference/worker-reference.md
+              - Codecatalogus: 06-reference/code-catalog.md
+
+      - iOS:
+          - Onboarding:
+              - Startgids: ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS.md
+              - Documentatie Overzicht: ios/README.md
+              - Overzicht: ios/00-intro/overview.md
+              - Begrippenlijst: ios/00-intro/glossary.md
+              - Lokale Installatie: ios/local-install.md
+          - Architectuur:
+              - Architectuur: ios/01-architecture/architecture.md
+              - Architectuurdiagram: ios/01-architecture/architecture-diagram.md
+              - Capabilities en permissies: ios/01-architecture/capabilities-permissions.md
+              - State- en lifecyclemodellen: ios/01-architecture/state-models.md
+              - Procesflows: ios/01-architecture/flows.md
+          - Runtime:
+              - Tracking en herstel: ios/02-runtime/tracking.md
+              - Achtergrondtaken: ios/02-runtime/background-jobs.md
+              - Diagnostiek: ios/02-runtime/diagnostics.md
+              - Runbooks: ios/02-runtime/runbooks.md
+              - Teststrategie: ios/02-runtime/testing.md
+          - Data:
+              - Gegevensmodel: ios/03-data/data-model.md
+              - Data-referentie: ios/03-data/data-reference.md
+              - Repository & Storage: ios/03-data/repository-storage-reference.md
+          - UI:
+              - Schermen en navigatie: ios/04-ui/ui-navigation.md
+              - UI-referentie: ios/04-ui/ui-reference.md
+              - ViewModel-referentie: ios/04-ui/viewmodel-state-reference.md
+              - Components: ios/04-ui/components.md
+              - Component-referentie: ios/04-ui/component-reference.md
+          - Integraties:
+              - Apple CarPlay: ios/05-integrations/carplay.md
+              - Integration-referentie: ios/05-integrations/integration-reference.md
+          - Referentie:
+              - Core: ios/06-reference/core-reference.md
+              - Service: ios/06-reference/service-reference.md
+              - Utility: ios/06-reference/util-reference.md
+              - Background Task: ios/06-reference/background-task-reference.md
+              - Codecatalogus: ios/06-reference/code-catalog.md
+
+  - FAQ:
+      - Android: faq/android.md
+      - iOS: faq/ios.md
+  - Wat is er nieuw?:
+      - Android: changelog/android.md
+      - iOS: changelog/ios.md
+  - Licentie: licentie.md
