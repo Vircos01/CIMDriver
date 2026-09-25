@@ -1,0 +1,1025 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/CHANGELOG-DOCUMENTATIE/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/CHANGELOG-DOCUMENTATIE/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/CHANGELOG-DOCUMENTATIE/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/RELEASE_CHECKLIST/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/RELEASE_CHECKLIST/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/RELEASE_CHECKLIST/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/intro/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/intro/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/intro/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/licentie/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/licentie/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/licentie/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/screenshots/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/screenshots/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/screenshots/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/00-intro/glossary/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/00-intro/glossary/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/00-intro/glossary/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/00-intro/overview/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/00-intro/overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/00-intro/overview/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/01-architecture/architecture-diagram/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/architecture-diagram/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/architecture-diagram/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/01-architecture/architecture/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/architecture/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/01-architecture/flows/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/flows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/flows/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/01-architecture/manifest-permissions/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/manifest-permissions/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/manifest-permissions/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/01-architecture/state-models/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/state-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/state-models/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/02-runtime/background-jobs/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/background-jobs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/background-jobs/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/02-runtime/diagnostics/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/diagnostics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/diagnostics/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/02-runtime/runbooks/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/runbooks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/runbooks/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/02-runtime/testing/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/testing/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/testing/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/02-runtime/tracking/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/tracking/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/tracking/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/03-data/data-model/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/03-data/data-model/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/03-data/data-model/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/03-data/data-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/03-data/data-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/03-data/data-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/03-data/entity-dao-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/03-data/entity-dao-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/03-data/entity-dao-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/04-ui/ui-navigation/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/ui-navigation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/ui-navigation/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/04-ui/ui-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/ui-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/ui-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/04-ui/viewmodel-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/viewmodel-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/viewmodel-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/04-ui/widget-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/widget-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/widget-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/04-ui/widgets/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/widgets/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/widgets/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/05-integrations/android-auto/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/05-integrations/android-auto/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/05-integrations/android-auto/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/05-integrations/car-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/05-integrations/car-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/05-integrations/car-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/06-reference/code-catalog/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/code-catalog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/code-catalog/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/06-reference/core-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/core-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/core-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/06-reference/service-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/service-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/service-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/06-reference/util-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/util-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/util-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/06-reference/worker-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/worker-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/worker-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/changelog/android/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/changelog/android/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/changelog/android/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/changelog/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/changelog/ios/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/changelog/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/download/android/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/download/android/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/download/android/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/download/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/download/ios/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/download/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/faq/android/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/faq/android/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/faq/android/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/faq/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/faq/ios/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/faq/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/CHANGELOG-DOCUMENTATIE/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/CHANGELOG-DOCUMENTATIE/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/CHANGELOG-DOCUMENTATIE/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/local-install/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/local-install/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/local-install/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/00-intro/glossary/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/00-intro/glossary/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/00-intro/glossary/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/00-intro/overview/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/00-intro/overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/00-intro/overview/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/01-architecture/architecture-diagram/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/architecture-diagram/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/architecture-diagram/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/01-architecture/architecture/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/architecture/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/01-architecture/capabilities-permissions/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/capabilities-permissions/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/capabilities-permissions/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/01-architecture/flows/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/flows/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/flows/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/01-architecture/state-models/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/state-models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/state-models/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/02-runtime/background-jobs/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/background-jobs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/background-jobs/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/02-runtime/diagnostics/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/diagnostics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/diagnostics/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/02-runtime/release-checklist/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/release-checklist/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/release-checklist/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/02-runtime/runbooks/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/runbooks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/runbooks/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/02-runtime/testing/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/testing/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/testing/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/02-runtime/tracking/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/tracking/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/tracking/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/03-data/data-model/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/03-data/data-model/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/03-data/data-model/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/03-data/data-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/03-data/data-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/03-data/data-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/03-data/repository-storage-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/03-data/repository-storage-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/03-data/repository-storage-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/04-ui/component-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/component-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/component-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/04-ui/components/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/components/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/components/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/04-ui/ui-navigation/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/ui-navigation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/ui-navigation/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/04-ui/ui-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/ui-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/ui-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/04-ui/viewmodel-state-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/viewmodel-state-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/viewmodel-state-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/05-integrations/carplay/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/05-integrations/carplay/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/05-integrations/carplay/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/05-integrations/integration-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/05-integrations/integration-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/05-integrations/integration-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/06-reference/background-task-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/background-task-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/background-task-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/06-reference/code-catalog/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/code-catalog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/code-catalog/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/06-reference/core-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/core-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/core-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/06-reference/service-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/service-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/service-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/ios/06-reference/util-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/util-reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/util-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/release/FEATURES/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/release/FEATURES/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/release/FEATURES/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/CHANGELOG-DOCUMENTATIE/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/CHANGELOG-DOCUMENTATIE/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/CHANGELOG-DOCUMENTATIE/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/RELEASE_CHECKLIST/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/RELEASE_CHECKLIST/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/RELEASE_CHECKLIST/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/intro/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/intro/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/intro/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/licentie/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/licentie/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/licentie/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/screenshots/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/screenshots/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/screenshots/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/00-intro/glossary/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/00-intro/glossary/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/00-intro/glossary/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/00-intro/overview/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/00-intro/overview/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/00-intro/overview/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/01-architecture/architecture-diagram/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/architecture-diagram/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/architecture-diagram/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/01-architecture/architecture/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/architecture/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/01-architecture/flows/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/flows/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/flows/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/01-architecture/manifest-permissions/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/manifest-permissions/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/manifest-permissions/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/01-architecture/state-models/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/01-architecture/state-models/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/01-architecture/state-models/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/02-runtime/background-jobs/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/background-jobs/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/background-jobs/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/02-runtime/diagnostics/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/diagnostics/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/diagnostics/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/02-runtime/runbooks/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/runbooks/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/runbooks/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/02-runtime/testing/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/testing/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/testing/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/02-runtime/tracking/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/02-runtime/tracking/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/02-runtime/tracking/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/03-data/data-model/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/03-data/data-model/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/03-data/data-model/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/03-data/data-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/03-data/data-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/03-data/data-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/03-data/entity-dao-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/03-data/entity-dao-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/03-data/entity-dao-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/04-ui/ui-navigation/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/ui-navigation/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/ui-navigation/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/04-ui/ui-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/ui-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/ui-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/04-ui/viewmodel-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/viewmodel-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/viewmodel-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/04-ui/widget-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/widget-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/widget-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/04-ui/widgets/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/04-ui/widgets/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/04-ui/widgets/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/05-integrations/android-auto/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/05-integrations/android-auto/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/05-integrations/android-auto/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/05-integrations/car-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/05-integrations/car-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/05-integrations/car-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/06-reference/code-catalog/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/code-catalog/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/code-catalog/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/06-reference/core-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/core-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/core-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/06-reference/service-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/service-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/service-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/06-reference/util-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/util-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/util-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/06-reference/worker-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/06-reference/worker-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/06-reference/worker-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/changelog/android/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/changelog/android/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/changelog/android/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/changelog/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/changelog/ios/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/changelog/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/download/android/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/download/android/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/download/android/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/download/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/download/ios/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/download/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/faq/android/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/faq/android/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/faq/android/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/faq/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/faq/ios/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/faq/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/CHANGELOG-DOCUMENTATIE/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/CHANGELOG-DOCUMENTATIE/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/CHANGELOG-DOCUMENTATIE/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/local-install/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/local-install/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/local-install/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/00-intro/glossary/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/00-intro/glossary/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/00-intro/glossary/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/00-intro/overview/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/00-intro/overview/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/00-intro/overview/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/01-architecture/architecture-diagram/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/architecture-diagram/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/architecture-diagram/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/01-architecture/architecture/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/architecture/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/01-architecture/capabilities-permissions/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/capabilities-permissions/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/capabilities-permissions/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/01-architecture/flows/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/flows/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/flows/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/01-architecture/state-models/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/01-architecture/state-models/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/01-architecture/state-models/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/02-runtime/background-jobs/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/background-jobs/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/background-jobs/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/02-runtime/diagnostics/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/diagnostics/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/diagnostics/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/02-runtime/release-checklist/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/release-checklist/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/release-checklist/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/02-runtime/runbooks/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/runbooks/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/runbooks/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/02-runtime/testing/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/testing/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/testing/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/02-runtime/tracking/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/02-runtime/tracking/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/02-runtime/tracking/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/03-data/data-model/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/03-data/data-model/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/03-data/data-model/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/03-data/data-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/03-data/data-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/03-data/data-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/03-data/repository-storage-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/03-data/repository-storage-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/03-data/repository-storage-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/04-ui/component-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/component-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/component-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/04-ui/components/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/components/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/components/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/04-ui/ui-navigation/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/ui-navigation/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/ui-navigation/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/04-ui/ui-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/ui-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/ui-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/04-ui/viewmodel-state-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/04-ui/viewmodel-state-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/04-ui/viewmodel-state-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/05-integrations/carplay/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/05-integrations/carplay/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/05-integrations/carplay/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/05-integrations/integration-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/05-integrations/integration-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/05-integrations/integration-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/06-reference/background-task-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/background-task-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/background-task-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/06-reference/code-catalog/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/code-catalog/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/code-catalog/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/06-reference/core-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/core-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/core-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/06-reference/service-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/service-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/service-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/ios/06-reference/util-reference/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/ios/06-reference/util-reference/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/ios/06-reference/util-reference/"/>
+    </url>
+    <url>
+        <loc>https://vircos01.github.io/CIMDriver/en/release/FEATURES/</loc>
+        <lastmod>2026-09-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vircos01.github.io/CIMDriver/en/release/FEATURES/"/>
+        <xhtml:link rel="alternate" hreflang="nl" href="https://vircos01.github.io/CIMDriver/release/FEATURES/"/>
+    </url>
+</urlset>
