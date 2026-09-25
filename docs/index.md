@@ -23,7 +23,7 @@ CIMDriver detecteert ritten via Bluetooth-verbinding en classificeert ze automat
 
 <br>
 
-[Lees de Handleiding (Over de app)](over-de-app/android.md){ .md-button }
+[Documentatie](intro.md){ .md-button }
 {: style="display: flex; justify-content: center;" }
 
 <br>

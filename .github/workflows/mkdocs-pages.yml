@@ -35,13 +35,13 @@ jobs:
       - run: |
           mkdir -p docs/ios
           cp -R ios/docs/* docs/ios/ || true
-          sed -i '' -e '/<div align="center">/d' ios/README.md || sed -i '/<div align="center">/d' ios/README.md
-          sed -i '' -e '/<\/div>/d' ios/README.md || sed -i '/<\/div>/d' ios/README.md
-          sed -i '' -e 's|src="docs/screenshots/|src="../ios/screenshots/|g' ios/README.md || sed -i 's|src="docs/screenshots/|src="../ios/screenshots/|g' ios/README.md
-          sed -i '' -e 's/> \[\!IMPORTANT\]/> **BELANGRIJK:**/g' ios/README.md || sed -i 's/> \[\!IMPORTANT\]/> **BELANGRIJK:**/g' ios/README.md
-          cp ios/README.md docs/over-de-app/ios.md
-          sed -i '' -e '/## 📸 Screenshots/,/^---$/d' docs/over-de-app/ios.md || sed -i '/## 📸 Screenshots/,/^---$/d' docs/over-de-app/ios.md
-          sed -i '' -e '/## Inhoudsopgave/,/^---$/d' docs/over-de-app/ios.md || sed -i '/## Inhoudsopgave/,/^---$/d' docs/over-de-app/ios.md
-          sed -i '' -e '/## ❤️ Support/,$d' docs/over-de-app/ios.md || sed -i '/## ❤️ Support/,$d' docs/over-de-app/ios.md
-      - run: pip install mkdocs-material 
+          sed -i -e '/<div align="center">/d' ios/README.md
+          sed -i -e '/<\/div>/d' ios/README.md
+          sed -i -e 's|src="docs/screenshots/|src="../ios/screenshots/|g' ios/README.md
+          sed -i -e 's/> \[\!IMPORTANT\]/> **BELANGRIJK:**/g' ios/README.md
+          cp ios/README.md docs/ios/README.md
+          sed -i -e '/## 📸 Screenshots/,/^---$/d' docs/ios/README.md
+          sed -i -e '/## Inhoudsopgave/,/^---$/d' docs/ios/README.md
+          sed -i -e '/## ❤️ Support/,$d' docs/ios/README.md
+      - run: pip install mkdocs-material mkdocs-static-i18n
       - run: mkdocs gh-deploy --force

@@ -17,7 +17,7 @@ Welkom bij de veelgestelde vragen over CIMDriver. Hier vind je snelle antwoorden
     Binnen de app ga je naar het tabblad **Rapportages** of **Exporteren**. Hier kun je een datumbereik kiezen en je geregistreerde ritten eenvoudig exporteren naar een overzichtelijk CSV- of Excel-bestand. Dit bestand kun je vervolgens delen via e-mail of WhatsApp.
 
 ??? bug "De app lijkt af en toe een rit te missen, wat kan ik doen?"
-    Controleer of batterij-optimalisatie voor CIMDriver is uitgeschakeld. Android (en soms iOS) sluiten automatisch apps af om batterij te besparen. In de handleiding onder [Troubleshooting](../over-de-app/android.md) vind je precies hoe je CIMDriver kunt uitzonderen van deze agressieve batterijbesparing.
+    Controleer of batterij-optimalisatie voor CIMDriver is uitgeschakeld. Android (en soms iOS) sluiten automatisch apps af om batterij te besparen. In de handleiding onder [Troubleshooting](../02-runtime/diagnostics.md) vind je precies hoe je CIMDriver kunt uitzonderen van deze agressieve batterijbesparing.
 
 ??? question "Hoe kan ik een geregistreerde rit, adres of werkdag verwijderen?"
     Je kunt items eenvoudig verwijderen door ze in de lijst **naar links te swipen**. Er verschijnt dan een rood prullenbak-icoontje en na een extra bevestiging wordt het item permanent verwijderd. Dit werkt voor ritten in het rittenoverzicht, opgeslagen adressen in het adresboek en werkdagen in je urenregistratie.

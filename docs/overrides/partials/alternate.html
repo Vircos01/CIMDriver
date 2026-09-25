@@ -1,0 +1,26 @@
+<div class="md-header__option">
+  <div class="md-select">
+    <button class="md-header__button md-icon" aria-label="{{ lang.t('select.language') }}" style="width: auto; padding: 0 8px; font-size: 1.2rem;">
+      {% set current_flag = "🇳🇱" %}
+      {% if config.theme.language == "en" %}
+        {% set current_flag = "🇬🇧" %}
+      {% endif %}
+      {{ current_flag }}
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        {% for alt in config.extra.alternate %}
+          {% set flag = "🇳🇱" %}
+          {% if alt.lang == "en" %}
+            {% set flag = "🇬🇧" %}
+          {% endif %}
+          <li class="md-select__item">
+            <a href="{{ alt.link | url }}" hreflang="{{ alt.lang }}" class="md-select__link" style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.2rem;">{{ flag }}</span> {{ alt.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
