@@ -52,6 +52,8 @@ android {
                 storePassword = keystorePassword
                 keyAlias = keystoreKeyAlias
                 keyPassword = keystoreKeyPassword
+                enableV1Signing = true
+                enableV2Signing = true
             } else {
                 // Fallback to debug keystore so release builds can succeed without secrets
                 initWith(getByName("debug"))
