@@ -22,10 +22,12 @@ import com.cimdriver.app.ui.viewmodel.SettingsViewModel
 @Composable
 fun TripClassificationSettingsScreen(
     onBack: () -> Unit,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
+    addressBookViewModel: com.cimdriver.app.ui.viewmodel.AddressBookViewModel = hiltViewModel()
 ) {
     val settings by viewModel.settings.collectAsState()
     val classificationRules by viewModel.classificationRules.collectAsState()
+    val savedAddresses by addressBookViewModel.addresses.collectAsState()
     
     val initialSettings = settings ?: com.cimdriver.app.data.local.entity.Settings()
     var businessCompensationStr by remember(initialSettings.businessCompensation) { 
@@ -63,7 +65,7 @@ fun TripClassificationSettingsScreen(
         ) {
             com.cimdriver.app.ui.components.TripTypeSettingsCard(viewModel, classificationRules)
             Spacer(modifier = Modifier.height(16.dp))
-            ClassificationSettingsCard(viewModel, initialSettings, classificationRules)
+            ClassificationSettingsCard(viewModel, initialSettings, classificationRules, savedAddresses, { query -> addressBookViewModel.searchAddress(query) })
             
             Spacer(modifier = Modifier.height(16.dp))
 
