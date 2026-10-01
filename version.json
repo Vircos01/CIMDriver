@@ -1,6 +1,6 @@
 {
-  "versionCode": 15,
-  "versionName": "1.1.4",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.1.4.apk",
-  "releaseNotes": "Versie 1.1.4: Reparatie van database migratiecrash en verwijdering van het custom splash screen voor sneller opstarten."
+  "versionCode": 16,
+  "versionName": "1.1.5",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.1.5.apk",
+  "releaseNotes": "Versie 1.1.5: Auto-aanvullen en adresboek selectie toegevoegd voor classificatieregels."
 }

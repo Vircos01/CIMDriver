@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.1.5] - 2026-10-01
+
+### Toegevoegd
+- **Classificatieregels:** Auto-aanvullen en adresboek selectie toegevoegd voor classificatieregels. Vanaf nu kun je net als bij ritten eenvoudig adressen selecteren uit je adresboek.
+
 ## [1.1.4] - 2026-09-24
 
 ### Opgelost

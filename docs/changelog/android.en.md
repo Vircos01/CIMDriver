@@ -4,7 +4,14 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.1.4 (Current Version)
+## Version 1.1.5 (Current Version)
+
+!!! success "New"
+    * **Classification Rules:** Added auto-complete and address book selection. You can now easily select addresses from your address book when setting up rules, just like with trips.
+
+---
+
+## Version 1.1.4
 
 !!! success "New"
     * **Documentation:** Release notes have been updated with a warning about the backup functionality, and the project structure has been improved.
