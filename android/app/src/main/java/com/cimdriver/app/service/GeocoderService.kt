@@ -206,6 +206,54 @@ class GeocoderService(private val context: Context) {
         }
     }
 
+    suspend fun checkGasStationNearby(latitude: Double, longitude: Double, engineType: String = "ICE"): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val amenities = mutableListOf("\"amenity\"=\"fuel\"")
+                if (engineType == "EV" || engineType == "PHEV") {
+                    amenities.add("\"amenity\"=\"charging_station\"")
+                }
+                
+                val nodeQueries = amenities.joinToString(";") { "node(around:75,$latitude,$longitude)[$it]" }
+                val wayQueries = amenities.joinToString(";") { "way(around:75,$latitude,$longitude)[$it]" }
+                
+                val query = "[out:json];($nodeQueries;$wayQueries;);out center;"
+                
+                val url = URL("https://overpass-api.de/api/interpreter")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("User-Agent", "CIMDriver/1.0")
+                connection.doOutput = true
+                connection.outputStream.write(query.toByteArray())
+
+                if (connection.responseCode == 200) {
+                    val response = connection.inputStream.bufferedReader().readText()
+                    val json = JSONObject(response)
+                    val elements = json.optJSONArray("elements")
+                    if (elements != null && elements.length() > 0) {
+                        for (i in 0 until elements.length()) {
+                            val element = elements.getJSONObject(i)
+                            val tags = element.optJSONObject("tags")
+                            if (tags != null) {
+                                val name = tags.optString("name")
+                                val brand = tags.optString("brand")
+                                val operator = tags.optString("operator")
+                                if (name.isNotEmpty()) return@withContext name
+                                if (brand.isNotEmpty()) return@withContext brand
+                                if (operator.isNotEmpty()) return@withContext operator
+                            }
+                        }
+                        return@withContext if (engineType == "EV" || engineType == "PHEV") "Laadpaal" else "Tankstation"
+                    }
+                }
+                null
+            } catch (e: Exception) {
+                Log.e("GeocoderService", "Failed to check gas station", e)
+                null
+            }
+        }
+    }
+
     suspend fun getOsrmRoute(startLat: Double, startLon: Double, endLat: Double, endLon: Double): List<Pair<Double, Double>> {
         return withContext(Dispatchers.IO) {
             try {

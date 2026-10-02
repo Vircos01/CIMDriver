@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import com.cimdriver.app.ui.components.DistanceStackedChart
 import com.cimdriver.app.ui.components.WorkHoursBarChart
 import com.cimdriver.app.ui.components.TripItem
+import com.cimdriver.app.ui.components.TripsCalendarView
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.rememberCoroutineScope
@@ -110,6 +111,7 @@ fun TripsScreen(
     var showExportMenu by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
     var isSearchVisible by remember { mutableStateOf(false) }
+    var viewMode by remember { mutableStateOf("LIST") } // "LIST" or "CALENDAR"
     val coroutineScope = rememberCoroutineScope()
     
     val suggestRuleState by viewModel.suggestRuleState.collectAsState()
@@ -301,10 +303,9 @@ fun TripsScreen(
                             }
                         }
                         
-                        if (selectedTrips.size == 2) {
+                        if (selectedTrips.size >= 2) {
                             IconButton(onClick = {
-                                val list = selectedTrips.toList()
-                                viewModel.mergeTrips(list[0], list[1])
+                                viewModel.mergeTrips(selectedTrips.toList())
                                 selectedTrips = emptySet()
                             }) {
                                 Icon(Icons.AutoMirrored.Filled.CallMerge, contentDescription = stringResource(R.string.merge))
@@ -435,17 +436,41 @@ fun TripsScreen(
                         }
                     }
                     
-                    PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    onRefresh = {
-                        coroutineScope.launch {
-                            isRefreshing = true
-                            delay(500)
-                            isRefreshing = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize().weight(1f)
-                ) {
+                    TabRow(selectedTabIndex = if (viewMode == "LIST") 0 else 1) {
+                        Tab(
+                            selected = viewMode == "LIST",
+                            onClick = { viewMode = "LIST" },
+                            text = { Text("Lijst") }
+                        )
+                        Tab(
+                            selected = viewMode == "CALENDAR",
+                            onClick = { viewMode = "CALENDAR" },
+                            text = { Text("Kalender") }
+                        )
+                    }
+                    
+                    if (viewMode == "CALENDAR") {
+                        TripsCalendarView(
+                            trips = trips,
+                            selectedYear = selectedYear,
+                            onDayClick = { dayTrips ->
+                                // Optional: handle day click, e.g. scroll list to this day, or show dialog.
+                                // For now we'll switch back to list and perhaps in future filter it.
+                                viewMode = "LIST"
+                            }
+                        )
+                    } else {
+                        PullToRefreshBox(
+                        isRefreshing = isRefreshing,
+                        onRefresh = {
+                            coroutineScope.launch {
+                                isRefreshing = true
+                                delay(500)
+                                isRefreshing = false
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize().weight(1f)
+                    ) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(trips, key = { it.id }) { trip ->
                             val isSelected = selectedTrips.contains(trip)
@@ -539,6 +564,7 @@ fun TripsScreen(
                                 )
                             }
                         }
+                    }
                     }
                 }
             }

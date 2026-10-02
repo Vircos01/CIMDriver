@@ -164,6 +164,7 @@ fun TripDetailScreen(
                 actions = {
                     var expanded by remember { mutableStateOf(false) }
                     var showRecalculateConfirm by remember { mutableStateOf(false) }
+                    var showFavoriteConfirm by remember { mutableStateOf(false) }
 
                     if (showRecalculateConfirm) {
                         AlertDialog(
@@ -180,6 +181,40 @@ fun TripDetailScreen(
                             },
                             dismissButton = {
                                 TextButton(onClick = { showRecalculateConfirm = false }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
+
+                    if (showFavoriteConfirm) {
+                        var routeName by remember { mutableStateOf("") }
+                        AlertDialog(
+                            onDismissRequest = { showFavoriteConfirm = false },
+                            title = { Text("Opslaan als favoriete route") },
+                            text = { 
+                                Column {
+                                    Text("Geef deze route een naam om hem later snel te kunnen selecteren.")
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    OutlinedTextField(
+                                        value = routeName,
+                                        onValueChange = { routeName = it },
+                                        label = { Text("Naam route") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    viewModel.saveAsFavoriteRoute(routeName.ifBlank { "Mijn Route" })
+                                    showFavoriteConfirm = false
+                                }) {
+                                    Text("Opslaan")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showFavoriteConfirm = false }) {
                                     Text(stringResource(R.string.cancel))
                                 }
                             }
@@ -220,6 +255,13 @@ fun TripDetailScreen(
                             onClick = {
                                 expanded = false
                                 showRecalculateConfirm = true
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Opslaan als favoriet") },
+                            onClick = {
+                                expanded = false
+                                showFavoriteConfirm = true
                             }
                         )
                     }
@@ -297,6 +339,14 @@ fun TripDetailScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
+                    if (!trip!!.projectCode.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        HorizontalDivider()
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(stringResource(R.string.project_code_optional), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(trip!!.projectCode ?: "")
+                    }
+
                     if (!trip!!.note.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         HorizontalDivider()
@@ -315,6 +365,9 @@ fun TripDetailScreen(
                 var typeExpanded by remember { mutableStateOf(false) }
                 var showNoteRequiredDialog by remember { mutableStateOf(false) }
                 var reviewNoteText by remember { mutableStateOf(trip!!.note ?: "") }
+                var reviewProjectCode by remember { mutableStateOf(trip!!.projectCode ?: "") }
+                val projectCodes by viewModel.projectCodes.collectAsState()
+                var projectCodeExpanded by remember { mutableStateOf(false) }
 
                 if (showNoteRequiredDialog) {
                     val expected = trip!!.expectedDistanceMeters ?: 0
@@ -338,7 +391,7 @@ fun TripDetailScreen(
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    viewModel.saveReviewWithNote(selectedType, reviewNoteText)
+                                    viewModel.saveReviewWithNote(selectedType, reviewNoteText, reviewProjectCode.takeIf { it.isNotBlank() })
                                     showNoteRequiredDialog = false
                                 },
                                 enabled = reviewNoteText.isNotBlank()
@@ -386,6 +439,42 @@ fun TripDetailScreen(
                                 }
                             }
                         }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        ExposedDropdownMenuBox(
+                            expanded = projectCodeExpanded,
+                            onExpandedChange = { projectCodeExpanded = !projectCodeExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = reviewProjectCode,
+                                onValueChange = { 
+                                    reviewProjectCode = it 
+                                    projectCodeExpanded = true
+                                },
+                                modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                                label = { Text(stringResource(R.string.project_code_optional)) }
+                            )
+                            val filteredCodes = projectCodes.filter { it.contains(reviewProjectCode, ignoreCase = true) }
+                            if (filteredCodes.isNotEmpty() && projectCodeExpanded) {
+                                DropdownMenu(
+                                    expanded = projectCodeExpanded,
+                                    onDismissRequest = { projectCodeExpanded = false },
+                                    modifier = Modifier.exposedDropdownSize()
+                                ) {
+                                    filteredCodes.forEach { code ->
+                                        DropdownMenuItem(
+                                            text = { Text(code) },
+                                            onClick = {
+                                                reviewProjectCode = code
+                                                projectCodeExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = {
@@ -395,7 +484,7 @@ fun TripDetailScreen(
                                 if (expected != null && diff > 2000 && diff > (expected * 0.1) && trip!!.note.isNullOrBlank()) {
                                     showNoteRequiredDialog = true
                                 } else {
-                                    viewModel.saveReview(selectedType)
+                                    viewModel.saveReview(selectedType, reviewProjectCode.takeIf { it.isNotBlank() })
                                 }
                             },
                             modifier = Modifier.fillMaxWidth()

@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bluetooth
@@ -22,6 +23,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.ui.viewmodel.VehiclesViewModel
 import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import com.cimdriver.app.domain.DashboardStatsCalculator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,9 +46,15 @@ fun AddVehicleScreen(
     var odometerCurrent by remember(existingVehicle) { mutableStateOf(existingVehicle?.odometerCurrent?.toString() ?: "") }
     var odometerCorrectionStrategy by remember(existingVehicle) { mutableStateOf(existingVehicle?.odometerCorrectionStrategy ?: "DISTRIBUTE") }
     var usageType by remember(existingVehicle) { mutableStateOf(existingVehicle?.usageType ?: "MIXED") }
+    var engineType by remember(existingVehicle) { mutableStateOf(existingVehicle?.engineType ?: "ICE") }
     var privateKmYearlyLimitStr by remember(existingVehicle) { mutableStateOf(existingVehicle?.privateKmYearlyLimit?.toString() ?: "500") }
     var showPrivateKmWarning by remember(existingVehicle) { mutableStateOf(existingVehicle?.showPrivateKmWarning ?: true) }
+    var inServiceDate by remember(existingVehicle) { mutableStateOf(existingVehicle?.inServiceDate) }
+    var endServiceDate by remember(existingVehicle) { mutableStateOf(existingVehicle?.endServiceDate) }
     var notes by remember(existingVehicle) { mutableStateOf(existingVehicle?.notes ?: "") }
+
+    var showInServiceDatePicker by remember { mutableStateOf(false) }
+    var showEndServiceDatePicker by remember { mutableStateOf(false) }
 
     val allBluetoothDevices by viewModel.bluetoothDevices.collectAsState(initial = emptyList())
     val linkedDevices = existingVehicle?.let { vehicle ->
@@ -86,10 +97,10 @@ fun AddVehicleScreen(
                             val odoCurrentInt = odometerCurrent.toIntOrNull() ?: 0
                             val privateKmYearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500
                             if (vehicleId == null) {
-                                viewModel.addVehicle(name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy)
+                                viewModel.addVehicle(name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType)
                             } else {
                                 existingVehicle?.let {
-                                    viewModel.updateVehicle(it, name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy)
+                                    viewModel.updateVehicle(it, name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType)
                                 }
                             }
                             onBack()
@@ -156,6 +167,43 @@ fun AddVehicleScreen(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    Text("Aandrijving (Brandstof/EV)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
+                    
+                    var engineTypeExpanded by remember { mutableStateOf(false) }
+                    val engineTypeOptions = listOf(
+                        "ICE" to "Brandstof (Benzine/Diesel)",
+                        "EV" to "Volledig Elektrisch",
+                        "PHEV" to "Plug-in Hybride"
+                    )
+                    
+                    ExposedDropdownMenuBox(
+                        expanded = engineTypeExpanded,
+                        onExpandedChange = { engineTypeExpanded = !engineTypeExpanded }
+                    ) {
+                        OutlinedTextField(
+                            value = engineTypeOptions.find { it.first == engineType }?.second ?: "Brandstof",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Aandrijving") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = engineTypeExpanded) },
+                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = engineTypeExpanded,
+                            onDismissRequest = { engineTypeExpanded = false }
+                        ) {
+                            engineTypeOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option.second) },
+                                    onClick = {
+                                        engineType = option.first
+                                        engineTypeExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                     
                     OutlinedTextField(
                         value = odometerStart, 
@@ -235,6 +283,71 @@ fun AddVehicleScreen(
                                 label = { Text("Maximale privékilometers (bijv. 500)") },
                                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
                                 modifier = Modifier.fillMaxWidth()
+                            )
+                            
+                            val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                            
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                                Box(modifier = Modifier.weight(1f).clickable { showInServiceDatePicker = true }) {
+                                    OutlinedTextField(
+                                        value = inServiceDate?.let { dateFormat.format(Date(it)) } ?: "",
+                                        onValueChange = { },
+                                        readOnly = true,
+                                        label = { Text("Datum ingebruikname (pro rata)") },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        enabled = false,
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                            disabledBorderColor = MaterialTheme.colorScheme.outline,
+                                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    )
+                                    Box(modifier = Modifier.matchParentSize().clickable { showInServiceDatePicker = true })
+                                }
+                            }
+                            
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                                Box(modifier = Modifier.weight(1f).clickable { showEndServiceDatePicker = true }) {
+                                    OutlinedTextField(
+                                        value = endServiceDate?.let { dateFormat.format(Date(it)) } ?: "",
+                                        onValueChange = { },
+                                        readOnly = true,
+                                        label = { Text("Datum einde gebruik") },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        enabled = false,
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                            disabledBorderColor = MaterialTheme.colorScheme.outline,
+                                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    )
+                                    Box(modifier = Modifier.matchParentSize().clickable { showEndServiceDatePicker = true })
+                                }
+                                if (endServiceDate != null) {
+                                    IconButton(onClick = { endServiceDate = null }, modifier = Modifier.padding(start = 8.dp)) {
+                                        Icon(Icons.Filled.Delete, contentDescription = "Wis datum", tint = MaterialTheme.colorScheme.error)
+                                    }
+                                }
+                            }
+                            
+                            val proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
+                                yearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500,
+                                inServiceDate = inServiceDate,
+                                endServiceDate = endServiceDate
+                            )
+                            
+                            Text(
+                                text = "ℹ Berekende pro rata grens dit jaar: $proRataLimit km",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                            )
+                            
+                            Text(
+                                text = "Let op: De fiscale grens geldt per persoon per auto. Heb je een auto halverwege het jaar gekregen (bijv. poolauto)? Dan tellen ritten van vorige bestuurders niet mee voor jouw grens. Gebruik de ingebruiknamedatum hierboven om jouw persoonlijke pro-rata grens te berekenen.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 4.dp, top = 8.dp)
                             )
                         }
                     }
@@ -370,5 +483,49 @@ fun AddVehicleScreen(
                 }
             }
         )
+    }
+
+    if (showInServiceDatePicker) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = inServiceDate ?: System.currentTimeMillis())
+        DatePickerDialog(
+            onDismissRequest = { showInServiceDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    inServiceDate = datePickerState.selectedDateMillis
+                    showInServiceDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showInServiceDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    if (showEndServiceDatePicker) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = endServiceDate ?: System.currentTimeMillis())
+        DatePickerDialog(
+            onDismissRequest = { showEndServiceDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    endServiceDate = datePickerState.selectedDateMillis
+                    showEndServiceDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEndServiceDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 }

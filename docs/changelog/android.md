@@ -6,7 +6,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.1.5 (Huidige Versie)
+## Versie 1.2.0 (Huidige Versie)
+
+!!! success "Nieuw"
+    * **Tankbeurten en Laadsessies:** Handmatige registratie via het nieuwe "Tanken / Laden" overzicht.
+    * **Automatische Detectie:** Proximity-detectie op de achtergrond. De app detecteert automatisch een tank- of laadbeurt wanneer je langere tijd bij een tankstation of laadpaal staat.
+    * **Fiscale Kilometergrens (Privé):** Stel een ingebruiknamedatum in voor je (privé) voertuig. De app berekent nu automatisch je naar rato pro-rata grens op basis van de 500 kilometer norm!
+
+---
+
+## Versie 1.1.5
 
 !!! success "Nieuw"
     * **Classificatieregels:** Auto-aanvullen en adresboek selectie toegevoegd. Vanaf nu kun je net als bij ritten eenvoudig adressen selecteren uit je adresboek bij het instellen van regels.

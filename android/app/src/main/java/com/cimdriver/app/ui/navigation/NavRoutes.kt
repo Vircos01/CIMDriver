@@ -58,3 +58,9 @@ data class AddVehicleRoute(val vehicleId: Long? = null)
 
 @Serializable
 data class AddAddressRoute(val addressId: Long? = null)
+
+@Serializable
+object FuelRoute
+
+@Serializable
+data class AddFuelRoute(val fillUpId: Long? = null)

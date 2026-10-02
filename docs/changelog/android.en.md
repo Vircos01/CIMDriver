@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.1.5 (Current Version)
+## Version 1.2.0 (Current Version)
+
+!!! success "New"
+    * **Fuel & Charging Sessions:** Manual registration via the new "Fuel / Charging" overview.
+    * **Automatic Detection:** Background proximity detection. The app automatically detects a fuel or charging session when you stop for an extended period at a fuel station or charging point.
+    * **Tax Limit (Private Use):** Set an in-service date for your (private) vehicle. The app now automatically calculates your pro-rata limit based on the 500 km threshold!
+
+---
+
+## Version 1.1.5
 
 !!! success "New"
     * **Classification Rules:** Added auto-complete and address book selection. You can now easily select addresses from your address book when setting up rules, just like with trips.

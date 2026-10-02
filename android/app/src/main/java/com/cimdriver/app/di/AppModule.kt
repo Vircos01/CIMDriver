@@ -10,6 +10,10 @@ import com.cimdriver.app.data.local.dao.VehicleDao
 import com.cimdriver.app.data.local.dao.SettingsDao
 import com.cimdriver.app.data.local.dao.WorkDayDao
 import com.cimdriver.app.data.local.dao.BluetoothDeviceDao
+import com.cimdriver.app.data.local.dao.FavoriteRouteDao
+import com.cimdriver.app.data.local.dao.OdometerCheckDao
+import com.cimdriver.app.data.local.dao.FuelFillUpDao
+import com.cimdriver.app.data.repository.FuelRepository
 import com.cimdriver.app.data.repository.TripRepository
 import com.cimdriver.app.service.GeocoderService
 import dagger.Module
@@ -70,6 +74,21 @@ object AppModule {
     }
 
     @Provides
+    fun provideFavoriteRouteDao(database: AppDatabase): FavoriteRouteDao {
+        return database.favoriteRouteDao()
+    }
+
+    @Provides
+    fun provideOdometerCheckDao(database: AppDatabase): OdometerCheckDao {
+        return database.odometerCheckDao()
+    }
+
+    @Provides
+    fun provideFuelFillUpDao(database: AppDatabase): FuelFillUpDao {
+        return database.fuelFillUpDao()
+    }
+
+    @Provides
     @Singleton
     fun provideGeocoderService(@ApplicationContext context: Context): GeocoderService {
         return GeocoderService(context)
@@ -82,6 +101,7 @@ object AppModule {
         vehicleDao: VehicleDao,
         classificationRuleDao: ClassificationRuleDao,
         savedAddressDao: SavedAddressDao,
+        favoriteRouteDao: FavoriteRouteDao,
         geocoderService: GeocoderService
     ): TripRepository {
         return TripRepository(
@@ -89,7 +109,16 @@ object AppModule {
             vehicleDao = vehicleDao,
             classificationRuleDao = classificationRuleDao,
             savedAddressDao = savedAddressDao,
+            favoriteRouteDao = favoriteRouteDao,
             geocoderService = geocoderService
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideFuelRepository(
+        fuelFillUpDao: FuelFillUpDao
+    ): FuelRepository {
+        return FuelRepository(fuelFillUpDao)
     }
 }

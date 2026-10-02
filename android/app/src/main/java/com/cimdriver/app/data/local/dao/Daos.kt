@@ -66,6 +66,9 @@ interface TripDao {
     @Query("SELECT COUNT(*) FROM trips WHERE startAddress = :startAddress AND endAddress = :endAddress AND tripType = :tripType AND status = 'DONE'")
     suspend fun getTripCountForRoute(startAddress: String, endAddress: String, tripType: String): Int
 
+    @Query("SELECT DISTINCT projectCode FROM trips WHERE projectCode IS NOT NULL AND projectCode != '' ORDER BY projectCode ASC")
+    fun getUniqueProjectCodes(): Flow<List<String>>
+
     @Delete
     suspend fun deleteTrip(trip: Trip)
 }
@@ -194,4 +197,25 @@ interface WorkDayDao {
 
     @Delete
     suspend fun deleteWorkDay(workDay: WorkDay)
+}
+
+@Dao
+interface FuelFillUpDao {
+    @Query("SELECT * FROM fuel_fillups ORDER BY dateTimestamp DESC")
+    fun getAllFillUps(): Flow<List<FuelFillUp>>
+
+    @Query("SELECT * FROM fuel_fillups WHERE vehicleId = :vehicleId ORDER BY dateTimestamp DESC")
+    fun getFillUpsForVehicle(vehicleId: Long): Flow<List<FuelFillUp>>
+
+    @Query("SELECT * FROM fuel_fillups")
+    suspend fun getAllFillUpsSync(): List<FuelFillUp>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFillUp(fillUp: FuelFillUp): Long
+
+    @Update
+    suspend fun updateFillUp(fillUp: FuelFillUp)
+
+    @Delete
+    suspend fun deleteFillUp(fillUp: FuelFillUp)
 }

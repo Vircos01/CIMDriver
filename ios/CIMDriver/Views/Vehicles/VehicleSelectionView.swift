@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct VehicleSelectionView: View {
     @Environment(\.modelContext) private var modelContext
@@ -98,6 +99,11 @@ struct VehicleEditView: View {
     @State private var usageType: String = "MIXED"
     @State private var odometerCorrectionStrategy: String = "DISTRIBUTE"
     
+    @State private var hasInServiceDate: Bool = false
+    @State private var inServiceDate: Date = Date()
+    @State private var hasEndServiceDate: Bool = false
+    @State private var endServiceDate: Date = Date()
+    
     var body: some View {
         Form {
             Section(header: Text("Voertuig details")) {
@@ -125,6 +131,29 @@ struct VehicleEditView: View {
                         .keyboardType(.numberPad)
                         .multilineTextAlignment(.trailing)
                 }
+                
+                Toggle("Vanaf een specifieke datum ingebruikgenomen", isOn: $hasInServiceDate)
+                if hasInServiceDate {
+                    DatePicker("Datum ingebruikname", selection: $inServiceDate, displayedComponents: .date)
+                }
+                
+                Toggle("Auto is inmiddels ingeleverd", isOn: $hasEndServiceDate)
+                if hasEndServiceDate {
+                    DatePicker("Datum einde gebruik", selection: $endServiceDate, displayedComponents: .date)
+                }
+                
+                let proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
+                    yearlyLimit: Int(privateKmYearlyLimit) ?? 500,
+                    inServiceDate: hasInServiceDate ? inServiceDate : nil,
+                    endServiceDate: hasEndServiceDate ? endServiceDate : nil
+                )
+                Text("ℹ Berekende pro rata grens dit jaar: \(proRataLimit) km")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    
+                Text("Let op: De fiscale grens geldt per persoon per auto. Heb je een auto halverwege het jaar gekregen (bijv. poolauto)? Dan tellen ritten van vorige bestuurders niet mee voor jouw grens. Gebruik de ingebruiknamedatum hierboven om jouw persoonlijke pro-rata grens te berekenen.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
             
             Section(header: Text("Geavanceerd")) {
@@ -161,6 +190,15 @@ struct VehicleEditView: View {
                 odometerStart = String(v.odometerStart)
                 usageType = v.usageType
                 odometerCorrectionStrategy = v.odometerCorrectionStrategy
+                
+                if let isd = v.inServiceDate {
+                    hasInServiceDate = true
+                    inServiceDate = isd
+                }
+                if let esd = v.endServiceDate {
+                    hasEndServiceDate = true
+                    endServiceDate = esd
+                }
             }
         }
         .toolbar {
@@ -186,6 +224,8 @@ struct VehicleEditView: View {
             v.privateKmYearlyLimit = Int(privateKmYearlyLimit) ?? 500
             v.usageType = usageType
             v.odometerCorrectionStrategy = odometerCorrectionStrategy
+            v.inServiceDate = hasInServiceDate ? inServiceDate : nil
+            v.endServiceDate = hasEndServiceDate ? endServiceDate : nil
         } else {
             let vehicle = Vehicle(
                 name: name,
@@ -196,7 +236,9 @@ struct VehicleEditView: View {
                 odometerCurrent: Int(odometerStart) ?? 0,
                 privateKmYearlyLimit: Int(privateKmYearlyLimit) ?? 500,
                 usageType: usageType,
-                odometerCorrectionStrategy: odometerCorrectionStrategy
+                odometerCorrectionStrategy: odometerCorrectionStrategy,
+                inServiceDate: hasInServiceDate ? inServiceDate : nil,
+                endServiceDate: hasEndServiceDate ? endServiceDate : nil
             )
             modelContext.insert(vehicle)
         }
@@ -221,6 +263,9 @@ struct OdometerCalibrationView: View {
     @State private var newOdometerString: String = ""
     @State private var showingWarning = false
     @State private var calculatedDifference: Int = 0
+    
+    @State private var showingCamera = false
+    @State private var capturedImage: UIImage?
     
     var body: some View {
         Form {
@@ -247,6 +292,15 @@ struct OdometerCalibrationView: View {
                 if calculatedDifference != 0 {
                     LabeledContent("Verschil", value: "\(calculatedDifference > 0 ? "+" : "")\(calculatedDifference) km")
                         .foregroundStyle(abs(calculatedDifference) > 50 ? .orange : .primary)
+                }
+                
+                Button(action: { showingCamera = true }) {
+                    HStack {
+                        Image(systemName: capturedImage != nil ? "checkmark.circle.fill" : "camera.fill")
+                            .foregroundColor(capturedImage != nil ? .green : .accentColor)
+                        Text(capturedImage != nil ? "Foto toegevoegd" : "Maak foto als bewijs")
+                            .foregroundColor(capturedImage != nil ? .green : .primary)
+                    }
                 }
             }
             
@@ -278,6 +332,10 @@ struct OdometerCalibrationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             newOdometerString = String(vehicle.odometerCurrent)
+        }
+        .fullScreenCover(isPresented: $showingCamera) {
+            CameraPicker(image: $capturedImage)
+                .ignoresSafeArea()
         }
         .alert("Groot Verschil", isPresented: $showingWarning) {
             Button("Toch Opslaan", role: .destructive) {
@@ -323,7 +381,18 @@ struct OdometerCalibrationView: View {
         }
         
         vehicle.odometerCurrent = newStand
-        vehicle.lastOdometerCheckTimestamp = Date()
+        let now = Date()
+        vehicle.lastOdometerCheckTimestamp = now
+        
+        let photoData = capturedImage?.jpegData(compressionQuality: 0.7)
+        let check = OdometerCheck(
+            vehicleId: vehicle.id,
+            timestamp: now,
+            registeredOdometer: vehicle.odometerCurrent,
+            correctedOdometer: newStand,
+            photoData: photoData
+        )
+        modelContext.insert(check)
         
         try? modelContext.save()
         dismiss()

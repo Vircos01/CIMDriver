@@ -1,6 +1,6 @@
 {
-  "versionCode": 16,
-  "versionName": "1.1.5",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.1.5.apk",
-  "releaseNotes": "Versie 1.1.5: Auto-aanvullen en adresboek selectie toegevoegd voor classificatieregels."
+  "versionCode": 17,
+  "versionName": "1.2.0",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.0.apk",
+  "releaseNotes": "Versie 1.2.0: Tankbeurten en Laadsessies functionaliteit, en pro-rata km registratie voor prive auto's."
 }

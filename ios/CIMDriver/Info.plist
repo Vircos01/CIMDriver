@@ -28,6 +28,8 @@
 	<string>CIMDriver heeft locatie op de achtergrond nodig om ritten te registreren.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>CIMDriver heeft locatie nodig om ritten te registreren.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>CIMDriver heeft de camera nodig om kilometerstanden vast te leggen als bewijs voor de Belastingdienst.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

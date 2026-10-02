@@ -60,6 +60,23 @@ fun VehicleSelectorTopBarAction(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.all_vehicles), fontWeight = if (activeVehicleId == -1L) androidx.compose.ui.text.font.FontWeight.Bold else null) },
+                    trailingIcon = if (activeVehicleId == -1L) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = stringResource(R.string.selected),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    } else null,
+                    onClick = {
+                        onVehicleSelected(-1L)
+                        expanded = false
+                    }
+                )
+                
                 vehicles.forEach { v ->
                     val isSelected = v.id == activeVehicleId
                     DropdownMenuItem(

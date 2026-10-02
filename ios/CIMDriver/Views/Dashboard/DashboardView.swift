@@ -130,7 +130,16 @@ struct DashboardView: View {
                     // 2. Voertuig Info & Waarschuwingen
                     if let activeVehicle = activeVehicle {
                         if activeVehicle.privateKmYearlyLimit > 0 {
-                            privateKmWarningCard(limit: activeVehicle.privateKmYearlyLimit, current: stats.ytdPriveKm)
+                            let proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
+                                yearlyLimit: activeVehicle.privateKmYearlyLimit,
+                                inServiceDate: activeVehicle.inServiceDate,
+                                endServiceDate: activeVehicle.endServiceDate
+                            )
+                            privateKmWarningCard(
+                                limit: proRataLimit, 
+                                current: stats.ytdPriveKm,
+                                isProRata: activeVehicle.inServiceDate != nil || activeVehicle.endServiceDate != null
+                            )
                         }
                     }
                     
@@ -203,6 +212,14 @@ struct DashboardView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if !vehicles.isEmpty {
                         Menu {
+                            Button(action: { selectedVehicleId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")! }) {
+                                HStack {
+                                    Text(String(localized: "all_vehicles"))
+                                    if selectedVehicleId == UUID(uuidString: "00000000-0000-0000-0000-000000000000")! {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
                             ForEach(vehicles) { vehicle in
                                 Button(action: { selectedVehicleId = vehicle.id }) {
                                     HStack {
@@ -233,7 +250,8 @@ struct DashboardView: View {
     // MARK: - Components
     
     private var activeVehicle: Vehicle? {
-        vehicles.first { $0.id == selectedVehicleId } ?? vehicles.first(where: { $0.isDefault }) ?? vehicles.first
+        if selectedVehicleId == UUID(uuidString: "00000000-0000-0000-0000-000000000000")! { return nil }
+        return vehicles.first { $0.id == selectedVehicleId } ?? vehicles.first(where: { $0.isDefault }) ?? vehicles.first
     }
     
     private var statusCard: some View {
@@ -278,7 +296,7 @@ struct DashboardView: View {
         .padding(.top, 5)
     }
     
-    private func privateKmWarningCard(limit: Int, current: Double) -> some View {
+    private func privateKmWarningCard(limit: Int, current: Double, isProRata: Bool = false) -> some View {
         let progress = min(current / Double(limit), 1.0)
         let isDanger = progress >= 1.0
         let isWarning = progress >= 0.8 && !isDanger
@@ -310,6 +328,13 @@ struct DashboardView: View {
                 }
             }
             .frame(height: 14)
+            
+            if isProRata {
+                Text("Aangepaste grens (pro rata).")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.top, -4)
+            }
         }
         .padding()
         .background(Color(.secondarySystemGroupedBackground))

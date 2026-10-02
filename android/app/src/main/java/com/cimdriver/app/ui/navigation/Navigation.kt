@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.LocalGasStation
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
@@ -95,6 +98,7 @@ sealed class Screen(val route: Any, @StringRes val titleRes: Int, val icon: Imag
     object AddressBook : Screen(AddressBookRoute, R.string.address_book, Icons.Filled.Contacts)
     object About : Screen(AboutRoute, R.string.about, Icons.Filled.Info)
     object Help : Screen(HelpRoute, R.string.help, Icons.AutoMirrored.Filled.Help)
+    object Fuel : Screen(FuelRoute, R.string.fuel, Icons.Filled.LocalGasStation)
 }
 
 val bottomNavigationItems = listOf(
@@ -145,6 +149,16 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                         navController.navigate(VehiclesRoute)
                     },
                     icon = { Icon(Screen.Vehicles.icon, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text(stringResource(R.string.fuel)) },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate(FuelRoute)
+                    },
+                    icon = { Icon(Screen.Fuel.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
@@ -237,6 +251,20 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                 var odometerInput by remember(checkVehicle.id) {
                     mutableStateOf(checkVehicle.odometerCurrent.toString())
                 }
+                val context = androidx.compose.ui.platform.LocalContext.current
+                var photoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+                var photoPath by remember { mutableStateOf<String?>(null) }
+                
+                val cameraLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+                    contract = androidx.activity.result.contract.ActivityResultContracts.TakePicture(),
+                    onResult = { success ->
+                        if (!success) {
+                            photoUri = null
+                            photoPath = null
+                        }
+                    }
+                )
+
                 AlertDialog(
                     onDismissRequest = {
                         com.cimdriver.app.service.OdometerCheckStore.dismiss()
@@ -266,12 +294,31 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                                 ),
                                 suffix = { Text("km") }
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            TextButton(
+                                onClick = {
+                                    val tempFile = java.io.File(context.filesDir, "photos/odo_${System.currentTimeMillis()}.jpg")
+                                    tempFile.parentFile?.mkdirs()
+                                    val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tempFile)
+                                    photoUri = uri
+                                    photoPath = tempFile.absolutePath
+                                    cameraLauncher.launch(uri)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = if (photoPath != null) androidx.compose.material.icons.Icons.Filled.Check else androidx.compose.material.icons.Icons.Filled.PhotoCamera,
+                                    contentDescription = "Maak foto"
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(if (photoPath != null) "Foto opgeslagen" else "Maak foto als bewijs")
+                            }
                         }
                     },
                     confirmButton = {
                         TextButton(onClick = {
                             val corrected = odometerInput.toIntOrNull() ?: checkVehicle.odometerCurrent
-                            vehiclesViewModel.confirmOdometerCheck(checkVehicle, corrected)
+                            vehiclesViewModel.confirmOdometerCheck(checkVehicle, corrected, photoPath)
                             com.cimdriver.app.service.OdometerCheckStore.dismiss()
                         }) {
                             Text("Bevestigen")
@@ -280,7 +327,7 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     dismissButton = {
                         TextButton(onClick = {
                             // Confirm with current value (no change, but stamp the check)
-                            vehiclesViewModel.confirmOdometerCheck(checkVehicle, checkVehicle.odometerCurrent)
+                            vehiclesViewModel.confirmOdometerCheck(checkVehicle, checkVehicle.odometerCurrent, photoPath)
                             com.cimdriver.app.service.OdometerCheckStore.dismiss()
                         }) {
                             Text("Klopt al")
@@ -322,6 +369,23 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     }
                 ) 
             }
+            
+            composable<FuelRoute> {
+                com.cimdriver.app.ui.screens.FuelScreen(
+                    onOpenDrawer = onOpenDrawer,
+                    onAddFuelClick = { navController.navigate(AddFuelRoute()) },
+                    onEditFuelClick = { id -> navController.navigate(AddFuelRoute(fillUpId = id)) }
+                )
+            }
+            
+            composable<AddFuelRoute> { backStackEntry ->
+                val args = backStackEntry.toRoute<AddFuelRoute>()
+                com.cimdriver.app.ui.screens.AddFuelScreen(
+                    fillUpId = args.fillUpId,
+                    onNavigateBack = { navController.navigateUp() }
+                )
+            }
+
             composable<TripsRoute> { 
                 TripsScreen(
                     onOpenDrawer = onOpenDrawer,

@@ -42,6 +42,7 @@
     <string name="no_recent_trips">Geen recente ritten gevonden</string>
     <string name="no_results">Geen resultaten</string>
     <string name="no_vehicles">Geen voertuigen</string>
+    <string name="all_vehicles">Alle voertuigen</string>
     <string name="no_work_hours">Geen werkuren geregistreerd.</string>
     <string name="mixed">Gemengd</string>
     <string name="selected">Geselecteerd</string>

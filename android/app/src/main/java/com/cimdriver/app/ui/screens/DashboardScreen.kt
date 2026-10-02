@@ -1,5 +1,6 @@
 package com.cimdriver.app.ui.screens
 
+import com.cimdriver.app.domain.DashboardStatsCalculator
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 
@@ -325,7 +326,11 @@ fun DashboardScreen(
                 val activeVehicle = vehicles.find { it.id == activeVehicleId }
 
                 if (activeVehicle?.showPrivateKmWarning == true) {
-                    val limit = activeVehicle.privateKmYearlyLimit
+                    val limit = DashboardStatsCalculator.calculateProRataLimit(
+                        yearlyLimit = activeVehicle.privateKmYearlyLimit,
+                        inServiceDate = activeVehicle.inServiceDate,
+                        endServiceDate = activeVehicle.endServiceDate
+                    )
                     val current = stats.ytdPriveKm.toFloat()
                     val progress = (current / limit.toFloat()).coerceIn(0f, 1f)
                     
@@ -377,6 +382,14 @@ fun DashboardScreen(
                                 color = progressColor,
                                 trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                             )
+                            if (activeVehicle.inServiceDate != null || activeVehicle.endServiceDate != null) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Aangepaste grens (pro rata).",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                     

@@ -2,6 +2,14 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.0] - 2026-10-02
+
+### Toegevoegd
+- **Tankbeurten en Laadsessies:** Nieuwe functionaliteit toegevoegd voor het registreren van brandstof tankbeurten en EV laadsessies, inclusief een handig overzicht in het hoofdmenu.
+- **Proximity Detectie:** Automatische herkenning en opbouw van een tankbeurt of laadsessie na langdurige stilstand bij een tankstation of laadpaal (vereist achtergrondlocatie).
+- **Fiscale Kilometergrens:** Bij privéauto's kan nu de datum ingebruikname worden ingesteld zodat de maximale grens van 500 privékilometers pro-rata (naar rato) wordt berekend voor het huidige jaar.
+- **Verbeterde Voertuig Selectie:** Uniforme voertuig selectie widget in alle schermen geïmplementeerd.
+
 ## [1.1.5] - 2026-10-01
 
 ### Toegevoegd

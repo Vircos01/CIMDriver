@@ -8,6 +8,8 @@ import com.cimdriver.app.data.local.entity.ClassificationRule
 import com.cimdriver.app.data.local.entity.SavedAddress
 import com.cimdriver.app.data.local.entity.Trip
 import com.cimdriver.app.data.local.entity.Vehicle
+import com.cimdriver.app.data.local.entity.FavoriteRoute
+import com.cimdriver.app.data.local.dao.FavoriteRouteDao
 import com.cimdriver.app.service.GeocoderService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -17,15 +19,20 @@ class TripRepository(
     private val vehicleDao: VehicleDao,
     private val classificationRuleDao: ClassificationRuleDao,
     private val savedAddressDao: SavedAddressDao,
+    private val favoriteRouteDao: FavoriteRouteDao,
     private val geocoderService: GeocoderService
 ) {
     fun getAllTrips(): Flow<List<Trip>> = tripDao.getAllTrips()
+    
+    fun getUniqueProjectCodes(): Flow<List<String>> = tripDao.getUniqueProjectCodes()
     
     fun getAllVehicles(): Flow<List<Vehicle>> = vehicleDao.getAllVehicles()
     
     fun getClassificationRules(): Flow<List<ClassificationRule>> = classificationRuleDao.getAllRules()
     
     fun getSavedAddresses(): Flow<List<SavedAddress>> = savedAddressDao.getAllAddresses()
+
+    fun getAllFavoriteRoutes(): Flow<List<FavoriteRoute>> = favoriteRouteDao.getAllFavoriteRoutes()
 
     suspend fun getTripById(id: Long): Trip? = tripDao.getTripById(id)
 
@@ -59,5 +66,13 @@ class TripRepository(
     
     suspend fun getOsrmRoute(startLat: Double, startLng: Double, endLat: Double, endLng: Double): List<Pair<Double, Double>> {
         return geocoderService.getOsrmRoute(startLat, startLng, endLat, endLng)
+    }
+    
+    suspend fun insertFavoriteRoute(route: FavoriteRoute) {
+        favoriteRouteDao.insert(route)
+    }
+    
+    suspend fun deleteFavoriteRoute(route: FavoriteRoute) {
+        favoriteRouteDao.delete(route)
     }
 }

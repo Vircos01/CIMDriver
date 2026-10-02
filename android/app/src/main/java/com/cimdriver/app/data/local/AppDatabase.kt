@@ -19,9 +19,12 @@ import com.cimdriver.app.data.local.entity.*
         BluetoothDevice::class,
         WorkDay::class,
         LocationPoint::class,
-        Workplace::class
+        Workplace::class,
+        FavoriteRoute::class,
+        OdometerCheck::class,
+        FuelFillUp::class
     ], 
-    version = 35, 
+    version = 41, 
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -35,6 +38,9 @@ abstract class AppDatabase : RoomDatabase() {
 	abstract fun savedAddressDao(): SavedAddressDao
 	abstract fun workDayDao(): WorkDayDao
 	abstract fun classificationRuleDao(): ClassificationRuleDao
+	abstract fun favoriteRouteDao(): FavoriteRouteDao
+	abstract fun odometerCheckDao(): OdometerCheckDao
+	abstract fun fuelFillUpDao(): FuelFillUpDao
 
 	companion object {
 		const val DATABASE_NAME = "cimdriver_database"
@@ -239,9 +245,74 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_35_36 = object : Migration(35, 36) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE vehicles ADD COLUMN inServiceDate INTEGER DEFAULT NULL")
+                db.execSQL("ALTER TABLE vehicles ADD COLUMN endServiceDate INTEGER DEFAULT NULL")
+            }
+        }
+
+        val MIGRATION_36_37 = object : Migration(36, 37) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `favorite_routes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `startAddress` TEXT NOT NULL, `endAddress` TEXT NOT NULL, `tripType` TEXT NOT NULL, `projectCode` TEXT)")
+            }
+        }
+
+        val MIGRATION_37_38 = object : Migration(37, 38) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `odometer_checks` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                        `vehicleId` INTEGER NOT NULL, 
+                        `timestamp` INTEGER NOT NULL, 
+                        `registeredOdometer` INTEGER NOT NULL, 
+                        `correctedOdometer` INTEGER NOT NULL, 
+                        `photoPath` TEXT, 
+                        FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                    )
+                """)
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_odometer_checks_vehicleId` ON `odometer_checks` (`vehicleId`)")
+            }
+        }
+
+        val MIGRATION_38_39 = object : Migration(38, 39) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `fuel_fillups` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                        `vehicleId` INTEGER NOT NULL, 
+                        `dateTimestamp` INTEGER NOT NULL, 
+                        `liters` REAL NOT NULL, 
+                        `pricePerLiter` REAL NOT NULL, 
+                        `totalCost` REAL NOT NULL, 
+                        `odometer` INTEGER NOT NULL, 
+                        `stationName` TEXT, 
+                        `notes` TEXT, 
+                        FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                    )
+                """)
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_fuel_fillups_vehicleId` ON `fuel_fillups` (`vehicleId`)")
+            }
+        }
+
+        val MIGRATION_39_40 = object : Migration(39, 40) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `fuel_fillups` ADD COLUMN `latitude` REAL")
+                db.execSQL("ALTER TABLE `fuel_fillups` ADD COLUMN `longitude` REAL")
+                db.execSQL("ALTER TABLE `fuel_fillups` ADD COLUMN `address` TEXT")
+                db.execSQL("ALTER TABLE `fuel_fillups` ADD COLUMN `status` TEXT NOT NULL DEFAULT 'COMPLETED'")
+            }
+        }
+
+        val MIGRATION_40_41 = object : Migration(40, 41) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `vehicles` ADD COLUMN `engineType` TEXT NOT NULL DEFAULT 'ICE'")
+            }
+        }
+
 		fun getDatabase(context: Context): AppDatabase {
 			return INSTANCE ?: synchronized(this) {
-				val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
+				val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39, MIGRATION_39_40, MIGRATION_40_41).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
 				INSTANCE = instance
 				instance
 			}
