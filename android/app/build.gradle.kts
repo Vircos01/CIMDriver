@@ -25,13 +25,17 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        
-        ndk {
-            abiFilters.add("armeabi-v7a")
-            abiFilters.add("arm64-v8a")
-        }
-        
+
         buildConfigField("String", "GIT_HASH", "\"${getGitHash(providers)}\"")
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = false
+        }
     }
 
     signingConfigs {
