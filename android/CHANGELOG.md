@@ -2,6 +2,13 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.4] - 2026-10-02
+
+### Opgelost
+- **Zakelijke auto's:** De begin- en einddatum kunnen nu ook bij zakelijke voertuigen worden aangepast.
+- **PHEV-registratie:** Plug-in hybriden worden niet meer per ongeluk als alleen 'laden' behandeld; standaard blijft de registratie op tanken gericht, tenzij het voertuig puur elektrisch is.
+- **UI:** De voertuig- en tank-/laadregistratie zijn consistent afgestemd op het type auto.
+
 ## [1.2.3] - 2026-10-02
 
 ### Opgelost

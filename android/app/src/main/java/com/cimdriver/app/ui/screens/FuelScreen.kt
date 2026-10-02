@@ -65,7 +65,7 @@ fun FuelScreen(
                                 Text("€${String.format("%.2f", stats.totalCost)}", style = MaterialTheme.typography.titleLarge)
                             }
                             Column(horizontalAlignment = Alignment.End) {
-                                val isEV = selectedVehicle.engineType == "EV" || selectedVehicle.engineType == "PHEV"
+                                val isEV = selectedVehicle.engineType == "EV"
                                 Text("Gemiddeld verbruik", style = MaterialTheme.typography.bodySmall)
                                 Text("${String.format("%.1f", stats.averageConsumption)} ${if (isEV) "kWh" else "L"}/100km", style = MaterialTheme.typography.titleLarge)
                             }
@@ -138,7 +138,7 @@ fun FuelCard(fillUp: com.cimdriver.app.data.local.entity.FuelFillUp, vehicles: L
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        val isEV = vehicle?.engineType == "EV" || vehicle?.engineType == "PHEV"
+        val isEV = vehicle?.engineType == "EV"
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(

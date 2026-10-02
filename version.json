@@ -1,6 +1,6 @@
 {
-  "versionCode": 20,
-  "versionName": "1.2.3",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.3.apk",
-  "releaseNotes": "Versie 1.2.3: Fix voor het aanpassen van begin- en einddatum bij bestaande auto's in de voertuiginstellingen."
+  "versionCode": 21,
+  "versionName": "1.2.4",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.4.apk",
+  "releaseNotes": "Versie 1.2.4: Fix voor zakelijke auto's en PHEV's in de voertuig- en tank-/laadregistratie."
 }

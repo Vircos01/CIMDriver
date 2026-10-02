@@ -29,7 +29,7 @@ fun AddFuelScreen(
     
     var selectedVehicleId by remember { mutableStateOf(vehicles.firstOrNull()?.id ?: 0L) }
     val selectedVehicle = vehicles.find { it.id == selectedVehicleId }
-    val isEV = selectedVehicle?.engineType == "EV" || selectedVehicle?.engineType == "PHEV"
+    val isEV = selectedVehicle?.engineType == "EV"
     
     var litersStr by remember { mutableStateOf("") }
     var pricePerLiterStr by remember { mutableStateOf("") }

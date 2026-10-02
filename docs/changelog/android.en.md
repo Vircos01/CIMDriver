@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.2.3 (Current Version)
+## Version 1.2.4 (Current Version)
+
+!!! bug "Bug fix"
+    * **Business vehicles:** The start and end dates can now also be edited for business-use vehicles.
+    * **PHEV registration:** Plug-in hybrids are no longer unintentionally treated as purely charging vehicles; the default registration remains focused on fueling unless the vehicle is fully electric.
+    * **Consistency:** The vehicle and fuel/charge registration flow is now better aligned with the vehicle type.
+
+---
+
+## Version 1.2.3
 
 !!! bug "Bug fix"
     * **Existing vehicle:** Editing the start and end date for an existing vehicle now works correctly, even when the private-use warning is disabled.

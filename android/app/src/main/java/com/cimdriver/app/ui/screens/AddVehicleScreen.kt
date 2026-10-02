@@ -264,26 +264,7 @@ fun AddVehicleScreen(
                         }
                     }
                     
-                    if (usageType == "MIXED" || usageType == "PRIVATE_ONLY") {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(text = "Waarschuwing Privégebruik", style = MaterialTheme.typography.titleSmall)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            androidx.compose.material3.Switch(
-                                checked = showPrivateKmWarning,
-                                onCheckedChange = { showPrivateKmWarning = it }
-                            )
-                            Text("Toon waarschuwing op dashboard", modifier = Modifier.padding(start = 8.dp))
-                        }
-                        
-                        OutlinedTextField(
-                            value = privateKmYearlyLimitStr,
-                            onValueChange = { privateKmYearlyLimitStr = it.filter { char -> char.isDigit() } },
-                            label = { Text("Maximale privékilometers (bijv. 500)") },
-                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
+                    if (usageType == "MIXED" || usageType == "PRIVATE_ONLY" || usageType == "BUSINESS_ONLY") {
                         val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -334,26 +315,47 @@ fun AddVehicleScreen(
                             }
                         }
 
-                        if (showPrivateKmWarning) {
-                            val proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
-                                yearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500,
-                                inServiceDate = inServiceDate,
-                                endServiceDate = endServiceDate
+                        if (usageType == "MIXED" || usageType == "PRIVATE_ONLY") {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(text = "Waarschuwing Privégebruik", style = MaterialTheme.typography.titleSmall)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                androidx.compose.material3.Switch(
+                                    checked = showPrivateKmWarning,
+                                    onCheckedChange = { showPrivateKmWarning = it }
+                                )
+                                Text("Toon waarschuwing op dashboard", modifier = Modifier.padding(start = 8.dp))
+                            }
+
+                            OutlinedTextField(
+                                value = privateKmYearlyLimitStr,
+                                onValueChange = { privateKmYearlyLimitStr = it.filter { char -> char.isDigit() } },
+                                label = { Text("Maximale privékilometers (bijv. 500)") },
+                                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                                modifier = Modifier.fillMaxWidth()
                             )
 
-                            Text(
-                                text = "ℹ Berekende pro rata grens dit jaar: $proRataLimit km",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
-                            )
+                            if (showPrivateKmWarning) {
+                                val proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
+                                    yearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500,
+                                    inServiceDate = inServiceDate,
+                                    endServiceDate = endServiceDate
+                                )
 
-                            Text(
-                                text = "Let op: De fiscale grens geldt per persoon per auto. Heb je een auto halverwege het jaar gekregen (bijv. poolauto)? Dan tellen ritten van vorige bestuurders niet mee voor jouw grens. Gebruik de ingebruiknamedatum hierboven om jouw persoonlijke pro-rata grens te berekenen.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(start = 4.dp, top = 8.dp)
-                            )
+                                Text(
+                                    text = "ℹ Berekende pro rata grens dit jaar: $proRataLimit km",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                                )
+
+                                Text(
+                                    text = "Let op: De fiscale grens geldt per persoon per auto. Heb je een auto halverwege het jaar gekregen (bijv. poolauto)? Dan tellen ritten van vorige bestuurders niet mee voor jouw grens. Gebruik de ingebruiknamedatum hierboven om jouw persoonlijke pro-rata grens te berekenen.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(start = 4.dp, top = 8.dp)
+                                )
+                            }
                         }
                     }
 

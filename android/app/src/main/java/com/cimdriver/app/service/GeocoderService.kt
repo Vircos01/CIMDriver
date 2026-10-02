@@ -243,7 +243,7 @@ class GeocoderService(private val context: Context) {
                                 if (operator.isNotEmpty()) return@withContext operator
                             }
                         }
-                        return@withContext if (engineType == "EV" || engineType == "PHEV") "Laadpaal" else "Tankstation"
+                        return@withContext if (engineType == "EV") "Laadpaal" else "Tankstation"
                     }
                 }
                 null
