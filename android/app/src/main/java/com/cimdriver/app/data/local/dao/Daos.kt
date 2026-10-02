@@ -167,6 +167,24 @@ interface SavedAddressDao {
 }
 
 @Dao
+interface FuelFillUpDao {
+    @Query("SELECT * FROM fuel_entries ORDER BY dateTimestamp DESC")
+    fun getAllFillUps(): Flow<List<FuelFillUp>>
+
+    @Query("SELECT * FROM fuel_entries ORDER BY dateTimestamp DESC")
+    suspend fun getAllFillUpsSync(): List<FuelFillUp>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFillUp(fillUp: FuelFillUp): Long
+
+    @Update
+    suspend fun updateFillUp(fillUp: FuelFillUp)
+
+    @Delete
+    suspend fun deleteFillUp(fillUp: FuelFillUp)
+}
+
+@Dao
 interface WorkDayDao {
     @Query("SELECT * FROM work_days ORDER BY date DESC")
     fun getAllWorkDays(): Flow<List<WorkDay>>

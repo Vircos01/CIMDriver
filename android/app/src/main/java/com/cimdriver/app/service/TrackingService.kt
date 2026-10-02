@@ -577,7 +577,7 @@ class TrackingService : Service(), LocationListener {
                 val fuelFillUp = com.cimdriver.app.data.local.entity.FuelFillUp(
                     vehicleId = vehicleId,
                     dateTimestamp = System.currentTimeMillis(),
-                    liters = 0.0,
+                    litersPurchased = 0.0,
                     pricePerLiter = 0.0,
                     totalCost = 0.0,
                     odometer = odoEnd,

@@ -21,6 +21,7 @@ data class Vehicle(
     val privateKmYearlyLimit: Int = 500,
     val showPrivateKmWarning: Boolean = true,
     val usageType: String = "MIXED", // "MIXED", "BUSINESS_ONLY", "PRIVATE_ONLY"
+    val engineType: String = "ICE", // "ICE", "PHEV", "EV"
     val lastOdometerCheckTimestamp: Long = 0L,
     val isDefault: Boolean = false,
     val odometerCorrectionStrategy: String = "DISTRIBUTE" // "DISTRIBUTE", "CREATE_TRIP", "LEAVE_GAP"
@@ -154,6 +155,23 @@ data class SavedAddress(
     val addressType: String? = null, // "THUIS", "WERK", "KLANT"
     val latitude: Double? = null,
     val longitude: Double? = null
+)
+
+@Entity(tableName = "fuel_entries")
+data class FuelFillUp(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val vehicleId: Long? = null,
+    val tripId: Long? = null,
+    val stationName: String,
+    val address: String? = null,
+    val pricePerLiter: Double = 0.0,
+    val litersPurchased: Double = 0.0,
+    val totalCost: Double = 0.0,
+    val dateTimestamp: Long = System.currentTimeMillis(),
+    val odometer: Int? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val status: String = "DRAFT"
 )
 
 @Entity(tableName = "work_days")
