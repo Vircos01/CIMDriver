@@ -4,12 +4,12 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.2.0 (Current Version)
+## Version 1.2.2 (Current Version)
 
 !!! success "New"
-    * **Fuel & Charging Sessions:** Manual registration via the new "Fuel / Charging" overview.
-    * **Automatic Detection:** Background proximity detection. The app automatically detects a fuel or charging session when you stop for an extended period at a fuel station or charging point.
-    * **Tax Limit (Private Use):** Set an in-service date for your (private) vehicle. The app now automatically calculates your pro-rata limit based on the 500 km threshold!
+    * **Odometer checks:** New monthly odometer check screen per vehicle with a history of previous checks.
+    * **OCR for odometer readings:** Photos of the odometer can now be read automatically, making data entry faster and more reliable.
+    * **Improved vehicle flow:** The workflow for viewing and managing odometer checks has been refined for a smoother experience.
 
 ---
 

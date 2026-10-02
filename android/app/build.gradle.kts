@@ -18,8 +18,8 @@ android {
         applicationId = "com.cimdriver.app"
         minSdk = 29
         targetSdk = 37
-        versionCode = 18
-        versionName = "1.2.1-${getGitHash(providers)}"
+        versionCode = 19
+        versionName = "1.2.2-${getGitHash(providers)}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -114,6 +114,7 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Room
     implementation(libs.room.runtime)
@@ -132,6 +133,12 @@ dependencies {
     
     // Play Services Location (for Geofencing)
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // ML Kit Text Recognition (for OCR on odometer photos)
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+
+    // Coil for image loading (odometer check photo thumbnails)
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

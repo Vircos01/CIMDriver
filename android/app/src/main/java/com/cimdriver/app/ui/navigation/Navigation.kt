@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
@@ -254,11 +255,25 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                 val context = androidx.compose.ui.platform.LocalContext.current
                 var photoUri by remember { mutableStateOf<android.net.Uri?>(null) }
                 var photoPath by remember { mutableStateOf<String?>(null) }
+                var isOcrRunning by remember { mutableStateOf(false) }
+                val coroutineScope = rememberCoroutineScope()
                 
                 val cameraLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
                     contract = androidx.activity.result.contract.ActivityResultContracts.TakePicture(),
                     onResult = { success ->
-                        if (!success) {
+                        if (success && photoUri != null) {
+                            // Auto-run OCR on the photo
+                            isOcrRunning = true
+                            coroutineScope.launch {
+                                val ocrResult = com.cimdriver.app.util.OdometerOcrHelper.readOdometerFromUri(
+                                    photoUri!!, context
+                                )
+                                isOcrRunning = false
+                                if (ocrResult != null) {
+                                    odometerInput = ocrResult.toString()
+                                }
+                            }
+                        } else {
                             photoUri = null
                             photoPath = null
                         }
@@ -306,12 +321,18 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(
-                                    imageVector = if (photoPath != null) androidx.compose.material.icons.Icons.Filled.Check else androidx.compose.material.icons.Icons.Filled.PhotoCamera,
-                                    contentDescription = "Maak foto"
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(if (photoPath != null) "Foto opgeslagen" else "Maak foto als bewijs")
+                                if (isOcrRunning) {
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Km-stand herkennen...")
+                                } else {
+                                    Icon(
+                                        imageVector = if (photoPath != null) Icons.Filled.Check else Icons.Filled.PhotoCamera,
+                                        contentDescription = "Maak foto"
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(if (photoPath != null) "Foto gemaakt (km-stand herkend)" else "Maak foto als bewijs")
+                                }
                             }
                         }
                     },
@@ -401,8 +422,16 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                 VehiclesScreen(
                     onOpenDrawer = onOpenDrawer,
                     onAddVehicle = { navController.navigate(AddVehicleRoute()) },
-                    onEditVehicle = { vehicleId -> navController.navigate(AddVehicleRoute(vehicleId = vehicleId)) }
+                    onEditVehicle = { vehicleId -> navController.navigate(AddVehicleRoute(vehicleId = vehicleId)) },
+                    onViewOdometerChecks = { vehicleId -> navController.navigate(OdometerChecksRoute(vehicleId = vehicleId)) }
                 ) 
+            }
+            composable<OdometerChecksRoute> { backStackEntry ->
+                val args = backStackEntry.toRoute<OdometerChecksRoute>()
+                com.cimdriver.app.ui.screens.OdometerChecksScreen(
+                    vehicleId = args.vehicleId,
+                    onNavigateBack = { navController.navigateUp() }
+                )
             }
             composable<SettingsRoute> { 
                 SettingsScreen(

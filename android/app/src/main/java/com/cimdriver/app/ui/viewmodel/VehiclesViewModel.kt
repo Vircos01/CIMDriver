@@ -115,6 +115,8 @@ class VehiclesViewModel @Inject constructor(
         }
     }
 
+    fun getChecksForVehicle(vehicleId: Long) = odometerCheckDao.getChecksForVehicle(vehicleId)
+
     fun confirmOdometerCheck(vehicle: Vehicle, correctedOdometer: Int, photoPath: String? = null) {
         viewModelScope.launch {
             val timestamp = System.currentTimeMillis()

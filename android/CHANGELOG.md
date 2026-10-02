@@ -2,6 +2,13 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.2] - 2026-10-02
+
+### Toegevoegd
+- **Kilometercontroles:** Nieuw scherm voor maandelijkse km-controles per voertuig, met een overzicht van alle historische controles.
+- **OCR voor km-stand:** Fotos van de kilometerstand kunnen nu automatisch worden gelezen met ML Kit, zodat de invoer sneller en robuuster verloopt.
+- **Voertuigwerkstroom:** Verbeterde navigatie en voertuigdetails voor het bekijken en beheren van odometer-controles.
+
 ## [1.2.1] - 2026-10-02
 
 ### Opgelost
