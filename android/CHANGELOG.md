@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.1] - 2026-10-02
+
+### Opgelost
+- **Taal:** Ontbrekende Nederlandse vertaling ("Tanken / Laden") in het navigatiemenu toegevoegd in plaats van "Fuel".
+
 ## [1.2.0] - 2026-10-02
 
 ### Toegevoegd

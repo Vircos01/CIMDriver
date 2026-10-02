@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <resources>
     <string name="app_name">CIMDriver</string>
+    <string name="fuel">Tanken / Laden</string>
     <string name="delete_address">Adres verwijderen</string>
     <string name="address_book">Adresboek</string>
     <string name="loading_address_book">Adresboek laden...</string>
