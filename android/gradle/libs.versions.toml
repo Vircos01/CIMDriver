@@ -1,5 +1,6 @@
 [versions]
 coroutinesTest = "1.9.0"
+coroutinesPlayServices = "1.9.0"
 mockitoKotlin = "5.4.0"
 mockitoCore = "5.14.2"
 agp = "9.4.1"
@@ -23,6 +24,7 @@ hiltNavigationCompose = "1.2.0"
 
 [libraries]
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockitoCore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
