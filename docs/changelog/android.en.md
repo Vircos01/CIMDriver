@@ -4,12 +4,11 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.2.2 (Current Version)
+## Version 1.2.3 (Current Version)
 
-!!! success "New"
-    * **Odometer checks:** New monthly odometer check screen per vehicle with a history of previous checks.
-    * **OCR for odometer readings:** Photos of the odometer can now be read automatically, making data entry faster and more reliable.
-    * **Improved vehicle flow:** The workflow for viewing and managing odometer checks has been refined for a smoother experience.
+!!! bug "Bug fix"
+    * **Existing vehicle:** Editing the start and end date for an existing vehicle now works correctly, even when the private-use warning is disabled.
+    * **Date fields:** The date fields remain visible and can be edited or cleared directly from the vehicle settings.
 
 ---
 

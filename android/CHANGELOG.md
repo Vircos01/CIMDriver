@@ -2,6 +2,12 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.3] - 2026-10-02
+
+### Opgelost
+- **Voertuigdata:** Het aanpassen van de begin- en einddatum bij een bestaande auto werkt nu weer correct, ook als de waarschuwing voor privégebruik is uitgeschakeld.
+- **UI:** De datumvelden blijven zichtbaar en kunnen direct worden aangepast of gewist vanuit de voertuiginstellingen.
+
 ## [1.2.2] - 2026-10-02
 
 ### Toegevoegd

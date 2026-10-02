@@ -276,73 +276,78 @@ fun AddVehicleScreen(
                             Text("Toon waarschuwing op dashboard", modifier = Modifier.padding(start = 8.dp))
                         }
                         
+                        OutlinedTextField(
+                            value = privateKmYearlyLimitStr,
+                            onValueChange = { privateKmYearlyLimitStr = it.filter { char -> char.isDigit() } },
+                            label = { Text("Maximale privékilometers (bijv. 500)") },
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            Box(modifier = Modifier.weight(1f).clickable { showInServiceDatePicker = true }) {
+                                OutlinedTextField(
+                                    value = inServiceDate?.let { dateFormat.format(Date(it)) } ?: "",
+                                    onValueChange = { },
+                                    readOnly = true,
+                                    label = { Text("Datum ingebruikname (pro rata)") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    enabled = false,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledBorderColor = MaterialTheme.colorScheme.outline,
+                                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                                Box(modifier = Modifier.matchParentSize().clickable { showInServiceDatePicker = true })
+                            }
+                            if (inServiceDate != null) {
+                                IconButton(onClick = { inServiceDate = null }, modifier = Modifier.padding(start = 8.dp)) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Wis begin datum", tint = MaterialTheme.colorScheme.error)
+                                }
+                            }
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                            Box(modifier = Modifier.weight(1f).clickable { showEndServiceDatePicker = true }) {
+                                OutlinedTextField(
+                                    value = endServiceDate?.let { dateFormat.format(Date(it)) } ?: "",
+                                    onValueChange = { },
+                                    readOnly = true,
+                                    label = { Text("Datum einde gebruik") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    enabled = false,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledBorderColor = MaterialTheme.colorScheme.outline,
+                                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                                Box(modifier = Modifier.matchParentSize().clickable { showEndServiceDatePicker = true })
+                            }
+                            if (endServiceDate != null) {
+                                IconButton(onClick = { endServiceDate = null }, modifier = Modifier.padding(start = 8.dp)) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Wis datum", tint = MaterialTheme.colorScheme.error)
+                                }
+                            }
+                        }
+
                         if (showPrivateKmWarning) {
-                            OutlinedTextField(
-                                value = privateKmYearlyLimitStr,
-                                onValueChange = { privateKmYearlyLimitStr = it.filter { char -> char.isDigit() } },
-                                label = { Text("Maximale privékilometers (bijv. 500)") },
-                                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            
-                            val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                            
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Box(modifier = Modifier.weight(1f).clickable { showInServiceDatePicker = true }) {
-                                    OutlinedTextField(
-                                        value = inServiceDate?.let { dateFormat.format(Date(it)) } ?: "",
-                                        onValueChange = { },
-                                        readOnly = true,
-                                        label = { Text("Datum ingebruikname (pro rata)") },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        enabled = false,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                            disabledBorderColor = MaterialTheme.colorScheme.outline,
-                                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    )
-                                    Box(modifier = Modifier.matchParentSize().clickable { showInServiceDatePicker = true })
-                                }
-                            }
-                            
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-                                Box(modifier = Modifier.weight(1f).clickable { showEndServiceDatePicker = true }) {
-                                    OutlinedTextField(
-                                        value = endServiceDate?.let { dateFormat.format(Date(it)) } ?: "",
-                                        onValueChange = { },
-                                        readOnly = true,
-                                        label = { Text("Datum einde gebruik") },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        enabled = false,
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                            disabledBorderColor = MaterialTheme.colorScheme.outline,
-                                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    )
-                                    Box(modifier = Modifier.matchParentSize().clickable { showEndServiceDatePicker = true })
-                                }
-                                if (endServiceDate != null) {
-                                    IconButton(onClick = { endServiceDate = null }, modifier = Modifier.padding(start = 8.dp)) {
-                                        Icon(Icons.Filled.Delete, contentDescription = "Wis datum", tint = MaterialTheme.colorScheme.error)
-                                    }
-                                }
-                            }
-                            
                             val proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
                                 yearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500,
                                 inServiceDate = inServiceDate,
                                 endServiceDate = endServiceDate
                             )
-                            
+
                             Text(
                                 text = "ℹ Berekende pro rata grens dit jaar: $proRataLimit km",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.padding(start = 4.dp, top = 4.dp)
                             )
-                            
+
                             Text(
                                 text = "Let op: De fiscale grens geldt per persoon per auto. Heb je een auto halverwege het jaar gekregen (bijv. poolauto)? Dan tellen ritten van vorige bestuurders niet mee voor jouw grens. Gebruik de ingebruiknamedatum hierboven om jouw persoonlijke pro-rata grens te berekenen.",
                                 style = MaterialTheme.typography.bodySmall,

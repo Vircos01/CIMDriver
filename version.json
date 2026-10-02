@@ -1,6 +1,6 @@
 {
-  "versionCode": 19,
-  "versionName": "1.2.2",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.2.apk",
-  "releaseNotes": "Versie 1.2.2: Nieuw kilometercontroles scherm met OCR-ondersteuning voor km-stand foto\'s en verbeterde voertuignavigatie."
+  "versionCode": 20,
+  "versionName": "1.2.3",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.3.apk",
+  "releaseNotes": "Versie 1.2.3: Fix voor het aanpassen van begin- en einddatum bij bestaande auto's in de voertuiginstellingen."
 }

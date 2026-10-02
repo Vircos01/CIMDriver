@@ -6,12 +6,11 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.2.2 (Huidige Versie)
+## Versie 1.2.3 (Huidige Versie)
 
-!!! success "Nieuw"
-    * **Kilometercontroles:** Nieuw scherm met maandelijkse km-controles per voertuig en een historisch overzicht van eerdere controles.
-    * **OCR voor kilometerstand:** Foto's van de km-stand kunnen nu automatisch worden gelezen, waardoor de invoer sneller en betrouwbaarder verloopt.
-    * **Verbeterde voertuignavigatie:** De workflow voor het bekijken en beheren van odometer-controles is verbeterd voor een logischere flow.
+!!! bug "Bugfix"
+    * **Bestaande auto:** Het aanpassen van de begin- en einddatum bij een bestaande auto werkt nu weer correct, ook als de waarschuwing voor privégebruik is uitgeschakeld.
+    * **Datumvelden:** De velden blijven zichtbaar en kunnen direct worden aangepast of gewist vanuit de voertuiginstellingen.
 
 ---
 
