@@ -18,20 +18,24 @@ android {
         applicationId = "com.cimdriver.app"
         minSdk = 29
         targetSdk = 37
-        versionCode = 15
-        versionName = "1.1.4-${getGitHash(providers)}"
+        versionCode = 21
+        versionName = "1.2.4-${getGitHash(providers)}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-        
-        ndk {
-            abiFilters.add("armeabi-v7a")
-            abiFilters.add("arm64-v8a")
-        }
-        
+
         buildConfigField("String", "GIT_HASH", "\"${getGitHash(providers)}\"")
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = false
+        }
     }
 
     signingConfigs {
@@ -52,6 +56,8 @@ android {
                 storePassword = keystorePassword
                 keyAlias = keystoreKeyAlias
                 keyPassword = keystoreKeyPassword
+                enableV1Signing = true
+                enableV2Signing = true
             } else {
                 // Fallback to debug keystore so release builds can succeed without secrets
                 initWith(getByName("debug"))
@@ -112,6 +118,7 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Room
     implementation(libs.room.runtime)
@@ -130,6 +137,15 @@ dependencies {
     
     // Play Services Location (for Geofencing)
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // ML Kit Text Recognition (for OCR on odometer photos)
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+
+    // Coil for image loading (odometer check photo thumbnails)
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Local summary endpoint for Zepp OS companion app
+    implementation("org.nanohttpd:nanohttpd:2.3.1")
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

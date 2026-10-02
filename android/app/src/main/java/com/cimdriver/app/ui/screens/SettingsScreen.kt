@@ -87,6 +87,10 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
+import android.content.ClipData
+import androidx.compose.material.icons.filled.ContentCopy
+import java.net.Inet4Address
+import java.net.NetworkInterface
 
 @Composable
 fun SettingsListItem(
@@ -218,6 +222,55 @@ fun SettingsScreen(
             )
 
             // Werkuren
+            SettingsSectionHeader(title = "Companion / Watch")
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+            ) {
+                val zeppSummaryUrl = remember(context) { resolveZeppSummaryUrl(context) }
+                val scope = rememberCoroutineScope()
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ContentCopy,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 12.dp)
+                        )
+                        Text(
+                            text = "Zepp companion URL",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = zeppSummaryUrl,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = {
+                            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                            val clip = ClipData.newPlainText("Zepp companion URL", zeppSummaryUrl)
+                            clipboard.setPrimaryClip(clip)
+                            scope.launch {
+                                android.widget.Toast.makeText(context, "URL gekopieerd", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Text("URL kopiëren")
+                    }
+                }
+            }
+
             SettingsSectionHeader(title = "Werkuren")
             SettingsListItem(
                 title = "Werkdagen & Tijden",
@@ -252,5 +305,29 @@ fun SettingsScreen(
     }
 }
 
+private fun resolveZeppSummaryUrl(context: Context): String {
+    val fallbackUrl = "http://127.0.0.1:8765/zepp/summary"
+    try {
+        val interfaces = NetworkInterface.getNetworkInterfaces() ?: return fallbackUrl
+        while (interfaces.hasMoreElements()) {
+            val networkInterface = interfaces.nextElement()
+            if (networkInterface.isLoopback || !networkInterface.isUp) continue
+
+            val addresses = networkInterface.inetAddresses ?: continue
+            while (addresses.hasMoreElements()) {
+                val address = addresses.nextElement()
+                if (!address.isLoopbackAddress && address is Inet4Address) {
+                    val host = address.hostAddress ?: continue
+                    if (host.isNotBlank()) {
+                        return "http://$host:8765/zepp/summary"
+                    }
+                }
+            }
+        }
+    } catch (_: Exception) {
+        // Fallback below
+    }
+    return fallbackUrl
+}
 
 
