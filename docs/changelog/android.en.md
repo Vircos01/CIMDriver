@@ -22,6 +22,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
     * **Improved UI for settings:** The option to automatically archive project codes has been moved to the Work hours menu and redesigned as a user-friendly toggle switch.
 
 ## Version 1.2.5
+*Release date: October 9, 2026*
 
 !!! success "New Features"
     * **Clients & Projects:** Added the ability to create project codes and link them to clients.
@@ -32,8 +33,10 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.2.4
+*Release date: October 2, 2026*
 
 ## Version 1.2.3
+*Release date: October 2, 2026*
 
 !!! bug "Bug fix"
     * **Existing vehicle:** Editing the start and end date for an existing vehicle now works correctly, even when the private-use warning is disabled.
@@ -42,6 +45,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.1.5
+*Release date: October 1, 2026*
 
 !!! success "New"
     * **Classification Rules:** Added auto-complete and address book selection. You can now easily select addresses from your address book when setting up rules, just like with trips.
@@ -49,6 +53,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.1.4
+*Release date: September 24, 2026*
 
 !!! success "New"
     * **Documentation:** Release notes have been updated with a warning about the backup functionality, and the project structure has been improved.
@@ -59,6 +64,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.1.1 to 1.1.3
+*Release dates: September 18 (1.1.1) and September 21, 2026 (1.1.2 and 1.1.3)*
 
 !!! info "Adjustments"
     * **Help screen:** The in-app help screen has been updated with refreshed information for users.
@@ -67,6 +73,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.0.8 & 1.1.0 (Strict Address Matching)
+*Release date: September 17, 2026*
 
 !!! success "New"
     * **Strict Address Matching:** A new algorithm (priority-based) has been implemented to link trips to the correct locations even more accurately and prevent false connections.
@@ -77,6 +84,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.0.7
+*Release date: September 16, 2026*
 
 !!! info "Adjustments"
     * **UI Improvements:** Various visual improvements and fixes in address matching and keystore.
@@ -84,6 +92,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.0.3 & 1.0.4
+*Release date: September 16, 2026*
 
 !!! success "New"
     * **Database Update:** Database model updated (version 30) for faster processing of entities and settings.

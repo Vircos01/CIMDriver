@@ -24,6 +24,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
     * **Verbeterde UI voor instellingen:** De optie om projectcodes automatisch te archiveren is verplaatst naar het Werkuren-menu en opnieuw opgemaakt als een gebruiksvriendelijke toggle-schakelaar.
 
 ## Versie 1.2.5
+*Releasedatum: 9 oktober 2026*
 
 !!! success "Nieuwe Functies"
     * **Klanten & Projecten:** Mogelijkheid toegevoegd om projectcodes aan te maken en te koppelen aan klanten.
@@ -34,8 +35,10 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.2.4
+*Releasedatum: 2 oktober 2026*
 
 ## Versie 1.2.3
+*Releasedatum: 2 oktober 2026*
 
 !!! bug "Bugfix"
     * **Bestaande auto:** Het aanpassen van de begin- en einddatum bij een bestaande auto werkt nu weer correct, ook als de waarschuwing voor privégebruik is uitgeschakeld.
@@ -44,6 +47,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.1.5
+*Releasedatum: 1 oktober 2026*
 
 !!! success "Nieuw"
     * **Classificatieregels:** Auto-aanvullen en adresboek selectie toegevoegd. Vanaf nu kun je net als bij ritten eenvoudig adressen selecteren uit je adresboek bij het instellen van regels.
@@ -51,6 +55,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.1.4
+*Releasedatum: 24 september 2026*
 
 !!! success "Nieuw"
     * **Documentatie:** Release notes zijn bijgewerkt met een waarschuwing over de back-up functionaliteit, en de structuur van het project is verbeterd.
@@ -61,6 +66,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.1.1 t/m 1.1.3
+*Releasedata: 18 september (1.1.1) en 21 september 2026 (1.1.2 en 1.1.3)*
 
 !!! info "Aanpassingen"
     * **Help-scherm:** Het in-app helpscherm is geüpdatet met vernieuwde informatie voor gebruikers.
@@ -69,6 +75,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.0.8 & 1.1.0 (Stricte Adres Matching)
+*Releasedatum: 17 september 2026*
 
 !!! success "Nieuw"
     * **Stricte Adres Matching:** Een nieuw algoritme (priority-based) is geïmplementeerd om ritten nog accurater aan de juiste locaties te koppelen en foute verbindingen te voorkomen.
@@ -79,6 +86,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.0.7
+*Releasedatum: 16 september 2026*
 
 !!! info "Aanpassingen"
     * **UI Verbeteringen:** Diverse visuele verbeteringen en fixes in adresmatching en keystore.
@@ -86,6 +94,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.0.3 & 1.0.4
+*Releasedatum: 16 september 2026*
 
 !!! success "Nieuw"
     * **Database Update:** Database model bijgewerkt (versie 30) voor snellere verwerking van entiteiten en instellingen.
