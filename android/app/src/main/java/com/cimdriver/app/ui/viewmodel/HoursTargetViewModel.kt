@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.cimdriver.app.data.local.AppDatabase
 import com.cimdriver.app.data.local.dao.HoursTargetWithDetails
 import com.cimdriver.app.data.local.entity.HoursTarget
+import com.cimdriver.app.util.employmentTargetFactor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,9 +19,13 @@ import javax.inject.Inject
 data class TargetProgress(
     val targetDetails: HoursTargetWithDetails,
     val accumulatedHours: Double,
+    val accumulatedRevenue: Double,
+    val accumulatedValue: Double, // General value for percentage calc
     val percentage: Float,
     val isBehind: Boolean,
-    val diffHours: Double
+    val diffValue: Double,
+    val effectiveTargetValue: Double, // Pro-rata adjusted target
+    val proRataFactor: Double // 1.0 = full year, 0.5 = half year, etc.
 )
 
 @HiltViewModel
@@ -34,6 +39,8 @@ class HoursTargetViewModel @Inject constructor(
     private val _currentYear = MutableStateFlow(Calendar.getInstance().get(Calendar.YEAR))
     val currentYear: StateFlow<Int> = _currentYear
     
+    private val settingsDao = database.settingsDao()
+
     // Combining targets for the year with workdays for the year to compute progress
     val targetProgresses: StateFlow<List<TargetProgress>> = combine(
         _currentYear,
@@ -59,22 +66,35 @@ class HoursTargetViewModel @Inject constructor(
         combine(
             hoursTargetDao.getActiveTargetsForYear(year),
             workDayDao.getWorkDaysInRange(startCal.timeInMillis, endCal.timeInMillis),
-            database.projectCodeDao().getActiveProjectCodes()
-        ) { targets, workDays, allProjectCodes ->
+            database.projectCodeDao().getAllProjectCodes(),
+            settingsDao.getSettings()
+        ) { targets, workDays, allProjectCodes, settings ->
             // Filter approved workdays
             val approvedDays = workDays.filter { it.status == "APPROVED" }
             
             // Map project codes by ID for quick lookup
             val projectMap = allProjectCodes.associateBy { it.id }
             
-            // Calculate elapsed ratio (linear)
+            // Pro-rata: determine the effective start of the year for this user
+            val totalDaysInYear = if (java.util.GregorianCalendar().isLeapYear(year)) 366.0 else 365.0
+            // The employment start day within the year (or day 1 if not set / before this year)
+            val employmentStartDayOfYear: Int = settings?.employmentStartDate?.let { empTs ->
+                val empCal = Calendar.getInstance().apply { timeInMillis = empTs }
+                if (empCal.get(Calendar.YEAR) == year) empCal.get(Calendar.DAY_OF_YEAR) else if (empCal.get(Calendar.YEAR) > year) totalDaysInYear.toInt() + 1 else 1
+            } ?: 1
+
+            // Effective working days in this year (from employment start to end of year)
+            val effectiveDaysInYear = (totalDaysInYear - employmentStartDayOfYear + 1).coerceAtLeast(0.0)
+            val proRataFactor = employmentTargetFactor(settings?.employmentStartDate, year)
+
+            // Calculate elapsed ratio (linear, but only within the employment window)
             val now = Calendar.getInstance()
             val isCurrentYear = now.get(Calendar.YEAR) == year
             
             val elapsedRatio = if (isCurrentYear) {
-                val dayOfYear = now.get(Calendar.DAY_OF_YEAR)
-                val totalDays = if (now.getActualMaximum(Calendar.DAY_OF_YEAR) > 365) 366.0 else 365.0
-                dayOfYear / totalDays
+                val dayOfYear = now.get(Calendar.DAY_OF_YEAR).coerceAtLeast(employmentStartDayOfYear)
+                val daysElapsedSinceStart = (dayOfYear - employmentStartDayOfYear + 1).coerceAtLeast(0)
+                if (effectiveDaysInYear > 0) daysElapsedSinceStart / effectiveDaysInYear else 0.0
             } else if (year < now.get(Calendar.YEAR)) {
                 1.0
             } else {
@@ -101,29 +121,41 @@ class HoursTargetViewModel @Inject constructor(
                     clientMatch && projectMatch
                 }
                 
-                // Let's get project codes to accurately match clientId
-                // Not ideal to fetch synchronously here, but we will fix this via combine
-                
                 var totalMs = 0L
+                var totalRevenue = 0.0
                 validDays.forEach { wd ->
                     val start = wd.roundedArrivalTime ?: wd.arrivalTime
                     val end = wd.roundedDepartureTime ?: wd.departureTime ?: wd.lastArrivalTime ?: start
-                    totalMs += (end - start) - (wd.breakMinutes * 60000L)
+                    val workedMs = ((end - start) - (wd.breakMinutes * 60000L)).coerceAtLeast(0L)
+                    totalMs += workedMs
+                    val projectRate = wd.projectCodeId?.let { projectMap[it]?.hourlyRate?.takeIf { rate -> rate > 0.0 } }
+                        ?: td.target.hourlyRate
+                    totalRevenue += (workedMs / 3600000.0) * projectRate
                 }
                 
                 val accHours = if (totalMs > 0) totalMs / 3600000.0 else 0.0
-                val targetHours = td.target.targetHours
+                val accRevenue = totalRevenue
+
+                val isRevenue = td.target.targetType == "REVENUE"
+                // Apply pro-rata to the full year target to get the effective target for this year
+                val fullYearTargetValue = if (isRevenue) td.target.targetRevenue else td.target.targetHours
+                val effectiveTargetValue = fullYearTargetValue * proRataFactor
+                val accumulatedValue = if (isRevenue) accRevenue else accHours
                 
-                val expectedHours = targetHours * elapsedRatio
-                val diffHours = accHours - expectedHours
-                val isBehind = diffHours < 0 && elapsedRatio > 0 && elapsedRatio < 1
+                val expectedValue = effectiveTargetValue * elapsedRatio
+                val diffValue = accumulatedValue - expectedValue
+                val isBehind = diffValue < 0 && elapsedRatio > 0 && elapsedRatio < 1
                 
                 TargetProgress(
                     targetDetails = td,
                     accumulatedHours = accHours,
-                    percentage = if (targetHours > 0) (accHours / targetHours).toFloat() else 0f,
+                    accumulatedRevenue = accRevenue,
+                    accumulatedValue = accumulatedValue,
+                    percentage = if (effectiveTargetValue > 0) (accumulatedValue / effectiveTargetValue).toFloat() else 0f,
                     isBehind = isBehind,
-                    diffHours = diffHours
+                    diffValue = diffValue,
+                    effectiveTargetValue = effectiveTargetValue,
+                    proRataFactor = proRataFactor
                 )
             }
         }

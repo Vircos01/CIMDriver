@@ -122,6 +122,13 @@ fun ClientsProjectCodesScreen(
                                                 color = if (project.isActive) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                             )
                                         }
+                                        if (project.hourlyRate > 0.0) {
+                                            Text(
+                                                "€ ${String.format("%.2f", project.hourlyRate)} / uur",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
                                     }
                                     Row {
                                         IconButton(onClick = { projectToEdit = project }) {
@@ -185,6 +192,13 @@ fun ClientsProjectCodesScreen(
                                                 project.description, 
                                                 style = MaterialTheme.typography.bodySmall, 
                                                 color = if (project.isActive) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
+                                        }
+                                        if (project.hourlyRate > 0.0) {
+                                            Text(
+                                                "€ ${String.format("%.2f", project.hourlyRate)} / uur",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
                                     }
@@ -284,6 +298,7 @@ fun ClientsProjectCodesScreen(
         val isEdit = projectToEdit != null
         var code by remember { mutableStateOf(projectToEdit?.code ?: "") }
         var description by remember { mutableStateOf(projectToEdit?.description ?: "") }
+        var hourlyRateStr by remember { mutableStateOf(projectToEdit?.hourlyRate?.toString() ?: "") }
         var isBillable by remember { mutableStateOf(projectToEdit?.isBillable ?: true) }
         
         val actualClientId = if (isEdit) {
@@ -315,6 +330,17 @@ fun ClientsProjectCodesScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = hourlyRateStr,
+                        onValueChange = { hourlyRateStr = it },
+                        label = { Text("Vast uurtarief (€/uur)") },
+                        singleLine = true,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
                             checked = isBillable,
@@ -328,18 +354,21 @@ fun ClientsProjectCodesScreen(
                 TextButton(
                     onClick = {
                         if (code.isNotBlank()) {
+                            val hourlyRate = hourlyRateStr.replace(',', '.').toDoubleOrNull()?.coerceAtLeast(0.0) ?: 0.0
                             if (isEdit) {
                                 viewModel.updateProjectCode(projectToEdit!!.copy(
                                     code = code,
                                     description = description.takeIf { it.isNotBlank() },
-                                    isBillable = isBillable
+                                    isBillable = isBillable,
+                                    hourlyRate = hourlyRate
                                 ))
                             } else {
                                 viewModel.addProjectCode(
                                     code = code,
                                     description = description.takeIf { it.isNotBlank() },
                                     clientId = actualClientId,
-                                    isBillable = isBillable
+                                    isBillable = isBillable,
+                                    hourlyRate = hourlyRate
                                 )
                             }
                             showAddProjectDialogForClient = null

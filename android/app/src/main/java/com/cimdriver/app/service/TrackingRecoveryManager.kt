@@ -5,14 +5,15 @@ import android.util.Log
 import com.cimdriver.app.data.local.AppDatabase
 import com.cimdriver.app.data.local.entity.Trip
 
-class TrackingRecoveryManager(private val context: Context) {
+class TrackingRecoveryManager(
+    private val context: Context,
+    private val maxAttemptsProvider: suspend () -> Int = {
+        AppDatabase.getDatabase(context).settingsDao().getSettingsSync()?.maxRecoveryAttempts ?: 3
+    },
+    private val debugLog: (String) -> Unit = { Log.d("TrackingRecovery", it) }
+) {
 
     private val prefs = context.getSharedPreferences("tracking_recovery_prefs", Context.MODE_PRIVATE)
-
-    private suspend fun getMaxAttempts(): Int {
-        val db = AppDatabase.getDatabase(context)
-        return db.settingsDao().getSettingsSync()?.maxRecoveryAttempts ?: 3
-    }
 
     suspend fun getTripToRecover(): Trip? {
         val db = AppDatabase.getDatabase(context)
@@ -22,7 +23,7 @@ class TrackingRecoveryManager(private val context: Context) {
 
     suspend fun shouldAttemptRecovery(tripId: Long): Boolean {
         val attempts = prefs.getInt("recovery_attempts_$tripId", 0)
-        val maxAttempts = getMaxAttempts()
+        val maxAttempts = maxAttemptsProvider()
         
         if (attempts >= maxAttempts) {
             Log.e("TrackingRecovery", "Max recovery attempts reached for trip $tripId")
@@ -36,7 +37,7 @@ class TrackingRecoveryManager(private val context: Context) {
     fun incrementRecoveryAttempt(tripId: Long) {
         val attempts = prefs.getInt("recovery_attempts_$tripId", 0)
         prefs.edit().putInt("recovery_attempts_$tripId", attempts + 1).apply()
-        Log.d("TrackingRecovery", "Recovery attempt ${attempts + 1} for trip $tripId")
+        debugLog("Recovery attempt ${attempts + 1} for trip $tripId")
     }
     
     fun clearRecoveryAttempts(tripId: Long) {

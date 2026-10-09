@@ -306,11 +306,71 @@ fun SettingsScreen(
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
             SettingsListItem(
-                title = "Uren Targets",
+                title = "Targets (Uren & Omzet)",
                 icon = Icons.Filled.Flag,
                 onClick = { navController.navigate(HoursTargetsRoute) }
             )
 
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            // Employment start date for pro-rata target calculation
+            var showDatePicker by remember { mutableStateOf(false) }
+            Surface(
+                modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Datum in Dienst",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        val empDate = initialSettings.employmentStartDate
+                        Text(
+                            text = if (empDate != null) {
+                                val cal = java.util.Calendar.getInstance().apply { timeInMillis = empDate }
+                                "${cal.get(java.util.Calendar.DAY_OF_MONTH)}-${cal.get(java.util.Calendar.MONTH) + 1}-${cal.get(java.util.Calendar.YEAR)}"
+                            } else {
+                                "Niet ingesteld (jaartarget volledig)"
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (initialSettings.employmentStartDate != null) {
+                        IconButton(onClick = { viewModel.updateEmploymentStartDate(null) }) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Wis datum", tint = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+            }
+            if (showDatePicker) {
+                val datePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = initialSettings.employmentStartDate
+                )
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            viewModel.updateEmploymentStartDate(datePickerState.selectedDateMillis)
+                            showDatePicker = false
+                        }) { Text("OK") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) { Text("Annuleren") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
             Surface(
                 modifier = Modifier.fillMaxWidth().clickable {

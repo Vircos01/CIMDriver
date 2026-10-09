@@ -144,6 +144,13 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { locationPointDao.deleteAllPoints() }
     }
 
+    fun updateEmploymentStartDate(timestamp: Long?) {
+        viewModelScope.launch {
+            val currentSettings = settings.value ?: Settings()
+            settingsDao.insertSettings(currentSettings.copy(employmentStartDate = timestamp))
+        }
+    }
+
     fun resetAllData() {
         viewModelScope.launch {
             database.clearAllTables()

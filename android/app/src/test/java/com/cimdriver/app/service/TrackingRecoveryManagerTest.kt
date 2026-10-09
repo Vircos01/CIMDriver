@@ -34,7 +34,11 @@ class TrackingRecoveryManagerTest {
         `when`(mockEditor.putInt(anyString(), anyInt())).thenReturn(mockEditor)
         `when`(mockEditor.remove(anyString())).thenReturn(mockEditor)
         
-        recoveryManager = TrackingRecoveryManager(mockContext)
+        recoveryManager = TrackingRecoveryManager(
+            context = mockContext,
+            maxAttemptsProvider = { 3 },
+            debugLog = {}
+        )
     }
 
     @Test

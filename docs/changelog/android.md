@@ -6,7 +6,15 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.2.6 (Huidige Versie)
+## Versie 1.2.7 (Huidige Versie)
+**9 Oktober 2026**
+
+### Toegevoegd
+- **Uren- en omzetdoelen:** Stel targets in op uren of omzet en koppel ze aan een klant of projectcode.
+- **Vaste projecttarieven:** Configureer het uurtarief per projectcode; de gerealiseerde omzet wordt per project berekend.
+- **Pro-rata jaartarget:** De instelbare datum in dienst bepaalt hoeveel kalendermaanden van de jaartarget meetellen. Start je in september, dan is dit 4/12.
+
+## Versie 1.2.6
 **9 Oktober 2026**
 
 ### Toegevoegd

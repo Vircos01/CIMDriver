@@ -2,6 +2,13 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.7] - 2026-10-09
+
+### Toegevoegd
+- **Uren- en omzetdoelen:** Targets kunnen nu zowel op uren als omzet worden ingesteld en aan een klant of projectcode worden gekoppeld.
+- **Vaste projecttarieven:** Het uurtarief wordt per projectcode ingesteld en gebruikt om gerealiseerde omzet te berekenen.
+- **Pro-rata jaartarget:** De instelbare datum in dienst bepaalt vanaf welke kalendermaand de jaartarget meetelt; indiensttreding in september geeft 4/12 van de jaartarget.
+
 ## [1.2.6] - 2026-10-09
 
 ### Toegevoegd

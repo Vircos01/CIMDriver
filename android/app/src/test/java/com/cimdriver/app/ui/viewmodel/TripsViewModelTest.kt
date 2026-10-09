@@ -1,6 +1,7 @@
 package com.cimdriver.app.ui.viewmodel
 
 import com.cimdriver.app.data.local.AppDatabase
+import com.cimdriver.app.data.local.dao.SettingsDao
 import com.cimdriver.app.data.repository.TripRepository
 import com.cimdriver.app.data.local.entity.Trip
 import kotlinx.coroutines.Dispatchers
@@ -29,9 +30,16 @@ class TripsViewModelTest {
         Dispatchers.setMain(testDispatcher)
         tripRepository = mock(TripRepository::class.java)
         database = mock(AppDatabase::class.java)
+        val settingsDao = mock(SettingsDao::class.java)
         
-        // Setup default mocks
+        `when`(database.settingsDao()).thenReturn(settingsDao)
+        `when`(settingsDao.getSettings()).thenReturn(flowOf(null))
         `when`(tripRepository.getAllTrips()).thenReturn(flowOf(emptyList()))
+        `when`(tripRepository.getAllFavoriteRoutes()).thenReturn(flowOf(emptyList()))
+        `when`(tripRepository.getAllVehicles()).thenReturn(flowOf(emptyList()))
+        `when`(tripRepository.getUniqueProjectCodes()).thenReturn(flowOf(emptyList()))
+        `when`(tripRepository.getClassificationRules()).thenReturn(flowOf(emptyList()))
+        `when`(tripRepository.getSavedAddresses()).thenReturn(flowOf(emptyList()))
         
         viewModel = TripsViewModel(tripRepository, database)
     }
@@ -43,7 +51,6 @@ class TripsViewModelTest {
 
     @Test
     fun `test initial state is empty`() = runTest {
-        // Just verify it doesn't crash on init
-        assertEquals(true, viewModel != null)
+        assertEquals(emptyList<Trip>(), viewModel.trips.value)
     }
 }

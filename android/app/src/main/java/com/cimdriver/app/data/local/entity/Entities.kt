@@ -143,7 +143,8 @@ data class Settings(
     val businessCompensation: Float = 0.23f,
     val skippedUpdateVersionCode: Int = 0,
     val autoArchiveProjectDays: Int = 0, // 0 means disabled
-    val zeppCompanionEnabled: Boolean = false
+    val zeppCompanionEnabled: Boolean = false,
+    @ColumnInfo(defaultValue = "NULL") val employmentStartDate: Long? = null
 )
 
 @Entity(tableName = "saved_addresses")
@@ -225,10 +226,15 @@ data class ProjectCode(
     val clientId: Long? = null,
     val code: String,
     val description: String? = null,
+    @ColumnInfo(defaultValue = "0.0") val hourlyRate: Double = 0.0,
     @ColumnInfo(defaultValue = "1") val isBillable: Boolean = true,
     @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
     @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
 )
+
+enum class TargetType {
+    HOURS, REVENUE
+}
 
 @Entity(
     tableName = "hours_targets",
@@ -258,6 +264,9 @@ data class HoursTarget(
     val projectCodeId: Long? = null,
     val name: String,
     val targetHours: Double,
+    @ColumnInfo(defaultValue = "'HOURS'") val targetType: String = "HOURS",
+    @ColumnInfo(defaultValue = "0.0") val targetRevenue: Double = 0.0,
+    @ColumnInfo(defaultValue = "0.0") val hourlyRate: Double = 0.0,
     val year: Int,
     @ColumnInfo(defaultValue = "'#4CAF50'") val color: String = "#4CAF50",
     @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,

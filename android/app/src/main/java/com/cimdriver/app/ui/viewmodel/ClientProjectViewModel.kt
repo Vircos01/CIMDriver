@@ -62,14 +62,15 @@ class ClientProjectViewModel @Inject constructor(
         }
     }
 
-    fun addProjectCode(code: String, description: String?, clientId: Long?, isBillable: Boolean) {
+    fun addProjectCode(code: String, description: String?, clientId: Long?, isBillable: Boolean, hourlyRate: Double = 0.0) {
         viewModelScope.launch {
             projectCodeDao.insertProjectCode(
                 ProjectCode(
                     code = code,
                     description = description,
                     clientId = clientId,
-                    isBillable = isBillable
+                    isBillable = isBillable,
+                    hourlyRate = hourlyRate
                 )
             )
         }

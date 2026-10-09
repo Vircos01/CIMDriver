@@ -568,7 +568,7 @@ fun DashboardScreen(
                 
                 if (targetProgresses.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(text = "Uren Targets", style = MaterialTheme.typography.titleLarge)
+                    Text(text = "Targets", style = MaterialTheme.typography.titleLarge)
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     val defaultColor = MaterialTheme.colorScheme.primary
@@ -612,8 +612,13 @@ fun DashboardScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text("${String.format("%.1f", progress.accumulatedHours)} uur", style = MaterialTheme.typography.bodyMedium)
-                                    Text("Doel: ${target.targetHours} uur", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    if (target.targetType == "REVENUE") {
+                                        Text("€ ${String.format("%.2f", progress.accumulatedRevenue)}", style = MaterialTheme.typography.bodyMedium)
+                                        Text("Doel: € ${String.format("%.2f", target.targetRevenue)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    } else {
+                                        Text("${String.format("%.1f", progress.accumulatedHours)} uur", style = MaterialTheme.typography.bodyMedium)
+                                        Text("Doel: ${target.targetHours} uur", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
                                 }
                             }
                         }

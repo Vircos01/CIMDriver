@@ -44,7 +44,7 @@ fun HoursTargetsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Uren Targets $currentYear", color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
+                title = { Text("Targets $currentYear", color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug", tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
@@ -75,7 +75,7 @@ fun HoursTargetsScreen(
             if (targetProgresses.isEmpty()) {
                 item {
                     Text(
-                        "Je hebt nog geen uren targets voor dit jaar ingesteld.",
+                        "Je hebt nog geen targets voor dit jaar ingesteld.",
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                 }
@@ -115,10 +115,23 @@ fun HoursTargetsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("${String.format("%.1f", progress.accumulatedHours)} / ${target.targetHours} uur")
+                            if (target.targetType == "REVENUE") {
+                                Text("€ ${String.format("%.2f", progress.accumulatedRevenue)} / € ${String.format("%.2f", progress.effectiveTargetValue)}")
+                            } else {
+                                Text("${String.format("%.1f", progress.accumulatedHours)} / ${String.format("%.1f", progress.effectiveTargetValue)} uur")
+                            }
                             Text("${String.format("%.1f", progress.percentage * 100)}%")
                         }
                         
+                        // Show pro-rata indicator if applicable
+                        if (progress.proRataFactor < 0.99) {
+                            Text(
+                                "Pro-rata: ${String.format("%.0f", progress.proRataFactor * 100)}% van jaar (vol jaar: ${if (target.targetType == "REVENUE") "€ ${String.format("%.0f", target.targetRevenue)}" else "${target.targetHours.toInt()} uur"})",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
                         Spacer(modifier = Modifier.height(4.dp))
                         
                         val defaultColor = MaterialTheme.colorScheme.primary
@@ -141,7 +154,11 @@ fun HoursTargetsScreen(
                             if (progress.isBehind) {
                                 Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Achter op schema: ${String.format("%.1f", progress.diffHours)} uur", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                if (target.targetType == "REVENUE") {
+                                    Text("Achter op schema: € ${String.format("%.2f", progress.diffValue)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                } else {
+                                    Text("Achter op schema: ${String.format("%.1f", progress.diffValue)} uur", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                }
                             } else {
                                 Icon(Icons.Filled.TrendingUp, contentDescription = null, tint = com.cimdriver.app.ui.theme.CIMDriverGreen, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -158,6 +175,8 @@ fun HoursTargetsScreen(
         val isEdit = targetToEdit != null
         var name by remember { mutableStateOf(targetToEdit?.name ?: "") }
         var targetHoursStr by remember { mutableStateOf(targetToEdit?.targetHours?.toString() ?: "1600.0") }
+        var targetType by remember { mutableStateOf(targetToEdit?.targetType ?: "HOURS") }
+        var targetRevenueStr by remember { mutableStateOf(targetToEdit?.targetRevenue?.toString() ?: "50000.0") }
         var selectedClientId by remember { mutableStateOf(targetToEdit?.clientId) }
         var selectedProjectId by remember { mutableStateOf(targetToEdit?.projectCodeId) }
         
@@ -184,16 +203,48 @@ fun HoursTargetsScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = targetHoursStr,
-                        onValueChange = { targetHoursStr = it },
-                        label = { Text("Doeluren") },
-                        singleLine = true,
+
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.RadioButton(
+                            selected = targetType == "HOURS",
+                            onClick = { targetType = "HOURS" }
                         )
-                    )
+                        Text("Uren Target")
+                        Spacer(modifier = Modifier.width(16.dp))
+                        androidx.compose.material3.RadioButton(
+                            selected = targetType == "REVENUE",
+                            onClick = { targetType = "REVENUE" }
+                        )
+                        Text("Omzet Target")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (targetType == "HOURS") {
+                        OutlinedTextField(
+                            value = targetHoursStr,
+                            onValueChange = { targetHoursStr = it },
+                            label = { Text("Doeluren") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                            )
+                        )
+                    } else {
+                        OutlinedTextField(
+                            value = targetRevenueStr,
+                            onValueChange = { targetRevenueStr = it },
+                            label = { Text("Doelomzet (€)") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                            )
+                        )
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     // Client Dropdown
@@ -274,6 +325,20 @@ fun HoursTargetsScreen(
                             }
                         }
                     }
+
+                    if (targetType == "REVENUE") {
+                        val selectedProject = projectCodes.find { it.id == selectedProjectId }
+                        val rateDescription = when {
+                            (selectedProject?.hourlyRate ?: 0.0) > 0.0 -> "Vast projecttarief: € ${String.format("%.2f", selectedProject!!.hourlyRate)} / uur"
+                            selectedProjectId != null -> "Geen vast uurtarief ingesteld voor dit project."
+                            else -> "Omzet wordt per project berekend met het ingestelde vaste uurtarief."
+                        }
+                        Text(
+                            rateDescription,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     Text("Kleur", style = MaterialTheme.typography.bodySmall)
@@ -299,12 +364,16 @@ fun HoursTargetsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val hours = targetHoursStr.toDoubleOrNull()
-                        if (name.isNotBlank() && hours != null) {
+                        val hours = targetHoursStr.toDoubleOrNull() ?: 0.0
+                        val revenue = targetRevenueStr.toDoubleOrNull() ?: 0.0
+
+                        if (name.isNotBlank()) {
                             if (isEdit) {
                                 viewModel.updateTarget(targetToEdit!!.copy(
                                     name = name,
                                     targetHours = hours,
+                                    targetType = targetType,
+                                    targetRevenue = revenue,
                                     clientId = selectedClientId,
                                     projectCodeId = selectedProjectId,
                                     color = selectedColor
@@ -314,6 +383,8 @@ fun HoursTargetsScreen(
                                     HoursTarget(
                                         name = name,
                                         targetHours = hours,
+                                        targetType = targetType,
+                                        targetRevenue = revenue,
                                         year = currentYear,
                                         clientId = selectedClientId,
                                         projectCodeId = selectedProjectId,

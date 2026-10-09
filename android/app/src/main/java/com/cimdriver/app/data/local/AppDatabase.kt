@@ -27,7 +27,7 @@ import com.cimdriver.app.data.local.entity.*
         OdometerCheck::class,
         FuelFillUp::class
     ], 
-    version = 44, 
+    version = 47,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -424,9 +424,29 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_44_45 = object : Migration(44, 45) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE hours_targets ADD COLUMN targetType TEXT NOT NULL DEFAULT 'HOURS'")
+                db.execSQL("ALTER TABLE hours_targets ADD COLUMN targetRevenue REAL NOT NULL DEFAULT 0.0")
+                db.execSQL("ALTER TABLE hours_targets ADD COLUMN hourlyRate REAL NOT NULL DEFAULT 0.0")
+            }
+        }
+
+        val MIGRATION_45_46 = object : Migration(45, 46) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE settings ADD COLUMN employmentStartDate INTEGER DEFAULT NULL")
+            }
+        }
+
+        val MIGRATION_46_47 = object : Migration(46, 47) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE project_codes ADD COLUMN hourlyRate REAL NOT NULL DEFAULT 0.0")
+            }
+        }
+
 		fun getDatabase(context: Context): AppDatabase {
 			return INSTANCE ?: synchronized(this) {
-				val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39, MIGRATION_39_40, MIGRATION_40_41, MIGRATION_41_42, MIGRATION_42_43, MIGRATION_43_44).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
+                val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39, MIGRATION_39_40, MIGRATION_40_41, MIGRATION_41_42, MIGRATION_42_43, MIGRATION_43_44, MIGRATION_44_45, MIGRATION_45_46, MIGRATION_46_47).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
 
 				INSTANCE = instance
 				instance
