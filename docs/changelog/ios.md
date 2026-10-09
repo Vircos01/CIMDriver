@@ -4,7 +4,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
-## Versie 0.6 Alpha
+## Versie 0.0.6 Alpha
 *Releasedatum: 9 oktober 2026*
 
 !!! success "Nieuwe functies"

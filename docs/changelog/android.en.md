@@ -7,19 +7,19 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ## Version 1.2.7 (Current Version)
 **October 9, 2026**
 
-### Added
-- **Hours and revenue targets:** Set targets in hours or revenue and link them to a client or project code.
-- **Fixed project rates:** Configure the hourly rate per project code; earned revenue is calculated per project.
-- **Pro-rated annual target:** The configurable employment start date determines how many calendar months count toward the annual target. Starting in September yields 4/12.
-- **Dashboard targets:** The displayed revenue or hours target is now also prorated based on the employment start date.
-- **In-app help:** Added guidance on configuring hours and revenue targets, fixed project rates, and pro-rata calculations.
+!!! success "New Features"
+    * **Hours and revenue targets:** Set targets in hours or revenue and link them to a client or project code.
+    * **Fixed project rates:** Configure the hourly rate per project code; earned revenue is calculated per project.
+    * **Pro-rated annual target:** The configurable employment start date determines how many calendar months count toward the annual target. Starting in September yields 4/12.
+    * **Dashboard targets:** The displayed revenue or hours target is now also prorated based on the employment start date.
+    * **In-app help:** Added guidance on configuring hours and revenue targets, fixed project rates, and pro-rata calculations.
 
 ## Version 1.2.6
 **October 9, 2026**
 
-### Added
-- **Zepp Companion Toggle:** Added a new setting to toggle the Zepp OS integration server (for smartwatches) on or off to improve battery life.
-- **Improved UI for settings:** The option to automatically archive project codes has been moved to the Work hours menu and redesigned as a user-friendly toggle switch.
+!!! success "New Features"
+    * **Zepp Companion Toggle:** Added a new setting to toggle the Zepp OS integration server (for smartwatches) on or off to improve battery life.
+    * **Improved UI for settings:** The option to automatically archive project codes has been moved to the Work hours menu and redesigned as a user-friendly toggle switch.
 
 ## Version 1.2.5
 

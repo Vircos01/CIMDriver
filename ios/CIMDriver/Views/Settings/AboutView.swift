@@ -3,20 +3,6 @@ import SwiftUI
 struct AboutView: View {
     private var appVersionText: String {
         let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-        let gitCommit = (Bundle.main.object(forInfoDictionaryKey: "GIT_COMMIT") as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        if let gitCommit, !gitCommit.isEmpty, gitCommit != "$(GIT_COMMIT)", gitCommit != "unknown" {
-            return "Versie \(shortVersion)-\(gitCommit)"
-        }
-
-        let displayVersion = Bundle.main.object(forInfoDictionaryKey: "APP_DISPLAY_VERSION") as? String
-        let cleanedDisplayVersion = displayVersion?.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        if let cleanedDisplayVersion, !cleanedDisplayVersion.isEmpty, cleanedDisplayVersion != "$(APP_DISPLAY_VERSION)", cleanedDisplayVersion != shortVersion, cleanedDisplayVersion != "\(shortVersion)-", cleanedDisplayVersion != "unknown" {
-            return "Versie \(cleanedDisplayVersion)"
-        }
-
         return "Versie \(shortVersion)"
     }
     
@@ -39,7 +25,7 @@ struct AboutView: View {
                         .frame(maxWidth: .infinity)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                     
-                    Text(appVersionText + " • Alpha")
+                    Text(appVersionText + " Alpha")
                         .font(.headline)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)

@@ -29,7 +29,7 @@ targets:
         embed: true
     settings:
       base:
-        MARKETING_VERSION: 0.6.0
+        MARKETING_VERSION: 0.0.6
         CURRENT_PROJECT_VERSION: 2
         APP_DISPLAY_VERSION: "$(MARKETING_VERSION)-$(GIT_COMMIT)"
         GIT_COMMIT: unknown
@@ -56,7 +56,7 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.cimsolutions.CIMDriver.widget
       PRODUCT_NAME: CIMDriverWidget
-      MARKETING_VERSION: 0.6.0
+      MARKETING_VERSION: 0.0.6
       CURRENT_PROJECT_VERSION: 2
       SWIFT_VERSION: 5.0
       CODE_SIGN_ENTITLEMENTS: ""

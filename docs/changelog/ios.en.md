@@ -4,7 +4,7 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
-## Version 0.6 Alpha
+## Version 0.0.6 Alpha
 *Release date: October 9, 2026*
 
 !!! success "New features"
