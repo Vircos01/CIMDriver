@@ -361,6 +361,12 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
             composable<WorkDaysEditorRoute> {
                 com.cimdriver.app.ui.screens.settings.WorkDaysEditorScreen(onBack = { navController.popBackStack() })
             }
+            composable<ClientsProjectCodesRoute> {
+                com.cimdriver.app.ui.screens.ClientsProjectCodesScreen(onBack = { navController.popBackStack() })
+            }
+            composable<HoursTargetsRoute> {
+                com.cimdriver.app.ui.screens.HoursTargetsScreen(onBack = { navController.popBackStack() })
+            }
             composable<WorkHoursRoute> { 
                 com.cimdriver.app.ui.screens.WorkHoursScreen(
                     onOpenDrawer = onOpenDrawer,

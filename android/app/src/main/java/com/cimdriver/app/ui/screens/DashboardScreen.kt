@@ -84,6 +84,7 @@ fun DashboardScreen(
     workHoursViewModel: com.cimdriver.app.ui.viewmodel.WorkHoursViewModel = hiltViewModel(),
     settingsViewModel: com.cimdriver.app.ui.viewmodel.SettingsViewModel = hiltViewModel(),
     updateViewModel: com.cimdriver.app.ui.viewmodel.UpdateViewModel = hiltViewModel(),
+    hoursTargetViewModel: com.cimdriver.app.ui.viewmodel.HoursTargetViewModel = hiltViewModel(),
     onNavigateToTrips: () -> Unit = {},
     onNavigateToWorkHours: () -> Unit = {},
     onNavigateToDiagnostics: () -> Unit = {}
@@ -150,6 +151,7 @@ fun DashboardScreen(
     var showTrackingStatusDialog by remember { mutableStateOf(false) }
 
     val updateInfo by updateViewModel.updateInfo.collectAsState()
+    val targetProgresses by hoursTargetViewModel.targetProgresses.collectAsState()
 
     LaunchedEffect(Unit) {
         updateViewModel.checkForUpdates()
@@ -549,6 +551,60 @@ fun DashboardScreen(
                         Text(text = String.format(locale, "%.1f uur", workHoursStats), style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
                     }
                     WorkHoursBarChart(data = workHoursChartData)
+                }
+                
+                if (targetProgresses.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(text = "Uren Targets", style = MaterialTheme.typography.titleLarge)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    val defaultColor = MaterialTheme.colorScheme.primary
+                    targetProgresses.forEach { progress ->
+                        val target = progress.targetDetails.target
+                        val barColor = try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(target.color)) } catch (e: Exception) { defaultColor }
+                        
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(target.name, style = MaterialTheme.typography.titleMedium)
+                                    Text("${String.format("%.1f", progress.percentage * 100)}%", style = MaterialTheme.typography.titleMedium, color = barColor)
+                                }
+                                
+                                val subtitleParts = mutableListOf<String>()
+                                progress.targetDetails.clientName?.let { subtitleParts.add(it) }
+                                progress.targetDetails.projectCodeStr?.let { subtitleParts.add(it) }
+                                if (subtitleParts.isEmpty()) subtitleParts.add("Alle uren")
+                                
+                                Text(subtitleParts.joinToString(" • "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                
+                                Spacer(modifier = Modifier.height(12.dp))
+                                
+                                LinearProgressIndicator(
+                                    progress = { progress.percentage.coerceIn(0f, 1f) },
+                                    modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
+                                    color = barColor,
+                                    trackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+                                )
+                                
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text("${String.format("%.1f", progress.accumulatedHours)} uur", style = MaterialTheme.typography.bodyMedium)
+                                    Text("Doel: ${target.targetHours} uur", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 if (vehicles.isNotEmpty()) {

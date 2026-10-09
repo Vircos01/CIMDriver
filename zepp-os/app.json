@@ -1,5 +1,6 @@
 {
   "configVersion": "v2",
+  "defaultLanguage": "en-US",
   "app": {
     "appId": 1002001,
     "appName": "CIMDriver",

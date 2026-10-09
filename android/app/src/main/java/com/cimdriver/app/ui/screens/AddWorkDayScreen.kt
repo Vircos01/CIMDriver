@@ -34,11 +34,15 @@ fun AddWorkDayScreen(
     workDayId: Long? = null,
     onBack: () -> Unit,
     viewModel: WorkHoursViewModel = hiltViewModel(),
-    addressBookViewModel: AddressBookViewModel = hiltViewModel()
+    addressBookViewModel: AddressBookViewModel = hiltViewModel(),
+    clientProjectViewModel: com.cimdriver.app.ui.viewmodel.ClientProjectViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val locale = currentAppLocale()
     val addresses by addressBookViewModel.addresses.collectAsState()
+    val clients by clientProjectViewModel.clients.collectAsState()
+    val projectCodes by clientProjectViewModel.projectCodes.collectAsState()
+    
     var selectedDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
     
     val calendar = remember { Calendar.getInstance() }
@@ -58,6 +62,7 @@ fun AddWorkDayScreen(
     var breakMinutes by remember { mutableStateOf("30") }
     var workLocationLabel by remember { mutableStateOf("") }
     var projectCode by remember { mutableStateOf("") }
+    var projectCodeId by remember { mutableStateOf<Long?>(null) }
     var workLocationExpanded by remember { mutableStateOf(false) }
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -94,6 +99,7 @@ fun AddWorkDayScreen(
                 breakMinutes = wd.breakMinutes.toString()
                 workLocationLabel = wd.workLocationLabel ?: ""
                 projectCode = wd.projectCode ?: ""
+                projectCodeId = wd.projectCodeId
                 initialLoadDone = true
             }
         }
@@ -129,7 +135,8 @@ fun AddWorkDayScreen(
                                     lastArrivalTime = getTime(arrHomeHour, arrHomeMinute),
                                     breakMinutes = breakMinutes.toIntOrNull() ?: 0,
                                     workLocationLabel = workLocationLabel.ifBlank { context.getString(R.string.manually_entered) },
-                                    projectCode = projectCode.ifBlank { null }
+                                    projectCode = projectCode.ifBlank { null },
+                                    projectCodeId = projectCodeId
                                 )
                             } else {
                                 viewModel.updateWorkDay(
@@ -144,7 +151,8 @@ fun AddWorkDayScreen(
                                     breakMinutes = breakMinutes.toIntOrNull() ?: 0,
                                     workLocationLabel = workLocationLabel.ifBlank { null },
                                     projectCode = projectCode.ifBlank { null },
-                                    status = "APPROVED"
+                                    status = "APPROVED",
+                                    projectCodeId = projectCodeId
                                 )
                             }
                             onBack()
@@ -316,13 +324,67 @@ fun AddWorkDayScreen(
                         } else null
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = projectCode,
-                        onValueChange = { projectCode = it },
-                        label = { Text(stringResource(R.string.project_code_optional)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
+                    var projectCodeExpanded by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded = projectCodeExpanded,
+                        onExpandedChange = { projectCodeExpanded = !projectCodeExpanded }
+                    ) {
+                        OutlinedTextField(
+                            value = projectCode,
+                            onValueChange = { 
+                                projectCode = it
+                                projectCodeId = null 
+                            },
+                            label = { Text(stringResource(R.string.project_code_optional)) },
+                            modifier = Modifier.fillMaxWidth().menuAnchor(),
+                            singleLine = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = projectCodeExpanded) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        )
+                        if (projectCodes.isNotEmpty()) {
+                            ExposedDropdownMenu(
+                                expanded = projectCodeExpanded,
+                                onDismissRequest = { projectCodeExpanded = false }
+                            ) {
+                                clients.forEach { client ->
+                                    val clientProjects = projectCodes.filter { it.clientId == client.id }
+                                    if (clientProjects.isNotEmpty()) {
+                                        DropdownMenuItem(
+                                            text = { Text(client.name, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary) },
+                                            onClick = { }
+                                        )
+                                        clientProjects.forEach { pc ->
+                                            DropdownMenuItem(
+                                                text = { Text("  ${pc.code}") },
+                                                onClick = {
+                                                    projectCode = pc.code
+                                                    projectCodeId = pc.id
+                                                    projectCodeExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                                val noClientProjects = projectCodes.filter { it.clientId == null }
+                                if (noClientProjects.isNotEmpty()) {
+                                    DropdownMenuItem(
+                                        text = { Text("Zonder klant", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary) },
+                                        onClick = { }
+                                    )
+                                    noClientProjects.forEach { pc ->
+                                        DropdownMenuItem(
+                                            text = { Text("  ${pc.code}") },
+                                            onClick = {
+                                                projectCode = pc.code
+                                                projectCodeId = pc.id
+                                                projectCodeExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = breakMinutes,

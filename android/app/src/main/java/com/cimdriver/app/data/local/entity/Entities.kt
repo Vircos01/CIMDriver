@@ -75,7 +75,8 @@ data class Trip(
     val odometerEnd: Int?,
     val expectedDistanceMeters: Int? = null,
     val projectCode: String? = null,
-    val appliedRuleName: String? = null
+    val appliedRuleName: String? = null,
+    val projectCodeId: Long? = null
 )
 
 @Entity(
@@ -154,7 +155,8 @@ data class SavedAddress(
     val notes: String? = null,
     val addressType: String? = null, // "THUIS", "WERK", "KLANT"
     val latitude: Double? = null,
-    val longitude: Double? = null
+    val longitude: Double? = null,
+    val defaultProjectCodeId: Long? = null
 )
 
 @Entity(tableName = "fuel_entries")
@@ -187,7 +189,8 @@ data class WorkDay(
     val breakMinutes: Int = 30,
     val workLocationLabel: String?,
     val projectCode: String? = null,
-    val status: String = "TO_REVIEW"
+    val status: String = "TO_REVIEW",
+    val projectCodeId: Long? = null
 )
 
 @Entity(tableName = "classification_rules")
@@ -203,4 +206,65 @@ data class ClassificationRule(
     @ColumnInfo(defaultValue = "0") val orderIndex: Int = 0,
     @ColumnInfo(defaultValue = "1") val isEnabled: Boolean = true,
     @ColumnInfo(defaultValue = "0") val autoApprove: Boolean = false
+)
+
+@Entity(tableName = "clients")
+data class Client(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val color: String = "#1976D2",
+    val isActive: Boolean = true,
+    val createdAt: Long = System.currentTimeMillis()
+)
+
+@Entity(
+    tableName = "project_codes",
+    foreignKeys = [
+        ForeignKey(
+            entity = Client::class,
+            parentColumns = ["id"],
+            childColumns = ["clientId"],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ],
+    indices = [Index("clientId"), Index("code", unique = true)]
+)
+data class ProjectCode(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val clientId: Long? = null,
+    val code: String,
+    val description: String? = null,
+    val isBillable: Boolean = true,
+    val isActive: Boolean = true,
+    val createdAt: Long = System.currentTimeMillis()
+)
+
+@Entity(
+    tableName = "hours_targets",
+    foreignKeys = [
+        ForeignKey(
+            entity = Client::class,
+            parentColumns = ["id"],
+            childColumns = ["clientId"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = ProjectCode::class,
+            parentColumns = ["id"],
+            childColumns = ["projectCodeId"],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ],
+    indices = [Index("clientId"), Index("projectCodeId")]
+)
+data class HoursTarget(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val clientId: Long? = null,
+    val projectCodeId: Long? = null,
+    val name: String,
+    val targetHours: Double,
+    val year: Int,
+    val color: String = "#4CAF50",
+    val isActive: Boolean = true,
+    val createdAt: Long = System.currentTimeMillis()
 )

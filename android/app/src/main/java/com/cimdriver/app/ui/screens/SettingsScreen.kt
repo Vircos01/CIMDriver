@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.FileDownload
@@ -276,6 +278,18 @@ fun SettingsScreen(
                 title = "Werkdagen & Tijden",
                 icon = Icons.Filled.DateRange,
                 onClick = { navController.navigate(WorkDaysEditorRoute) }
+            )
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            SettingsListItem(
+                title = "Klanten & Projectcodes",
+                icon = Icons.Filled.Business,
+                onClick = { navController.navigate(ClientsProjectCodesRoute) }
+            )
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            SettingsListItem(
+                title = "Uren Targets",
+                icon = Icons.Filled.Flag,
+                onClick = { navController.navigate(HoursTargetsRoute) }
             )
 
             // Diagnostiek & Systeem
