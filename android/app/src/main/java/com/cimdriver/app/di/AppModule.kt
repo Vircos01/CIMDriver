@@ -89,6 +89,21 @@ object AppModule {
     }
 
     @Provides
+    fun provideClientDao(database: AppDatabase): com.cimdriver.app.data.local.dao.ClientDao {
+        return database.clientDao()
+    }
+
+    @Provides
+    fun provideProjectCodeDao(database: AppDatabase): com.cimdriver.app.data.local.dao.ProjectCodeDao {
+        return database.projectCodeDao()
+    }
+
+    @Provides
+    fun provideHoursTargetDao(database: AppDatabase): com.cimdriver.app.data.local.dao.HoursTargetDao {
+        return database.hoursTargetDao()
+    }
+
+    @Provides
     @Singleton
     fun provideGeocoderService(@ApplicationContext context: Context): GeocoderService {
         return GeocoderService(context)

@@ -166,12 +166,6 @@ class GeocoderService(private val context: Context) {
         }
     }
 
-    suspend fun checkGasStationNearby(latitude: Double, longitude: Double, engineType: String): String? {
-        val baseLabel = if (engineType == "EV") "Laadpunt" else if (engineType == "PHEV") "Tankstation" else "Tankstation"
-        return getAddressFromLocation(latitude, longitude)?.let { address ->
-            if (address.isBlank()) baseLabel else "$baseLabel · $address"
-        } ?: baseLabel
-    }
 
     suspend fun getCoordinatesForAddress(address: String): Pair<Double, Double>? {
         if (address.isBlank()) return null

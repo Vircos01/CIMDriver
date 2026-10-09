@@ -8,11 +8,14 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.data.local.entity.Client
 import com.cimdriver.app.data.local.entity.ProjectCode
@@ -26,6 +29,8 @@ fun ClientsProjectCodesScreen(
 ) {
     val clients by viewModel.clients.collectAsState()
     val projectCodes by viewModel.projectCodes.collectAsState()
+    val showArchived by viewModel.showArchived.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var showAddClientDialog by remember { mutableStateOf(false) }
     var clientToEdit by remember { mutableStateOf<Client?>(null) }
@@ -47,15 +52,7 @@ fun ClientsProjectCodesScreen(
                 )
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddClientDialog = true },
-                containerColor = com.cimdriver.app.ui.theme.CIMDriverGreen,
-                contentColor = com.cimdriver.app.ui.theme.CIMDriverWhite
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Klant Toevoegen")
-            }
-        }
+        floatingActionButton = {}
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -64,6 +61,20 @@ fun ClientsProjectCodesScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Toon gearchiveerde items", style = MaterialTheme.typography.bodyMedium)
+                    Switch(
+                        checked = showArchived,
+                        onCheckedChange = { viewModel.toggleShowArchived() }
+                    )
+                }
+            }
+
             items(clients, key = { it.id }) { client ->
                 val clientProjects = projectCodes.filter { it.clientId == client.id }
                 Card(
@@ -98,13 +109,40 @@ fun ClientsProjectCodesScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column {
-                                        Text(project.code, style = MaterialTheme.typography.bodyMedium)
+                                        Text(
+                                            project.code, 
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            textDecoration = if (project.isActive) null else TextDecoration.LineThrough,
+                                            color = if (project.isActive) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                        )
                                         if (!project.description.isNullOrBlank()) {
-                                            Text(project.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(
+                                                project.description, 
+                                                style = MaterialTheme.typography.bodySmall, 
+                                                color = if (project.isActive) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
                                         }
                                     }
-                                    IconButton(onClick = { projectToEdit = project }) {
-                                        Icon(Icons.Filled.Edit, contentDescription = "Bewerk", modifier = Modifier.size(16.dp))
+                                    Row {
+                                        IconButton(onClick = { projectToEdit = project }) {
+                                            Icon(Icons.Filled.Edit, contentDescription = "Bewerk", modifier = Modifier.size(16.dp))
+                                        }
+                                        if (project.isActive) {
+                                            IconButton(onClick = {
+                                                viewModel.deleteProjectCode(project) { success, message ->
+                                                    android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show()
+                                                }
+                                            }) {
+                                                Icon(Icons.Filled.Delete, contentDescription = "Verwijder", modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.error)
+                                            }
+                                        } else {
+                                            IconButton(onClick = {
+                                                viewModel.restoreProjectCode(project)
+                                                android.widget.Toast.makeText(context, "Projectcode hersteld", android.widget.Toast.LENGTH_SHORT).show()
+                                            }) {
+                                                Icon(Icons.Filled.Refresh, contentDescription = "Herstel", modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -136,13 +174,40 @@ fun ClientsProjectCodesScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column {
-                                        Text(project.code, style = MaterialTheme.typography.bodyMedium)
+                                        Text(
+                                            project.code, 
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            textDecoration = if (project.isActive) null else TextDecoration.LineThrough,
+                                            color = if (project.isActive) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                        )
                                         if (!project.description.isNullOrBlank()) {
-                                            Text(project.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            Text(
+                                                project.description, 
+                                                style = MaterialTheme.typography.bodySmall, 
+                                                color = if (project.isActive) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                            )
                                         }
                                     }
-                                    IconButton(onClick = { projectToEdit = project }) {
-                                        Icon(Icons.Filled.Edit, contentDescription = "Bewerk", modifier = Modifier.size(16.dp))
+                                    Row {
+                                        IconButton(onClick = { projectToEdit = project }) {
+                                            Icon(Icons.Filled.Edit, contentDescription = "Bewerk", modifier = Modifier.size(16.dp))
+                                        }
+                                        if (project.isActive) {
+                                            IconButton(onClick = {
+                                                viewModel.deleteProjectCode(project) { success, message ->
+                                                    android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show()
+                                                }
+                                            }) {
+                                                Icon(Icons.Filled.Delete, contentDescription = "Verwijder", modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.error)
+                                            }
+                                        } else {
+                                            IconButton(onClick = {
+                                                viewModel.restoreProjectCode(project)
+                                                android.widget.Toast.makeText(context, "Projectcode hersteld", android.widget.Toast.LENGTH_SHORT).show()
+                                            }) {
+                                                Icon(Icons.Filled.Refresh, contentDescription = "Herstel", modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                                            }
+                                        }
                                     }
                                 }
                             }

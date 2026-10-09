@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+
 @HiltViewModel
 class ClientProjectViewModel @Inject constructor(
     private val database: AppDatabase
@@ -20,11 +24,22 @@ class ClientProjectViewModel @Inject constructor(
     private val clientDao = database.clientDao()
     private val projectCodeDao = database.projectCodeDao()
 
+    private val _showArchived = MutableStateFlow(false)
+    val showArchived = _showArchived.asStateFlow()
+
+    fun toggleShowArchived() {
+        _showArchived.value = !_showArchived.value
+    }
+
     val clients: StateFlow<List<Client>> = clientDao.getActiveClients()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    val projectCodes: StateFlow<List<ProjectCode>> = projectCodeDao.getActiveProjectCodes()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val projectCodes: StateFlow<List<ProjectCode>> = combine(
+        projectCodeDao.getAllProjectCodes(),
+        _showArchived
+    ) { codes, showArchived ->
+        if (showArchived) codes else codes.filter { it.isActive }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun addClient(name: String, color: String = "#1976D2") {
         viewModelScope.launch {
@@ -66,10 +81,50 @@ class ClientProjectViewModel @Inject constructor(
         }
     }
 
-    fun deleteProjectCode(projectCode: ProjectCode) {
+    fun deleteProjectCode(projectCode: ProjectCode, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
-            // Soft delete
-            projectCodeDao.updateProjectCode(projectCode.copy(isActive = false))
+            val hasTrip = database.tripDao().getTripForProjectSync(projectCode.id) != null
+            val hasTarget = database.hoursTargetDao().getHoursTargetForProjectSync(projectCode.id) != null
+            
+            if (hasTrip || hasTarget) {
+                // In use -> we can only archive it (soft delete)
+                projectCodeDao.updateProjectCode(projectCode.copy(isActive = false))
+                onResult(true, "Projectcode in gebruik, is in plaats daarvan gearchiveerd.")
+            } else {
+                // Not in use -> hard delete
+                projectCodeDao.deleteProjectCode(projectCode)
+                onResult(true, "Projectcode verwijderd.")
+            }
+        }
+    }
+    
+    fun restoreProjectCode(projectCode: ProjectCode) {
+        viewModelScope.launch {
+            projectCodeDao.updateProjectCode(projectCode.copy(isActive = true))
+        }
+    }
+    
+    init {
+        viewModelScope.launch {
+            archiveUnusedProjectCodes()
+        }
+    }
+    
+    private suspend fun archiveUnusedProjectCodes() {
+        val settings = database.settingsDao().getSettingsSync()
+        val archiveDays = settings?.autoArchiveProjectDays ?: 0
+        if (archiveDays <= 0) return
+        
+        val thresholdTime = System.currentTimeMillis() - (archiveDays * 24L * 60 * 60 * 1000)
+        val allActive = database.projectCodeDao().getAllProjectCodesSync().filter { it.isActive }
+        
+        for (pc in allActive) {
+            val lastTripTime = database.tripDao().getLastTripTimeForProjectSync(pc.id) ?: 0L
+            val compareTime = maxOf(lastTripTime, pc.createdAt)
+            if (compareTime > 0 && compareTime < thresholdTime) {
+                // Older than threshold, archive it
+                database.projectCodeDao().updateProjectCode(pc.copy(isActive = false))
+            }
         }
     }
 }

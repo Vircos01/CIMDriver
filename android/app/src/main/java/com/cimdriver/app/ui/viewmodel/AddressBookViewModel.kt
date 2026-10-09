@@ -17,10 +17,17 @@ import kotlinx.coroutines.launch
 
 import com.cimdriver.app.service.GeocoderService
 
+import com.cimdriver.app.data.local.dao.ClientDao
+import com.cimdriver.app.data.local.entity.Client
+import com.cimdriver.app.data.local.dao.ProjectCodeDao
+import com.cimdriver.app.data.local.entity.ProjectCode
+
 @HiltViewModel
 class AddressBookViewModel @Inject constructor(
     private val savedAddressDao: SavedAddressDao,
     private val tripDao: TripDao,
+    private val clientDao: ClientDao,
+    private val projectCodeDao: ProjectCodeDao,
     private val geocoderService: GeocoderService
 ) : ViewModel() {
 
@@ -30,6 +37,45 @@ class AddressBookViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    val activeProjectCodes: StateFlow<List<ProjectCode>> = projectCodeDao.getActiveProjectCodes()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun addProjectCode(code: String, description: String, isBillable: Boolean, clientName: String?) {
+        viewModelScope.launch {
+            var cId: Long? = null
+            if (!clientName.isNullOrBlank()) {
+                val existingClients = clientDao.getAllClientsSync()
+                val existing = existingClients.find { it.name.equals(clientName, ignoreCase = true) }
+                if (existing != null) {
+                    cId = existing.id
+                } else {
+                    cId = clientDao.insertClient(Client(name = clientName, color = "#4285F4"))
+                }
+            }
+            projectCodeDao.insertProjectCode(
+                ProjectCode(
+                    code = code,
+                    description = description,
+                    isBillable = isBillable,
+                    clientId = cId
+                )
+            )
+        }
+    }
+
+    private suspend fun ensureClientExists(label: String, isCustomer: Boolean) {
+        if (isCustomer && label.isNotBlank()) {
+            val existingClients = clientDao.getAllClientsSync()
+            if (existingClients.none { it.name.equals(label, ignoreCase = true) }) {
+                clientDao.insertClient(Client(name = label, color = "#4285F4")) // Default color
+            }
+        }
+    }
 
     fun addAddress(label: String, address: String, isWorkLocation: Boolean, isHomeLocation: Boolean, isCustomerLocation: Boolean, defaultTripType: String?, projectCode: String?, notes: String?, addressType: String? = null) {
         viewModelScope.launch {
@@ -42,6 +88,9 @@ class AddressBookViewModel @Inject constructor(
             val effectiveIsWork = isWorkLocation || addressType == "WERK"
             val effectiveIsHome = isHomeLocation || addressType == "THUIS"
             val effectiveIsCustomer = isCustomerLocation || addressType == "KLANT"
+            
+            ensureClientExists(label, effectiveIsCustomer)
+            
             val coords = geocoderService.getCoordinatesForAddress(address)
             savedAddressDao.insertAddress(
                 SavedAddress(
@@ -72,6 +121,9 @@ class AddressBookViewModel @Inject constructor(
             val effectiveIsWork = isWorkLocation || addressType == "WERK"
             val effectiveIsHome = isHomeLocation || addressType == "THUIS"
             val effectiveIsCustomer = isCustomerLocation || addressType == "KLANT"
+            
+            ensureClientExists(label, effectiveIsCustomer)
+            
             // Re-geocode if address changed, otherwise keep existing coords
             val existing = savedAddressDao.getAllAddressesSync().find { it.id == id }
             val coords = if (existing?.address != address) {

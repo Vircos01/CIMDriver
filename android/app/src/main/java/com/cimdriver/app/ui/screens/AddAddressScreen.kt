@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -299,6 +300,59 @@ fun AddAddressScreen(
                     ) || addressType in listOf("WERK", "KLANT")
 
                     if (showProjectCode) {
+                        val activeProjectCodes by viewModel.activeProjectCodes.collectAsState()
+                        var expandedProjectCode by remember { mutableStateOf(false) }
+                        var showAddProjectDialog by remember { mutableStateOf(false) }
+
+                        if (showAddProjectDialog) {
+                            var newCode by remember { mutableStateOf("") }
+                            var newDesc by remember { mutableStateOf("") }
+                            AlertDialog(
+                                onDismissRequest = { showAddProjectDialog = false },
+                                title = { Text("Nieuwe Projectcode") },
+                                text = {
+                                    Column {
+                                        OutlinedTextField(
+                                            value = newCode,
+                                            onValueChange = { newCode = it },
+                                            label = { Text("Code (bijv. GOOG-DEV)") },
+                                            singleLine = true
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        OutlinedTextField(
+                                            value = newDesc,
+                                            onValueChange = { newDesc = it },
+                                            label = { Text("Omschrijving (optioneel)") },
+                                            singleLine = true
+                                        )
+                                    }
+                                },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            if (newCode.isNotBlank()) {
+                                                viewModel.addProjectCode(
+                                                    code = newCode,
+                                                    description = newDesc,
+                                                    isBillable = true, // Defaulting to true for now
+                                                    clientName = if (addressType == "KLANT") label else null
+                                                )
+                                                projectCode = newCode
+                                                showAddProjectDialog = false
+                                            }
+                                        }
+                                    ) {
+                                        Text("Toevoegen")
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showAddProjectDialog = false }) {
+                                        Text("Annuleren")
+                                    }
+                                }
+                            )
+                        }
+
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             stringResource(R.string.project_code_desc),
@@ -306,13 +360,60 @@ fun AddAddressScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedTextField(
-                            value = projectCode,
-                            onValueChange = { projectCode = it },
-                            label = { Text(stringResource(R.string.project_code_optional)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
+                        
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            ExposedDropdownMenuBox(
+                                expanded = expandedProjectCode,
+                                onExpandedChange = { expandedProjectCode = it },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                OutlinedTextField(
+                                    value = projectCode.takeIf { it.isNotBlank() } ?: "Geen projectcode geselecteerd",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.project_code_optional)) },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedProjectCode) },
+                                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = expandedProjectCode,
+                                    onDismissRequest = { expandedProjectCode = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Geen (wissen)") },
+                                        onClick = {
+                                            projectCode = ""
+                                            expandedProjectCode = false
+                                        }
+                                    )
+                                    activeProjectCodes.forEach { option ->
+                                        DropdownMenuItem(
+                                            text = { Text(option.code) },
+                                            onClick = {
+                                                projectCode = option.code
+                                                expandedProjectCode = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.width(8.dp))
+                            
+                            IconButton(
+                                onClick = { showAddProjectDialog = true },
+                                modifier = Modifier
+                                    .padding(top = 8.dp) // align with text field roughly
+                                    .size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = "Projectcode Toevoegen",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                     } else if (defaultTripType == "Home To Work" || addressType == "THUIS") {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(

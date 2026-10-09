@@ -51,6 +51,12 @@ interface TripDao {
     @Query("SELECT * FROM trips WHERE vehicleId = :vehicleId AND status = 'ACTIVE' ORDER BY startTime DESC LIMIT 1")
     suspend fun getActiveTripForVehicle(vehicleId: Long): Trip?
 
+    @Query("SELECT * FROM trips WHERE projectCodeId = :projectCodeId LIMIT 1")
+    suspend fun getTripForProjectSync(projectCodeId: Long): Trip?
+
+    @Query("SELECT MAX(endTime) FROM trips WHERE projectCodeId = :projectCodeId")
+    suspend fun getLastTripTimeForProjectSync(projectCodeId: Long): Long?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrip(trip: Trip): Long
 
@@ -170,24 +176,6 @@ interface SavedAddressDao {
 }
 
 @Dao
-interface FuelFillUpDao {
-    @Query("SELECT * FROM fuel_entries ORDER BY dateTimestamp DESC")
-    fun getAllFillUps(): Flow<List<FuelFillUp>>
-
-    @Query("SELECT * FROM fuel_entries ORDER BY dateTimestamp DESC")
-    suspend fun getAllFillUpsSync(): List<FuelFillUp>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFillUp(fillUp: FuelFillUp): Long
-
-    @Update
-    suspend fun updateFillUp(fillUp: FuelFillUp)
-
-    @Delete
-    suspend fun deleteFillUp(fillUp: FuelFillUp)
-}
-
-@Dao
 interface WorkDayDao {
     @Query("SELECT * FROM work_days ORDER BY date DESC")
     fun getAllWorkDays(): Flow<List<WorkDay>>
@@ -224,6 +212,9 @@ interface ClientDao {
 
     @Query("SELECT * FROM clients ORDER BY name ASC")
     fun getAllClients(): Flow<List<Client>>
+    
+    @Query("SELECT * FROM clients")
+    suspend fun getAllClientsSync(): List<Client>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertClient(client: Client): Long
@@ -246,6 +237,12 @@ interface ProjectCodeDao {
     @Query("SELECT * FROM project_codes WHERE isBillable = 1 AND isActive = 1")
     fun getBillableProjectCodes(): Flow<List<ProjectCode>>
 
+    @Query("SELECT * FROM project_codes ORDER BY code ASC")
+    fun getAllProjectCodes(): Flow<List<ProjectCode>>
+
+    @Query("SELECT * FROM project_codes")
+    suspend fun getAllProjectCodesSync(): List<ProjectCode>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProjectCode(projectCode: ProjectCode): Long
 
@@ -264,6 +261,9 @@ data class HoursTargetWithDetails(
 
 @Dao
 interface HoursTargetDao {
+    @Query("SELECT * FROM hours_targets WHERE projectCodeId = :projectCodeId LIMIT 1")
+    suspend fun getHoursTargetForProjectSync(projectCodeId: Long): HoursTarget?
+
     @Query("""
         SELECT ht.*, c.name AS clientName, pc.code AS projectCodeStr
         FROM hours_targets ht
@@ -274,6 +274,9 @@ interface HoursTargetDao {
     """)
     fun getActiveTargetsForYear(year: Int): Flow<List<HoursTargetWithDetails>>
 
+    @Query("SELECT * FROM hours_targets")
+    suspend fun getAllTargetsSync(): List<HoursTarget>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTarget(target: HoursTarget): Long
 
@@ -282,6 +285,9 @@ interface HoursTargetDao {
 
     @Delete
     suspend fun deleteTarget(target: HoursTarget)
+}
+
+@Dao
 interface FuelFillUpDao {
     @Query("SELECT * FROM fuel_fillups ORDER BY dateTimestamp DESC")
     fun getAllFillUps(): Flow<List<FuelFillUp>>

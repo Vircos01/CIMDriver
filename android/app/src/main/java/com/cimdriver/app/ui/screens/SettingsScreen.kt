@@ -203,6 +203,62 @@ fun SettingsScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = "Projectcode Archiveren", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Automatisch ongebruikte projectcodes archiveren",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    val archiveOptions = listOf(
+                        0 to "Uitgeschakeld",
+                        30 to "Na 30 dagen",
+                        60 to "Na 60 dagen",
+                        90 to "Na 90 dagen",
+                        180 to "Na 180 dagen",
+                        365 to "Na 1 jaar"
+                    )
+                    var expandedArchive by remember { mutableStateOf(false) }
+                    val currentLabel = archiveOptions.find { it.first == initialSettings.autoArchiveProjectDays }?.second ?: "Uitgeschakeld"
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandedArchive,
+                        onExpandedChange = { expandedArchive = it }
+                    ) {
+                        OutlinedTextField(
+                            value = currentLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedArchive) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedArchive,
+                            onDismissRequest = { expandedArchive = false }
+                        ) {
+                            archiveOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option.second) },
+                                    onClick = {
+                                        viewModel.updateAutoArchiveDays(option.first)
+                                        expandedArchive = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // App Gedrag
             SettingsSectionHeader(title = "App Gedrag")
             SettingsListItem(
@@ -278,12 +334,6 @@ fun SettingsScreen(
                 title = "Werkdagen & Tijden",
                 icon = Icons.Filled.DateRange,
                 onClick = { navController.navigate(WorkDaysEditorRoute) }
-            )
-            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
-            SettingsListItem(
-                title = "Klanten & Projectcodes",
-                icon = Icons.Filled.Business,
-                onClick = { navController.navigate(ClientsProjectCodesRoute) }
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
             SettingsListItem(

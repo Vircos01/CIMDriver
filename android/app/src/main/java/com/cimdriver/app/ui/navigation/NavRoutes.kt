@@ -64,6 +64,7 @@ object ClientsProjectCodesRoute
 
 @Serializable
 object HoursTargetsRoute
+@Serializable
 object FuelRoute
 
 @Serializable

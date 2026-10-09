@@ -26,8 +26,7 @@ data class Vehicle(
     val isDefault: Boolean = false,
     val odometerCorrectionStrategy: String = "DISTRIBUTE", // "DISTRIBUTE", "CREATE_TRIP", "LEAVE_GAP"
     val inServiceDate: Long? = null,
-    val endServiceDate: Long? = null,
-    @ColumnInfo(defaultValue = "ICE") val engineType: String = "ICE" // "ICE", "EV", "PHEV"
+    val endServiceDate: Long? = null
 )
 
 @Entity(
@@ -142,7 +141,8 @@ data class Settings(
     val locationRetentionDays: Int = 365,
     val maxRecoveryAttempts: Int = 3,
     val businessCompensation: Float = 0.23f,
-    val skippedUpdateVersionCode: Int = 0
+    val skippedUpdateVersionCode: Int = 0,
+    val autoArchiveProjectDays: Int = 0 // 0 means disabled
 )
 
 @Entity(tableName = "saved_addresses")
@@ -160,23 +160,6 @@ data class SavedAddress(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val defaultProjectCodeId: Long? = null
-)
-
-@Entity(tableName = "fuel_entries")
-data class FuelFillUp(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val vehicleId: Long? = null,
-    val tripId: Long? = null,
-    val stationName: String,
-    val address: String? = null,
-    val pricePerLiter: Double = 0.0,
-    val litersPurchased: Double = 0.0,
-    val totalCost: Double = 0.0,
-    val dateTimestamp: Long = System.currentTimeMillis(),
-    val odometer: Int? = null,
-    val latitude: Double? = null,
-    val longitude: Double? = null,
-    val status: String = "DRAFT"
 )
 
 @Entity(tableName = "work_days")
@@ -215,9 +198,9 @@ data class ClassificationRule(
 data class Client(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
-    val color: String = "#1976D2",
-    val isActive: Boolean = true,
-    val createdAt: Long = System.currentTimeMillis()
+    @ColumnInfo(defaultValue = "'#1976D2'") val color: String = "#1976D2",
+    @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
 )
 
 @Entity(
@@ -230,16 +213,20 @@ data class Client(
             onDelete = ForeignKey.SET_NULL
         )
     ],
-    indices = [Index("clientId"), Index("code", unique = true)]
+    indices = [
+        Index(value = ["clientId"], name = "idx_project_codes_clientId"), 
+        Index(value = ["code"], unique = true, name = "idx_project_codes_code")
+    ]
+
 )
 data class ProjectCode(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val clientId: Long? = null,
     val code: String,
     val description: String? = null,
-    val isBillable: Boolean = true,
-    val isActive: Boolean = true,
-    val createdAt: Long = System.currentTimeMillis()
+    @ColumnInfo(defaultValue = "1") val isBillable: Boolean = true,
+    @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
 )
 
 @Entity(
@@ -258,7 +245,11 @@ data class ProjectCode(
             onDelete = ForeignKey.SET_NULL
         )
     ],
-    indices = [Index("clientId"), Index("projectCodeId")]
+    indices = [
+        Index(value = ["clientId"], name = "idx_hours_targets_clientId"), 
+        Index(value = ["projectCodeId"], name = "idx_hours_targets_projectCodeId")
+    ]
+
 )
 data class HoursTarget(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -267,9 +258,11 @@ data class HoursTarget(
     val name: String,
     val targetHours: Double,
     val year: Int,
-    val color: String = "#4CAF50",
-    val isActive: Boolean = true,
-    val createdAt: Long = System.currentTimeMillis()
+    @ColumnInfo(defaultValue = "'#4CAF50'") val color: String = "#4CAF50",
+    @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
+)
+
 @Entity(tableName = "favorite_routes")
 data class FavoriteRoute(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
