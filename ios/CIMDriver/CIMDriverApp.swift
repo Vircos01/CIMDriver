@@ -89,6 +89,9 @@ struct ModelContainerSetup {
             WorkDay.self,
             ClassificationRule.self,
             AppSettings.self,
+            Client.self,
+            ProjectCode.self,
+            HoursTarget.self,
             FavoriteRoute.self,
             OdometerCheck.self,
             FuelFillUp.self

@@ -19,9 +19,27 @@ targets:
         NSLocationWhenInUseUsageDescription: CIMDriver heeft locatie nodig om ritten te registreren.
         NSLocationAlwaysAndWhenInUseUsageDescription: CIMDriver heeft locatie op de achtergrond nodig om ritten te registreren.
         NSBluetoothAlwaysUsageDescription: CIMDriver gebruikt Bluetooth om automatisch ritten te starten zodra u met de carkit verbindt.
+        NSCameraUsageDescription: CIMDriver gebruikt de camera om kilometerstanden als bewijs vast te leggen.
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        APP_DISPLAY_VERSION: "$(APP_DISPLAY_VERSION)"
+        GIT_COMMIT: "$(GIT_COMMIT)"
     dependencies:
       - target: CIMDriverWidget
         embed: true
+    settings:
+      base:
+        MARKETING_VERSION: 0.6.0
+        CURRENT_PROJECT_VERSION: 2
+        APP_DISPLAY_VERSION: "$(MARKETING_VERSION)-$(GIT_COMMIT)"
+        GIT_COMMIT: unknown
+    postBuildScripts:
+      - name: Stamp Git version
+        script: |
+          COMMIT=$(/usr/bin/git -C "$SRCROOT" rev-parse --short HEAD 2>/dev/null)
+          if [ -z "$COMMIT" ]; then COMMIT=unknown; fi
+          /usr/libexec/PlistBuddy -c "Set :GIT_COMMIT $COMMIT" "$TARGET_BUILD_DIR/$INFOPLIST_PATH" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :GIT_COMMIT string $COMMIT" "$TARGET_BUILD_DIR/$INFOPLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Set :APP_DISPLAY_VERSION $MARKETING_VERSION-$COMMIT" "$TARGET_BUILD_DIR/$INFOPLIST_PATH" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :APP_DISPLAY_VERSION string $MARKETING_VERSION-$COMMIT" "$TARGET_BUILD_DIR/$INFOPLIST_PATH"
 
   CIMDriverWidget:
     type: app-extension
@@ -30,9 +48,16 @@ targets:
       - path: CIMDriverWidget
     info:
       path: CIMDriverWidget/Info.plist
+      properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.cimsolutions.CIMDriver.widget
       PRODUCT_NAME: CIMDriverWidget
+      MARKETING_VERSION: 0.6.0
+      CURRENT_PROJECT_VERSION: 2
       SWIFT_VERSION: 5.0
       CODE_SIGN_ENTITLEMENTS: ""
       INFOPLIST_KEY_NSHumanReadableCopyright: ""

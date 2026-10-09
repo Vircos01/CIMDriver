@@ -63,6 +63,7 @@ struct AddAddressView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Query(sort: \ProjectCode.code) private var projectCodes: [ProjectCode]
     
     var addressToEdit: SavedAddress?
     
@@ -135,7 +136,15 @@ struct AddAddressView: View {
                     Text("Anders").tag("OTHER")
                 }
                 
-                TextField("Projectcode (Optioneel)", text: $projectCode)
+                Picker("Projectcode (optioneel)", selection: $projectCode) {
+                    Text("Geen project").tag("")
+                    ForEach(projectCodes.filter(\.isActive)) { project in
+                        Text(project.code).tag(project.code)
+                    }
+                    if !projectCode.isEmpty && !projectCodes.contains(where: { $0.code == projectCode }) {
+                        Text("\(projectCode) (bestaand)").tag(projectCode)
+                    }
+                }
             }
             
             if let coord = selectedCoordinate {

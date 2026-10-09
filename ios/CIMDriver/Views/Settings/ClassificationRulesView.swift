@@ -4,17 +4,21 @@ import SwiftData
 struct ClassificationRulesView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var rules: [ClassificationRule]
+
+    private var orderedRules: [ClassificationRule] {
+        rules.sorted { $0.orderIndex == $1.orderIndex ? $0.name < $1.name : $0.orderIndex < $1.orderIndex }
+    }
     
     @State private var showingAddRule = false
     @State private var ruleToEdit: ClassificationRule?
     
     var body: some View {
         List {
-            if rules.isEmpty {
+            if orderedRules.isEmpty {
                 Text("Geen aangepaste regels gevonden.")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(rules) { rule in
+                ForEach(orderedRules) { rule in
                     Button(action: {
                         ruleToEdit = rule
                     }) {
@@ -27,6 +31,13 @@ struct ClassificationRulesView: View {
                             Text("\(startStr) ⇄ \(endStr) | \(rule.tripType ?? "*") | \(rule.category)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                            HStack(spacing: 8) {
+                                Text("Prioriteit \(rule.orderIndex + 1)")
+                                if !rule.isEnabled { Text("Uitgeschakeld") }
+                                if rule.autoApprove { Text("Automatisch akkoord") }
+                            }
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                         }
                     }
                     .buttonStyle(.plain)
@@ -58,7 +69,7 @@ struct ClassificationRulesView: View {
     
     private func deleteRules(offsets: IndexSet) {
         for index in offsets {
-            modelContext.delete(rules[index])
+            modelContext.delete(orderedRules[index])
         }
         try? modelContext.save()
     }

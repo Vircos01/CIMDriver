@@ -7,7 +7,7 @@
 *De moderne en slimme alpha ritten- en werkurenregistratie app voor iPhone*
 
 [![Platform](https://img.shields.io/badge/platform-iOS%2017%2B-blue)](https://developer.apple.com/ios/)
-[![Version](https://img.shields.io/badge/version-0.0.5%20alpha-purple)](#)
+[![Version](https://img.shields.io/badge/version-0.6%20alpha-purple)](#)
 [![Swift](https://img.shields.io/badge/built%20with-Swift-orange)](https://swift.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 

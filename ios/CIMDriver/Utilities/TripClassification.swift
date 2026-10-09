@@ -40,7 +40,7 @@ enum TripClassification {
         // Outside work hours check first (unless there's an explicit rule)
         let outsideHours = timestamp != nil ? isOutsideWorkHours(timestamp: timestamp!, appSettings: appSettings) : false
 
-        if let matchingRule = findMatchingRule(
+        if let matchingRule = matchingRule(
             tripType: tripType,
             startAddressType: startAddressType,
             endAddressType: endAddressType,
@@ -84,7 +84,7 @@ enum TripClassification {
         endAddress: String?,
         rules: [ClassificationRule]
     ) -> String? {
-        return findMatchingRule(
+        return matchingRule(
             tripType: tripType,
             startAddressType: startAddressType,
             endAddressType: endAddressType,
@@ -94,7 +94,7 @@ enum TripClassification {
         )?.tripType ?? tripType
     }
 
-    private static func findMatchingRule(
+    static func matchingRule(
         tripType: String?,
         startAddressType: String?,
         endAddressType: String?,
@@ -103,6 +103,7 @@ enum TripClassification {
         rules: [ClassificationRule]
     ) -> ClassificationRule? {
         let matchedRules = rules.filter { rule in
+            guard rule.isEnabled else { return false }
             let tripMatches = (rule.tripType?.isEmpty ?? true) || rule.tripType?.caseInsensitiveCompare(tripType ?? "") == .orderedSame
             
             let typeDirectionForward = ((rule.startAddressType?.isEmpty ?? true) || rule.startAddressType?.caseInsensitiveCompare(startAddressType ?? "") == .orderedSame) &&
@@ -128,7 +129,8 @@ enum TripClassification {
         return matchedRules.max { a, b in
             let countA = [a.startAddressType, a.endAddressType, a.tripType, a.startAddress, a.endAddress].compactMap { $0 }.filter { !$0.isEmpty }.count
             let countB = [b.startAddressType, b.endAddressType, b.tripType, b.startAddress, b.endAddress].compactMap { $0 }.filter { !$0.isEmpty }.count
-            return countA < countB
+            if countA != countB { return countA < countB }
+            return a.orderIndex > b.orderIndex
         }
     }
 

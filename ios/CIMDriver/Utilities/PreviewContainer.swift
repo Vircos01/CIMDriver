@@ -19,7 +19,10 @@ class PreviewContainer {
             AppSettings.self,
             FavoriteRoute.self,
             OdometerCheck.self,
-            FuelFillUp.self
+            FuelFillUp.self,
+            Client.self,
+            ProjectCode.self,
+            HoursTarget.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         

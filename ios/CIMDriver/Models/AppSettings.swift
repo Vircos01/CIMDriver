@@ -11,6 +11,8 @@ final class AppSettings {
     var workDays: String // e.g. "1=08:00-18:00;2=08:00-18:00"
     var breakMinutes: Int
     var toleranceMinutes: Int = 30
+    var employmentStartDate: Date?
+    var autoArchiveProjectDays: Int = 0
     
     // Tracking
     var gracePeriodSec: Int
@@ -51,6 +53,8 @@ final class AppSettings {
         workDays: String = "1=08:00-17:00;2=08:00-17:00;3=08:00-17:00;4=08:00-17:00;5=08:00-17:00",
         breakMinutes: Int = 30,
         toleranceMinutes: Int = 30,
+        employmentStartDate: Date? = nil,
+        autoArchiveProjectDays: Int = 0,
         gracePeriodSec: Int = 180,
         trackingIntervalSec: Int = 10,
         classificationDefault: String = "PRIVATE",
@@ -74,6 +78,8 @@ final class AppSettings {
         self.workDays = workDays
         self.breakMinutes = breakMinutes
         self.toleranceMinutes = toleranceMinutes
+        self.employmentStartDate = employmentStartDate
+        self.autoArchiveProjectDays = autoArchiveProjectDays
         self.gracePeriodSec = gracePeriodSec
         self.trackingIntervalSec = trackingIntervalSec
         self.classificationDefault = classificationDefault

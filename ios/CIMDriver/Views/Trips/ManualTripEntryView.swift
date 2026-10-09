@@ -12,6 +12,7 @@ struct ManualTripEntryView: View {
     @Query private var settingsList: [AppSettings]
     @Query private var favoriteRoutes: [FavoriteRoute]
     @Query private var trips: [Trip]
+    @Query(sort: \ProjectCode.code) private var catalogProjectCodes: [ProjectCode]
 
     private var appSettings: AppSettings? { settingsList.first }
     
@@ -37,7 +38,7 @@ struct ManualTripEntryView: View {
     @State private var calculatedRoute: MKRoute?
     
     private var uniqueProjectCodes: [String] {
-        Array(Set(trips.compactMap { $0.projectCode }).filter { !$0.isEmpty }).sorted()
+        Array(Set(catalogProjectCodes.filter(\.isActive).map(\.code) + trips.compactMap { $0.projectCode }.filter { !$0.isEmpty })).sorted()
     }
     
     var body: some View {

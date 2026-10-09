@@ -4,6 +4,18 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
+## Versie 0.6 Alpha
+*Releasedatum: 9 oktober 2026*
+
+!!! success "Nieuwe functies"
+    * **Klanten en projectcodes:** Beheer klanten en projectcodes, stel per project een vast uurtarief in en archiveer ongebruikte codes.
+    * **Uren- en omzetdoelen:** Volg jaardoelen per uren, klant of project. Omzet wordt berekend met het vaste projecttarief.
+    * **Doelen naar rato:** Stel de datum in dienst in. Bij een start op 1 september telt 4/12 van de jaartarget mee; het aangepaste doel is zichtbaar op het dashboard.
+    * **Projectkeuze en zoeken:** Koppel projectcodes aan adressen, ritten en werkdagen en zoek werkuren op project, locatie of notitie.
+    * **Kilometerstandherkenning:** Een foto van de kilometerstand kan met tekstherkenning worden uitgelezen; controleer de herkende waarde voor je opslaat.
+    * **Classificatieregels:** Schakel regels in of uit, stel prioriteiten in en keur overeenkomende ritten automatisch goed.
+    * **In-app help:** Nieuwe uitleg over projecttarieven en pro-rata targets.
+
 ## Versie 0.0.5 (Alpha)
 *Release datum: September 2026*
 

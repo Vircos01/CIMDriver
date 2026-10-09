@@ -6,13 +6,19 @@ struct WorkHoursView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showingAddWorkDay = false
     @State private var exportURL: URL?
+    @State private var searchText = ""
     
     private var groupedWorkDays: [(key: String, value: [WorkDay])] {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
         formatter.locale = Locale(identifier: "nl_NL")
         
-        let grouped = Dictionary(grouping: workDays) { wd in
+        let filteredWorkDays = workDays.filter { workDay in
+            searchText.isEmpty || [workDay.projectCode, workDay.workLocationLabel, workDay.note]
+                .compactMap { $0 }
+                .contains { $0.localizedCaseInsensitiveContains(searchText) }
+        }
+        let grouped = Dictionary(grouping: filteredWorkDays) { wd in
             formatter.string(from: wd.date)
         }
         
@@ -41,6 +47,7 @@ struct WorkHoursView: View {
                 }
             }
             .navigationTitle("Werkuren")
+            .searchable(text: $searchText, prompt: "Zoek op project, locatie of notitie")
             .navigationDestination(for: WorkDay.self) { workDay in
                 ManualWorkDayEntryView(workDayToEdit: workDay)
             }

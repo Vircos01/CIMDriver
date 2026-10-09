@@ -266,6 +266,7 @@ struct OdometerCalibrationView: View {
     
     @State private var showingCamera = false
     @State private var capturedImage: UIImage?
+    @State private var odometerRecognitionMessage: String?
     
     var body: some View {
         Form {
@@ -302,6 +303,11 @@ struct OdometerCalibrationView: View {
                             .foregroundColor(capturedImage != nil ? .green : .primary)
                     }
                 }
+                if let odometerRecognitionMessage {
+                    Text(odometerRecognitionMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
             
             if abs(calculatedDifference) > 50 {
@@ -336,6 +342,19 @@ struct OdometerCalibrationView: View {
         .fullScreenCover(isPresented: $showingCamera) {
             CameraPicker(image: $capturedImage)
                 .ignoresSafeArea()
+        }
+        .onChange(of: capturedImage) { _, image in
+            guard let image else { return }
+            odometerRecognitionMessage = "Kilometerstand wordt herkend..."
+            Task {
+                if let reading = await OdometerTextRecognizer.recognize(in: image) {
+                    newOdometerString = reading
+                    calculatedDifference = (Int(reading) ?? vehicle.odometerCurrent) - vehicle.odometerCurrent
+                    odometerRecognitionMessage = "Herkend: \(reading) km. Controleer de waarde voordat je opslaat."
+                } else {
+                    odometerRecognitionMessage = "Geen kilometerstand herkend. Je kunt deze handmatig invoeren."
+                }
+            }
         }
         .alert("Groot Verschil", isPresented: $showingWarning) {
             Button("Toch Opslaan", role: .destructive) {

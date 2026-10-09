@@ -12,6 +12,9 @@ struct SettingsView: View {
                     NavigationLink(destination: VehicleSelectionView()) {
                         Label("Mijn Auto's", systemImage: "car.2")
                     }
+                    NavigationLink(destination: ClientProjectCatalogView()) {
+                        Label("Klanten & Projectcodes", systemImage: "number")
+                    }
                     NavigationLink(destination: AddressListView()) {
                         Label("Opgeslagen Adressen", systemImage: "mappin.and.ellipse")
                     }
@@ -31,6 +34,9 @@ struct SettingsView: View {
                     }
                     NavigationLink(destination: DiagnosticsView()) {
                         Label("App Diagnostiek", systemImage: "stethoscope")
+                    }
+                    NavigationLink(destination: HelpView()) {
+                        Label("Help", systemImage: "questionmark.circle")
                     }
                 }
                 
@@ -97,8 +103,27 @@ struct AppSettingsForm: View {
             NavigationLink(destination: WorkDaysEditor(workDaysString: $settings.workDays)) {
                 Label("Werkdagen & Tijden", systemImage: "calendar")
             }
+            NavigationLink(destination: HoursTargetsView()) {
+                Label("Uren- & omzetdoelen", systemImage: "flag")
+            }
             Stepper("Standaard Pauze: \(settings.breakMinutes) min", value: $settings.breakMinutes, in: 0...120, step: 5)
             Stepper("Marge / Tolerantie: \(settings.toleranceMinutes) min", value: $settings.toleranceMinutes, in: 0...60, step: 5)
+            Toggle("Datum in dienst gebruiken", isOn: Binding(
+                get: { settings.employmentStartDate != nil },
+                set: { settings.employmentStartDate = $0 ? Date() : nil }
+            ))
+            if settings.employmentStartDate != nil {
+                DatePicker("Datum in dienst", selection: Binding(
+                    get: { settings.employmentStartDate ?? Date() },
+                    set: { settings.employmentStartDate = $0 }
+                ), displayedComponents: .date)
+            }
+            Stepper(
+                settings.autoArchiveProjectDays == 0 ? "Projectcodes automatisch archiveren: uit" : "Projectcodes archiveren na \(settings.autoArchiveProjectDays) dagen",
+                value: $settings.autoArchiveProjectDays,
+                in: 0...365,
+                step: 15
+            )
         }
     }
 }

@@ -11,8 +11,11 @@ final class ClassificationRule {
     var endAddress: String?
     var tripType: String?
     var category: String // "BUSINESS", "PRIVATE", "COMMUTE"
+    var orderIndex: Int = 0
+    var isEnabled: Bool = true
+    var autoApprove: Bool = false
 
-    init(id: UUID = UUID(), name: String, startAddressType: String? = nil, endAddressType: String? = nil, startAddress: String? = nil, endAddress: String? = nil, tripType: String? = nil, category: String = "PRIVATE") {
+    init(id: UUID = UUID(), name: String, startAddressType: String? = nil, endAddressType: String? = nil, startAddress: String? = nil, endAddress: String? = nil, tripType: String? = nil, category: String = "PRIVATE", orderIndex: Int = 0, isEnabled: Bool = true, autoApprove: Bool = false) {
         self.id = id
         self.name = name
         self.startAddressType = startAddressType
@@ -21,5 +24,8 @@ final class ClassificationRule {
         self.endAddress = endAddress
         self.tripType = tripType
         self.category = category
+        self.orderIndex = orderIndex
+        self.isEnabled = isEnabled
+        self.autoApprove = autoApprove
     }
 }

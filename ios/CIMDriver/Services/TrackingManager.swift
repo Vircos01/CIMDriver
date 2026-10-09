@@ -294,6 +294,14 @@ class TrackingManager: NSObject, BluetoothServiceDelegate, LocationServiceDelega
         guard let context = modelContext else { return }
         let rules = (try? context.fetch(FetchDescriptor<ClassificationRule>())) ?? []
         let settingsList = (try? context.fetch(FetchDescriptor<AppSettings>())) ?? []
+        let matchingRule = TripClassification.matchingRule(
+            tripType: trip.tripType.isEmpty ? nil : trip.tripType,
+            startAddressType: nil,
+            endAddressType: nil,
+            startAddress: trip.startAddress,
+            endAddress: trip.endAddress,
+            rules: rules
+        )
         
         let category = TripClassification.classify(
             tripType: trip.tripType.isEmpty ? nil : trip.tripType,
@@ -306,6 +314,9 @@ class TrackingManager: NSObject, BluetoothServiceDelegate, LocationServiceDelega
             appSettings: settingsList.first
         )
         trip.tripType = category.rawValue
+        if matchingRule?.autoApprove == true {
+            trip.status = "DONE"
+        }
     }
     
     private func handleWorkDayUpdates(trip: Trip) {

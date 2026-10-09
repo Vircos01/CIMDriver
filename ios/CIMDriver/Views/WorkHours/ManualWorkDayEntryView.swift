@@ -4,6 +4,7 @@ import SwiftData
 struct ManualWorkDayEntryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Query(sort: \ProjectCode.code) private var projectCodes: [ProjectCode]
     
     var workDayToEdit: WorkDay?
     
@@ -13,6 +14,7 @@ struct ManualWorkDayEntryView: View {
     @State private var departureTime: Date
     @State private var breakMinutes: String
     @State private var note: String
+    @State private var projectCode: String
     
     init(workDayToEdit: WorkDay? = nil) {
         self.workDayToEdit = workDayToEdit
@@ -23,6 +25,7 @@ struct ManualWorkDayEntryView: View {
         _departureTime = State(initialValue: workDayToEdit?.departureTime ?? Calendar.current.date(bySettingHour: 17, minute: 0, second: 0, of: now)!)
         _breakMinutes = State(initialValue: String(workDayToEdit?.breakMinutes ?? 30))
         _note = State(initialValue: workDayToEdit?.note ?? "")
+        _projectCode = State(initialValue: workDayToEdit?.projectCode ?? "")
     }
     
     var body: some View {
@@ -41,6 +44,18 @@ struct ManualWorkDayEntryView: View {
                 Section(header: Text("Pauze")) {
                     TextField("Pauze in minuten", text: $breakMinutes)
                         .keyboardType(.numberPad)
+                }
+
+                Section(header: Text("Project")) {
+                    Picker("Projectcode", selection: $projectCode) {
+                        Text("Geen project").tag("")
+                        ForEach(projectCodes.filter(\.isActive)) { project in
+                            Text(project.code).tag(project.code)
+                        }
+                        if !projectCode.isEmpty && !projectCodes.contains(where: { $0.code == projectCode }) {
+                            Text("\(projectCode) (bestaand)").tag(projectCode)
+                        }
+                    }
                 }
                 
                 Section(header: Text("Notities")) {
@@ -88,6 +103,7 @@ struct ManualWorkDayEntryView: View {
             workDay.roundedArrivalTime = roundedArrival
             workDay.roundedDepartureTime = roundedDeparture
             workDay.breakMinutes = effectiveBreak
+            workDay.projectCode = projectCode.isEmpty ? nil : projectCode
             workDay.note = note.isEmpty ? nil : note
             workDay.status = "APPROVED"
         } else {
@@ -100,6 +116,7 @@ struct ManualWorkDayEntryView: View {
                 roundedArrivalTime: roundedArrival,
                 roundedDepartureTime: roundedDeparture,
                 breakMinutes: effectiveBreak,
+                projectCode: projectCode.isEmpty ? nil : projectCode,
                 status: "APPROVED",
                 note: note.isEmpty ? nil : note
             )

@@ -9,6 +9,8 @@ struct DashboardView: View {
     @Query private var addresses: [SavedAddress]
     @Query private var rules: [ClassificationRule]
     @Query private var workDays: [WorkDay]
+    @Query private var targets: [HoursTarget]
+    @Query private var projectCodes: [ProjectCode]
     @Query private var settingsList: [AppSettings]
     
     @State private var timeFilter: TimeFilter = .week
@@ -48,6 +50,18 @@ struct DashboardView: View {
     }
     
     private var appSettings: AppSettings? { settingsList.first }
+
+    private var currentTargetProgress: [(target: HoursTarget, progress: TargetProgressSnapshot)] {
+        let year = Calendar.current.component(.year, from: Date())
+        return targets.filter { $0.isActive && $0.year == year }.map { target in
+            (target, TargetCalculator.progress(
+                for: target,
+                workDays: workDays,
+                projectCodes: projectCodes,
+                employmentStartDate: appSettings?.employmentStartDate
+            ))
+        }
+    }
     
     private var distanceChartData: [DistanceChartItem] {
         DashboardStatsCalculator.calculateDistanceChartData(
@@ -138,7 +152,7 @@ struct DashboardView: View {
                             privateKmWarningCard(
                                 limit: proRataLimit, 
                                 current: stats.ytdPriveKm,
-                                isProRata: activeVehicle.inServiceDate != nil || activeVehicle.endServiceDate != null
+                                isProRata: activeVehicle.inServiceDate != nil || activeVehicle.endServiceDate != nil
                             )
                         }
                     }
@@ -189,6 +203,49 @@ struct DashboardView: View {
                     // 6. Swift Charts - Work Hours Bar Chart
                     WorkHoursBarChart(data: workHoursChartData)
                         .padding(.horizontal)
+
+                    if !currentTargetProgress.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Uren- & omzetdoelen")
+                                .font(.title2.bold())
+                                .padding(.horizontal)
+
+                            ForEach(currentTargetProgress, id: \.target.id) { item in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text(item.target.name).font(.headline)
+                                        Spacer()
+                                        Text(item.progress.percentage, format: .percent.precision(.fractionLength(0)))
+                                            .font(.headline)
+                                    }
+                                    ProgressView(value: min(max(item.progress.percentage, 0), 1))
+                                        .tint(item.progress.isBehind ? .orange : .cimGreen)
+                                    HStack {
+                                        if item.target.targetType == "REVENUE" {
+                                            Text(item.progress.accumulatedRevenue, format: .currency(code: Locale.current.currency?.identifier ?? "EUR"))
+                                            Spacer()
+                                            Text("Doel: \(item.progress.effectiveTarget, format: .currency(code: Locale.current.currency?.identifier ?? "EUR"))")
+                                        } else {
+                                            Text("\(item.progress.accumulatedHours, format: .number.precision(.fractionLength(1))) uur")
+                                            Spacer()
+                                            Text("Doel: \(item.progress.effectiveTarget, format: .number.precision(.fractionLength(1))) uur")
+                                        }
+                                    }
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    if item.progress.proRataFactor < 1 {
+                                        Text("Pro-rata: \(item.progress.proRataFactor, format: .percent.precision(.fractionLength(0))) van jaar")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .padding()
+                                .background(Color(.secondarySystemGroupedBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .padding(.horizontal)
+                            }
+                        }
+                    }
                     
                     // 7. Voertuig Odometer Overzicht
                     if !vehicles.isEmpty {

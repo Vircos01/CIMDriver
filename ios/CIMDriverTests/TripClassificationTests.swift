@@ -80,6 +80,33 @@ final class TripClassificationTests: XCTestCase {
         )
         XCTAssertEqual(categoryDynamicsPersonal, .privateTrip, "PERSONAL should be PRIVATE")
     }
+
+    func testDisabledRuleDoesNotMatch() {
+        let disabledRule = ClassificationRule(
+            name: "Disabled exact rule",
+            startAddress: "Home",
+            endAddress: "Office",
+            category: "BUSINESS",
+            isEnabled: false
+        )
+
+        let result = TripClassification.classify(
+            tripType: nil,
+            startAddress: "Home",
+            endAddress: "Office",
+            defaultCategory: .privateTrip,
+            rules: [disabledRule]
+        )
+
+        XCTAssertEqual(result, .privateTrip)
+    }
+
+    func testRulePriorityBreaksEqualSpecificityTies() {
+        let laterRule = ClassificationRule(name: "Later", tripType: "X", category: "PRIVATE", orderIndex: 2)
+        let earlierRule = ClassificationRule(name: "Earlier", tripType: "X", category: "BUSINESS", orderIndex: 0)
+
+        XCTAssertEqual(TripClassification.classify(tripType: "X", rules: [laterRule, earlierRule]), .business)
+    }
     
     func testOutsideWorkHours() {
         let appSettings = AppSettings(
