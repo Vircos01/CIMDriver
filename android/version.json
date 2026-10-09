@@ -1,6 +1,6 @@
 {
-  "versionCode": 22,
-  "versionName": "1.2.5",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.5.apk",
-  "releaseNotes": "Versie 1.2.5: Klanten, projectcodes, uren targets & archiveren toegevoegd."
+  "versionCode": 23,
+  "versionName": "1.2.6",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.6.apk",
+  "releaseNotes": "Versie 1.2.6: Zepp Companion toggle, verbeterde layout projectcode archivering."
 }

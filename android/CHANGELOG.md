@@ -2,6 +2,13 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.6] - 2026-10-09
+
+### Toegevoegd
+- **Zepp Companion Toggle:** Nieuwe instelling toegevoegd om de Zepp OS integratie server (voor smartwatches) in- of uit te schakelen ter verbetering van batterijduur.
+- **Verbeterde UI voor instellingen:** De optie om projectcodes automatisch te archiveren is verplaatst naar het Werkuren-menu en opnieuw opgemaakt als een gebruiksvriendelijke toggle-schakelaar.
+
+
 ## [1.2.5] - 2026-10-09
 
 ### Toegevoegd

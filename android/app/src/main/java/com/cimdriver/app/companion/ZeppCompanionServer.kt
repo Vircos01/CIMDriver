@@ -19,6 +19,14 @@ class ZeppCompanionServer(
         private var instance: ZeppCompanionServer? = null
 
         fun startIfNeeded(context: Context): ZeppCompanionServer? {
+            val enabled = kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+                AppDatabase.getDatabase(context).settingsDao().getSettingsSync()?.zeppCompanionEnabled ?: false
+            }
+            if (!enabled) {
+                stopIfNeeded()
+                return null
+            }
+
             val current = instance
             if (current != null && current.isAlive) {
                 return current

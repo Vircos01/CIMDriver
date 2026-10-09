@@ -4,7 +4,14 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.2.5 (Current Version)
+## Version 1.2.6 (Current Version)
+**October 9, 2026**
+
+### Added
+- **Zepp Companion Toggle:** Added a new setting to toggle the Zepp OS integration server (for smartwatches) on or off to improve battery life.
+- **Improved UI for settings:** The option to automatically archive project codes has been moved to the Work hours menu and redesigned as a user-friendly toggle switch.
+
+## Version 1.2.5
 
 !!! success "New Features"
     * **Clients & Projects:** Added the ability to create project codes and link them to clients.

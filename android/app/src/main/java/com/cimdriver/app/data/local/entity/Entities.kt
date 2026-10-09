@@ -142,7 +142,8 @@ data class Settings(
     val maxRecoveryAttempts: Int = 3,
     val businessCompensation: Float = 0.23f,
     val skippedUpdateVersionCode: Int = 0,
-    val autoArchiveProjectDays: Int = 0 // 0 means disabled
+    val autoArchiveProjectDays: Int = 0, // 0 means disabled
+    val zeppCompanionEnabled: Boolean = false
 )
 
 @Entity(tableName = "saved_addresses")

@@ -52,6 +52,17 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateZeppCompanionEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            val currentSettings = settings.value
+            if (currentSettings != null) {
+                settingsDao.insertSettings(currentSettings.copy(zeppCompanionEnabled = enabled))
+            } else {
+                settingsDao.insertSettings(Settings(zeppCompanionEnabled = enabled))
+            }
+        }
+    }
+
     fun updateOdometerReminder(enabled: Boolean, intervalDays: Int) {
         viewModelScope.launch {
             val currentSettings = settingsDao.getSettingsSync() ?: Settings()

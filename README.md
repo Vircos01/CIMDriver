@@ -6,7 +6,7 @@
 
 *De moderne en slimme ritten- en werkurenregistratie app voor Android*
 
-[![Release](https://img.shields.io/badge/release-v1.2.5-blue)](https://github.com/Vircos01/CIMDriver/releases)
+[![Release](https://img.shields.io/badge/release-v1.2.6-blue)](https://github.com/Vircos01/CIMDriver/releases)
 [![Platform](https://img.shields.io/badge/platform-Android%2010%2B-green)](https://developer.android.com/about/versions/10)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
 [![Built with Kotlin](https://img.shields.io/badge/built%20with-Kotlin-purple)](https://kotlinlang.org/)

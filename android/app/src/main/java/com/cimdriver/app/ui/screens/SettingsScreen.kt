@@ -203,61 +203,6 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "Projectcode Archiveren", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Automatisch ongebruikte projectcodes archiveren",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    val archiveOptions = listOf(
-                        0 to "Uitgeschakeld",
-                        30 to "Na 30 dagen",
-                        60 to "Na 60 dagen",
-                        90 to "Na 90 dagen",
-                        180 to "Na 180 dagen",
-                        365 to "Na 1 jaar"
-                    )
-                    var expandedArchive by remember { mutableStateOf(false) }
-                    val currentLabel = archiveOptions.find { it.first == initialSettings.autoArchiveProjectDays }?.second ?: "Uitgeschakeld"
-
-                    ExposedDropdownMenuBox(
-                        expanded = expandedArchive,
-                        onExpandedChange = { expandedArchive = it }
-                    ) {
-                        OutlinedTextField(
-                            value = currentLabel,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedArchive) },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
-                        )
-                        ExposedDropdownMenu(
-                            expanded = expandedArchive,
-                            onDismissRequest = { expandedArchive = false }
-                        ) {
-                            archiveOptions.forEach { option ->
-                                DropdownMenuItem(
-                                    text = { Text(option.second) },
-                                    onClick = {
-                                        viewModel.updateAutoArchiveDays(option.first)
-                                        expandedArchive = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
 
             // App Gedrag
             SettingsSectionHeader(title = "App Gedrag")
@@ -292,18 +237,41 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.ContentCopy,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(end = 12.dp)
-                        )
-                        Text(
-                            text = "Zepp companion URL",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Zepp OS Integratie",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = "Activeer koppeling met Zepp smartwatches",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = initialSettings.zeppCompanionEnabled,
+                            onCheckedChange = { viewModel.updateZeppCompanionEnabled(it) }
                         )
                     }
+
+                    if (initialSettings.zeppCompanionEnabled) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ContentCopy,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(end = 12.dp)
+                            )
+                            Text(
+                                text = "Zepp companion URL",
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -326,6 +294,7 @@ fun SettingsScreen(
                     ) {
                         Text("URL kopiëren")
                     }
+                    }
                 }
             }
 
@@ -341,6 +310,85 @@ fun SettingsScreen(
                 icon = Icons.Filled.Flag,
                 onClick = { navController.navigate(HoursTargetsRoute) }
             )
+
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth().clickable {
+                    val newValue = if (initialSettings.autoArchiveProjectDays > 0) 0 else 30
+                    viewModel.updateAutoArchiveDays(newValue)
+                },
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Business,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Projectcodes Archiveren",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = "Automatisch ongebruikte projectcodes archiveren",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = initialSettings.autoArchiveProjectDays > 0,
+                        onCheckedChange = { checked ->
+                            viewModel.updateAutoArchiveDays(if (checked) 30 else 0)
+                        }
+                    )
+                }
+            }
+            if (initialSettings.autoArchiveProjectDays > 0) {
+                val archiveOptions = listOf(
+                    30 to "Na 30 dagen",
+                    60 to "Na 60 dagen",
+                    90 to "Na 90 dagen",
+                    180 to "Na 180 dagen",
+                    365 to "Na 1 jaar"
+                )
+                var expandedArchive by remember { mutableStateOf(false) }
+                val currentLabel = archiveOptions.find { it.first == initialSettings.autoArchiveProjectDays }?.second ?: "Na 30 dagen"
+
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), horizontalArrangement = Arrangement.End) {
+                    ExposedDropdownMenuBox(
+                        expanded = expandedArchive,
+                        onExpandedChange = { expandedArchive = it }
+                    ) {
+                        OutlinedTextField(
+                            value = currentLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedArchive) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).width(200.dp)
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedArchive,
+                            onDismissRequest = { expandedArchive = false }
+                        ) {
+                            archiveOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option.second) },
+                                    onClick = {
+                                        viewModel.updateAutoArchiveDays(option.first)
+                                        expandedArchive = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
 
             // Diagnostiek & Systeem
             SettingsSectionHeader(title = "Diagnostiek & Systeem")
