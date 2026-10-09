@@ -4,14 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.2.4 (Current Version)
+## Version 1.2.5 (Current Version)
 
-!!! bug "Bug fix"
-    * **Business vehicles:** The start and end dates can now also be edited for business-use vehicles.
-    * **PHEV registration:** Plug-in hybrids are no longer unintentionally treated as purely charging vehicles; the default registration remains focused on fueling unless the vehicle is fully electric.
-    * **Consistency:** The vehicle and fuel/charge registration flow is now better aligned with the vehicle type.
+!!! success "New Features"
+    * **Clients & Projects:** Added the ability to create project codes and link them to clients.
+    * **Archive Project Codes:** Project codes currently in use are no longer permanently deleted but archived (soft delete).
+    * **Auto-Archive:** Added a setting to automatically archive unused project codes after a configurable number of days.
+    * **Hours Targets:** When setting hours targets, you can now select project codes to track hours per project/client.
 
 ---
+
+## Version 1.2.4
 
 ## Version 1.2.3
 

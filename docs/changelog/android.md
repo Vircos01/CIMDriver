@@ -6,14 +6,17 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.2.4 (Huidige Versie)
+## Versie 1.2.5 (Huidige Versie)
 
-!!! bug "Bugfix"
-    * **Zakelijke auto's:** De begin- en einddatum kunnen nu ook bij zakelijke voertuigen worden aangepast.
-    * **PHEV-registratie:** Plug-in hybriden worden niet meer per ongeluk als alleen 'laden' behandeld; standaard blijft de registratie op tanken gericht, tenzij het voertuig puur elektrisch is.
-    * **Consistentie:** De voertuig- en tank-/laadregistratie zijn nu beter afgestemd op het type auto.
+!!! success "Nieuwe Functies"
+    * **Klanten & Projecten:** Mogelijkheid toegevoegd om projectcodes aan te maken en te koppelen aan klanten.
+    * **Projectcodes Archiveren:** Projectcodes die in gebruik zijn worden bij verwijdering niet meer gewist, maar gearchiveerd (soft delete).
+    * **Automatisch Archiveren:** Functie toegevoegd om ongebruikte projectcodes na een instelbaar aantal dagen automatisch te archiveren.
+    * **Uren Targets:** Bij het instellen van uren targets kan er nu gekozen worden uit projectcodes om de uren per project/klant bij te houden.
 
 ---
+
+## Versie 1.2.4
 
 ## Versie 1.2.3
 

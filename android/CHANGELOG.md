@@ -2,6 +2,15 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.5] - 2026-10-09
+
+### Toegevoegd
+- **Klanten & Projecten:** Mogelijkheid toegevoegd om projectcodes aan te maken en te koppelen aan klanten.
+- **Projectcodes Archiveren:** Projectcodes die in gebruik zijn (voor ritten of targets) worden bij verwijdering niet meer gewist, maar gearchiveerd (soft delete). Via een instelling in de app ("Toon gearchiveerde items") kunnen deze weer zichtbaar worden gemaakt en hersteld.
+- **Automatisch Archiveren:** Onder Instellingen -> App Gedrag is een functie toegevoegd om ongebruikte projectcodes na een instelbaar aantal dagen automatisch te archiveren.
+- **Uren Targets:** Bij het instellen van uren targets kan er nu gekozen worden uit projectcodes om de uren per project/klant bij te houden.
+- **Testdata:** Het interne testscript is geüpdatet zodat klanten en projecten direct goed worden ingeregeld op basis van gekoppelde adressen van het type 'Klant'.
+
 ## [1.2.4] - 2026-10-02
 
 ### Opgelost
