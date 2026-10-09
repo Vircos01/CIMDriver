@@ -1,6 +1,6 @@
 {
-  "versionCode": 24,
+  "versionCode": 25,
   "versionName": "1.2.7",
   "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.2.7.apk",
-  "releaseNotes": "Versie 1.2.7: Uren- en omzetdoelen met vaste projecttarieven en pro-rata targets vanaf indiensttreding."
+  "releaseNotes": "Versie 1.2.7: Vaste projecttarieven, pro-rata targets vanaf indiensttreding en correcte weergave van aangepaste targets op het dashboard."
 }

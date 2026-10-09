@@ -614,10 +614,10 @@ fun DashboardScreen(
                                 ) {
                                     if (target.targetType == "REVENUE") {
                                         Text("€ ${String.format("%.2f", progress.accumulatedRevenue)}", style = MaterialTheme.typography.bodyMedium)
-                                        Text("Doel: € ${String.format("%.2f", target.targetRevenue)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("Doel: € ${String.format("%.2f", progress.effectiveTargetValue)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     } else {
                                         Text("${String.format("%.1f", progress.accumulatedHours)} uur", style = MaterialTheme.typography.bodyMedium)
-                                        Text("Doel: ${target.targetHours} uur", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text("Doel: ${String.format("%.1f", progress.effectiveTargetValue)} uur", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                 }
                             }
