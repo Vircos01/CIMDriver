@@ -5,7 +5,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 ---
 
 ## Version 1.2.7 (Current Version)
-**October 9, 2026**
+*Release date: October 9, 2026*
 
 !!! success "New Features"
     * **Hours and revenue targets:** Set targets in hours or revenue and link them to a client or project code.
@@ -15,7 +15,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
     * **In-app help:** Added guidance on configuring hours and revenue targets, fixed project rates, and pro-rata calculations.
 
 ## Version 1.2.6
-**October 9, 2026**
+*Release date: October 9, 2026*
 
 !!! success "New Features"
     * **Zepp Companion Toggle:** Added a new setting to toggle the Zepp OS integration server (for smartwatches) on or off to improve battery life.

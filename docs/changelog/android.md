@@ -7,7 +7,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ---
 
 ## Versie 1.2.7 (Huidige Versie)
-**9 Oktober 2026**
+*Releasedatum: 9 oktober 2026*
 
 !!! success "Nieuwe Functies"
     * **Uren- en omzetdoelen:** Stel targets in op uren of omzet en koppel ze aan een klant of projectcode.
@@ -17,7 +17,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
     * **In-app help:** Nieuwe uitleg over het instellen van uren- en omzetdoelen, vaste projecttarieven en de pro-rata berekening.
 
 ## Versie 1.2.6
-**9 Oktober 2026**
+*Releasedatum: 9 oktober 2026*
 
 !!! success "Nieuwe Functies"
     * **Zepp Companion Toggle:** Nieuwe instelling toegevoegd om de Zepp OS integratie server (voor smartwatches) in- of uit te schakelen ter verbetering van batterijduur.
