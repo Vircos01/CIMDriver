@@ -20,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,10 +48,21 @@ class MainActivity : ComponentActivity() {
 
     private val settingsViewModel: SettingsViewModel by viewModels()
 
+    @javax.inject.Inject
+    lateinit var appDatabase: com.cimdriver.app.data.local.AppDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (BuildConfig.DEBUG) {
+            lifecycleScope.launch {
+                com.cimdriver.app.data.local.TestDataSeeder.seedTestData(appDatabase)
+            }
+        }
+
         handleIntents(intent)
         setContent {
+
             val settings by settingsViewModel.settings.collectAsState()
             val themeMode = settings?.themeMode ?: "SYSTEM"
             val useDarkTheme = when (themeMode) {

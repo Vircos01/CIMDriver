@@ -21,12 +21,12 @@ data class Vehicle(
     val privateKmYearlyLimit: Int = 500,
     val showPrivateKmWarning: Boolean = true,
     val usageType: String = "MIXED", // "MIXED", "BUSINESS_ONLY", "PRIVATE_ONLY"
+    val engineType: String = "ICE", // "ICE", "PHEV", "EV"
     val lastOdometerCheckTimestamp: Long = 0L,
     val isDefault: Boolean = false,
     val odometerCorrectionStrategy: String = "DISTRIBUTE", // "DISTRIBUTE", "CREATE_TRIP", "LEAVE_GAP"
     val inServiceDate: Long? = null,
-    val endServiceDate: Long? = null,
-    @ColumnInfo(defaultValue = "ICE") val engineType: String = "ICE" // "ICE", "EV", "PHEV"
+    val endServiceDate: Long? = null
 )
 
 @Entity(
@@ -77,7 +77,8 @@ data class Trip(
     val odometerEnd: Int?,
     val expectedDistanceMeters: Int? = null,
     val projectCode: String? = null,
-    val appliedRuleName: String? = null
+    val appliedRuleName: String? = null,
+    val projectCodeId: Long? = null
 )
 
 @Entity(
@@ -140,7 +141,8 @@ data class Settings(
     val locationRetentionDays: Int = 365,
     val maxRecoveryAttempts: Int = 3,
     val businessCompensation: Float = 0.23f,
-    val skippedUpdateVersionCode: Int = 0
+    val skippedUpdateVersionCode: Int = 0,
+    val autoArchiveProjectDays: Int = 0 // 0 means disabled
 )
 
 @Entity(tableName = "saved_addresses")
@@ -156,7 +158,8 @@ data class SavedAddress(
     val notes: String? = null,
     val addressType: String? = null, // "THUIS", "WERK", "KLANT"
     val latitude: Double? = null,
-    val longitude: Double? = null
+    val longitude: Double? = null,
+    val defaultProjectCodeId: Long? = null
 )
 
 @Entity(tableName = "work_days")
@@ -172,7 +175,8 @@ data class WorkDay(
     val breakMinutes: Int = 30,
     val workLocationLabel: String?,
     val projectCode: String? = null,
-    val status: String = "TO_REVIEW"
+    val status: String = "TO_REVIEW",
+    val projectCodeId: Long? = null
 )
 
 @Entity(tableName = "classification_rules")
@@ -188,6 +192,75 @@ data class ClassificationRule(
     @ColumnInfo(defaultValue = "0") val orderIndex: Int = 0,
     @ColumnInfo(defaultValue = "1") val isEnabled: Boolean = true,
     @ColumnInfo(defaultValue = "0") val autoApprove: Boolean = false
+)
+
+@Entity(tableName = "clients")
+data class Client(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    @ColumnInfo(defaultValue = "'#1976D2'") val color: String = "#1976D2",
+    @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
+)
+
+@Entity(
+    tableName = "project_codes",
+    foreignKeys = [
+        ForeignKey(
+            entity = Client::class,
+            parentColumns = ["id"],
+            childColumns = ["clientId"],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ],
+    indices = [
+        Index(value = ["clientId"], name = "idx_project_codes_clientId"), 
+        Index(value = ["code"], unique = true, name = "idx_project_codes_code")
+    ]
+
+)
+data class ProjectCode(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val clientId: Long? = null,
+    val code: String,
+    val description: String? = null,
+    @ColumnInfo(defaultValue = "1") val isBillable: Boolean = true,
+    @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
+)
+
+@Entity(
+    tableName = "hours_targets",
+    foreignKeys = [
+        ForeignKey(
+            entity = Client::class,
+            parentColumns = ["id"],
+            childColumns = ["clientId"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = ProjectCode::class,
+            parentColumns = ["id"],
+            childColumns = ["projectCodeId"],
+            onDelete = ForeignKey.SET_NULL
+        )
+    ],
+    indices = [
+        Index(value = ["clientId"], name = "idx_hours_targets_clientId"), 
+        Index(value = ["projectCodeId"], name = "idx_hours_targets_projectCodeId")
+    ]
+
+)
+data class HoursTarget(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val clientId: Long? = null,
+    val projectCodeId: Long? = null,
+    val name: String,
+    val targetHours: Double,
+    val year: Int,
+    @ColumnInfo(defaultValue = "'#4CAF50'") val color: String = "#4CAF50",
+    @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
 )
 
 @Entity(tableName = "favorite_routes")

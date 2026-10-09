@@ -328,7 +328,8 @@ class WorkHoursViewModel @Inject constructor(
         breakMinutes: Int,
         workLocationLabel: String?,
         projectCode: String?,
-        status: String
+        status: String,
+        projectCodeId: Long? = null
     ) {
         viewModelScope.launch {
             val effectiveStart = roundedArrivalTime ?: arrivalTime
@@ -352,7 +353,8 @@ class WorkHoursViewModel @Inject constructor(
                     breakMinutes = effectiveBreak,
                     workLocationLabel = workLocationLabel,
                     projectCode = projectCode,
-                    status = status
+                    status = status,
+                    projectCodeId = projectCodeId
                 )
             )
         }
@@ -366,7 +368,8 @@ class WorkHoursViewModel @Inject constructor(
         lastArrivalTime: Long,
         breakMinutes: Int,
         workLocationLabel: String?,
-        projectCode: String?
+        projectCode: String?,
+        projectCodeId: Long? = null
     ) {
         viewModelScope.launch {
             val effectiveBreak = WorkHoursCalculator.effectiveBreakMinutes(
@@ -387,7 +390,8 @@ class WorkHoursViewModel @Inject constructor(
                     breakMinutes = effectiveBreak,
                     workLocationLabel = workLocationLabel,
                     projectCode = projectCode,
-                    status = "APPROVED"
+                    status = "APPROVED",
+                    projectCodeId = projectCodeId
                 )
             )
         }

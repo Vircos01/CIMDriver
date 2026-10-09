@@ -26,7 +26,7 @@ class CIMDriverApplication : Application() {
             ExistingPeriodicWorkPolicy.KEEP,
             backupWorkRequest
         )
-        
+
         // Enqueue daily data lifecycle worker
         val lifecycleWorkRequest = PeriodicWorkRequestBuilder<DataLifecycleWorker>(1, TimeUnit.DAYS)
             .build()

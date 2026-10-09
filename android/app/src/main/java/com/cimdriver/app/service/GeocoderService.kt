@@ -166,6 +166,7 @@ class GeocoderService(private val context: Context) {
         }
     }
 
+
     suspend fun getCoordinatesForAddress(address: String): Pair<Double, Double>? {
         if (address.isBlank()) return null
         return try {

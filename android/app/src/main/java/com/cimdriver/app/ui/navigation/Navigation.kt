@@ -53,6 +53,8 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
@@ -160,6 +162,16 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                         navController.navigate(FuelRoute)
                     },
                     icon = { Icon(Screen.Fuel.icon, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+                NavigationDrawerItem(
+                    label = { Text("Klanten & Projecten") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate(ClientsProjectCodesRoute)
+                    },
+                    icon = { Icon(Icons.Filled.Business, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
@@ -453,6 +465,12 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
             }
             composable<WorkDaysEditorRoute> {
                 com.cimdriver.app.ui.screens.settings.WorkDaysEditorScreen(onBack = { navController.popBackStack() })
+            }
+            composable<ClientsProjectCodesRoute> {
+                com.cimdriver.app.ui.screens.ClientsProjectCodesScreen(onBack = { navController.popBackStack() })
+            }
+            composable<HoursTargetsRoute> {
+                com.cimdriver.app.ui.screens.HoursTargetsScreen(onBack = { navController.popBackStack() })
             }
             composable<WorkHoursRoute> { 
                 com.cimdriver.app.ui.screens.WorkHoursScreen(

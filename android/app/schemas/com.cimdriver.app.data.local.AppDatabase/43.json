@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 36,
-    "identityHash": "a0dca0d67ee569ac84378830f76ef1d7",
+    "version": 43,
+    "identityHash": "ce2113d434226ccf56891c229d6737f7",
     "entities": [
       {
         "tableName": "trips",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vehicleId` INTEGER, `startTime` INTEGER NOT NULL, `endTime` INTEGER, `startAddress` TEXT, `endAddress` TEXT, `distanceMeters` INTEGER NOT NULL, `tripType` TEXT NOT NULL, `note` TEXT, `status` TEXT NOT NULL, `isManual` INTEGER NOT NULL, `odometerStart` INTEGER NOT NULL, `odometerEnd` INTEGER, `expectedDistanceMeters` INTEGER, `projectCode` TEXT, `appliedRuleName` TEXT, FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vehicleId` INTEGER, `startTime` INTEGER NOT NULL, `endTime` INTEGER, `startAddress` TEXT, `endAddress` TEXT, `distanceMeters` INTEGER NOT NULL, `tripType` TEXT NOT NULL, `note` TEXT, `status` TEXT NOT NULL, `isManual` INTEGER NOT NULL, `odometerStart` INTEGER NOT NULL, `odometerEnd` INTEGER, `expectedDistanceMeters` INTEGER, `projectCode` TEXT, `appliedRuleName` TEXT, `projectCodeId` INTEGER, FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "id",
@@ -94,6 +94,11 @@
             "fieldPath": "appliedRuleName",
             "columnName": "appliedRuleName",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "projectCodeId",
+            "columnName": "projectCodeId",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -129,7 +134,7 @@
       },
       {
         "tableName": "vehicles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `licensePlate` TEXT NOT NULL, `make` TEXT NOT NULL, `model` TEXT NOT NULL, `year` TEXT, `odometerStart` INTEGER NOT NULL, `odometerCurrent` INTEGER NOT NULL, `notes` TEXT, `isActive` INTEGER NOT NULL, `privateKmYearlyLimit` INTEGER NOT NULL, `showPrivateKmWarning` INTEGER NOT NULL, `usageType` TEXT NOT NULL, `lastOdometerCheckTimestamp` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `odometerCorrectionStrategy` TEXT NOT NULL, `inServiceDate` INTEGER, `endServiceDate` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `licensePlate` TEXT NOT NULL, `make` TEXT NOT NULL, `model` TEXT NOT NULL, `year` TEXT, `odometerStart` INTEGER NOT NULL, `odometerCurrent` INTEGER NOT NULL, `notes` TEXT, `isActive` INTEGER NOT NULL, `privateKmYearlyLimit` INTEGER NOT NULL, `showPrivateKmWarning` INTEGER NOT NULL, `usageType` TEXT NOT NULL, `engineType` TEXT NOT NULL, `lastOdometerCheckTimestamp` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `odometerCorrectionStrategy` TEXT NOT NULL, `inServiceDate` INTEGER, `endServiceDate` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -208,6 +213,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "engineType",
+            "columnName": "engineType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "lastOdometerCheckTimestamp",
             "columnName": "lastOdometerCheckTimestamp",
             "affinity": "INTEGER",
@@ -245,7 +256,7 @@
       },
       {
         "tableName": "settings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `defaultTripType` TEXT NOT NULL, `gracePeriodSec` INTEGER NOT NULL, `defaultBreakMinutes` INTEGER NOT NULL, `workHoursToleranceMinutes` INTEGER NOT NULL, `trackingInterval` INTEGER NOT NULL, `workStartTime` TEXT NOT NULL, `workEndTime` TEXT NOT NULL, `workDays` TEXT NOT NULL, `autoMergeEnabled` INTEGER NOT NULL, `mergeTimeLimitMin` INTEGER NOT NULL, `mergeDistanceM` INTEGER NOT NULL, `odometerReminder` INTEGER NOT NULL, `odometerReminderIntervalDays` INTEGER NOT NULL, `backupReminder` INTEGER NOT NULL, `distanceUnit` TEXT NOT NULL, `themeMode` TEXT NOT NULL, `preferredNavAppPackage` TEXT, `classificationDefault` TEXT NOT NULL, `classifyHomeWorkAsCommute` INTEGER NOT NULL, `classifyCustomerAsBusiness` INTEGER NOT NULL, `locationRetentionDays` INTEGER NOT NULL, `maxRecoveryAttempts` INTEGER NOT NULL, `businessCompensation` REAL NOT NULL, `skippedUpdateVersionCode` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `defaultTripType` TEXT NOT NULL, `gracePeriodSec` INTEGER NOT NULL, `defaultBreakMinutes` INTEGER NOT NULL, `workHoursToleranceMinutes` INTEGER NOT NULL, `trackingInterval` INTEGER NOT NULL, `workStartTime` TEXT NOT NULL, `workEndTime` TEXT NOT NULL, `workDays` TEXT NOT NULL, `autoMergeEnabled` INTEGER NOT NULL, `mergeTimeLimitMin` INTEGER NOT NULL, `mergeDistanceM` INTEGER NOT NULL, `odometerReminder` INTEGER NOT NULL, `odometerReminderIntervalDays` INTEGER NOT NULL, `backupReminder` INTEGER NOT NULL, `distanceUnit` TEXT NOT NULL, `themeMode` TEXT NOT NULL, `preferredNavAppPackage` TEXT, `classificationDefault` TEXT NOT NULL, `classifyHomeWorkAsCommute` INTEGER NOT NULL, `classifyCustomerAsBusiness` INTEGER NOT NULL, `locationRetentionDays` INTEGER NOT NULL, `maxRecoveryAttempts` INTEGER NOT NULL, `businessCompensation` REAL NOT NULL, `skippedUpdateVersionCode` INTEGER NOT NULL, `autoArchiveProjectDays` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -395,6 +406,12 @@
             "columnName": "skippedUpdateVersionCode",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "autoArchiveProjectDays",
+            "columnName": "autoArchiveProjectDays",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -484,7 +501,7 @@
       },
       {
         "tableName": "saved_addresses",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `label` TEXT NOT NULL, `address` TEXT NOT NULL, `isWorkLocation` INTEGER NOT NULL, `isHomeLocation` INTEGER NOT NULL, `isCustomerLocation` INTEGER NOT NULL, `defaultTripType` TEXT, `projectCode` TEXT, `notes` TEXT, `addressType` TEXT, `latitude` REAL, `longitude` REAL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `label` TEXT NOT NULL, `address` TEXT NOT NULL, `isWorkLocation` INTEGER NOT NULL, `isHomeLocation` INTEGER NOT NULL, `isCustomerLocation` INTEGER NOT NULL, `defaultTripType` TEXT, `projectCode` TEXT, `notes` TEXT, `addressType` TEXT, `latitude` REAL, `longitude` REAL, `defaultProjectCodeId` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -551,6 +568,11 @@
             "fieldPath": "longitude",
             "columnName": "longitude",
             "affinity": "REAL"
+          },
+          {
+            "fieldPath": "defaultProjectCodeId",
+            "columnName": "defaultProjectCodeId",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -628,7 +650,7 @@
       },
       {
         "tableName": "work_days",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `firstDepartureTime` INTEGER NOT NULL, `arrivalTime` INTEGER NOT NULL, `departureTime` INTEGER, `lastArrivalTime` INTEGER, `roundedArrivalTime` INTEGER, `roundedDepartureTime` INTEGER, `breakMinutes` INTEGER NOT NULL, `workLocationLabel` TEXT, `projectCode` TEXT, `status` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `firstDepartureTime` INTEGER NOT NULL, `arrivalTime` INTEGER NOT NULL, `departureTime` INTEGER, `lastArrivalTime` INTEGER, `roundedArrivalTime` INTEGER, `roundedDepartureTime` INTEGER, `breakMinutes` INTEGER NOT NULL, `workLocationLabel` TEXT, `projectCode` TEXT, `status` TEXT NOT NULL, `projectCodeId` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -695,6 +717,11 @@
             "columnName": "status",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "projectCodeId",
+            "columnName": "projectCodeId",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -841,11 +868,482 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "clients",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `color` TEXT NOT NULL DEFAULT '#1976D2', `isActive` INTEGER NOT NULL DEFAULT 1, `createdAt` INTEGER NOT NULL DEFAULT 0)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'#1976D2'"
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "project_codes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `clientId` INTEGER, `code` TEXT NOT NULL, `description` TEXT, `isBillable` INTEGER NOT NULL DEFAULT 1, `isActive` INTEGER NOT NULL DEFAULT 1, `createdAt` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`clientId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isBillable",
+            "columnName": "isBillable",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_project_codes_clientId",
+            "unique": false,
+            "columnNames": [
+              "clientId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_project_codes_clientId` ON `${TABLE_NAME}` (`clientId`)"
+          },
+          {
+            "name": "idx_project_codes_code",
+            "unique": true,
+            "columnNames": [
+              "code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `idx_project_codes_code` ON `${TABLE_NAME}` (`code`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "clients",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "clientId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "hours_targets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `clientId` INTEGER, `projectCodeId` INTEGER, `name` TEXT NOT NULL, `targetHours` REAL NOT NULL, `year` INTEGER NOT NULL, `color` TEXT NOT NULL DEFAULT '#4CAF50', `isActive` INTEGER NOT NULL DEFAULT 1, `createdAt` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`clientId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`projectCodeId`) REFERENCES `project_codes`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "projectCodeId",
+            "columnName": "projectCodeId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetHours",
+            "columnName": "targetHours",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'#4CAF50'"
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "idx_hours_targets_clientId",
+            "unique": false,
+            "columnNames": [
+              "clientId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_hours_targets_clientId` ON `${TABLE_NAME}` (`clientId`)"
+          },
+          {
+            "name": "idx_hours_targets_projectCodeId",
+            "unique": false,
+            "columnNames": [
+              "projectCodeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `idx_hours_targets_projectCodeId` ON `${TABLE_NAME}` (`projectCodeId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "clients",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "clientId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "project_codes",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "projectCodeId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "favorite_routes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `startAddress` TEXT NOT NULL, `endAddress` TEXT NOT NULL, `tripType` TEXT NOT NULL, `projectCode` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startAddress",
+            "columnName": "startAddress",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endAddress",
+            "columnName": "endAddress",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tripType",
+            "columnName": "tripType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectCode",
+            "columnName": "projectCode",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "odometer_checks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vehicleId` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `registeredOdometer` INTEGER NOT NULL, `correctedOdometer` INTEGER NOT NULL, `photoPath` TEXT, FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vehicleId",
+            "columnName": "vehicleId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "registeredOdometer",
+            "columnName": "registeredOdometer",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "correctedOdometer",
+            "columnName": "correctedOdometer",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoPath",
+            "columnName": "photoPath",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_odometer_checks_vehicleId",
+            "unique": false,
+            "columnNames": [
+              "vehicleId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_odometer_checks_vehicleId` ON `${TABLE_NAME}` (`vehicleId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "vehicles",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "vehicleId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "fuel_fillups",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vehicleId` INTEGER NOT NULL, `dateTimestamp` INTEGER NOT NULL, `liters` REAL NOT NULL, `pricePerLiter` REAL NOT NULL, `totalCost` REAL NOT NULL, `odometer` INTEGER NOT NULL, `stationName` TEXT, `notes` TEXT, `latitude` REAL, `longitude` REAL, `address` TEXT, `status` TEXT NOT NULL, FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vehicleId",
+            "columnName": "vehicleId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateTimestamp",
+            "columnName": "dateTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "liters",
+            "columnName": "liters",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pricePerLiter",
+            "columnName": "pricePerLiter",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalCost",
+            "columnName": "totalCost",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "odometer",
+            "columnName": "odometer",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationName",
+            "columnName": "stationName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_fuel_fillups_vehicleId",
+            "unique": false,
+            "columnNames": [
+              "vehicleId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_fuel_fillups_vehicleId` ON `${TABLE_NAME}` (`vehicleId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "vehicles",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "vehicleId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a0dca0d67ee569ac84378830f76ef1d7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ce2113d434226ccf56891c229d6737f7')"
     ]
   }
 }

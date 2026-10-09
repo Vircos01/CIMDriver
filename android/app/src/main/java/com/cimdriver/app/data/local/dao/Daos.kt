@@ -51,6 +51,12 @@ interface TripDao {
     @Query("SELECT * FROM trips WHERE vehicleId = :vehicleId AND status = 'ACTIVE' ORDER BY startTime DESC LIMIT 1")
     suspend fun getActiveTripForVehicle(vehicleId: Long): Trip?
 
+    @Query("SELECT * FROM trips WHERE projectCodeId = :projectCodeId LIMIT 1")
+    suspend fun getTripForProjectSync(projectCodeId: Long): Trip?
+
+    @Query("SELECT MAX(endTime) FROM trips WHERE projectCodeId = :projectCodeId")
+    suspend fun getLastTripTimeForProjectSync(projectCodeId: Long): Long?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrip(trip: Trip): Long
 
@@ -197,6 +203,88 @@ interface WorkDayDao {
 
     @Delete
     suspend fun deleteWorkDay(workDay: WorkDay)
+}
+
+@Dao
+interface ClientDao {
+    @Query("SELECT * FROM clients WHERE isActive = 1 ORDER BY name ASC")
+    fun getActiveClients(): Flow<List<Client>>
+
+    @Query("SELECT * FROM clients ORDER BY name ASC")
+    fun getAllClients(): Flow<List<Client>>
+    
+    @Query("SELECT * FROM clients")
+    suspend fun getAllClientsSync(): List<Client>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertClient(client: Client): Long
+
+    @Update
+    suspend fun updateClient(client: Client)
+
+    @Delete
+    suspend fun deleteClient(client: Client)
+}
+
+@Dao
+interface ProjectCodeDao {
+    @Query("SELECT * FROM project_codes WHERE isActive = 1 ORDER BY code ASC")
+    fun getActiveProjectCodes(): Flow<List<ProjectCode>>
+
+    @Query("SELECT * FROM project_codes WHERE clientId = :clientId AND isActive = 1")
+    fun getProjectCodesForClient(clientId: Long): Flow<List<ProjectCode>>
+
+    @Query("SELECT * FROM project_codes WHERE isBillable = 1 AND isActive = 1")
+    fun getBillableProjectCodes(): Flow<List<ProjectCode>>
+
+    @Query("SELECT * FROM project_codes ORDER BY code ASC")
+    fun getAllProjectCodes(): Flow<List<ProjectCode>>
+
+    @Query("SELECT * FROM project_codes")
+    suspend fun getAllProjectCodesSync(): List<ProjectCode>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProjectCode(projectCode: ProjectCode): Long
+
+    @Update
+    suspend fun updateProjectCode(projectCode: ProjectCode)
+
+    @Delete
+    suspend fun deleteProjectCode(projectCode: ProjectCode)
+}
+
+data class HoursTargetWithDetails(
+    @Embedded val target: HoursTarget,
+    val clientName: String?,
+    val projectCodeStr: String?
+)
+
+@Dao
+interface HoursTargetDao {
+    @Query("SELECT * FROM hours_targets WHERE projectCodeId = :projectCodeId LIMIT 1")
+    suspend fun getHoursTargetForProjectSync(projectCodeId: Long): HoursTarget?
+
+    @Query("""
+        SELECT ht.*, c.name AS clientName, pc.code AS projectCodeStr
+        FROM hours_targets ht
+        LEFT JOIN clients c ON ht.clientId = c.id
+        LEFT JOIN project_codes pc ON ht.projectCodeId = pc.id
+        WHERE ht.year = :year AND ht.isActive = 1
+        ORDER BY ht.name ASC
+    """)
+    fun getActiveTargetsForYear(year: Int): Flow<List<HoursTargetWithDetails>>
+
+    @Query("SELECT * FROM hours_targets")
+    suspend fun getAllTargetsSync(): List<HoursTarget>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTarget(target: HoursTarget): Long
+
+    @Update
+    suspend fun updateTarget(target: HoursTarget)
+
+    @Delete
+    suspend fun deleteTarget(target: HoursTarget)
 }
 
 @Dao

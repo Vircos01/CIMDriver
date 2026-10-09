@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.FileDownload
@@ -87,6 +89,10 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
+import android.content.ClipData
+import androidx.compose.material.icons.filled.ContentCopy
+import java.net.Inet4Address
+import java.net.NetworkInterface
 
 @Composable
 fun SettingsListItem(
@@ -197,6 +203,62 @@ fun SettingsScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = "Projectcode Archiveren", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Automatisch ongebruikte projectcodes archiveren",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    val archiveOptions = listOf(
+                        0 to "Uitgeschakeld",
+                        30 to "Na 30 dagen",
+                        60 to "Na 60 dagen",
+                        90 to "Na 90 dagen",
+                        180 to "Na 180 dagen",
+                        365 to "Na 1 jaar"
+                    )
+                    var expandedArchive by remember { mutableStateOf(false) }
+                    val currentLabel = archiveOptions.find { it.first == initialSettings.autoArchiveProjectDays }?.second ?: "Uitgeschakeld"
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandedArchive,
+                        onExpandedChange = { expandedArchive = it }
+                    ) {
+                        OutlinedTextField(
+                            value = currentLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedArchive) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedArchive,
+                            onDismissRequest = { expandedArchive = false }
+                        ) {
+                            archiveOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option.second) },
+                                    onClick = {
+                                        viewModel.updateAutoArchiveDays(option.first)
+                                        expandedArchive = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // App Gedrag
             SettingsSectionHeader(title = "App Gedrag")
             SettingsListItem(
@@ -218,11 +280,66 @@ fun SettingsScreen(
             )
 
             // Werkuren
+            SettingsSectionHeader(title = "Companion / Watch")
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+            ) {
+                val zeppSummaryUrl = remember(context) { resolveZeppSummaryUrl(context) }
+                val scope = rememberCoroutineScope()
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ContentCopy,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 12.dp)
+                        )
+                        Text(
+                            text = "Zepp companion URL",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = zeppSummaryUrl,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = {
+                            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                            val clip = ClipData.newPlainText("Zepp companion URL", zeppSummaryUrl)
+                            clipboard.setPrimaryClip(clip)
+                            scope.launch {
+                                android.widget.Toast.makeText(context, "URL gekopieerd", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Text("URL kopiëren")
+                    }
+                }
+            }
+
             SettingsSectionHeader(title = "Werkuren")
             SettingsListItem(
                 title = "Werkdagen & Tijden",
                 icon = Icons.Filled.DateRange,
                 onClick = { navController.navigate(WorkDaysEditorRoute) }
+            )
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+            SettingsListItem(
+                title = "Uren Targets",
+                icon = Icons.Filled.Flag,
+                onClick = { navController.navigate(HoursTargetsRoute) }
             )
 
             // Diagnostiek & Systeem
@@ -252,5 +369,29 @@ fun SettingsScreen(
     }
 }
 
+private fun resolveZeppSummaryUrl(context: Context): String {
+    val fallbackUrl = "http://127.0.0.1:8765/zepp/summary"
+    try {
+        val interfaces = NetworkInterface.getNetworkInterfaces() ?: return fallbackUrl
+        while (interfaces.hasMoreElements()) {
+            val networkInterface = interfaces.nextElement()
+            if (networkInterface.isLoopback || !networkInterface.isUp) continue
+
+            val addresses = networkInterface.inetAddresses ?: continue
+            while (addresses.hasMoreElements()) {
+                val address = addresses.nextElement()
+                if (!address.isLoopbackAddress && address is Inet4Address) {
+                    val host = address.hostAddress ?: continue
+                    if (host.isNotBlank()) {
+                        return "http://$host:8765/zepp/summary"
+                    }
+                }
+            }
+        }
+    } catch (_: Exception) {
+        // Fallback below
+    }
+    return fallbackUrl
+}
 
 

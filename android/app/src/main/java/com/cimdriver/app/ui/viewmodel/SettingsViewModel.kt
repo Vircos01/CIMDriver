@@ -59,6 +59,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateAutoArchiveDays(days: Int) {
+        viewModelScope.launch {
+            val currentSettings = settingsDao.getSettingsSync() ?: Settings()
+            settingsDao.insertSettings(currentSettings.copy(autoArchiveProjectDays = days))
+        }
+    }
+
     fun updateGracePeriod(seconds: Int) {
         viewModelScope.launch {
             val currentSettings = settingsDao.getSettingsSync() ?: Settings()

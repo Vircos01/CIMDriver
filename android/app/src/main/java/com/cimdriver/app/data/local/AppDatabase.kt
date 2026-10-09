@@ -20,11 +20,14 @@ import com.cimdriver.app.data.local.entity.*
         WorkDay::class,
         LocationPoint::class,
         Workplace::class,
+        Client::class,
+        ProjectCode::class,
+        HoursTarget::class,
         FavoriteRoute::class,
         OdometerCheck::class,
         FuelFillUp::class
     ], 
-    version = 41, 
+    version = 43, 
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -36,8 +39,12 @@ abstract class AppDatabase : RoomDatabase() {
 	abstract fun workplaceDao(): WorkplaceDao
 	abstract fun settingsDao(): SettingsDao
 	abstract fun savedAddressDao(): SavedAddressDao
+
 	abstract fun workDayDao(): WorkDayDao
 	abstract fun classificationRuleDao(): ClassificationRuleDao
+	abstract fun clientDao(): ClientDao
+	abstract fun projectCodeDao(): ProjectCodeDao
+	abstract fun hoursTargetDao(): HoursTargetDao
 	abstract fun favoriteRouteDao(): FavoriteRouteDao
 	abstract fun odometerCheckDao(): OdometerCheckDao
 	abstract fun fuelFillUpDao(): FuelFillUpDao
@@ -310,9 +317,111 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_41_42 = object : Migration(41, 42) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                // 1. Create clients table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS clients (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        color TEXT NOT NULL DEFAULT '#1976D2',
+                        isActive INTEGER NOT NULL DEFAULT 1,
+                        createdAt INTEGER NOT NULL DEFAULT 0
+                    )
+                """)
+
+                // 2. Create project_codes table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS project_codes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        clientId INTEGER,
+                        code TEXT NOT NULL,
+                        description TEXT,
+                        isBillable INTEGER NOT NULL DEFAULT 1,
+                        isActive INTEGER NOT NULL DEFAULT 1,
+                        createdAt INTEGER NOT NULL DEFAULT 0,
+                        FOREIGN KEY (clientId) REFERENCES clients(id) ON DELETE SET NULL
+                    )
+                """)
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS idx_project_codes_code ON project_codes(code)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_project_codes_clientId ON project_codes(clientId)")
+
+                // 3. Create hours_targets table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS hours_targets (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        clientId INTEGER,
+                        projectCodeId INTEGER,
+                        name TEXT NOT NULL,
+                        targetHours REAL NOT NULL,
+                        year INTEGER NOT NULL,
+                        color TEXT NOT NULL DEFAULT '#4CAF50',
+                        isActive INTEGER NOT NULL DEFAULT 1,
+                        createdAt INTEGER NOT NULL DEFAULT 0,
+                        FOREIGN KEY (clientId) REFERENCES clients(id) ON DELETE CASCADE,
+                        FOREIGN KEY (projectCodeId) REFERENCES project_codes(id) ON DELETE SET NULL
+                    )
+                """)
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_hours_targets_clientId ON hours_targets(clientId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_hours_targets_projectCodeId ON hours_targets(projectCodeId)")
+
+                // 4. Add projectCodeId FK columns to existing tables
+                db.execSQL("ALTER TABLE work_days ADD COLUMN projectCodeId INTEGER DEFAULT NULL")
+                db.execSQL("ALTER TABLE trips ADD COLUMN projectCodeId INTEGER DEFAULT NULL")
+                db.execSQL("ALTER TABLE saved_addresses ADD COLUMN defaultProjectCodeId INTEGER DEFAULT NULL")
+
+                // 5. Migrate existing free-text project codes -> project_codes table
+                val existingCodes = mutableSetOf<String>()
+                
+                listOf(
+                    "SELECT DISTINCT projectCode FROM work_days WHERE projectCode IS NOT NULL",
+                    "SELECT DISTINCT projectCode FROM trips WHERE projectCode IS NOT NULL",
+                    "SELECT DISTINCT projectCode FROM saved_addresses WHERE projectCode IS NOT NULL"
+                ).forEach { query ->
+                    val cursor = db.query(query)
+                    while (cursor.moveToNext()) {
+                        cursor.getString(0)?.takeIf { it.isNotBlank() }?.let { existingCodes.add(it) }
+                    }
+                    cursor.close()
+                }
+
+                existingCodes.forEach { code ->
+                    db.execSQL(
+                        "INSERT INTO project_codes (code, isBillable, createdAt) VALUES (?, 1, ?)",
+                        arrayOf<Any>(code, System.currentTimeMillis())
+                    )
+                }
+
+                // 6. Link existing records to new project_code IDs
+                db.execSQL("""
+                    UPDATE work_days SET projectCodeId = (
+                        SELECT id FROM project_codes WHERE code = work_days.projectCode
+                    ) WHERE projectCode IS NOT NULL
+                """)
+                db.execSQL("""
+                    UPDATE trips SET projectCodeId = (
+                        SELECT id FROM project_codes WHERE code = trips.projectCode
+                    ) WHERE projectCode IS NOT NULL
+                """)
+                db.execSQL("""
+                    UPDATE saved_addresses SET defaultProjectCodeId = (
+                        SELECT id FROM project_codes WHERE code = saved_addresses.projectCode
+                    ) WHERE projectCode IS NOT NULL
+                """)
+
+            }
+        }
+
+        val MIGRATION_42_43 = object : Migration(42, 43) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE settings ADD COLUMN autoArchiveProjectDays INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
 		fun getDatabase(context: Context): AppDatabase {
 			return INSTANCE ?: synchronized(this) {
-				val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39, MIGRATION_39_40, MIGRATION_40_41).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
+				val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39, MIGRATION_39_40, MIGRATION_40_41, MIGRATION_41_42, MIGRATION_42_43).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
+
 				INSTANCE = instance
 				instance
 			}

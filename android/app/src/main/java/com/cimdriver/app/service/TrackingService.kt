@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.firstOrNull
 import com.cimdriver.app.MainActivity
 import android.app.PendingIntent
+import com.cimdriver.app.companion.ZeppCompanionServer
 import com.cimdriver.app.util.TripDistance
 import com.cimdriver.app.util.TripClassification
 import com.cimdriver.app.util.AddressMatching
@@ -114,12 +115,14 @@ class TrackingService : Service(), LocationListener {
                     Log.i("TrackingService", "Starting tracking for trip $activeTripId [correlationId=$correlationId]")
                     
                     try {
+                        ZeppCompanionServer.startIfNeeded(this)
                         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.tracking_recording_trip)))
                         startLocationUpdates()
                         TrackingStatusStore.started(activeTripId!!)
                     } catch (e: Exception) {
                         Log.e("TrackingService", "Failed to start tracking", e)
                         TrackingStatusStore.failed("Fout bij opstarten: ${e.message}")
+                        ZeppCompanionServer.stopIfNeeded()
                         stopForeground(STOP_FOREGROUND_REMOVE)
                         stopSelf()
                     }
@@ -142,12 +145,14 @@ class TrackingService : Service(), LocationListener {
                     Log.i("TrackingService", "Recovering tracking for trip $activeTripId [correlationId=$correlationId]")
                     
                     try {
+                        ZeppCompanionServer.startIfNeeded(this)
                         startForeground(NOTIFICATION_ID, createNotification("Rit wordt hersteld..."))
                         startLocationUpdates()
                         TrackingStatusStore.started(activeTripId!!)
                     } catch (e: Exception) {
                         Log.e("TrackingService", "Failed to recover tracking", e)
                         TrackingStatusStore.failed("Fout bij herstel: ${e.message}")
+                        ZeppCompanionServer.stopIfNeeded()
                         stopForeground(STOP_FOREGROUND_REMOVE)
                         stopSelf()
                     }
@@ -230,7 +235,7 @@ class TrackingService : Service(), LocationListener {
                     val recoveryManager = TrackingRecoveryManager(this@TrackingService)
                     recoveryManager.clearRecoveryAttempts(tripId)
                     TrackingStatusStore.stopped("Rit succesvol afgerond")
-                    
+                    ZeppCompanionServer.stopIfNeeded()
                     // Fetch the updated trip to see if it still needs review
                     val updatedTrip = tripDao.getTripById(tripId)
                     if (updatedTrip?.status == "TO_REVIEW") {
@@ -246,6 +251,7 @@ class TrackingService : Service(), LocationListener {
             }
         } ?: run {
             TrackingStatusStore.stopped("Tracking gestopt")
+            ZeppCompanionServer.stopIfNeeded()
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
@@ -750,6 +756,7 @@ class TrackingService : Service(), LocationListener {
         super.onDestroy()
         serviceJob.cancel()
         stopLocationUpdates()
+        ZeppCompanionServer.stopIfNeeded()
         TrackingStatusStore.stopped()
     }
 
