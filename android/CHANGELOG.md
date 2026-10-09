@@ -9,6 +9,7 @@ Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bi
 - **Vaste projecttarieven:** Het uurtarief wordt per projectcode ingesteld en gebruikt om gerealiseerde omzet te berekenen.
 - **Pro-rata jaartarget:** De instelbare datum in dienst bepaalt vanaf welke kalendermaand de jaartarget meetelt; indiensttreding in september geeft 4/12 van de jaartarget.
 - **Dashboardtargets:** Het getoonde doelbedrag en doeluren zijn nu ook naar rato aangepast aan de datum in dienst.
+- **In-app help:** Nieuwe uitleg toegevoegd over het instellen van uren- en omzetdoelen, projecttarieven en pro-rata berekening.
 
 ## [1.2.6] - 2026-10-09
 

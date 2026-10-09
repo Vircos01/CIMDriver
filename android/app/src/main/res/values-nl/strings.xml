@@ -186,6 +186,10 @@
     <string name="help_android_auto_desc">Koppel je telefoon aan je auto om Android Auto te activeren. Je kunt je actieve rit stoppen, recente ritten bekijken en beoordelen, Dynamics-rittypes kiezen en naar adressen navigeren. Android Auto gebruikt dezelfde classificatieregels als de hoofdapp.</string>
     <string name="help_backup_title">12. Backup, restore &amp; privacy</string>
     <string name="help_backup_desc">Een backup bevat de volledige database, inclusief ritten, adressen, werkuren, instellingen en classificatieregels. Na restore wordt een oudere database automatisch gemigreerd naar de huidige versie. Android-permissies worden niet meegenomen en moeten opnieuw worden gegeven. GPS-punten worden volgens de ingestelde bewaartermijn opgeruimd.</string>
+    <string name="help_targets_title">13. Uren- en omzetdoelen</string>
+    <string name="help_targets_desc">Stel een doel in via Instellingen → Werkuren → Targets. Kies of je op uren of omzet wilt sturen en koppel het doel eventueel aan een klant of projectcode. Voor omzet stel je het vaste uurtarief in bij Klanten &amp; Projectcodes; goedgekeurde werkuren worden tegen het tarief van hun project berekend.
+
+Stel je datum in dienst in bij Instellingen → Werkuren. Het jaardoel wordt dan vanaf de maand van indiensttreding naar rato berekend. Start je bijvoorbeeld op 1 september, dan is je target 4/12 van het volledige jaardoel. Het dashboard en het targetoverzicht tonen het aangepaste doel en de voortgang ten opzichte daarvan.</string>
     <!-- Settings Screen Strings -->
     <string name="settings_saved">Instellingen opgeslagen</string>
     <string name="notifications">Notificaties</string>

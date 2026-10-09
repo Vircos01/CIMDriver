@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.CallMerge
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
@@ -118,6 +119,12 @@ fun HelpScreen(onOpenDrawer: () -> Unit) {
                 icon = Icons.Filled.Settings,
                 title = stringResource(R.string.help_backup_title),
                 description = stringResource(R.string.help_backup_desc)
+            )
+
+            HelpSection(
+                icon = Icons.Filled.Flag,
+                title = stringResource(R.string.help_targets_title),
+                description = stringResource(R.string.help_targets_desc)
             )
         }
     }

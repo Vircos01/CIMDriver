@@ -18,7 +18,7 @@ android {
         applicationId = "com.cimdriver.app"
         minSdk = 29
         targetSdk = 37
-        versionCode = 25
+        versionCode = 26
         versionName = "1.2.7-${getGitHash(providers)}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

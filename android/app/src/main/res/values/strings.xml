@@ -186,6 +186,10 @@
     <string name="help_android_auto_desc">Connect your phone to your car to activate Android Auto. You can stop your active trip, view and review recent trips, choose Dynamics trip types and navigate to addresses. Android Auto uses the same classification rules as the main app.</string>
     <string name="help_backup_title">12. Backup, Restore &amp; Privacy</string>
     <string name="help_backup_desc">A backup contains the full database, including trips, addresses, work hours, settings and classification rules. After a restore, an older database is automatically migrated to the current version. Android permissions are not included and must be granted again. GPS points are cleaned up according to the configured retention period.</string>
+    <string name="help_targets_title">13. Hours and Revenue Targets</string>
+    <string name="help_targets_desc">Set a target via Settings → Work Hours → Targets. Choose whether to track hours or revenue and optionally link the target to a client or project code. For revenue targets, set the fixed hourly rate under Clients &amp; Project Codes; approved work hours are valued using the rate for their project.
+
+Set your employment start date under Settings → Work Hours. The annual target is prorated starting with your employment month. For example, a start date of September 1 gives you 4/12 of the full-year target. The dashboard and target overview show the adjusted target and progress toward it.</string>
     <!-- Settings Screen Strings -->
     <string name="settings_saved">Settings saved</string>
     <string name="notifications">Notifications</string>
