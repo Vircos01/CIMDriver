@@ -10,6 +10,8 @@ struct ManualTripEntryView: View {
     @Query private var vehicles: [Vehicle]
     @Query private var rules: [ClassificationRule]
     @Query private var settingsList: [AppSettings]
+    @Query private var favoriteRoutes: [FavoriteRoute]
+    @Query private var trips: [Trip]
 
     private var appSettings: AppSettings? { settingsList.first }
     
@@ -34,9 +36,43 @@ struct ManualTripEntryView: View {
     @State private var calculateTask: Task<Void, Never>?
     @State private var calculatedRoute: MKRoute?
     
+    private var uniqueProjectCodes: [String] {
+        Array(Set(trips.compactMap { $0.projectCode }).filter { !$0.isEmpty }).sorted()
+    }
+    
     var body: some View {
         NavigationStack {
             Form {
+                if !favoriteRoutes.isEmpty {
+                    Section(header: Text("Favoriete Routes")) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(favoriteRoutes) { route in
+                                    Button(action: {
+                                        startAddress = route.startAddress
+                                        endAddress = route.endAddress
+                                        tripType = route.tripType
+                                        if let pc = route.projectCode, !pc.isEmpty {
+                                            projectCode = pc
+                                        }
+                                    }) {
+                                        HStack {
+                                            Image(systemName: "star.fill")
+                                            Text(route.name)
+                                        }
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.accentColor.opacity(0.1))
+                                        .foregroundColor(.accentColor)
+                                        .cornerRadius(8)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+                
                 Section(header: Text("Voertuig")) {
                     Picker("Selecteer Voertuig", selection: $selectedVehicleId) {
                         Text("Geen voertuig geselecteerd").tag(UUID?.none)
@@ -87,7 +123,19 @@ struct ManualTripEntryView: View {
                     .pickerStyle(.segmented)
                     
                     if tripType == TripCategory.business.rawValue {
-                        TextField("Projectcode", text: $projectCode)
+                        HStack {
+                            TextField("Projectcode", text: $projectCode)
+                            if !uniqueProjectCodes.isEmpty {
+                                Menu {
+                                    ForEach(uniqueProjectCodes, id: \.self) { code in
+                                        Button(code) { projectCode = code }
+                                    }
+                                } label: {
+                                    Image(systemName: "chevron.down.circle")
+                                        .foregroundColor(.accentColor)
+                                }
+                            }
+                        }
                     }
                 }
                 

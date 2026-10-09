@@ -3,8 +3,8 @@ package com.cimdriver.app.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
@@ -21,7 +21,8 @@ fun VehicleItem(
     vehicle: Vehicle, 
     onEdit: (Vehicle) -> Unit,
     onRecalculate: (Vehicle) -> Unit = {},
-    onSetDefault: (Vehicle) -> Unit = {}
+    onSetDefault: (Vehicle) -> Unit = {},
+    onViewOdometerChecks: (Vehicle) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -42,7 +43,12 @@ fun VehicleItem(
                     Text(text = vehicle.name, style = MaterialTheme.typography.titleMedium)
                     if (vehicle.isDefault) {
                         Spacer(modifier = Modifier.width(4.dp))
-                        Icon(Icons.Filled.Star, contentDescription = stringResource(R.string.vehicle_default), tint = com.cimdriver.app.ui.theme.CIMDriverGreen, modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Filled.Star,
+                            contentDescription = stringResource(R.string.vehicle_default),
+                            tint = com.cimdriver.app.ui.theme.CIMDriverGreen,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
                 Text(text = "${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}", style = MaterialTheme.typography.bodyMedium)
@@ -50,6 +56,14 @@ fun VehicleItem(
             }
 
             Row {
+                // Odometer check history button
+                IconButton(onClick = { onViewOdometerChecks(vehicle) }) {
+                    Icon(
+                        Icons.Filled.Speed,
+                        contentDescription = "Km-controles bekijken",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 IconButton(onClick = { onSetDefault(vehicle) }) {
                     Icon(
                         if (vehicle.isDefault) Icons.Filled.Star else Icons.Outlined.Star, 

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import com.cimdriver.app.service.GeocoderService
 import com.cimdriver.app.data.local.entity.SavedAddress
+import com.cimdriver.app.data.local.entity.FavoriteRoute
 
 class TripDetailViewModel(application: Application) : AndroidViewModel(application) {
     private val database = AppDatabase.getDatabase(application)
@@ -24,6 +25,9 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
     private val geocoderService = GeocoderService(application)
 
     val savedAddresses: StateFlow<List<SavedAddress>> = savedAddressDao.getAllAddresses()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val projectCodes: StateFlow<List<String>> = tripDao.getUniqueProjectCodes()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _trip = MutableStateFlow<Trip?>(null)
@@ -108,11 +112,12 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveReview(tripType: String) {
+    fun saveReview(tripType: String, projectCode: String? = null) {
         val currentTrip = _trip.value ?: return
         viewModelScope.launch {
             val updatedTrip = currentTrip.copy(
                 tripType = tripType,
+                projectCode = projectCode,
                 status = "DONE"
             )
             tripDao.updateTrip(updatedTrip)
@@ -121,12 +126,13 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveReviewWithNote(tripType: String, note: String) {
+    fun saveReviewWithNote(tripType: String, note: String, projectCode: String? = null) {
         val currentTrip = _trip.value ?: return
         viewModelScope.launch {
             val updatedTrip = currentTrip.copy(
                 tripType = tripType,
                 note = note,
+                projectCode = projectCode,
                 status = "DONE"
             )
             tripDao.updateTrip(updatedTrip)
@@ -183,6 +189,23 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
             }
             
             _trip.value = updatedTrip
+        }
+    }
+
+    fun saveAsFavoriteRoute(name: String) {
+        val currentTrip = _trip.value ?: return
+        val startAddress = currentTrip.startAddress ?: return
+        val endAddress = currentTrip.endAddress ?: return
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            val route = FavoriteRoute(
+                name = name,
+                startAddress = startAddress,
+                endAddress = endAddress,
+                tripType = currentTrip.tripType,
+                projectCode = currentTrip.projectCode
+            )
+            database.favoriteRouteDao().insert(route)
         }
     }
 }

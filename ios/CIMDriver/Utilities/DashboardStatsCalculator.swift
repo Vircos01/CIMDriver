@@ -2,6 +2,40 @@ import Foundation
 
 struct DashboardStatsCalculator {
     
+    static func calculateProRataLimit(
+        yearlyLimit: Int,
+        inServiceDate: Date?,
+        endServiceDate: Date?
+    ) -> Int {
+        let cal = Calendar.current
+        let currentYear = cal.component(.year, from: Date())
+        
+        let startMonth: Int
+        if let inServiceDate = inServiceDate {
+            if cal.component(.year, from: inServiceDate) < currentYear {
+                startMonth = 1
+            } else {
+                startMonth = cal.component(.month, from: inServiceDate)
+            }
+        } else {
+            startMonth = 1
+        }
+        
+        let endMonth: Int
+        if let endServiceDate = endServiceDate {
+            if cal.component(.year, from: endServiceDate) > currentYear {
+                endMonth = 12
+            } else {
+                endMonth = cal.component(.month, from: endServiceDate)
+            }
+        } else {
+            endMonth = 12
+        }
+        
+        let monthsAvailable = max(0, min(12, endMonth - startMonth + 1))
+        return Int((Float(monthsAvailable) / 12.0) * Float(yearlyLimit))
+    }
+    
     static func classifyTrip(
         trip: Trip,
         addresses: [SavedAddress],
@@ -60,7 +94,10 @@ struct DashboardStatsCalculator {
         
         var ytdPriveMeters = 0
         
-        let activeVehicleId = selectedVehicleId ?? vehicleList.first(where: { $0.isDefault })?.id ?? vehicleList.first?.id
+        let allVehiclesId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let activeVehicleId = selectedVehicleId == allVehiclesId ? nil : (selectedVehicleId ?? vehicleList.first(where: { $0.isDefault })?.id ?? vehicleList.first?.id)
+        let activeVehicle = activeVehicleId != nil ? vehicleList.first(where: { $0.id == activeVehicleId }) : nil
+        let inServiceDate = activeVehicle?.inServiceDate ?? Date(timeIntervalSince1970: 0)
         let filteredTripList = activeVehicleId != nil ? tripList.filter { $0.vehicle?.id == activeVehicleId } : tripList
         
         for trip in filteredTripList {
@@ -92,7 +129,9 @@ struct DashboardStatsCalculator {
                     let meters = trip.distanceMeters
                     
                     if tripYear == currentYear && category == .privateTrip {
-                        ytdPriveMeters += meters
+                        if trip.startTime >= inServiceDate {
+                            ytdPriveMeters += meters
+                        }
                     }
                     
                     if isMatch {
@@ -150,7 +189,8 @@ struct DashboardStatsCalculator {
         let currentMonth = cal.component(.month, from: now)
         let currentYear = cal.component(.year, from: now)
         
-        let activeVehicleId = selectedVehicleId ?? vehicleList.first(where: { $0.isDefault })?.id ?? vehicleList.first?.id
+        let allVehiclesId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let activeVehicleId = selectedVehicleId == allVehiclesId ? nil : (selectedVehicleId ?? vehicleList.first(where: { $0.isDefault })?.id ?? vehicleList.first?.id)
         let filteredTripList = activeVehicleId != nil ? tripList.filter { $0.vehicle?.id == activeVehicleId } : tripList
         
         var items: [DistanceChartItem] = []

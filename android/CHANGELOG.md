@@ -2,6 +2,44 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.2.4] - 2026-10-02
+
+### Opgelost
+- **Zakelijke auto's:** De begin- en einddatum kunnen nu ook bij zakelijke voertuigen worden aangepast.
+- **PHEV-registratie:** Plug-in hybriden worden niet meer per ongeluk als alleen 'laden' behandeld; standaard blijft de registratie op tanken gericht, tenzij het voertuig puur elektrisch is.
+- **UI:** De voertuig- en tank-/laadregistratie zijn consistent afgestemd op het type auto.
+
+## [1.2.3] - 2026-10-02
+
+### Opgelost
+- **Voertuigdata:** Het aanpassen van de begin- en einddatum bij een bestaande auto werkt nu weer correct, ook als de waarschuwing voor privégebruik is uitgeschakeld.
+- **UI:** De datumvelden blijven zichtbaar en kunnen direct worden aangepast of gewist vanuit de voertuiginstellingen.
+
+## [1.2.2] - 2026-10-02
+
+### Toegevoegd
+- **Kilometercontroles:** Nieuw scherm voor maandelijkse km-controles per voertuig, met een overzicht van alle historische controles.
+- **OCR voor km-stand:** Fotos van de kilometerstand kunnen nu automatisch worden gelezen met ML Kit, zodat de invoer sneller en robuuster verloopt.
+- **Voertuigwerkstroom:** Verbeterde navigatie en voertuigdetails voor het bekijken en beheren van odometer-controles.
+
+## [1.2.1] - 2026-10-02
+
+### Opgelost
+- **Taal:** Ontbrekende Nederlandse vertaling ("Tanken / Laden") in het navigatiemenu toegevoegd in plaats van "Fuel".
+
+## [1.2.0] - 2026-10-02
+
+### Toegevoegd
+- **Tankbeurten en Laadsessies:** Nieuwe functionaliteit toegevoegd voor het registreren van brandstof tankbeurten en EV laadsessies, inclusief een handig overzicht in het hoofdmenu.
+- **Proximity Detectie:** Automatische herkenning en opbouw van een tankbeurt of laadsessie na langdurige stilstand bij een tankstation of laadpaal (vereist achtergrondlocatie).
+- **Fiscale Kilometergrens:** Bij privéauto's kan nu de datum ingebruikname worden ingesteld zodat de maximale grens van 500 privékilometers pro-rata (naar rato) wordt berekend voor het huidige jaar.
+- **Verbeterde Voertuig Selectie:** Uniforme voertuig selectie widget in alle schermen geïmplementeerd.
+
+## [1.1.5] - 2026-10-01
+
+### Toegevoegd
+- **Classificatieregels:** Auto-aanvullen en adresboek selectie toegevoegd voor classificatieregels. Vanaf nu kun je net als bij ritten eenvoudig adressen selecteren uit je adresboek.
+
 ## [1.1.4] - 2026-09-24
 
 ### Opgelost

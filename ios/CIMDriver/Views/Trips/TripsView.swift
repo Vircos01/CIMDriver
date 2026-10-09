@@ -18,6 +18,7 @@ struct TripsView: View {
     @State private var selection = Set<Trip>()
     @State private var isEditing = false
     @State private var showingMergeAlert = false
+    @State private var viewMode: String = "Lijst"
     
     private var filteredTrips: [Trip] {
         switch filter {
@@ -58,16 +59,27 @@ struct TripsView: View {
                 .pickerStyle(.segmented)
                 .padding()
                 
-                if isEditing {
-                    List(selection: $selection) {
-                        tripListContent
-                    }
-                    .environment(\.editMode, .constant(.active))
+                Picker("Weergave", selection: $viewMode) {
+                    Text("Lijst").tag("Lijst")
+                    Text("Kalender").tag("Kalender")
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                
+                if viewMode == "Kalender" {
+                    TripsCalendarView(trips: filteredTrips)
                 } else {
-                    List {
-                        tripListContent
+                    if isEditing {
+                        List(selection: $selection) {
+                            tripListContent
+                        }
+                        .environment(\.editMode, .constant(.active))
+                    } else {
+                        List {
+                            tripListContent
+                        }
+                        .environment(\.editMode, .constant(.inactive))
                     }
-                    .environment(\.editMode, .constant(.inactive))
                 }
                 
                 if isEditing && !selection.isEmpty {

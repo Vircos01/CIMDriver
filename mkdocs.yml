@@ -1,9 +1,10 @@
 site_name: CIMDriver
-site_description: De moderne en slimme ritten- en werkurenregistratie app voor Android
+site_description: De moderne en slimme ritten- en werkurenregistratie app voor Android en iOS
 site_author: Remco Visser
 repo_url: https://github.com/Vircos01/CIMDriver
 site_url: https://vircos01.github.io/CIMDriver/
 copyright: Copyright &copy; 2026 CIMDriver
+
 
 extra:
   social:
@@ -73,14 +74,13 @@ nav:
       - Android: download/android.md
       - iOS: download/ios.md
   - Screenshots: screenshots.md
-  - Over de App:
-      - Android: over-de-app/android.md
-      - iOS: over-de-app/ios.md
+
   - Documentatie:
+      - Documentatie Overzicht: intro.md
       - Android:
           - Onboarding:
               - Startgids: 00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS.md
-              - Documentatie Overzicht: intro.md
+
               - Overzicht: 00-intro/overview.md
               - Begrippenlijst: 00-intro/glossary.md
           - Architectuur:
@@ -118,7 +118,7 @@ nav:
       - iOS:
           - Onboarding:
               - Startgids: ios/00-intro/ONBOARDING-NIEUWE-ONTWIKKELAARS.md
-              - Documentatie Overzicht: ios/README.md
+
               - Overzicht: ios/00-intro/overview.md
               - Begrippenlijst: ios/00-intro/glossary.md
               - Lokale Installatie: ios/local-install.md
@@ -161,3 +161,69 @@ nav:
       - Android: changelog/android.md
       - iOS: changelog/ios.md
   - Licentie: licentie.md
+
+plugins:
+  - search
+  - i18n:
+      reconfigure_material: true
+      languages:
+        - locale: nl
+          name: Nederlands
+          default: true
+          build: true
+        - locale: en
+          name: English
+          build: true
+          nav_translations:
+            Home: Home
+            Download & Installatie: Download & Install
+            Android: Android
+            iOS: iOS
+            Screenshots: Screenshots
+            Documentatie: Documentation
+            Documentatie Overzicht: Documentation Overview
+            Onboarding: Onboarding
+            Startgids: Getting Started
+            Overzicht: Overview
+            Begrippenlijst: Glossary
+            Lokale Installatie: Local Install
+            Architectuur: Architecture
+            Architectuurdiagram: Architecture Diagram
+            Manifest en permissies: Manifest and permissions
+            Capabilities en permissies: Capabilities and permissions
+            State- en lifecyclemodellen: State and lifecycle models
+            Procesflows: Process flows
+            Runtime: Runtime
+            Tracking en herstel: Tracking and recovery
+            Achtergrondtaken: Background jobs
+            Diagnostiek: Diagnostics
+            Runbooks: Runbooks
+            Teststrategie: Test strategy
+            Data: Data
+            Gegevensmodel: Data model
+            Data-referentie: Data reference
+            Entity & DAO: Entity & DAO
+            Repository & Storage: Repository & Storage
+            UI: UI
+            Schermen en navigatie: Screens and navigation
+            UI-referentie: UI reference
+            ViewModel-referentie: ViewModel reference
+            Widgets: Widgets
+            Widget-referentie: Widget reference
+            Components: Components
+            Component-referentie: Component reference
+            Integraties: Integrations
+            Android Auto: Android Auto
+            Apple CarPlay: Apple CarPlay
+            Car-referentie: Car reference
+            Integration-referentie: Integration reference
+            Referentie: Reference
+            Core: Core
+            Service: Service
+            Utility: Utility
+            Worker: Worker
+            Background Task: Background Task
+            Codecatalogus: Code catalog
+            FAQ: FAQ
+            Wat is er nieuw?: What's new?
+            Licentie: License

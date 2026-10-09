@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.cimdriver.app.data.local.dao.VehicleDao
 import com.cimdriver.app.data.local.dao.BluetoothDeviceDao
 import com.cimdriver.app.data.local.dao.TripDao
+import com.cimdriver.app.data.local.dao.OdometerCheckDao
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ import com.cimdriver.app.data.local.AppDatabase
 import com.cimdriver.app.data.local.entity.BluetoothDevice
 import com.cimdriver.app.data.local.entity.Vehicle
 import com.cimdriver.app.data.local.entity.Trip
+import com.cimdriver.app.data.local.entity.OdometerCheck
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +31,7 @@ class VehiclesViewModel @Inject constructor(
     private val vehicleDao: VehicleDao,
     private val bluetoothDeviceDao: BluetoothDeviceDao,
     private val tripDao: TripDao,
+    private val odometerCheckDao: OdometerCheckDao,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -38,7 +41,7 @@ class VehiclesViewModel @Inject constructor(
     private val _selectedVehicle = MutableStateFlow<Vehicle?>(null)
     val selectedVehicle: StateFlow<Vehicle?> = _selectedVehicle.asStateFlow()
 
-    fun addVehicle(name: String, licensePlate: String, make: String, model: String, odometerStart: Int, odometerCurrent: Int, usageType: String, notes: String?, privateKmYearlyLimit: Int, showPrivateKmWarning: Boolean, odometerCorrectionStrategy: String) {
+    fun addVehicle(name: String, licensePlate: String, make: String, model: String, odometerStart: Int, odometerCurrent: Int, usageType: String, notes: String?, privateKmYearlyLimit: Int, showPrivateKmWarning: Boolean, odometerCorrectionStrategy: String, inServiceDate: Long?, endServiceDate: Long?, engineType: String) {
         viewModelScope.launch {
             val newVehicle = Vehicle(
                 name = name,
@@ -52,13 +55,16 @@ class VehiclesViewModel @Inject constructor(
                 usageType = usageType,
                 privateKmYearlyLimit = privateKmYearlyLimit,
                 showPrivateKmWarning = showPrivateKmWarning,
-                odometerCorrectionStrategy = odometerCorrectionStrategy
+                odometerCorrectionStrategy = odometerCorrectionStrategy,
+                inServiceDate = inServiceDate,
+                endServiceDate = endServiceDate,
+                engineType = engineType
             )
             vehicleDao.insertVehicle(newVehicle)
         }
     }
 
-    fun updateVehicle(vehicle: Vehicle, name: String, licensePlate: String, make: String, model: String, odometerStart: Int, odometerCurrent: Int, usageType: String, notes: String?, privateKmYearlyLimit: Int, showPrivateKmWarning: Boolean, odometerCorrectionStrategy: String) {
+    fun updateVehicle(vehicle: Vehicle, name: String, licensePlate: String, make: String, model: String, odometerStart: Int, odometerCurrent: Int, usageType: String, notes: String?, privateKmYearlyLimit: Int, showPrivateKmWarning: Boolean, odometerCorrectionStrategy: String, inServiceDate: Long?, endServiceDate: Long?, engineType: String) {
         viewModelScope.launch {
             val updatedVehicle = vehicle.copy(
                 name = name,
@@ -71,7 +77,10 @@ class VehiclesViewModel @Inject constructor(
                 notes = notes,
                 privateKmYearlyLimit = privateKmYearlyLimit,
                 showPrivateKmWarning = showPrivateKmWarning,
-                odometerCorrectionStrategy = odometerCorrectionStrategy
+                odometerCorrectionStrategy = odometerCorrectionStrategy,
+                inServiceDate = inServiceDate,
+                endServiceDate = endServiceDate,
+                engineType = engineType
             )
             vehicleDao.updateVehicle(updatedVehicle)
         }
@@ -106,12 +115,26 @@ class VehiclesViewModel @Inject constructor(
         }
     }
 
-    fun confirmOdometerCheck(vehicle: Vehicle, correctedOdometer: Int) {
+    fun getChecksForVehicle(vehicleId: Long) = odometerCheckDao.getChecksForVehicle(vehicleId)
+
+    fun confirmOdometerCheck(vehicle: Vehicle, correctedOdometer: Int, photoPath: String? = null) {
         viewModelScope.launch {
+            val timestamp = System.currentTimeMillis()
+            
+            // Record the check in the history
+            val check = OdometerCheck(
+                vehicleId = vehicle.id,
+                timestamp = timestamp,
+                registeredOdometer = vehicle.odometerCurrent,
+                correctedOdometer = correctedOdometer,
+                photoPath = photoPath
+            )
+            odometerCheckDao.insert(check)
+            
             val gap = correctedOdometer - vehicle.odometerCurrent
             if (gap == 0) {
                 val updatedVehicle = vehicle.copy(
-                    lastOdometerCheckTimestamp = System.currentTimeMillis()
+                    lastOdometerCheckTimestamp = timestamp
                 )
                 vehicleDao.updateVehicle(updatedVehicle)
                 return@launch
@@ -166,7 +189,7 @@ class VehiclesViewModel @Inject constructor(
 
             val updatedVehicle = vehicle.copy(
                 odometerCurrent = correctedOdometer,
-                lastOdometerCheckTimestamp = System.currentTimeMillis()
+                lastOdometerCheckTimestamp = timestamp
             )
             vehicleDao.updateVehicle(updatedVehicle)
         }

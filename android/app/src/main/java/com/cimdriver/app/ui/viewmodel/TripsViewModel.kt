@@ -85,6 +85,13 @@ class TripsViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    val favoriteRoutes: StateFlow<List<com.cimdriver.app.data.local.entity.FavoriteRoute>> = tripRepository.getAllFavoriteRoutes()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     private val _dismissedMerges = MutableStateFlow<Set<Pair<Long, Long>>>(emptySet())
 
     fun acceptMerge(trip1: Trip, trip2: Trip) {
@@ -195,6 +202,13 @@ class TripsViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    val projectCodes: StateFlow<List<String>> = tripRepository.getUniqueProjectCodes()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     private val _dashboardTimeFilter = MutableStateFlow(TimeFilter.MONTH)
     val dashboardTimeFilter: StateFlow<TimeFilter> = _dashboardTimeFilter.asStateFlow()
 
@@ -211,7 +225,7 @@ class TripsViewModel @Inject constructor(
 
     val mergeSuggestion: StateFlow<Pair<Trip, Trip>?> = kotlinx.coroutines.flow.combine(trips, _dismissedMerges, _globalSelectedVehicleId, vehicles) { tripList, dismissed, selectedVehicleId, vehicleList ->
         var suggestion: Pair<Trip, Trip>? = null
-        val activeVehicleId = selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id
+        val activeVehicleId = if (selectedVehicleId == -1L) null else (selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id)
         
         val vehicleTrips = tripList.filter { it.vehicleId == activeVehicleId }
         
@@ -249,7 +263,7 @@ class TripsViewModel @Inject constructor(
         val rules = context.rules
         val addresses = context.addresses
         val (filter, year, query) = filters
-        val activeVehicleId = selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id
+        val activeVehicleId = if (selectedVehicleId == -1L) null else (selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id)
         
         tripList.filter {
             val isVehicleMatch = if (activeVehicleId != null) it.vehicleId == activeVehicleId else true
@@ -355,7 +369,7 @@ class TripsViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DashboardUiState())
 
-    fun addManualTrip(vehicleId: Long?, startAddress: String, endAddress: String, distanceKm: Double, type: String, startTime: Long = System.currentTimeMillis(), endTime: Long = startTime + (1000 * 60 * 30), note: String? = null) {
+    fun addManualTrip(vehicleId: Long?, startAddress: String, endAddress: String, distanceKm: Double, type: String, startTime: Long = System.currentTimeMillis(), endTime: Long = startTime + (1000 * 60 * 30), note: String? = null, projectCode: String? = null) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             android.util.Log.d("CIMDriver", "addManualTrip started for $startAddress to $endAddress")
             var odoStart = 0
@@ -390,6 +404,7 @@ class TripsViewModel @Inject constructor(
                 odometerEnd = odoEnd,
                 status = TripStatus.DONE.value,
                 note = note,
+                projectCode = projectCode,
                 isManual = true
             )
             try {
@@ -433,7 +448,7 @@ class TripsViewModel @Inject constructor(
         }
     }
 
-    fun updateManualTrip(tripId: Long, vehicleId: Long?, startAddress: String, endAddress: String, distanceKm: Double, type: String, startTime: Long, endTime: Long, note: String? = null) {
+    fun updateManualTrip(tripId: Long, vehicleId: Long?, startAddress: String, endAddress: String, distanceKm: Double, type: String, startTime: Long, endTime: Long, note: String? = null, projectCode: String? = null) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             val existingTrip = tripRepository.getTripById(tripId)
             if (existingTrip != null) {
@@ -454,6 +469,7 @@ class TripsViewModel @Inject constructor(
                     startTime = startTime,
                     endTime = endTime,
                     note = note,
+                    projectCode = projectCode,
                     odometerEnd = existingTrip.odometerStart +
                         TripDistance.metersToOdometerKilometers(distanceM)
                 )
@@ -496,35 +512,43 @@ class TripsViewModel @Inject constructor(
         }
     }
 
-    fun mergeTrips(trip1: Trip, trip2: Trip) {
+    fun mergeTrips(trips: List<Trip>) {
+        if (trips.size < 2) return
         viewModelScope.launch {
-            val firstTrip = if (trip1.startTime < trip2.startTime) trip1 else trip2
-            val secondTrip = if (trip1.startTime < trip2.startTime) trip2 else trip1
+            val sortedTrips = trips.sortedBy { it.startTime }
+            val firstTrip = sortedTrips.first()
+            val lastTrip = sortedTrips.last()
+            
+            val totalDistance = sortedTrips.sumOf { it.distanceMeters }
+            val isManual = sortedTrips.all { it.isManual }
+            val dominantType = sortedTrips.firstOrNull { it.tripType != "UNCLASSIFIED" }?.tripType ?: "UNCLASSIFIED"
+            val combinedNotes = sortedTrips.mapNotNull { it.note }.filter { it.isNotBlank() }.joinToString("\n")
+            val defaultNote = "Samengevoegd uit ${sortedTrips.size} ritten (${totalDistance / 1000.0}km)"
 
             val mergedTrip = Trip(
-                vehicleId = firstTrip.vehicleId ?: secondTrip.vehicleId,
+                vehicleId = firstTrip.vehicleId,
                 startTime = firstTrip.startTime,
-                endTime = secondTrip.endTime ?: secondTrip.startTime,
+                endTime = lastTrip.endTime ?: lastTrip.startTime,
                 startAddress = firstTrip.startAddress,
-                endAddress = secondTrip.endAddress,
-                distanceMeters = firstTrip.distanceMeters + secondTrip.distanceMeters,
-                tripType = "UNCLASSIFIED",
-                note = "Samengevoegd: ${firstTrip.distanceMeters/1000.0}km + ${secondTrip.distanceMeters/1000.0}km",
+                endAddress = lastTrip.endAddress ?: firstTrip.endAddress,
+                distanceMeters = totalDistance,
+                tripType = dominantType,
+                note = if (combinedNotes.isNotBlank()) combinedNotes else defaultNote,
                 status = TripStatus.TO_REVIEW.value,
-                isManual = firstTrip.isManual && secondTrip.isManual,
-                odometerStart = firstTrip.odometerStart,
-                odometerEnd = secondTrip.odometerEnd ?: TripDistance.updatedOdometer(
-                    firstTrip.odometerStart, firstTrip.distanceMeters + secondTrip.distanceMeters
+                isManual = isManual,
+                odometerStart = sortedTrips.map { it.odometerStart }.minOrNull() ?: firstTrip.odometerStart,
+                odometerEnd = sortedTrips.mapNotNull { it.odometerEnd }.maxOrNull() ?: TripDistance.updatedOdometer(
+                    firstTrip.odometerStart, totalDistance
                 )
             )
 
             val newTripId = tripRepository.insertTrip(mergedTrip)
             val pointDao = database.locationPointDao()
-            pointDao.updatePointsTripId(firstTrip.id, newTripId)
-            pointDao.updatePointsTripId(secondTrip.id, newTripId)
             
-            tripRepository.deleteTrip(firstTrip)
-            tripRepository.deleteTrip(secondTrip)
+            sortedTrips.forEach { trip ->
+                pointDao.updatePointsTripId(trip.id, newTripId)
+                tripRepository.deleteTrip(trip)
+            }
         }
     }
 

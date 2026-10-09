@@ -236,7 +236,6 @@ class TrackingService : Service(), LocationListener {
                     recoveryManager.clearRecoveryAttempts(tripId)
                     TrackingStatusStore.stopped("Rit succesvol afgerond")
                     ZeppCompanionServer.stopIfNeeded()
-
                     // Fetch the updated trip to see if it still needs review
                     val updatedTrip = tripDao.getTripById(tripId)
                     if (updatedTrip?.status == "TO_REVIEW") {
@@ -577,7 +576,7 @@ class TrackingService : Service(), LocationListener {
                 val fuelFillUp = com.cimdriver.app.data.local.entity.FuelFillUp(
                     vehicleId = vehicleId,
                     dateTimestamp = System.currentTimeMillis(),
-                    litersPurchased = 0.0,
+                    liters = 0.0,
                     pricePerLiter = 0.0,
                     totalCost = 0.0,
                     odometer = odoEnd,

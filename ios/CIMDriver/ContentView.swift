@@ -5,7 +5,8 @@ enum AppTab: Int, Hashable {
     case dashboard = 0
     case trips = 1
     case workHours = 2
-    case settings = 3
+    case fuel = 3
+    case settings = 4
 }
 
 struct ContentView: View {
@@ -28,6 +29,7 @@ struct ContentView: View {
     @State private var dashboardNavigationID = UUID()
     @State private var tripsNavigationID = UUID()
     @State private var workHoursNavigationID = UUID()
+    @State private var fuelNavigationID = UUID()
     @State private var settingsNavigationID = UUID()
     
     var body: some View {
@@ -52,6 +54,13 @@ struct ContentView: View {
                     Label("Uren", systemImage: "clock.fill")
                 }
                 .tag(AppTab.workHours)
+            
+            FuelView()
+                .id(fuelNavigationID)
+                .tabItem {
+                    Label("Brandstof", systemImage: "fuelpump.fill")
+                }
+                .tag(AppTab.fuel)
             
             SettingsView()
                 .id(settingsNavigationID)
@@ -85,6 +94,8 @@ struct ContentView: View {
             tripsNavigationID = UUID()
         case .workHours:
             workHoursNavigationID = UUID()
+        case .fuel:
+            fuelNavigationID = UUID()
         case .settings:
             settingsNavigationID = UUID()
         }

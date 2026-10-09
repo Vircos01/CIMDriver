@@ -88,7 +88,10 @@ struct ModelContainerSetup {
             SavedAddress.self,
             WorkDay.self,
             ClassificationRule.self,
-            AppSettings.self
+            AppSettings.self,
+            FavoriteRoute.self,
+            OdometerCheck.self,
+            FuelFillUp.self
         ])
         
         let fileManager = FileManager.default

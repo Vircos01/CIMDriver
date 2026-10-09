@@ -11,6 +11,7 @@
     <string name="add_vehicle">Add Vehicle</string>
     <string name="delete_vehicle">Delete Vehicle</string>
     <string name="vehicles">Vehicles</string>
+    <string name="fuel">Fuel / Charging</string>
     <string name="vehicle_details">Vehicle Details</string>
     <string name="understood_close">Understood, close</string>
     <string name="review_recent_trips">Review and rate your recent trips</string>
@@ -42,6 +43,7 @@
     <string name="no_recent_trips">No recent trips found</string>
     <string name="no_results">No results</string>
     <string name="no_vehicles">No vehicles</string>
+    <string name="all_vehicles">All vehicles</string>
     <string name="no_work_hours">No work hours registered.</string>
     <string name="mixed">Mixed</string>
     <string name="selected">Selected</string>

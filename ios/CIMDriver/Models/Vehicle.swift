@@ -17,11 +17,13 @@ final class Vehicle {
     var lastOdometerCheckTimestamp: Date?
     var isDefault: Bool
     var odometerCorrectionStrategy: String // "DISTRIBUTE", "CREATE_TRIP", "LEAVE_GAP"
+    var inServiceDate: Date?
+    var endServiceDate: Date?
 
     @Relationship(deleteRule: .cascade) var bluetoothDevices: [BluetoothDevice] = []
     @Relationship(deleteRule: .nullify) var trips: [Trip] = []
 
-    init(id: UUID = UUID(), name: String, licensePlate: String, make: String, model: String, year: String? = nil, odometerStart: Int, odometerCurrent: Int, privateKmYearlyLimit: Int = 500, showPrivateKmWarning: Bool = true, usageType: String = "MIXED", lastOdometerCheckTimestamp: Date? = nil, isDefault: Bool = false, odometerCorrectionStrategy: String = "DISTRIBUTE") {
+    init(id: UUID = UUID(), name: String, licensePlate: String, make: String, model: String, year: String? = nil, odometerStart: Int, odometerCurrent: Int, privateKmYearlyLimit: Int = 500, showPrivateKmWarning: Bool = true, usageType: String = "MIXED", lastOdometerCheckTimestamp: Date? = nil, isDefault: Bool = false, odometerCorrectionStrategy: String = "DISTRIBUTE", inServiceDate: Date? = nil, endServiceDate: Date? = nil) {
         self.id = id
         self.name = name
         self.licensePlate = licensePlate
@@ -36,5 +38,7 @@ final class Vehicle {
         self.lastOdometerCheckTimestamp = lastOdometerCheckTimestamp
         self.isDefault = isDefault
         self.odometerCorrectionStrategy = odometerCorrectionStrategy
+        self.inServiceDate = inServiceDate
+        self.endServiceDate = endServiceDate
     }
 }

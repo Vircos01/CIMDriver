@@ -144,9 +144,12 @@ dependencies {
     // Coil for image loading (odometer check photo thumbnails)
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+<<<<<<< HEAD
     // Local summary endpoint for Zepp OS companion app
     implementation("org.nanohttpd:nanohttpd:2.3.1")
 
+=======
+>>>>>>> origin/main
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.kotlin)

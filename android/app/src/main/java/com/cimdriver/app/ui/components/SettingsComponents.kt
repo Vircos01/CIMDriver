@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -241,7 +242,9 @@ fun TripTypeSettingsCard(
 fun ClassificationSettingsCard(
     viewModel: SettingsViewModel,
     settings: com.cimdriver.app.data.local.entity.Settings,
-    rules: List<com.cimdriver.app.data.local.entity.ClassificationRule>
+    rules: List<com.cimdriver.app.data.local.entity.ClassificationRule>,
+    savedAddresses: List<com.cimdriver.app.data.local.entity.SavedAddress>,
+    onSearchAddress: suspend (String) -> List<String>
 ) {
     var editingRule by remember { mutableStateOf<com.cimdriver.app.data.local.entity.ClassificationRule?>(null) }
 
@@ -349,8 +352,63 @@ fun ClassificationSettingsCard(
                     OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.name_label)) }, singleLine = true)
                     OutlinedTextField(startType, { startType = it }, label = { Text(stringResource(R.string.start_address_type_optional)) }, singleLine = true)
                     OutlinedTextField(endType, { endType = it }, label = { Text(stringResource(R.string.end_address_type_optional)) }, singleLine = true)
-                    OutlinedTextField(startAddr, { startAddr = it }, label = { Text("Exact Start Adres (optioneel)") }, singleLine = true)
-                    OutlinedTextField(endAddr, { endAddr = it }, label = { Text("Exact Eind Adres (optioneel)") }, singleLine = true)
+                    var startAddressBookExpanded by remember { mutableStateOf(false) }
+                    com.cimdriver.app.ui.screens.AutoCompleteAddressField(
+                        value = startAddr,
+                        onValueChange = { startAddr = it },
+                        label = "Exact Start Adres (optioneel)",
+                        onSearchAddress = { query -> onSearchAddress(query) },
+                        trailingIcon = {
+                            Box {
+                                IconButton(onClick = { startAddressBookExpanded = true }) {
+                                    Icon(Icons.Filled.Contacts, contentDescription = "Adresboek")
+                                }
+                                DropdownMenu(expanded = startAddressBookExpanded, onDismissRequest = { startAddressBookExpanded = false }) {
+                                    if (savedAddresses.isEmpty()) {
+                                        DropdownMenuItem(text = { Text(stringResource(R.string.no_saved_addresses)) }, onClick = { startAddressBookExpanded = false })
+                                    }
+                                    savedAddresses.forEach { addr ->
+                                        DropdownMenuItem(
+                                            text = { Text(addr.label) },
+                                            onClick = {
+                                                startAddr = addr.address
+                                                startAddressBookExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    )
+                    
+                    var endAddressBookExpanded by remember { mutableStateOf(false) }
+                    com.cimdriver.app.ui.screens.AutoCompleteAddressField(
+                        value = endAddr,
+                        onValueChange = { endAddr = it },
+                        label = "Exact Eind Adres (optioneel)",
+                        onSearchAddress = { query -> onSearchAddress(query) },
+                        trailingIcon = {
+                            Box {
+                                IconButton(onClick = { endAddressBookExpanded = true }) {
+                                    Icon(Icons.Filled.Contacts, contentDescription = "Adresboek")
+                                }
+                                DropdownMenu(expanded = endAddressBookExpanded, onDismissRequest = { endAddressBookExpanded = false }) {
+                                    if (savedAddresses.isEmpty()) {
+                                        DropdownMenuItem(text = { Text(stringResource(R.string.no_saved_addresses)) }, onClick = { endAddressBookExpanded = false })
+                                    }
+                                    savedAddresses.forEach { addr ->
+                                        DropdownMenuItem(
+                                            text = { Text(addr.label) },
+                                            onClick = {
+                                                endAddr = addr.address
+                                                endAddressBookExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    )
                     OutlinedTextField(tripType, { tripType = it }, label = { Text(stringResource(R.string.dynamics_trip_type_optional)) }, singleLine = true)
                     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                         listOf("BUSINESS" to stringResource(R.string.business), "PRIVATE" to stringResource(R.string.private_usage), "COMMUTE" to "Woon-werk").forEachIndexed { index, option ->

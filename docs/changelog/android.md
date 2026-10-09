@@ -6,7 +6,31 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.1.4 (Huidige Versie)
+## Versie 1.2.4 (Huidige Versie)
+
+!!! bug "Bugfix"
+    * **Zakelijke auto's:** De begin- en einddatum kunnen nu ook bij zakelijke voertuigen worden aangepast.
+    * **PHEV-registratie:** Plug-in hybriden worden niet meer per ongeluk als alleen 'laden' behandeld; standaard blijft de registratie op tanken gericht, tenzij het voertuig puur elektrisch is.
+    * **Consistentie:** De voertuig- en tank-/laadregistratie zijn nu beter afgestemd op het type auto.
+
+---
+
+## Versie 1.2.3
+
+!!! bug "Bugfix"
+    * **Bestaande auto:** Het aanpassen van de begin- en einddatum bij een bestaande auto werkt nu weer correct, ook als de waarschuwing voor privégebruik is uitgeschakeld.
+    * **Datumvelden:** De velden blijven zichtbaar en kunnen direct worden aangepast of gewist vanuit de voertuiginstellingen.
+
+---
+
+## Versie 1.1.5
+
+!!! success "Nieuw"
+    * **Classificatieregels:** Auto-aanvullen en adresboek selectie toegevoegd. Vanaf nu kun je net als bij ritten eenvoudig adressen selecteren uit je adresboek bij het instellen van regels.
+
+---
+
+## Versie 1.1.4
 
 !!! success "Nieuw"
     * **Documentatie:** Release notes zijn bijgewerkt met een waarschuwing over de back-up functionaliteit, en de structuur van het project is verbeterd.

@@ -16,6 +16,32 @@ import java.util.Calendar
 
 object DashboardStatsCalculator {
 
+    fun calculateProRataLimit(
+        yearlyLimit: Int,
+        inServiceDate: Long?,
+        endServiceDate: Long?
+    ): Int {
+        val cal = Calendar.getInstance()
+        val currentYear = cal.get(Calendar.YEAR)
+        
+        // Determine start month
+        val startMonth = if (inServiceDate != null) {
+            val startCal = Calendar.getInstance().apply { timeInMillis = inServiceDate }
+            if (startCal.get(Calendar.YEAR) < currentYear) 1 
+            else startCal.get(Calendar.MONTH) + 1
+        } else 1
+
+        // Determine end month
+        val endMonth = if (endServiceDate != null) {
+            val endCal = Calendar.getInstance().apply { timeInMillis = endServiceDate }
+            if (endCal.get(Calendar.YEAR) > currentYear) 12
+            else endCal.get(Calendar.MONTH) + 1
+        } else 12
+
+        val monthsAvailable = (endMonth - startMonth + 1).coerceIn(0, 12)
+        return (monthsAvailable.toFloat() / 12f * yearlyLimit).toInt()
+    }
+
     fun classifyTrip(
         trip: Trip,
         addresses: List<SavedAddress>,
@@ -83,8 +109,10 @@ object DashboardStatsCalculator {
         
         var ytdPriveMeters = 0
         
-        val activeVehicleId = selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id
+        val activeVehicleId = if (selectedVehicleId == -1L) null else (selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id)
+        val activeVehicle = vehicleList.find { it.id == activeVehicleId }
         val filteredTripList = if (activeVehicleId != null) tripList.filter { it.vehicleId == activeVehicleId } else tripList
+        val inServiceDate = activeVehicle?.inServiceDate ?: 0L
         
         filteredTripList.forEach { trip ->
             val status = TripStatus.from(trip.status)
@@ -109,7 +137,9 @@ object DashboardStatsCalculator {
                     val category = classifyTrip(trip, addresses, rules, settings)
                     
                     if (cal.get(Calendar.YEAR) == currentYear && category == TripCategory.PRIVATE) {
-                        ytdPriveMeters += trip.distanceMeters
+                        if (trip.startTime >= inServiceDate) {
+                            ytdPriveMeters += trip.distanceMeters
+                        }
                     }
 
                     if (isMatch) {
@@ -166,7 +196,7 @@ object DashboardStatsCalculator {
         val currentMonth = calNow.get(Calendar.MONTH)
         val currentYear = calNow.get(Calendar.YEAR)
         
-        val activeVehicleId = selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id
+        val activeVehicleId = if (selectedVehicleId == -1L) null else (selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id)
         val filteredTripList = if (activeVehicleId != null) tripList.filter { it.vehicleId == activeVehicleId } else tripList
         
         var totalDistanceMeters = 0
@@ -220,7 +250,7 @@ object DashboardStatsCalculator {
         val currentMonth = calNow.get(Calendar.MONTH)
         val currentYear = calNow.get(Calendar.YEAR)
         
-        val activeVehicleId = selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id
+        val activeVehicleId = if (selectedVehicleId == -1L) null else (selectedVehicleId ?: (vehicleList.find { it.isDefault } ?: vehicleList.firstOrNull())?.id)
         val filteredTripList = if (activeVehicleId != null) tripList.filter { it.vehicleId == activeVehicleId } else tripList
         
         val items = mutableListOf<DistanceChartItem>()

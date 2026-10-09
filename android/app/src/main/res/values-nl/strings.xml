@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <resources>
     <string name="app_name">CIMDriver</string>
+    <string name="fuel">Tanken / Laden</string>
     <string name="delete_address">Adres verwijderen</string>
     <string name="address_book">Adresboek</string>
     <string name="loading_address_book">Adresboek laden...</string>
@@ -42,6 +43,7 @@
     <string name="no_recent_trips">Geen recente ritten gevonden</string>
     <string name="no_results">Geen resultaten</string>
     <string name="no_vehicles">Geen voertuigen</string>
+    <string name="all_vehicles">Alle voertuigen</string>
     <string name="no_work_hours">Geen werkuren geregistreerd.</string>
     <string name="mixed">Gemengd</string>
     <string name="selected">Geselecteerd</string>

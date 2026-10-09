@@ -24,7 +24,10 @@ data class Vehicle(
     val engineType: String = "ICE", // "ICE", "PHEV", "EV"
     val lastOdometerCheckTimestamp: Long = 0L,
     val isDefault: Boolean = false,
-    val odometerCorrectionStrategy: String = "DISTRIBUTE" // "DISTRIBUTE", "CREATE_TRIP", "LEAVE_GAP"
+    val odometerCorrectionStrategy: String = "DISTRIBUTE", // "DISTRIBUTE", "CREATE_TRIP", "LEAVE_GAP"
+    val inServiceDate: Long? = null,
+    val endServiceDate: Long? = null,
+    @ColumnInfo(defaultValue = "ICE") val engineType: String = "ICE" // "ICE", "EV", "PHEV"
 )
 
 @Entity(
@@ -267,4 +270,61 @@ data class HoursTarget(
     val color: String = "#4CAF50",
     val isActive: Boolean = true,
     val createdAt: Long = System.currentTimeMillis()
+@Entity(tableName = "favorite_routes")
+data class FavoriteRoute(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val startAddress: String,
+    val endAddress: String,
+    val tripType: String,
+    val projectCode: String? = null
+)
+
+@Entity(
+    tableName = "odometer_checks",
+    foreignKeys = [
+        ForeignKey(
+            entity = Vehicle::class,
+            parentColumns = ["id"],
+            childColumns = ["vehicleId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["vehicleId"])]
+)
+data class OdometerCheck(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val vehicleId: Long,
+    val timestamp: Long,
+    val registeredOdometer: Int,
+    val correctedOdometer: Int,
+    val photoPath: String?
+)
+
+@Entity(
+    tableName = "fuel_fillups",
+    foreignKeys = [
+        ForeignKey(
+            entity = Vehicle::class,
+            parentColumns = ["id"],
+            childColumns = ["vehicleId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["vehicleId"])]
+)
+data class FuelFillUp(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val vehicleId: Long,
+    val dateTimestamp: Long,
+    val liters: Double,
+    val pricePerLiter: Double,
+    val totalCost: Double,
+    val odometer: Int,
+    val stationName: String? = null,
+    val notes: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val address: String? = null,
+    val status: String = "COMPLETED" // "DRAFT" or "COMPLETED"
 )

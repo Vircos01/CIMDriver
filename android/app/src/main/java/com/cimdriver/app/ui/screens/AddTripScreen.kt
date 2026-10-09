@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -48,6 +49,7 @@ fun AddTripScreen(
     val vehicles by viewModel.vehicles.collectAsState(initial = emptyList())
     val allTrips by viewModel.trips.collectAsState()
     val savedAddresses by addressBookViewModel.addresses.collectAsState()
+    val favoriteRoutes by viewModel.favoriteRoutes.collectAsState()
     val existingTrip = allTrips.find { it.id == tripId }
     val copyTrip = allTrips.find { it.id == copyFromId }
     val refTrip = existingTrip ?: copyTrip
@@ -75,6 +77,9 @@ fun AddTripScreen(
     }
     var typeExpanded by remember { mutableStateOf(false) }
     var note by remember(refTrip) { mutableStateOf(existingTrip?.note ?: copyTrip?.note ?: "") }
+    var projectCode by remember(refTrip) { mutableStateOf(existingTrip?.projectCode ?: copyTrip?.projectCode ?: "") }
+    val projectCodes by viewModel.projectCodes.collectAsState()
+    var projectCodeExpanded by remember { mutableStateOf(false) }
     var newOdometer by remember(refTrip) { 
         mutableStateOf(refTrip?.odometerEnd?.toString() ?: "") 
     }
@@ -228,7 +233,8 @@ fun AddTripScreen(
                                     type = type,
                                     startTime = getSelectedTimestamp(),
                                     endTime = getSelectedEndTimestamp(),
-                                    note = note.takeIf { it.isNotBlank() }
+                                    note = note.takeIf { it.isNotBlank() },
+                                    projectCode = projectCode.takeIf { it.isNotBlank() }
                                 )
                             } else {
                                 viewModel.updateManualTrip(
@@ -240,7 +246,8 @@ fun AddTripScreen(
                                     type = type,
                                     startTime = getSelectedTimestamp(),
                                     endTime = getSelectedEndTimestamp(),
-                                    note = note.takeIf { it.isNotBlank() }
+                                    note = note.takeIf { it.isNotBlank() },
+                                    projectCode = projectCode.takeIf { it.isNotBlank() }
                                 )
                             }
                             onBack()
@@ -280,6 +287,28 @@ fun AddTripScreen(
                                     tripType = trip.tripType
                                 },
                                 label = { Text("${trip.startAddress?.split(",")?.first()} ➔ ${trip.endAddress?.split(",")?.first()}") },
+                                leadingIcon = { Icon(Icons.Filled.History, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (tripId == null && favoriteRoutes.isNotEmpty()) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text("Favoriete Routes", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    androidx.compose.foundation.lazy.LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        items(favoriteRoutes) { route ->
+                            androidx.compose.material3.AssistChip(
+                                onClick = {
+                                    startAddress = route.startAddress
+                                    endAddress = route.endAddress
+                                    tripType = route.tripType
+                                },
+                                label = { Text(route.name) },
                                 leadingIcon = { Icon(Icons.Filled.Star, contentDescription = null, modifier = Modifier.size(16.dp)) }
                             )
                         }
@@ -353,7 +382,7 @@ fun AddTripScreen(
                                             isHomeLocation = false,
                                             isCustomerLocation = false,
                                             defaultTripType = null,
-                                            projectCode = null,
+                                            projectCode = projectCode.takeIf { it.isNotBlank() },
                                             notes = null
                                         )
                                     },
@@ -409,7 +438,7 @@ fun AddTripScreen(
                                             isHomeLocation = false,
                                             isCustomerLocation = false,
                                             defaultTripType = null,
-                                            projectCode = null,
+                                            projectCode = projectCode.takeIf { it.isNotBlank() },
                                             notes = null
                                         )
                                     },
@@ -516,6 +545,41 @@ fun AddTripScreen(
                         }
                     }
                     
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    ExposedDropdownMenuBox(
+                        expanded = projectCodeExpanded,
+                        onExpandedChange = { projectCodeExpanded = !projectCodeExpanded }
+                    ) {
+                        OutlinedTextField(
+                            value = projectCode,
+                            onValueChange = { 
+                                projectCode = it 
+                                projectCodeExpanded = true
+                            },
+                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                            label = { Text(stringResource(R.string.project_code_optional)) }
+                        )
+                        val filteredCodes = projectCodes.filter { it.contains(projectCode, ignoreCase = true) }
+                        if (filteredCodes.isNotEmpty() && projectCodeExpanded) {
+                            DropdownMenu(
+                                expanded = projectCodeExpanded,
+                                onDismissRequest = { projectCodeExpanded = false },
+                                modifier = Modifier.exposedDropdownSize()
+                            ) {
+                                filteredCodes.forEach { code ->
+                                    DropdownMenuItem(
+                                        text = { Text(code) },
+                                        onClick = {
+                                            projectCode = code
+                                            projectCodeExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
                         value = note,

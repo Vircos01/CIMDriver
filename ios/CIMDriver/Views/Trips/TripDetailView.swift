@@ -11,6 +11,8 @@ struct TripDetailView: View {
     @State private var suggestedRule: ClassificationRule?
     @State private var showingSuggestionAlert = false
     @State private var showingDeleteAlert = false
+    @State private var showingFavoriteAlert = false
+    @State private var favoriteRouteName = ""
     
     private var coordinates: [CLLocationCoordinate2D] {
         trip.locationPoints.sorted { $0.timestamp < $1.timestamp }.map {
@@ -170,6 +172,9 @@ struct TripDetailView: View {
                     Button(action: { showingEditSheet = true }) {
                         Label("Bewerken", systemImage: "pencil")
                     }
+                    Button(action: { showingFavoriteAlert = true }) {
+                        Label("Opslaan als favoriet", systemImage: "star")
+                    }
                     Button(role: .destructive, action: { showingDeleteAlert = true }) {
                         Label("Verwijderen", systemImage: "trash")
                     }
@@ -192,6 +197,17 @@ struct TripDetailView: View {
             }
         } message: { rule in
             Text("Je hebt deze route nu 3 keer gereden als '\(rule.category)'. Wil je hier een vaste regel van maken?")
+        }
+        .alert("Opslaan als favoriete route", isPresented: $showingFavoriteAlert) {
+            TextField("Naam route", text: $favoriteRouteName)
+            Button("Annuleer", role: .cancel) {
+                favoriteRouteName = ""
+            }
+            Button("Opslaan") {
+                saveAsFavoriteRoute()
+            }
+        } message: {
+            Text("Geef deze route een naam om hem later snel te kunnen selecteren.")
         }
         .alert("Rit Verwijderen", isPresented: $showingDeleteAlert) {
             Button("Annuleer", role: .cancel) { }
@@ -218,6 +234,18 @@ struct TripDetailView: View {
             dismiss()
         }
     }
+    
+    private func saveAsFavoriteRoute() {
+        let route = FavoriteRoute(
+            name: favoriteRouteName.isEmpty ? "Mijn Route" : favoriteRouteName,
+            startAddress: trip.startAddress ?? "",
+            endAddress: trip.endAddress ?? "",
+            tripType: trip.tripType
+        )
+        modelContext.insert(route)
+        try? modelContext.save()
+        favoriteRouteName = ""
+    }
 }
 
 struct AutoPreviewProviderTripDetailView1: PreviewProvider {
@@ -233,6 +261,8 @@ struct EditTripView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    @Query private var trips: [Trip]
+    
     let trip: Trip
     
     @State private var tripType: String
@@ -246,6 +276,10 @@ struct EditTripView: View {
     @State private var showingSuggestionAlert = false
     @State private var showingStartPicker = false
     @State private var showingEndPicker = false
+    
+    private var uniqueProjectCodes: [String] {
+        Array(Set(trips.compactMap { $0.projectCode }).filter { !$0.isEmpty }).sorted()
+    }
     
     init(trip: Trip) {
         self.trip = trip
@@ -268,7 +302,19 @@ struct EditTripView: View {
                     }
                     
                     if tripType == "BUSINESS" {
-                        TextField("Projectcode", text: $projectCode)
+                        HStack {
+                            TextField("Projectcode", text: $projectCode)
+                            if !uniqueProjectCodes.isEmpty {
+                                Menu {
+                                    ForEach(uniqueProjectCodes, id: \.self) { code in
+                                        Button(code) { projectCode = code }
+                                    }
+                                } label: {
+                                    Image(systemName: "chevron.down.circle")
+                                        .foregroundColor(.accentColor)
+                                }
+                            }
+                        }
                     }
                     
                     TextField("Afstand (km)", text: $distanceString)

@@ -29,9 +29,12 @@ Always bump the version in all 5 of these files to keep the in-app updater in sy
 - Commit and push (use `--force` if you squashed).
 
 ## 5. Website & Documentatie (MkDocs) Updates
-De publieke website en documentatie zijn een integraal onderdeel van de release. Voer het volgende uit:
+De publieke website en documentatie zijn een integraal onderdeel van de release. Zorg ervoor dat **zowel de Nederlandse (`.md`) als de Engelse (`.en.md`) documentatie** wordt bijgewerkt:
 
-1. **Changelog Website (`docs/changelog/android.md` en `docs/changelog/ios.md`)**: Voeg een nieuwe release sectie toe (`## Versie X.X.X`) inclusief de wijzigingen uit de commit historie.
-2. **Download Pagina's (`docs/download/android.md` / `ios.md`)**: Controleer of versienummers (indien hardcoded in de tekst) kloppen met de nieuwe release.
+1. **Changelog Website**: Werk de changelog-pagina's bij voor Android en iOS, in BEIDE talen:
+   - `docs/changelog/android.md` én `docs/changelog/android.en.md`
+   - `docs/changelog/ios.md` én `docs/changelog/ios.en.md`
+   Voeg in deze bestanden een nieuwe release sectie toe (`## Versie X.X.X` / `## Version X.X.X`) inclusief de wijzigingen.
+2. **Download Pagina's (`docs/download/android.md` & `.en.md` / `ios.md` & `.en.md`)**: Controleer of versienummers (indien hardcoded in de tekst) kloppen met de nieuwe release in beide talen.
 3. **Commit & Push**: Commit deze documentatie/website wijzigingen samen met de app-code in de gesquashte release-commit.
 4. **Validatie**: Zodra de release-commit gepusht is (`git push`), wordt via de GitHub Actions (`.github/workflows/mkdocs-pages.yml`) automatisch de website gebouwd en live gezet. Verifieer (indien mogelijk) of deze succesvol afrondt.

@@ -14,13 +14,13 @@ Om de app lokaal te kunnen bouwen en installeren heb je het volgende nodig:
 Volg deze stappen om CIMDriver op je iPhone te installeren:
 
 ### 1. Code ophalen
-Kloon de iOS-repository naar je Mac:
+Kloon de repository naar je Mac:
 ```bash
-git clone https://github.com/Vircos01/CIMDriver-iOS.git
+git clone https://github.com/Vircos01/CIMDriver.git
 ```
 
 ### 2. Project openen in Xcode
-Open de map `CIMDriver-iOS` en dubbelklik op het `.xcodeproj` of `.xcworkspace` bestand om het project in Xcode te openen.
+Open de map `CIMDriver/ios` en dubbelklik op het `.xcodeproj` of `.xcworkspace` bestand om het project in Xcode te openen.
 
 ### 3. Apple ID toevoegen
 Als je dit nog niet hebt gedaan, voeg dan je Apple ID toe aan Xcode:
