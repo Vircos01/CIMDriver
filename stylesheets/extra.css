@@ -1,0 +1,65 @@
+:root {
+  /* CIMDriver Light Mode (Default) */
+  --md-primary-fg-color:        #192543;
+  --md-primary-fg-color--light: #243255;
+  --md-primary-fg-color--dark:  #10192e;
+  --md-accent-fg-color:         #3d8b40;
+  --md-accent-fg-color--transparent: rgba(61, 139, 64, 0.1);
+  --md-typeset-a-color:         var(--md-accent-fg-color);
+}
+
+[data-md-color-scheme="slate"] {
+  /* CIMDriver Dark Mode */
+  --md-primary-fg-color:        #192543;
+  --md-primary-fg-color--light: #243255;
+  --md-primary-fg-color--dark:  #10192e;
+  --md-accent-fg-color:         #5be553;
+  --md-accent-fg-color--transparent: rgba(91, 229, 83, 0.1);
+  --md-typeset-a-color:         var(--md-accent-fg-color);
+}
+
+/* Dynamically swap topbar logo for dark mode */
+[data-md-color-scheme="slate"] .md-header .md-logo img {
+  content: url("../assets/logo_dark.png");
+}
+
+/* Hide/Show logic for Light & Dark mode specific images (like Hero) */
+[data-md-color-scheme="slate"] .only-light { display: none !important; }
+[data-md-color-scheme="default"] .only-dark { display: none !important; }
+
+/* Custom Button Styling to make them pop (using Accent Color) */
+.md-button--primary {
+  background-color: var(--md-accent-fg-color) !important;
+  border-color: var(--md-accent-fg-color) !important;
+  color: white !important; /* White text on dark green for light mode */
+  font-weight: bold;
+}
+
+[data-md-color-scheme="slate"] .md-button--primary {
+  color: #10192e !important; /* Dark text on bright green for dark mode */
+}
+
+.md-button--primary:hover {
+  filter: brightness(1.1);
+  background-color: var(--md-accent-fg-color) !important;
+  border-color: var(--md-accent-fg-color) !important;
+}
+
+.md-button:not(.md-button--primary) {
+  border-color: var(--md-accent-fg-color) !important;
+  color: var(--md-accent-fg-color) !important;
+}
+
+.md-button:not(.md-button--primary):hover {
+  background-color: var(--md-accent-fg-color--transparent) !important;
+}
+
+/* Allow the wide banner to be displayed properly in the header */
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+  width: auto;
+  height: 2.5rem;
+}
+.md-header__button.md-logo {
+  padding: 0.2rem;
+}
+
