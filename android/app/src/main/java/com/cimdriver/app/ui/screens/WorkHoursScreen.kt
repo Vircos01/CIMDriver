@@ -313,7 +313,8 @@ fun WorkHoursScreen(
                                                 breakMinutes = workDay.breakMinutes,
                                                 workLocationLabel = workDay.workLocationLabel,
                                                 projectCode = workDay.projectCode,
-                                                status = "APPROVED"
+                                                status = "APPROVED",
+                                                projectCodeId = workDay.projectCodeId
                                             )
                                         }) {
                                             Icon(Icons.Filled.Check, contentDescription = null)

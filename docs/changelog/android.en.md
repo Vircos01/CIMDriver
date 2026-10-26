@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.2.7 (Current Version)
+## Version 1.3.0 (Current Version)
+*Release date: October 26, 2026*
+
+!!! success "Improvements & Bug Fixes"
+    * **Dashboard Targets (Bonus/Hours/Revenue):** Worked hours are now reliably processed and displayed in dashboard target progress.
+    * **Status Support:** Both approved (`APPROVED`) and completed (`DONE`) workdays count toward target progress.
+    * **Project & Client Matching:** Workdays are now properly matched via both `projectCodeId` and project code string (`code`), ensuring hourly rates for revenue targets are accurately applied.
+    * **Automatic & Manual Registration:** Project codes are preserved upon approval and automatically populated from saved locations.
+
+## Version 1.2.7
 *Release date: October 9, 2026*
 
 !!! success "New Features"

@@ -6,7 +6,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.2.7 (Huidige Versie)
+## Versie 1.3.0 (Huidige Versie)
+*Releasedatum: 26 oktober 2026*
+
+!!! success "Verbeteringen & Bugfixes"
+    * **Dashboarddoelen (Bonus/Uren/Omzet):** Gewerkte uren worden nu direct en betrouwbaar verwerkt en getoond in de doelvoortgang op het dashboard.
+    * **Statusondersteuning:** Zowel goedgekeurde (`APPROVED`) als voltooide (`DONE`) werkdagen tellen correct mee.
+    * **Project- & Klantkoppeling:** Werkdagen worden nu accuraat gekoppeld via zowel `projectCodeId` als tekstuele projectcode (`code`), waardoor ook uurtarieven voor omzetdoelen correct worden toegepast.
+    * **Automatische en handmatige registratie:** Projectcodes blijven behouden bij het goedkeuren en worden automatisch geregistreerd vanuit opgeslagen locaties.
+
+## Versie 1.2.7
 *Releasedatum: 9 oktober 2026*
 
 !!! success "Nieuwe Functies"

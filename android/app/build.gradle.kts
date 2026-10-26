@@ -18,8 +18,8 @@ android {
         applicationId = "com.cimdriver.app"
         minSdk = 29
         targetSdk = 37
-        versionCode = 26
-        versionName = "1.2.7-${getGitHash(providers)}"
+        versionCode = 27
+        versionName = "1.3.0-${getGitHash(providers)}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

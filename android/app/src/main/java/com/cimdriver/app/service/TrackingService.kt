@@ -347,6 +347,7 @@ class TrackingService : Service(), LocationListener {
         if (leftWork && arrivedAtHome) isCommute = true
         
         val projectCode: String? = endLoc?.projectCode?.takeIf { it.isNotBlank() } ?: startLoc?.projectCode?.takeIf { it.isNotBlank() }
+        val projectCodeId: Long? = endLoc?.defaultProjectCodeId ?: startLoc?.defaultProjectCodeId
         val isCustomerTrip = endLoc?.isCustomerLocation == true || startLoc?.isCustomerLocation == true
         val defaultTripType: String? = endLoc?.defaultTripType?.takeIf { it.isNotBlank() } ?: startLoc?.defaultTripType?.takeIf { it.isNotBlank() }
         
@@ -425,6 +426,7 @@ class TrackingService : Service(), LocationListener {
             expectedDistanceMeters = expectedDistance,
             tripType = finalTripType,
             projectCode = projectCode,
+            projectCodeId = projectCodeId,
             status = if (autoApprove) "DONE" else "TO_REVIEW",
             appliedRuleName = matchingRule?.name
         ))
@@ -487,6 +489,7 @@ class TrackingService : Service(), LocationListener {
                     breakMinutes = breakMins,
                     workLocationLabel = locationLabel,
                     projectCode = projectCode,
+                    projectCodeId = projectCodeId,
                     status = "IN_PROGRESS"
                 )
                 workDayDao.insertWorkDay(newWorkDay)
@@ -500,6 +503,13 @@ class TrackingService : Service(), LocationListener {
                         departureTime = currentTrip.startTime,
                         roundedDepartureTime = normalizedDeparture
                     )
+                }
+
+                if (updatedWorkDay.projectCodeId == null && projectCodeId != null) {
+                    updatedWorkDay = updatedWorkDay.copy(projectCodeId = projectCodeId)
+                }
+                if (updatedWorkDay.projectCode == null && projectCode != null) {
+                    updatedWorkDay = updatedWorkDay.copy(projectCode = projectCode)
                 }
 
                 if (arrivedAtWork) {

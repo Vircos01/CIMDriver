@@ -2,6 +2,15 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.0] - 2026-10-26
+
+### Opgelost & Verbeterd
+- **Doelen op het dashboard (Bonus/Uren/Omzet):** Gewerkte uren worden nu betrouwbaar verwerkt en getoond in de doelen op het dashboard.
+- **Ondersteuning voor status:** Zowel goedgekeurde (`APPROVED`) als voltooide (`DONE`) werkdagen tellen mee voor de doelvoortgang.
+- **Projectcode & Klant Matching:** Slimme resolutie toegevoegd waardoor werkdagen zowel via `projectCodeId` als tekstuele `projectCode` correct worden gekoppeld aan het bijbehorende project en uurtarief.
+- **Automatische registratie van project-ID:** `TrackingService` slaat bij automatische werkdag- en ritregistratie nu ook direct de gekoppelde `projectCodeId` op.
+- **Behoud project-ID bij goedkeuring:** Bij het goedkeuren van een werkdag in het overzicht blijft de gekoppelde projectcode behouden.
+
 ## [1.2.7] - 2026-10-09
 
 ### Toegevoegd
