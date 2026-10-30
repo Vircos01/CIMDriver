@@ -1,6 +1,6 @@
 {
-  "versionCode": 30,
-  "versionName": "1.3.3",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.3.3.apk",
-  "releaseNotes": "Versie 1.3.3: Tellerstanden chronologisch opnieuw doorberekenen op basis van ritten en km-controles met behoud van audit-trail gaten, keuze voor rit-type (privé/zakelijk/woon-werk) bij gat-herstel en directe actuele tellersynchronisatie."
+  "versionCode": 31,
+  "versionName": "1.3.4",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.3.4.apk",
+  "releaseNotes": "Versie 1.3.4: Oplossing voor crash bij handmatige ritten op de kaart (MapLibre), directe bewerk- en verwijderknoppen in ritdetails, en automatische tijdscorrectie bij herstel van overlappende gaten."
 }

@@ -112,7 +112,8 @@ fun AddTripScreen(
     var durationMinutes by remember(refTrip) { 
         if (refTrip != null) {
             val end = refTrip.endTime ?: (refTrip.startTime)
-            mutableStateOf(((end - refTrip.startTime) / (60 * 1000)).toString())
+            val mins = ((end - refTrip.startTime) / (60 * 1000)).let { if (it <= 0) 15L else it }
+            mutableStateOf(mins.toString())
         } else {
             mutableStateOf("")
         }

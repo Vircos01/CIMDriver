@@ -65,49 +65,64 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
             
             pointDao.getPointsForTrip(tripId).collect { dbPoints ->
                 if (dbPoints.isEmpty() && loadedTrip?.isManual == true) {
-                    // Try to geocode start and end address to show something on the map
-                    val startCoords = loadedTrip.startAddress?.let { geocoderService.getCoordinatesForAddress(it) }
-                    val endCoords = loadedTrip.endAddress?.let { geocoderService.getCoordinatesForAddress(it) }
-                    
-                    val fakePoints = mutableListOf<LocationPoint>()
-                    if (startCoords != null && endCoords != null) {
-                        val route = geocoderService.getOsrmRoute(
-                            startCoords.first, startCoords.second,
-                            endCoords.first, endCoords.second
-                        )
+                    try {
+                        // Try to geocode start and end address to show something on the map
+                        val startCoords = loadedTrip.startAddress?.let { geocoderService.getCoordinatesForAddress(it) }
+                        val endCoords = loadedTrip.endAddress?.let { geocoderService.getCoordinatesForAddress(it) }
                         
-                        if (route.isNotEmpty()) {
-                            route.forEachIndexed { index, pair ->
-                                fakePoints.add(
-                                    LocationPoint(
-                                        tripId = tripId,
-                                        latitude = pair.first,
-                                        longitude = pair.second,
-                                        altitude = 0.0,
-                                        timestamp = 0L,
-                                        speed = 0f,
-                                        accuracy = 0f
+                        val fakePoints = mutableListOf<LocationPoint>()
+                        if (startCoords != null && endCoords != null) {
+                            val route = geocoderService.getOsrmRoute(
+                                startCoords.first, startCoords.second,
+                                endCoords.first, endCoords.second
+                            )
+                            
+                            if (route.isNotEmpty()) {
+                                route.forEachIndexed { index, pair ->
+                                    fakePoints.add(
+                                        LocationPoint(
+                                            tripId = tripId,
+                                            latitude = pair.first,
+                                            longitude = pair.second,
+                                            altitude = 0.0,
+                                            timestamp = 0L,
+                                            speed = 0f,
+                                            accuracy = 0f
+                                        )
                                     )
-                                )
+                                }
+                            } else {
+                                // Fallback to straight line
+                                fakePoints.add(LocationPoint(tripId = tripId, latitude = startCoords.first, longitude = startCoords.second, altitude = 0.0, timestamp = 0L, speed = 0f, accuracy = 0f))
+                                fakePoints.add(LocationPoint(tripId = tripId, latitude = endCoords.first, longitude = endCoords.second, altitude = 0.0, timestamp = 0L, speed = 0f, accuracy = 0f))
                             }
-                        } else {
-                            // Fallback to straight line
+                        } else if (startCoords != null) {
                             fakePoints.add(LocationPoint(tripId = tripId, latitude = startCoords.first, longitude = startCoords.second, altitude = 0.0, timestamp = 0L, speed = 0f, accuracy = 0f))
+                        } else if (endCoords != null) {
                             fakePoints.add(LocationPoint(tripId = tripId, latitude = endCoords.first, longitude = endCoords.second, altitude = 0.0, timestamp = 0L, speed = 0f, accuracy = 0f))
                         }
-                    } else if (startCoords != null) {
-                        fakePoints.add(LocationPoint(tripId = tripId, latitude = startCoords.first, longitude = startCoords.second, altitude = 0.0, timestamp = 0L, speed = 0f, accuracy = 0f))
-                    } else if (endCoords != null) {
-                        fakePoints.add(LocationPoint(tripId = tripId, latitude = endCoords.first, longitude = endCoords.second, altitude = 0.0, timestamp = 0L, speed = 0f, accuracy = 0f))
+                        
+                        if (fakePoints.isNotEmpty()) {
+                            pointDao.insertPoints(fakePoints)
+                        }
+                        _points.value = fakePoints
+                    } catch (e: Exception) {
+                        android.util.Log.e("TripDetailViewModel", "Geocoding fallback failed", e)
+                        _points.value = emptyList()
                     }
-                    
-                    if (fakePoints.isNotEmpty()) {
-                        pointDao.insertPoints(fakePoints)
-                    }
-                    _points.value = fakePoints
                 } else {
                     _points.value = dbPoints
                 }
+            }
+        }
+    }
+
+    fun deleteTrip(onDeleted: () -> Unit) {
+        val currentTrip = _trip.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            tripDao.deleteTrip(currentTrip)
+            kotlinx.coroutines.withContext(Dispatchers.Main) {
+                onDeleted()
             }
         }
     }

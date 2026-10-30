@@ -41,7 +41,7 @@ fun TripItem(
     val endString = trip.endTime?.let { dateFormat.format(Date(it)) } ?: stringResource(R.string.trip_in_progress)
     
     val durationText = trip.endTime?.let { end ->
-        val diffMinutes = (end - trip.startTime) / (1000 * 60)
+        val diffMinutes = ((end - trip.startTime) / (1000 * 60)).let { if (it < 0) kotlin.math.abs(it) else it }
         val hours = diffMinutes / 60
         val mins = diffMinutes % 60
         if (hours > 0) "${hours}u ${mins}m" else "${mins}m"

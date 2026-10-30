@@ -2,6 +2,14 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.4] - 2026-10-30
+
+### Opgelost & Verbeterd
+- **Oplossing voor crash bij ritdetails (MapLibre):** Crash opgelost bij het openen van ritten met een enkel geocodeerpunt of handmatige bestemming (zoals "Supermarkt / Boodschappen"). De kaart gebruikt nu een veilige camerazoom in plaats van ongeldige bounding-box berekeningen.
+- **Directe bewerk- en verwijderknoppen in ritdetails:** Een prominente bewerkknop toegevoegd in de bovenbalk en een directe verwijderoptie met bevestiging in het optiemenu.
+- **Tijdscorrectie bij herstel van overlappende gaten:** Aangemaakte correctieritten waarborgen nu altijd een chronologisch sluitende start- en eindtijd, zelfs wanneer eerdere ritten elkaar in tijd overlapten.
+- **Veilige duurweergave:** Negatieve tijdverschillen bij overlappende ritten worden afgevangen en weergegeven als positieve reistijd.
+
 ## [1.3.3] - 2026-10-30
 
 ### Toegevoegd & Verbeterd

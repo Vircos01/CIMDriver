@@ -277,10 +277,20 @@ class VehiclesViewModel @Inject constructor(
                         ?: gap.nextTrip?.startAddress
                         ?: startAddr
                     val defaultNote = if (tripType == "BUSINESS") "Zakelijke rit voor sluitende tellerstand" else "Privérit voor sluitende tellerstand"
+                    
+                    // Ensure valid chronological start and end time (prevent inverted start > end)
+                    val tStart = minOf(gap.gapTimeStart, gap.gapTimeEnd)
+                    var tEnd = maxOf(gap.gapTimeStart, gap.gapTimeEnd)
+                    if (tEnd <= tStart) {
+                        val distanceKm = kotlin.math.abs(gap.gapKm)
+                        val durationMs = (distanceKm * 60 * 1000L).coerceIn(300_000L, 3_600_000L) // at least 5 mins
+                        tEnd = tStart + durationMs
+                    }
+
                     val trip = Trip(
                         vehicleId = gap.vehicleId,
-                        startTime = gap.gapTimeStart,
-                        endTime = gap.gapTimeEnd,
+                        startTime = tStart,
+                        endTime = tEnd,
                         startAddress = startAddr,
                         endAddress = endAddr,
                         distanceMeters = kotlin.math.abs(gap.gapKm) * 1000,

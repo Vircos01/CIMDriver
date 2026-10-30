@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.3 (Current Version)
+## Version 1.3.4 (Current Version)
+*Release date: October 30, 2026*
+
+!!! success "Improvements & Bug Fixes"
+    * **Fix Crash on Trip Detail Map:** Resolved MapLibre crash when a trip has a single geocoded point or custom address (e.g. manual entries).
+    * **Direct Edit & Delete Actions:** Prominent edit button in top bar and direct delete option with confirmation in trip details.
+    * **Timestamp Correction for Gap Resolution:** Ensured created correction trips enforce chronologically forward start and end times.
+    * **Safe Duration Display:** Handled negative time differences for overlapping trips gracefully.
+
+## Version 1.3.3
 *Release date: October 30, 2026*
 
 !!! success "New Features & Improvements"

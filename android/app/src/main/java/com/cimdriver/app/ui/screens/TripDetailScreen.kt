@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -165,6 +168,31 @@ fun TripDetailScreen(
                     var expanded by remember { mutableStateOf(false) }
                     var showRecalculateConfirm by remember { mutableStateOf(false) }
                     var showFavoriteConfirm by remember { mutableStateOf(false) }
+                    var showDeleteConfirm by remember { mutableStateOf(false) }
+
+                    if (showDeleteConfirm) {
+                        AlertDialog(
+                            onDismissRequest = { showDeleteConfirm = false },
+                            title = { Text(stringResource(R.string.delete_trip)) },
+                            text = { Text(stringResource(R.string.confirm_delete_trip_msg)) },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        showDeleteConfirm = false
+                                        viewModel.deleteTrip(onDeleted = onBack)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                                ) {
+                                    Text(stringResource(R.string.delete))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDeleteConfirm = false }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
 
                     if (showRecalculateConfirm) {
                         AlertDialog(
@@ -221,6 +249,10 @@ fun TripDetailScreen(
                         )
                     }
 
+                    IconButton(onClick = { onEditTrip(tripId) }) {
+                        Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.edit))
+                    }
+
                     IconButton(onClick = { expanded = true }) {
                         Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more_options))
                     }
@@ -264,6 +296,15 @@ fun TripDetailScreen(
                                 showFavoriteConfirm = true
                             }
                         )
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) },
+                            leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                            onClick = {
+                                expanded = false
+                                showDeleteConfirm = true
+                            }
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -295,7 +336,7 @@ fun TripDetailScreen(
                     val startStr = dateFormat.format(Date(trip!!.startTime))
                     val endStr = trip!!.endTime?.let { dateFormat.format(Date(it)) } ?: stringResource(R.string.in_progress)
                     val durationText = trip!!.endTime?.let { end ->
-                        val diffMinutes = (end - trip!!.startTime) / (1000 * 60)
+                        val diffMinutes = ((end - trip!!.startTime) / (1000 * 60)).let { if (it < 0) kotlin.math.abs(it) else it }
                         val hours = diffMinutes / 60
                         val mins = diffMinutes % 60
                         if (hours > 0) "${hours}u ${mins}m" else "${mins}m"
@@ -534,18 +575,32 @@ fun MapLibreMapView(points: List<com.cimdriver.app.data.local.entity.LocationPoi
             map.getMapAsync { mapboxMap ->
                 mapboxMap.setStyle(Style.Builder().fromJson(osmStyleJson)) { _ ->
                     if (points.isNotEmpty()) {
-                        mapboxMap.clear()
-                        val latLngs = points.map { LatLng(it.latitude, it.longitude) }
+                        try {
+                            mapboxMap.clear()
+                            val latLngs = points.map { LatLng(it.latitude, it.longitude) }
 
-                        mapboxMap.addPolyline(PolylineOptions().addAll(latLngs).color(Color.BLUE).width(5f))
-                        mapboxMap.addMarker(MarkerOptions().position(latLngs.first()).title(context.getString(R.string.start)))
+                            if (latLngs.size > 1) {
+                                mapboxMap.addPolyline(PolylineOptions().addAll(latLngs).color(Color.BLUE).width(5f))
+                            }
+                            mapboxMap.addMarker(MarkerOptions().position(latLngs.first()).title(context.getString(R.string.start)))
 
-                        if (latLngs.size > 1) {
-                            mapboxMap.addMarker(MarkerOptions().position(latLngs.last()).title(context.getString(R.string.end)))
+                            if (latLngs.size > 1) {
+                                mapboxMap.addMarker(MarkerOptions().position(latLngs.last()).title(context.getString(R.string.end)))
+                            }
+
+                            val hasDistinctPoints = latLngs.size > 1 && latLngs.any { 
+                                it.latitude != latLngs.first().latitude || it.longitude != latLngs.first().longitude 
+                            }
+
+                            if (hasDistinctPoints) {
+                                val bounds = LatLngBounds.Builder().includes(latLngs).build()
+                                mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), 1000)
+                            } else {
+                                mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(latLngs.first(), 14.0), 1000)
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("TripDetailScreen", "Error updating map markers/camera", e)
                         }
-
-                        val bounds = LatLngBounds.Builder().includes(latLngs).build()
-                        mapboxMap.easeCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), 1000)
                     }
                 }
             }

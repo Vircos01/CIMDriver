@@ -6,7 +6,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.3 (Huidige Versie)
+## Versie 1.3.4 (Huidige Versie)
+*Releasedatum: 30 oktober 2026*
+
+!!! success "Verbeteringen & Bugfixes"
+    * **Oplossen crash bij openen van ritten:** Crash verholpen bij ritten waarbij de kaart een enkel punt of afwijkend adres toont (zoals handmatige bestemmingen).
+    * **Directe bewerk- en verwijderknoppen:** Bewerkknop in de actiebalk en verwijderoptie met bevestiging direct beschikbaar in ritdetails.
+    * **Tijdscorrectie bij gat-herstel:** Correctieritten garanderen een chronologische start- en eindtijd zonder negatieve duur.
+    * **Veilige duurweergave:** Voorkomt negatieve tijdsduur bij overlappende ritten.
+
+## Versie 1.3.3
 *Releasedatum: 30 oktober 2026*
 
 !!! success "Nieuwe Functies & Verbeteringen"
