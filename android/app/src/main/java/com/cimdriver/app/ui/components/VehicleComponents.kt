@@ -3,6 +3,7 @@ package com.cimdriver.app.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Star
@@ -22,7 +23,8 @@ fun VehicleItem(
     onEdit: (Vehicle) -> Unit,
     onRecalculate: (Vehicle) -> Unit = {},
     onSetDefault: (Vehicle) -> Unit = {},
-    onViewOdometerChecks: (Vehicle) -> Unit = {}
+    onViewOdometerChecks: (Vehicle) -> Unit = {},
+    onViewGaps: (Vehicle) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -56,6 +58,14 @@ fun VehicleItem(
             }
 
             Row {
+                // Gap review / chain integrity button
+                IconButton(onClick = { onViewGaps(vehicle) }) {
+                    Icon(
+                        Icons.Filled.Build,
+                        contentDescription = "Gaten in registratie bekijken",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 // Odometer check history button
                 IconButton(onClick = { onViewOdometerChecks(vehicle) }) {
                     Icon(

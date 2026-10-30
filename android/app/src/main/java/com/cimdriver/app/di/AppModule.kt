@@ -12,6 +12,7 @@ import com.cimdriver.app.data.local.dao.WorkDayDao
 import com.cimdriver.app.data.local.dao.BluetoothDeviceDao
 import com.cimdriver.app.data.local.dao.FavoriteRouteDao
 import com.cimdriver.app.data.local.dao.OdometerCheckDao
+import com.cimdriver.app.data.local.dao.OdometerGapResolutionDao
 import com.cimdriver.app.data.local.dao.FuelFillUpDao
 import com.cimdriver.app.data.repository.FuelRepository
 import com.cimdriver.app.data.repository.TripRepository
@@ -81,6 +82,11 @@ object AppModule {
     @Provides
     fun provideOdometerCheckDao(database: AppDatabase): OdometerCheckDao {
         return database.odometerCheckDao()
+    }
+
+    @Provides
+    fun provideOdometerGapResolutionDao(database: AppDatabase): OdometerGapResolutionDao {
+        return database.odometerGapResolutionDao()
     }
 
     @Provides

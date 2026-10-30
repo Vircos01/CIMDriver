@@ -26,12 +26,20 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 
+import com.cimdriver.app.data.local.dao.OdometerGapResolutionDao
+import com.cimdriver.app.data.local.entity.OdometerGapResolution
+import com.cimdriver.app.util.OdometerGapAnalyzer
+import com.cimdriver.app.util.OdometerGap
+import com.cimdriver.app.util.FixType
+import com.cimdriver.app.util.GapType
+
 @HiltViewModel
 class VehiclesViewModel @Inject constructor(
     private val vehicleDao: VehicleDao,
     private val bluetoothDeviceDao: BluetoothDeviceDao,
     private val tripDao: TripDao,
     private val odometerCheckDao: OdometerCheckDao,
+    private val odometerGapResolutionDao: OdometerGapResolutionDao,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -116,82 +124,281 @@ class VehiclesViewModel @Inject constructor(
     }
 
     fun getChecksForVehicle(vehicleId: Long) = odometerCheckDao.getChecksForVehicle(vehicleId)
+    fun getResolutionsForVehicle(vehicleId: Long) = odometerGapResolutionDao.getResolutionsForVehicle(vehicleId)
+    val openGapsCount = odometerGapResolutionDao.getOpenResolutionCount()
+
+    fun getTripsForVehicle(vehicleId: Long) = tripDao.getTripsByVehicle(vehicleId)
+    suspend fun getTripsByVehicleSync(vehicleId: Long) = tripDao.getTripsByVehicleSync(vehicleId)
+    suspend fun getVehicleById(vehicleId: Long) = vehicleDao.getVehicleById(vehicleId)
+
+    fun scanVehicleGaps(vehicleId: Long, onResult: (List<OdometerGap>) -> Unit) {
+        viewModelScope.launch {
+            val vehicle = vehicleDao.getVehicleById(vehicleId) ?: return@launch onResult(emptyList())
+            val trips = tripDao.getTripsByVehicleSync(vehicleId)
+            val gaps = OdometerGapAnalyzer.analyze(vehicle, trips)
+            onResult(gaps)
+        }
+    }
 
     fun confirmOdometerCheck(vehicle: Vehicle, correctedOdometer: Int, photoPath: String? = null) {
+        confirmOdometerCheckWithDetails(
+            vehicle = vehicle,
+            correctedOdometer = correctedOdometer,
+            photoPath = photoPath,
+            strategy = vehicle.odometerCorrectionStrategy,
+            reason = null
+        )
+    }
+
+    fun confirmOdometerCheckWithDetails(
+        vehicle: Vehicle,
+        correctedOdometer: Int,
+        photoPath: String? = null,
+        strategy: String = "NONE",
+        reason: String? = null,
+        onComplete: () -> Unit = {}
+    ) {
         viewModelScope.launch {
             val timestamp = System.currentTimeMillis()
-            
-            // Record the check in the history
+            val gap = correctedOdometer - vehicle.odometerCurrent
+            val affectedTripIds = mutableListOf<Long>()
+
+            if (gap != 0) {
+                when (strategy) {
+                    "CREATE_TRIP" -> {
+                        if (gap > 0) {
+                            val lastTrip = tripDao.getTripsByVehicleSync(vehicle.id).maxByOrNull { it.startTime }
+                            val startAddr = lastTrip?.endAddress ?: "Laatste geregistreerde bestemming"
+                            val endAddr = startAddr
+                            val noteText = reason?.takeIf { it.isNotBlank() } ?: "Sluitende correctierit km-controle (${if (gap > 0) "+" else ""}$gap km)"
+
+                            val correctionTrip = Trip(
+                                vehicleId = vehicle.id,
+                                startTime = timestamp - 1000,
+                                endTime = timestamp,
+                                startAddress = startAddr,
+                                endAddress = endAddr,
+                                distanceMeters = gap * 1000,
+                                tripType = "PERSONAL",
+                                note = noteText,
+                                status = "DONE",
+                                isManual = true,
+                                odometerStart = vehicle.odometerCurrent,
+                                odometerEnd = correctedOdometer
+                            )
+                            val newTripId = tripDao.insertTrip(correctionTrip)
+                            affectedTripIds.add(newTripId)
+                        }
+                    }
+                    "DISTRIBUTE" -> {
+                        val trips = tripDao.getTripsByVehicleSync(vehicle.id)
+                        var totalDistance = 0.0
+                        trips.forEach { totalDistance += (it.distanceMeters / 1000.0) }
+                        
+                        val actualDistance = correctedOdometer - vehicle.odometerStart
+                        if (totalDistance > 0 && actualDistance > 0) {
+                            val ratio = actualDistance / totalDistance
+                            var currentOdo = vehicle.odometerStart
+                            
+                            for (trip in trips) {
+                                val newDistanceKm = Math.round((trip.distanceMeters / 1000.0) * ratio).toInt()
+                                val updatedTrip = trip.copy(
+                                    distanceMeters = newDistanceKm * 1000,
+                                    odometerStart = currentOdo,
+                                    odometerEnd = currentOdo + newDistanceKm
+                                )
+                                tripDao.updateTrip(updatedTrip)
+                                affectedTripIds.add(trip.id)
+                                currentOdo += newDistanceKm
+                            }
+                        }
+                    }
+                    "GAP_WITH_REASON" -> {
+                        val gapResolution = OdometerGapResolution(
+                            vehicleId = vehicle.id,
+                            detectedAt = timestamp,
+                            resolvedAt = timestamp,
+                            gapType = if (gap > 0) "MISSING_KM" else "OVERLAPPING_KM",
+                            gapStartTimestamp = vehicle.lastOdometerCheckTimestamp.takeIf { it > 0 } ?: (timestamp - 86400000L),
+                            gapEndTimestamp = timestamp,
+                            expectedOdometer = vehicle.odometerCurrent,
+                            actualOdometer = correctedOdometer,
+                            gapKm = gap,
+                            resolution = "MARK_AS_EXPLAINED",
+                            resolutionNote = reason ?: "Tussentijdse km-controle afwijking verklaard",
+                            affectedTripIds = null,
+                            status = "RESOLVED"
+                        )
+                        odometerGapResolutionDao.insert(gapResolution)
+                    }
+                    "MANUAL" -> {
+                        val gapResolution = OdometerGapResolution(
+                            vehicleId = vehicle.id,
+                            detectedAt = timestamp,
+                            gapType = if (gap > 0) "MISSING_KM" else "OVERLAPPING_KM",
+                            gapStartTimestamp = vehicle.lastOdometerCheckTimestamp.takeIf { it > 0 } ?: (timestamp - 86400000L),
+                            gapEndTimestamp = timestamp,
+                            expectedOdometer = vehicle.odometerCurrent,
+                            actualOdometer = correctedOdometer,
+                            gapKm = gap,
+                            resolution = "IGNORE",
+                            resolutionNote = reason,
+                            affectedTripIds = null,
+                            status = "OPEN"
+                        )
+                        odometerGapResolutionDao.insert(gapResolution)
+                    }
+                    "LEAVE_GAP", "NONE" -> {
+                        // Do not modify trips, just update vehicle
+                    }
+                }
+            }
+
+            // Record check with full audit trail
             val check = OdometerCheck(
                 vehicleId = vehicle.id,
                 timestamp = timestamp,
                 registeredOdometer = vehicle.odometerCurrent,
                 correctedOdometer = correctedOdometer,
-                photoPath = photoPath
+                photoPath = photoPath,
+                deviationKm = gap,
+                correctionStrategy = strategy,
+                correctionReason = reason,
+                status = if (strategy == "MANUAL") "PENDING" else "CONFIRMED",
+                affectedTripIds = if (affectedTripIds.isNotEmpty()) affectedTripIds.joinToString(",") else null
             )
             odometerCheckDao.insert(check)
-            
-            val gap = correctedOdometer - vehicle.odometerCurrent
-            if (gap == 0) {
-                val updatedVehicle = vehicle.copy(
-                    lastOdometerCheckTimestamp = timestamp
-                )
-                vehicleDao.updateVehicle(updatedVehicle)
-                return@launch
-            }
-
-            when (vehicle.odometerCorrectionStrategy) {
-                "CREATE_TRIP" -> {
-                    if (gap > 0) {
-                        val correctionTrip = Trip(
-                            vehicleId = vehicle.id,
-                            startTime = System.currentTimeMillis() - 1000,
-                            endTime = System.currentTimeMillis(),
-                            startAddress = "Correctie",
-                            endAddress = "Correctie",
-                            distanceMeters = gap * 1000,
-                            tripType = "PERSONAL",
-                            note = "Correctierit",
-                            status = "DONE",
-                            isManual = true,
-                            odometerStart = vehicle.odometerCurrent,
-                            odometerEnd = correctedOdometer
-                        )
-                        tripDao.insertTrip(correctionTrip)
-                    }
-                }
-                "DISTRIBUTE" -> {
-                    val trips = tripDao.getTripsByVehicleSync(vehicle.id)
-                    var totalDistance = 0.0
-                    trips.forEach { totalDistance += (it.distanceMeters / 1000.0) }
-                    
-                    val actualDistance = correctedOdometer - vehicle.odometerStart
-                    if (totalDistance > 0 && actualDistance > 0) {
-                        val ratio = actualDistance / totalDistance
-                        var currentOdo = vehicle.odometerStart
-                        
-                        for (trip in trips) {
-                            val newDistanceKm = Math.round((trip.distanceMeters / 1000.0) * ratio).toInt()
-                            val updatedTrip = trip.copy(
-                                distanceMeters = newDistanceKm * 1000,
-                                odometerStart = currentOdo,
-                                odometerEnd = currentOdo + newDistanceKm
-                            )
-                            tripDao.updateTrip(updatedTrip)
-                            currentOdo += newDistanceKm
-                        }
-                    }
-                }
-                "LEAVE_GAP" -> {
-                    // Do nothing extra, just update the vehicle's odometer
-                }
-            }
 
             val updatedVehicle = vehicle.copy(
                 odometerCurrent = correctedOdometer,
                 lastOdometerCheckTimestamp = timestamp
             )
             vehicleDao.updateVehicle(updatedVehicle)
+            onComplete()
+        }
+    }
+
+    fun resolveGap(gap: OdometerGap, fixType: FixType, note: String?, onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            val now = System.currentTimeMillis()
+            val affectedIds = mutableListOf<Long>()
+
+            when (fixType) {
+                FixType.CREATE_PRIVATE_TRIP -> {
+                    val startAddr = gap.previousTrip?.endAddress ?: "Laatste bekende bestemming"
+                    val endAddr = gap.nextTrip?.startAddress ?: startAddr
+                    val trip = Trip(
+                        vehicleId = gap.vehicleId,
+                        startTime = gap.gapTimeStart,
+                        endTime = gap.gapTimeEnd,
+                        startAddress = startAddr,
+                        endAddress = endAddr,
+                        distanceMeters = kotlin.math.abs(gap.gapKm) * 1000,
+                        tripType = "PERSONAL",
+                        note = note?.takeIf { it.isNotBlank() } ?: "Privérit voor sluitende tellerstand",
+                        status = "DONE",
+                        isManual = true,
+                        odometerStart = gap.expectedOdometer,
+                        odometerEnd = gap.actualOdometer
+                    )
+                    val newId = tripDao.insertTrip(trip)
+                    affectedIds.add(newId)
+                }
+                FixType.DISTRIBUTE_OVER_TRIPS -> {
+                    val allTrips = tripDao.getTripsByVehicleSync(gap.vehicleId).sortedBy { it.startTime }
+                    val nextTripEndTime = gap.nextTrip?.endTime ?: gap.nextTrip?.startTime ?: Long.MAX_VALUE
+                    val contextTrips = if (gap.previousTrip != null && gap.nextTrip != null) {
+                        allTrips.filter { it.startTime >= gap.previousTrip.startTime && (it.endTime ?: it.startTime) <= nextTripEndTime }
+                    } else if (gap.previousTrip != null) {
+                        allTrips.takeLast(minOf(5, allTrips.size))
+                    } else {
+                        allTrips.take(minOf(5, allTrips.size))
+                    }
+
+                    val preview = OdometerGapAnalyzer.calculateDistributionPreview(contextTrips, gap.gapKm)
+                    for (change in preview) {
+                        val original = contextTrips.find { it.id == change.tripId }
+                        if (original != null) {
+                            tripDao.updateTrip(original.copy(
+                                distanceMeters = change.newDistanceKm * 1000,
+                                odometerStart = change.newOdoStart,
+                                odometerEnd = change.newOdoEnd
+                            ))
+                            affectedIds.add(change.tripId)
+                        }
+                    }
+                }
+                FixType.ADJUST_SINGLE_TRIP -> {
+                    if (gap.previousTrip != null) {
+                        val newDist = maxOf(1, (gap.previousTrip.distanceMeters / 1000) + gap.gapKm)
+                        tripDao.updateTrip(gap.previousTrip.copy(
+                            distanceMeters = newDist * 1000,
+                            odometerEnd = gap.previousTrip.odometerStart + newDist
+                        ))
+                        affectedIds.add(gap.previousTrip.id)
+                    } else if (gap.nextTrip != null) {
+                        val newDist = maxOf(1, (gap.nextTrip.distanceMeters / 1000) - gap.gapKm)
+                        val nextEnd = gap.nextTrip.odometerEnd ?: (gap.nextTrip.odometerStart + (gap.nextTrip.distanceMeters / 1000))
+                        tripDao.updateTrip(gap.nextTrip.copy(
+                            distanceMeters = newDist * 1000,
+                            odometerStart = nextEnd - newDist
+                        ))
+                        affectedIds.add(gap.nextTrip.id)
+                    }
+                }
+                FixType.MARK_AS_EXPLAINED, FixType.IGNORE -> {
+                    // Stored directly in OdometerGapResolution table below
+                }
+            }
+
+            val resolution = OdometerGapResolution(
+                vehicleId = gap.vehicleId,
+                detectedAt = now,
+                resolvedAt = now,
+                gapType = gap.gapType.name,
+                gapStartTimestamp = gap.gapTimeStart,
+                gapEndTimestamp = gap.gapTimeEnd,
+                expectedOdometer = gap.expectedOdometer,
+                actualOdometer = gap.actualOdometer,
+                gapKm = gap.gapKm,
+                resolution = fixType.name,
+                resolutionNote = note,
+                affectedTripIds = if (affectedIds.isNotEmpty()) affectedIds.joinToString(",") else null,
+                status = if (fixType == FixType.IGNORE) "IGNORED" else "RESOLVED"
+            )
+            odometerGapResolutionDao.insert(resolution)
+
+            // Ensure vehicle current odometer is at least the latest trip end
+            val vehicle = vehicleDao.getVehicleById(gap.vehicleId)
+            if (vehicle != null) {
+                val latest = tripDao.getTripsByVehicleSync(gap.vehicleId).maxByOrNull { it.startTime }
+                val latestEnd = latest?.odometerEnd ?: latest?.let { it.odometerStart + (it.distanceMeters / 1000) }
+                if (latestEnd != null && latestEnd > vehicle.odometerCurrent) {
+                    vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = latestEnd))
+                }
+            }
+
+            onComplete()
+        }
+    }
+
+    fun batchResolveSmallGaps(vehicleId: Long, maxGapKm: Int = 5, onComplete: (Int) -> Unit = {}) {
+        viewModelScope.launch {
+            val vehicle = vehicleDao.getVehicleById(vehicleId) ?: return@launch onComplete(0)
+            val trips = tripDao.getTripsByVehicleSync(vehicleId)
+            val gaps = OdometerGapAnalyzer.analyze(vehicle, trips)
+            val smallGaps = gaps.filter { kotlin.math.abs(it.gapKm) <= maxGapKm }
+
+            var resolvedCount = 0
+            for (gap in smallGaps) {
+                if (gap.gapKm > 0) {
+                    resolveGap(gap, FixType.CREATE_PRIVATE_TRIP, "Automatische aansluiting (< ${maxGapKm} km)")
+                } else {
+                    resolveGap(gap, FixType.ADJUST_SINGLE_TRIP, "Automatische correctie overlap (< ${maxGapKm} km)")
+                }
+                resolvedCount++
+            }
+            onComplete(resolvedCount)
         }
     }
 

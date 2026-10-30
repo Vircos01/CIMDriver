@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -41,6 +42,9 @@ fun OdometerChecksScreen(
     val vehicles by viewModel.vehicles.collectAsState(initial = emptyList())
     val vehicle = vehicles.find { it.id == vehicleId }
     val checks by viewModel.getChecksForVehicle(vehicleId).collectAsState(initial = emptyList())
+    val trips by viewModel.getTripsForVehicle(vehicleId).collectAsState(initial = emptyList())
+    val resolutions by viewModel.getResolutionsForVehicle(vehicleId).collectAsState(initial = emptyList())
+    val context = LocalContext.current
 
     var selectedPhoto by remember { mutableStateOf<String?>(null) }
     val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
@@ -61,6 +65,32 @@ fun OdometerChecksScreen(
                             contentDescription = "Terug",
                             tint = com.cimdriver.app.ui.theme.CIMDriverWhite
                         )
+                    }
+                },
+                actions = {
+                    if (vehicle != null) {
+                        IconButton(onClick = {
+                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                context = context,
+                                fileName = "integriteitsrapport_${vehicle.licensePlate}.pdf",
+                                mimeType = "application/pdf"
+                            ) { uri ->
+                                com.cimdriver.app.util.ExportUtil.exportIntegrityReport(
+                                    context = context,
+                                    uri = uri,
+                                    vehicle = vehicle,
+                                    trips = trips,
+                                    checks = checks,
+                                    resolutions = resolutions
+                                )
+                            }
+                        }) {
+                            Icon(
+                                Icons.Default.PictureAsPdf,
+                                contentDescription = "Integriteitsrapport PDF",
+                                tint = com.cimdriver.app.ui.theme.CIMDriverWhite
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -214,6 +244,29 @@ fun OdometerCheckCard(
                         text = "Correctie: ${if (diff > 0) "+" else ""}${diff} km",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (diff != 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                if (check.correctionStrategy != "NONE") {
+                    val stratLabel = when (check.correctionStrategy) {
+                        "CREATE_TRIP" -> "Privérit aangemaakt"
+                        "DISTRIBUTE" -> "Evenredig verdeeld"
+                        "GAP_WITH_REASON" -> "Verklaard gat"
+                        "MANUAL" -> "In afwachting"
+                        else -> check.correctionStrategy
+                    }
+                    Text(
+                        text = "Strategie: $stratLabel",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                if (!check.correctionReason.isNullOrBlank()) {
+                    Text(
+                        text = "Toelichting: ${check.correctionReason}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

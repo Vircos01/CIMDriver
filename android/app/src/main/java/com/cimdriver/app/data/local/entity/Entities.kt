@@ -301,8 +301,43 @@ data class OdometerCheck(
     val timestamp: Long,
     val registeredOdometer: Int,
     val correctedOdometer: Int,
-    val photoPath: String?
+    val photoPath: String? = null,
+    val deviationKm: Int = 0,
+    val correctionStrategy: String = "NONE",
+    val correctionReason: String? = null,
+    val status: String = "CONFIRMED",
+    val affectedTripIds: String? = null
 )
+
+@Entity(
+    tableName = "odometer_gap_resolutions",
+    foreignKeys = [
+        ForeignKey(
+            entity = Vehicle::class,
+            parentColumns = ["id"],
+            childColumns = ["vehicleId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["vehicleId"])]
+)
+data class OdometerGapResolution(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val vehicleId: Long,
+    val detectedAt: Long,
+    val resolvedAt: Long? = null,
+    val gapType: String,
+    val gapStartTimestamp: Long,
+    val gapEndTimestamp: Long,
+    val expectedOdometer: Int,
+    val actualOdometer: Int,
+    val gapKm: Int,
+    val resolution: String,
+    val resolutionNote: String? = null,
+    val affectedTripIds: String? = null,
+    val status: String = "OPEN"
+)
+
 
 @Entity(
     tableName = "fuel_fillups",

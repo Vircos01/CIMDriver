@@ -32,6 +32,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cimdriver.app.ui.components.DashboardPermissionsSection
@@ -86,9 +88,11 @@ fun DashboardScreen(
     settingsViewModel: com.cimdriver.app.ui.viewmodel.SettingsViewModel = hiltViewModel(),
     updateViewModel: com.cimdriver.app.ui.viewmodel.UpdateViewModel = hiltViewModel(),
     hoursTargetViewModel: com.cimdriver.app.ui.viewmodel.HoursTargetViewModel = hiltViewModel(),
+    vehiclesViewModel: com.cimdriver.app.ui.viewmodel.VehiclesViewModel = hiltViewModel(),
     onNavigateToTrips: () -> Unit = {},
     onNavigateToWorkHours: () -> Unit = {},
-    onNavigateToDiagnostics: () -> Unit = {}
+    onNavigateToDiagnostics: () -> Unit = {},
+    onNavigateToGaps: (Long) -> Unit = {}
 ) {
     val locale = currentAppLocale()
     val context = LocalContext.current
@@ -148,6 +152,8 @@ fun DashboardScreen(
     val categoryBreakdown = uiState.dashboardCategoryBreakdown
     val workHoursChartData by workHoursViewModel.dashboardWorkHoursChartData.collectAsState()
     val trackingStatus by TrackingStatusStore.status.collectAsState()
+    val openGapsCount by vehiclesViewModel.openGapsCount.collectAsState(initial = 0)
+    val defaultVehicle = remember(vehicles) { vehicles.find { it.isDefault } ?: vehicles.firstOrNull() }
     val settings by settingsViewModel.settings.collectAsState()
     var showTrackingStatusDialog by remember { mutableStateOf(false) }
 
@@ -317,6 +323,57 @@ fun DashboardScreen(
                                 )
                             ) {
                                 Text(stringResource(R.string.view_work_hours))
+                            }
+                        }
+                    }
+                }
+
+                if (openGapsCount > 0 && defaultVehicle != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = "Gaten in KM-Registratie", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = "Er zijn $openGapsCount onopgeloste gaten gedetecteerd in de registratie van ${defaultVehicle.name}. Los deze op voor een sluitende administratie.", textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onErrorContainer)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { onNavigateToGaps(defaultVehicle.id) },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.onErrorContainer,
+                                    contentColor = MaterialTheme.colorScheme.errorContainer
+                                )
+                            ) {
+                                Text("Gaten bekijken en oplossen")
+                            }
+                        }
+                    }
+                }
+
+                if (defaultVehicle != null && defaultVehicle.lastOdometerCheckTimestamp > 0) {
+                    val daysSinceCheck = ((System.currentTimeMillis() - defaultVehicle.lastOdometerCheckTimestamp) / (1000 * 60 * 60 * 24)).toInt()
+                    if (daysSinceCheck >= 30) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFFEF3C7))
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "Km-controle aanbevolen", style = MaterialTheme.typography.titleMedium, color = Color(0xFF92400E), fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(text = "Laatste km-controle van ${defaultVehicle.name} was $daysSinceCheck dagen geleden. Voer een controle uit om de keten sluitend te houden.", textAlign = TextAlign.Center, color = Color(0xFF92400E))
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Button(
+                                    onClick = { com.cimdriver.app.service.OdometerCheckStore.requestCheck(defaultVehicle.id) },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFFD97706),
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Text("Km-stand controleren")
+                                }
                             }
                         }
                     }
@@ -613,11 +670,11 @@ fun DashboardScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     if (target.targetType == "REVENUE") {
-                                        Text("€ ${String.format("%.2f", progress.accumulatedRevenue)}", style = MaterialTheme.typography.bodyMedium)
-                                        Text("Doel: € ${String.format("%.2f", progress.effectiveTargetValue)}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(String.format(locale, "€ %,.2f", progress.accumulatedRevenue), style = MaterialTheme.typography.bodyMedium)
+                                        Text("Doel: " + String.format(locale, "€ %,.2f", progress.effectiveTargetValue), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     } else {
-                                        Text("${String.format("%.1f", progress.accumulatedHours)} uur", style = MaterialTheme.typography.bodyMedium)
-                                        Text("Doel: ${String.format("%.1f", progress.effectiveTargetValue)} uur", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(String.format(locale, "%,.1f uur", progress.accumulatedHours), style = MaterialTheme.typography.bodyMedium)
+                                        Text("Doel: " + String.format(locale, "%,.1f uur", progress.effectiveTargetValue), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                 }
                             }

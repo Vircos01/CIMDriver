@@ -351,8 +351,19 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     confirmButton = {
                         TextButton(onClick = {
                             val corrected = odometerInput.toIntOrNull() ?: checkVehicle.odometerCurrent
-                            vehiclesViewModel.confirmOdometerCheck(checkVehicle, corrected, photoPath)
+                            val deviation = corrected - checkVehicle.odometerCurrent
                             com.cimdriver.app.service.OdometerCheckStore.dismiss()
+                            if (deviation != 0) {
+                                navController.navigate(
+                                    OdometerCheckAnalysisRoute(
+                                        vehicleId = checkVehicle.id,
+                                        enteredOdometer = corrected,
+                                        photoPath = photoPath
+                                    )
+                                )
+                            } else {
+                                vehiclesViewModel.confirmOdometerCheck(checkVehicle, corrected, photoPath)
+                            }
                         }) {
                             Text("Bevestigen")
                         }
@@ -399,6 +410,9 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     },
                     onNavigateToDiagnostics = {
                         navController.navigate(DiagnosticsRoute)
+                    },
+                    onNavigateToGaps = { vehicleId ->
+                        navController.navigate(OdometerGapReviewRoute(vehicleId = vehicleId))
                     }
                 ) 
             }
@@ -435,12 +449,30 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     onOpenDrawer = onOpenDrawer,
                     onAddVehicle = { navController.navigate(AddVehicleRoute()) },
                     onEditVehicle = { vehicleId -> navController.navigate(AddVehicleRoute(vehicleId = vehicleId)) },
-                    onViewOdometerChecks = { vehicleId -> navController.navigate(OdometerChecksRoute(vehicleId = vehicleId)) }
+                    onViewOdometerChecks = { vehicleId -> navController.navigate(OdometerChecksRoute(vehicleId = vehicleId)) },
+                    onViewGaps = { vehicleId -> navController.navigate(OdometerGapReviewRoute(vehicleId = vehicleId)) }
                 ) 
             }
             composable<OdometerChecksRoute> { backStackEntry ->
                 val args = backStackEntry.toRoute<OdometerChecksRoute>()
                 com.cimdriver.app.ui.screens.OdometerChecksScreen(
+                    vehicleId = args.vehicleId,
+                    onNavigateBack = { navController.navigateUp() }
+                )
+            }
+            composable<OdometerCheckAnalysisRoute> { backStackEntry ->
+                val args = backStackEntry.toRoute<OdometerCheckAnalysisRoute>()
+                com.cimdriver.app.ui.screens.OdometerCheckAnalysisScreen(
+                    vehicleId = args.vehicleId,
+                    enteredOdometer = args.enteredOdometer,
+                    photoPath = args.photoPath,
+                    onNavigateBack = { navController.navigateUp() },
+                    onConfirmed = { navController.navigateUp() }
+                )
+            }
+            composable<OdometerGapReviewRoute> { backStackEntry ->
+                val args = backStackEntry.toRoute<OdometerGapReviewRoute>()
+                com.cimdriver.app.ui.screens.OdometerGapReviewScreen(
                     vehicleId = args.vehicleId,
                     onNavigateBack = { navController.navigateUp() }
                 )

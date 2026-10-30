@@ -4,7 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.0 (Current Version)
+## Version 1.3.1 (Current Version)
+*Release date: October 30, 2026*
+
+!!! success "New Features & Improvements"
+    * **Airtight Odometer Registration (Tax Authority Compliant):** Full chain integrity and gap resolution between consecutive trips and periodic odometer checks.
+    * **Interactive Check Analysis:** When registering an odometer check with discrepancies, the app provides immediate root-cause analysis and resolution options (assign as trip, distribute across trips, or log audited explanation).
+    * **Retroactive Gap Detection & Review:** Automatically detects gaps and discontinuities in trip history with one-tap batch fixing.
+    * **PDF Integrity Report:** Export an official integrity and audit report containing all checks, deviations, and resolutions for tax audit compliance.
+    * **Thousands Separators:** Targets (revenue and hours) on the dashboard and detail screens now format numbers with readable thousands separators.
+
+## Version 1.3.0
 *Release date: October 26, 2026*
 
 !!! success "Improvements & Bug Fixes"

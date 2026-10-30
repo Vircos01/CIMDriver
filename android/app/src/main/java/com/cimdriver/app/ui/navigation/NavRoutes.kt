@@ -72,3 +72,15 @@ data class AddFuelRoute(val fillUpId: Long? = null)
 
 @Serializable
 data class OdometerChecksRoute(val vehicleId: Long)
+
+@Serializable
+data class OdometerCheckAnalysisRoute(
+    val vehicleId: Long,
+    val enteredOdometer: Int,
+    val photoPath: String? = null
+)
+
+@Serializable
+data class OdometerGapReviewRoute(
+    val vehicleId: Long
+)

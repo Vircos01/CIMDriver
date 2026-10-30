@@ -37,6 +37,7 @@ fun HoursTargetsScreen(
     val clients by clientProjectViewModel.clients.collectAsState()
     val projectCodes by clientProjectViewModel.projectCodes.collectAsState()
     val currentYear by viewModel.currentYear.collectAsState()
+    val locale = currentAppLocale()
 
     var showAddDialog by remember { mutableStateOf(false) }
     var targetToEdit by remember { mutableStateOf<HoursTarget?>(null) }
@@ -116,17 +117,17 @@ fun HoursTargetsScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             if (target.targetType == "REVENUE") {
-                                Text("€ ${String.format("%.2f", progress.accumulatedRevenue)} / € ${String.format("%.2f", progress.effectiveTargetValue)}")
+                                Text("${String.format(locale, "€ %,.2f", progress.accumulatedRevenue)} / ${String.format(locale, "€ %,.2f", progress.effectiveTargetValue)}")
                             } else {
-                                Text("${String.format("%.1f", progress.accumulatedHours)} / ${String.format("%.1f", progress.effectiveTargetValue)} uur")
+                                Text("${String.format(locale, "%,.1f", progress.accumulatedHours)} / ${String.format(locale, "%,.1f", progress.effectiveTargetValue)} uur")
                             }
-                            Text("${String.format("%.1f", progress.percentage * 100)}%")
+                            Text("${String.format(locale, "%.1f", progress.percentage * 100)}%")
                         }
                         
                         // Show pro-rata indicator if applicable
                         if (progress.proRataFactor < 0.99) {
                             Text(
-                                "Pro-rata: ${String.format("%.0f", progress.proRataFactor * 100)}% van jaar (vol jaar: ${if (target.targetType == "REVENUE") "€ ${String.format("%.0f", target.targetRevenue)}" else "${target.targetHours.toInt()} uur"})",
+                                "Pro-rata: ${String.format(locale, "%.0f", progress.proRataFactor * 100)}% van jaar (vol jaar: ${if (target.targetType == "REVENUE") String.format(locale, "€ %,.0f", target.targetRevenue) else "${target.targetHours.toInt()} uur"})",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -155,9 +156,9 @@ fun HoursTargetsScreen(
                                 Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 if (target.targetType == "REVENUE") {
-                                    Text("Achter op schema: € ${String.format("%.2f", progress.diffValue)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                    Text("Achter op schema: ${String.format(locale, "€ %,.2f", progress.diffValue)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                                 } else {
-                                    Text("Achter op schema: ${String.format("%.1f", progress.diffValue)} uur", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                    Text("Achter op schema: ${String.format(locale, "%,.1f", progress.diffValue)} uur", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                                 }
                             } else {
                                 Icon(Icons.Filled.TrendingUp, contentDescription = null, tint = com.cimdriver.app.ui.theme.CIMDriverGreen, modifier = Modifier.size(16.dp))

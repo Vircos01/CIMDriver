@@ -6,7 +6,17 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.0 (Huidige Versie)
+## Versie 1.3.1 (Huidige Versie)
+*Releasedatum: 30 oktober 2026*
+
+!!! success "Nieuwe Functies & Verbeteringen"
+    * **Sluitende kilometerregistratie (Belastingdienst-proof):** Voorkomt en herstelt hiaten in de rittenregistratie tussen opeenvolgende ritten en periodieke kilometercontroles.
+    * **Interactieve controle-analyse:** Bij afwijkingen tijdens een km-controle toont de app direct een analyse met oplossingen (rit toevoegen, gat verdelen of toelichten).
+    * **Gat-detectie & Ketencontrole:** Achteraf automatisch opsporen en batchgewijs herstellen van ontbrekende kilometers in de rithistorie.
+    * **PDF Integriteitsrapport:** Exporteer een compleet integriteitsverslag voor de Belastingdienst met alle controles, afwijkingen en correcties.
+    * **Duizendtallen scheidingstekens:** Verbeterde leesbaarheid van targets (omzet en uren) op het dashboard met duizendtalscheiding.
+
+## Versie 1.3.0
 *Releasedatum: 26 oktober 2026*
 
 !!! success "Verbeteringen & Bugfixes"

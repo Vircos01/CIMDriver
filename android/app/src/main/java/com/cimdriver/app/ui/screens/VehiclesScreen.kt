@@ -76,7 +76,8 @@ fun VehiclesScreen(
     viewModel: VehiclesViewModel = hiltViewModel(),
     onAddVehicle: () -> Unit = {},
     onEditVehicle: (Long) -> Unit = {},
-    onViewOdometerChecks: (Long) -> Unit = {}
+    onViewOdometerChecks: (Long) -> Unit = {},
+    onViewGaps: (Long) -> Unit = {}
 ) {
     val vehicles by viewModel.vehicles.collectAsState(initial = emptyList())
     var vehicleToDelete by remember { mutableStateOf<Vehicle?>(null) }
@@ -132,12 +133,13 @@ fun VehiclesScreen(
                             vehicle = vehicle, 
                             onEdit = { onEditVehicle(it.id) },
                             onViewOdometerChecks = { onViewOdometerChecks(it.id) },
-                        onRecalculate = {
-                            vehicleToRecalculate = vehicle
-                        },
-                        onSetDefault = {
-                            viewModel.setAsDefaultVehicle(it)
-                        }
+                            onViewGaps = { onViewGaps(it.id) },
+                            onRecalculate = {
+                                vehicleToRecalculate = vehicle
+                            },
+                            onSetDefault = {
+                                viewModel.setAsDefaultVehicle(it)
+                            }
                         )
                     }
                 }

@@ -2,6 +2,18 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.1] - 2026-10-30
+
+### Toegevoegd & Verbeterd
+- **Sluitende kilometerregistratie (Belastingdienst-proof):** Complete ketencontrole en sluitende administratie tussen opeenvolgende ritten en kilometercontroles.
+- **Interactieve controle-analyse:** Bij het registreren van een kilometercontrole met afwijking wordt de stand niet meer blind overschreven. De app toont direct een analyse en biedt herstelopties:
+  - Gat toewijzen als zakelijke of privé rit.
+  - Gat evenredig verdelen over gereden ritten in de periode.
+  - Alleen als meetcorrectie registreren met duidelijke toelichting voor de Belastingdienst.
+- **Achteraf gat-detectie & review:** Nieuw overzicht "Gat-detectie & Ketencontrole" binnen de kilometercontroles. Detecteert automatisch alle gaten en discontinuïteiten in de rithistorie met de mogelijkheid tot batch-herstel.
+- **PDF Integriteitsrapport:** Exporteer een officieel Belastingdienst-conform integriteitsrapport van alle controles, afwijkingen, gat-detecties en audit-resoluties.
+- **Leesbaarheid Dashboard Targets:** Grote getallen (uren en omzet) op het dashboard en in het doelenoverzicht worden nu geformatteerd met duizendtallen scheidingstekens (bijv. € 85.000,00 en 1.250,0 uur).
+
 ## [1.3.0] - 2026-10-26
 
 ### Opgelost & Verbeterd
