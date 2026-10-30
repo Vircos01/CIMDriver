@@ -386,9 +386,24 @@ class TripsViewModel @Inject constructor(
             if (vehicleId != null) {
                 val vehicle = tripRepository.getVehicleById(vehicleId)
                 if (vehicle != null) {
-                    odoStart = vehicle.odometerCurrent
-                    odoEnd = TripDistance.updatedOdometer(odoStart, distanceM)
-                    tripRepository.updateVehicle(vehicle.copy(odometerCurrent = odoEnd))
+                    val existingTrips = database.tripDao().getTripsByVehicleSync(vehicleId)
+                    val isLatest = existingTrips.isEmpty() || startTime >= (existingTrips.maxOfOrNull { it.startTime } ?: 0L)
+                    
+                    if (isLatest) {
+                        odoStart = vehicle.odometerCurrent
+                        odoEnd = TripDistance.updatedOdometer(odoStart, distanceM)
+                        tripRepository.updateVehicle(vehicle.copy(odometerCurrent = odoEnd))
+                    } else {
+                        // Historical trip: find the trip directly preceding this startTime
+                        val prevTrip = existingTrips.filter { it.startTime <= startTime }.maxByOrNull { it.startTime }
+                        odoStart = if (prevTrip != null) {
+                            prevTrip.odometerEnd ?: TripDistance.updatedOdometer(prevTrip.odometerStart, prevTrip.distanceMeters)
+                        } else {
+                            vehicle.odometerStart
+                        }
+                        odoEnd = TripDistance.updatedOdometer(odoStart, distanceM)
+                        // Do not modify vehicle.odometerCurrent as subsequent trips already happened
+                    }
                 }
             }
 
@@ -555,14 +570,29 @@ class TripsViewModel @Inject constructor(
     fun deleteTrip(trip: Trip) {
         viewModelScope.launch {
             database.withTransaction {
-                trip.vehicleId?.let { vehicleId ->
-                    tripRepository.getVehicleById(vehicleId)?.let { vehicle ->
-                        val correctedOdometer = vehicle.odometerCurrent -
-                            TripDistance.metersToOdometerKilometers(trip.distanceMeters)
-                        tripRepository.updateVehicle(vehicle.copy(odometerCurrent = correctedOdometer.coerceAtLeast(0)))
+                val vehicleId = trip.vehicleId
+                tripRepository.deleteTrip(trip)
+
+                if (vehicleId != null) {
+                    val vehicle = tripRepository.getVehicleById(vehicleId)
+                    if (vehicle != null) {
+                        val remainingTrips = database.tripDao().getTripsByVehicleSync(vehicleId)
+                        val latestRemaining = remainingTrips.maxByOrNull { it.startTime }
+
+                        if (latestRemaining != null) {
+                            val latestEnd = latestRemaining.odometerEnd
+                                ?: TripDistance.updatedOdometer(latestRemaining.odometerStart, latestRemaining.distanceMeters)
+                            // Only revert/sync vehicle.odometerCurrent if:
+                            // 1. The deleted trip was the latest trip, OR
+                            // 2. vehicle.odometerCurrent was inflated by this trip (higher than the latest remaining trip's end)
+                            if (trip.startTime >= latestRemaining.startTime || vehicle.odometerCurrent > latestEnd) {
+                                tripRepository.updateVehicle(vehicle.copy(odometerCurrent = latestEnd))
+                            }
+                        } else {
+                            tripRepository.updateVehicle(vehicle.copy(odometerCurrent = vehicle.odometerStart))
+                        }
                     }
                 }
-                tripRepository.deleteTrip(trip)
             }
         }
     }
@@ -571,13 +601,22 @@ class TripsViewModel @Inject constructor(
         database.withTransaction {
             existingTrip.vehicleId?.let { oldVehicleId ->
                 tripRepository.getVehicleById(oldVehicleId)?.let { vehicle ->
-                    val correctedOdometer = vehicle.odometerCurrent -
-                        TripDistance.metersToOdometerKilometers(existingTrip.distanceMeters)
-                    tripRepository.updateVehicle(vehicle.copy(odometerCurrent = correctedOdometer.coerceAtLeast(0)))
+                    val trips = database.tripDao().getTripsByVehicleSync(oldVehicleId)
+                    val isLatest = trips.all { it.id == existingTrip.id || it.startTime <= existingTrip.startTime }
+                    if (isLatest) {
+                        val oldDistKm = TripDistance.metersToOdometerKilometers(existingTrip.distanceMeters)
+                        val correctedOdometer = if (oldVehicleId == newVehicleId) {
+                            val newDistKm = TripDistance.metersToOdometerKilometers(newDistanceMeters)
+                            vehicle.odometerCurrent - oldDistKm + newDistKm
+                        } else {
+                            vehicle.odometerCurrent - oldDistKm
+                        }
+                        tripRepository.updateVehicle(vehicle.copy(odometerCurrent = correctedOdometer.coerceAtLeast(vehicle.odometerStart)))
+                    }
                 }
             }
-            newVehicleId?.let { targetVehicleId ->
-                tripRepository.getVehicleById(targetVehicleId)?.let { vehicle ->
+            if (newVehicleId != null && newVehicleId != existingTrip.vehicleId) {
+                tripRepository.getVehicleById(newVehicleId)?.let { vehicle ->
                     tripRepository.updateVehicle(vehicle.copy(
                         odometerCurrent = TripDistance.updatedOdometer(vehicle.odometerCurrent, newDistanceMeters)
                     ))

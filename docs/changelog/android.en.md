@@ -4,7 +4,18 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.2 (Current Version)
+## Version 1.3.3 (Current Version)
+*Release date: October 30, 2026*
+
+!!! success "New Features & Improvements"
+    * **Recalculate Odometer Readings Chronologically:** Recompute all odometer start and end values based on trip distances and odometer checkpoints.
+    * **Preserve Audit Trail Gaps:** Discrepancies identified during odometer checks remain preserved as open audit points for full tax compliance.
+    * **Interactive Preview Dialog:** Preview affected trips, preserved checkpoints, and remaining gaps before applying changes.
+    * **Flexible Trip Types in Gap Resolution:** Select between Personal, Business, or Commute when resolving gaps with a new trip.
+    * **One-Tap Odometer Sync:** Quickly align current vehicle odometer with the end of the last recorded trip.
+    * **Time Window Fix:** Prevent inverted time range display when trips overlap chronologically.
+
+## Version 1.3.2
 *Release date: October 30, 2026*
 
 !!! success "Improvements & Bug Fixes"

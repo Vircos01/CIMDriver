@@ -261,6 +261,7 @@ class VehiclesViewModel @Inject constructor(
         note: String?,
         customStartAddress: String? = null,
         customEndAddress: String? = null,
+        tripType: String = "PERSONAL",
         onComplete: () -> Unit = {}
     ) {
         viewModelScope.launch {
@@ -275,6 +276,7 @@ class VehiclesViewModel @Inject constructor(
                     val endAddr = customEndAddress?.takeIf { it.isNotBlank() }
                         ?: gap.nextTrip?.startAddress
                         ?: startAddr
+                    val defaultNote = if (tripType == "BUSINESS") "Zakelijke rit voor sluitende tellerstand" else "Privérit voor sluitende tellerstand"
                     val trip = Trip(
                         vehicleId = gap.vehicleId,
                         startTime = gap.gapTimeStart,
@@ -282,8 +284,8 @@ class VehiclesViewModel @Inject constructor(
                         startAddress = startAddr,
                         endAddress = endAddr,
                         distanceMeters = kotlin.math.abs(gap.gapKm) * 1000,
-                        tripType = "PERSONAL",
-                        note = note?.takeIf { it.isNotBlank() } ?: "Privérit voor sluitende tellerstand",
+                        tripType = tripType,
+                        note = note?.takeIf { it.isNotBlank() } ?: defaultNote,
                         status = "DONE",
                         isManual = true,
                         odometerStart = gap.expectedOdometer,
@@ -312,6 +314,12 @@ class VehiclesViewModel @Inject constructor(
                         affectedIds.add(gap.nextTrip.id)
                     }
                 }
+                FixType.SYNC_VEHICLE_ODOMETER -> {
+                    val vehicle = vehicleDao.getVehicleById(gap.vehicleId)
+                    if (vehicle != null) {
+                        vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = gap.expectedOdometer))
+                    }
+                }
                 FixType.MARK_AS_EXPLAINED, FixType.IGNORE -> {
                     // Stored directly in OdometerGapResolution table below
                 }
@@ -335,16 +343,62 @@ class VehiclesViewModel @Inject constructor(
             odometerGapResolutionDao.insert(resolution)
 
             // Ensure vehicle current odometer is at least the latest trip end
-            val vehicle = vehicleDao.getVehicleById(gap.vehicleId)
-            if (vehicle != null) {
-                val latest = tripDao.getTripsByVehicleSync(gap.vehicleId).maxByOrNull { it.startTime }
-                val latestEnd = latest?.odometerEnd ?: latest?.let { it.odometerStart + kotlin.math.round(it.distanceMeters / 1000.0).toInt() }
-                if (latestEnd != null && latestEnd > vehicle.odometerCurrent) {
-                    vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = latestEnd))
+            if (fixType != FixType.SYNC_VEHICLE_ODOMETER) {
+                val vehicle = vehicleDao.getVehicleById(gap.vehicleId)
+                if (vehicle != null) {
+                    val latest = tripDao.getTripsByVehicleSync(gap.vehicleId).maxByOrNull { it.startTime }
+                    val latestEnd = latest?.odometerEnd ?: latest?.let { it.odometerStart + kotlin.math.round(it.distanceMeters / 1000.0).toInt() }
+                    if (latestEnd != null && latestEnd > vehicle.odometerCurrent) {
+                        vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = latestEnd))
+                    }
                 }
             }
 
             onComplete()
+        }
+    }
+
+    fun previewRecalculateOdometerChain(
+        vehicleId: Long,
+        onResult: (com.cimdriver.app.util.RecalculationPreview?) -> Unit
+    ) {
+        viewModelScope.launch {
+            val vehicle = vehicleDao.getVehicleById(vehicleId)
+            if (vehicle == null) {
+                onResult(null)
+                return@launch
+            }
+            val trips = tripDao.getTripsByVehicleSync(vehicleId)
+            val checks = odometerCheckDao.getChecksForVehicleSync(vehicleId)
+            val resolutions = odometerGapResolutionDao.getResolutionsForVehicleSync(vehicleId)
+
+            val preview = com.cimdriver.app.util.OdometerRecalculator.preview(
+                vehicle = vehicle,
+                trips = trips,
+                odometerChecks = checks,
+                resolutions = resolutions
+            )
+            onResult(preview)
+        }
+    }
+
+    fun applyRecalculateOdometerChain(
+        vehicleId: Long,
+        preview: com.cimdriver.app.util.RecalculationPreview,
+        onComplete: (Int) -> Unit
+    ) {
+        viewModelScope.launch {
+            val vehicle = vehicleDao.getVehicleById(vehicleId) ?: return@launch onComplete(0)
+
+            // 1. Bulk update trips
+            if (preview.recalculatedTrips.isNotEmpty()) {
+                tripDao.updateTrips(preview.recalculatedTrips)
+            }
+
+            // 2. Update vehicle current odometer
+            vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = preview.newCurrentOdometer))
+
+            onComplete(preview.modifiedTripsCount)
         }
     }
 

@@ -62,6 +62,9 @@ interface TripDao {
 
     @Update
     suspend fun updateTrip(trip: Trip)
+
+    @Update
+    suspend fun updateTrips(trips: List<Trip>)
     
     @Query("SELECT COUNT(*) FROM trips WHERE vehicleId = :vehicleId")
     suspend fun getTripCountForVehicle(vehicleId: Long): Int

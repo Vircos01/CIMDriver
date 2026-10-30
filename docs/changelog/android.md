@@ -6,7 +6,18 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.2 (Huidige Versie)
+## Versie 1.3.3 (Huidige Versie)
+*Releasedatum: 30 oktober 2026*
+
+!!! success "Nieuwe Functies & Verbeteringen"
+    * **Tellerstanden chronologisch opnieuw doorberekenen:** Herbereken alle tellerstanden van een voertuig chronologisch op basis van rittijden, afstanden en uitgevoerde km-controles.
+    * **Behoud van geconstateerde gaten:** Gaten bij tussentijdse kilometercontroles blijven netjes bewaard voor een sluitende Belastingdienst-audit trail.
+    * **Interactieve previewdialoog:** Direct overzicht van aangepaste ritten, behouden controlepunten en overblijvende gaten vóór toepassing.
+    * **Flexibele rit-typen bij gaten oplossen:** Kies nu direct tussen Privé, Zakelijk of Woon-werk bij het toevoegen van een aansluitende rit.
+    * **Directe tellersynchronisatie:** Zet de actuele tellerstand met één klik gelijk aan de laatste rit om eindverschillen direct op te lossen.
+    * **Verbeterde tijdsvolgorde:** Correcte weergave van tijdsbereiken bij overlappende ritten.
+
+## Versie 1.3.2
 *Releasedatum: 30 oktober 2026*
 
 !!! success "Verbeteringen & Bugfixes"

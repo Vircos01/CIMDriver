@@ -2,6 +2,16 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.3] - 2026-10-30
+
+### Toegevoegd & Verbeterd
+- **Tellerstanden chronologisch opnieuw doorberekenen (`OdometerRecalculator`):** Nieuwe functie om alle tellerstanden van een voertuig chronologisch opnieuw door te rekenen vanaf de startstand op basis van geregistreerde ritafstanden en uitgevoerde kilometercontroles.
+- **Behoud van audit-trail gaten:** Gaten die zijn geconstateerd bij tussentijdse kilometercontroles blijven netjes bewaard als openstaande auditpunten zodat de administratie 100% fiscaal sluitend en controleerbaar blijft.
+- **Interactieve Preview & Bevestigingsdialoog:** Direct inzicht in het aantal ritten dat wordt aangepast, behouden controlepunten en overblijvende gaten voordat de herberekening wordt toegepast.
+- **Flexibele rit-typen bij gaten oplossen:** Bij het toevoegen van een aansluitende rit kan nu direct gekozen worden tussen Privé (`PERSONAL`), Zakelijk (`BUSINESS`) en Woon-werk (`COMMUTE`).
+- **Directe actuele tellersynchronisatie (`SYNC_VEHICLE_ODOMETER`):** Verschillen met de actuele tellerstand aan het einde kunnen nu met één klik worden gecorrigeerd naar de eindstand van de voorgaande rit, zonder overbodige ritten aan te maken.
+- **Tijdsvolgorde bij overlappende ritten:** Voorkomen van geïnverteerde datumweergaven in de gatanalyse wanneer ritten elkaar in tijd overlappen.
+
 ## [1.3.2] - 2026-10-30
 
 ### Opgelost & Verbeterd

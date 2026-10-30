@@ -18,6 +18,7 @@ enum class FixType {
     CREATE_PRIVATE_TRIP,   // Create private trip for missing km
     ADJUST_SINGLE_TRIP,    // Adjust adjacent trip
     MARK_AS_EXPLAINED,     // Mark with explanation (e.g. maintenance/garage)
+    SYNC_VEHICLE_ODOMETER, // Sync current vehicle odometer with trip end (for CURRENT_STAND_GAP)
     IGNORE                 // Deliberately ignore
 }
 
@@ -131,11 +132,13 @@ object OdometerGapAnalyzer {
             val prevEnd = prev.effectiveOdometerEnd()
             val prevEndTime = prev.effectiveEndTime()
             val diff = next.odometerStart - prevEnd
+            val isTimeOverlap = next.startTime < prevEndTime
 
             if (diff != 0) {
                 val gapType = when {
                     diff < -50 -> GapType.ODOMETER_RESET
                     diff < 0 -> GapType.OVERLAPPING_KM
+                    isTimeOverlap -> GapType.OVERLAPPING_KM
                     (next.startTime - prevEndTime) > (48 * 3600 * 1000L) -> GapType.MISSING_TRIP
                     else -> GapType.MISSING_KM
                 }
@@ -145,6 +148,9 @@ object OdometerGapAnalyzer {
                     maxOf(0, i - 2),
                     minOf(sortedTrips.size, i + 3)
                 )
+
+                val timeStart = if (isTimeOverlap) minOf(prev.startTime, next.startTime) else prevEndTime
+                val timeEnd = if (isTimeOverlap) maxOf(prevEndTime, next.effectiveEndTime()) else next.startTime
 
                 gaps.add(
                     OdometerGap(
@@ -156,8 +162,8 @@ object OdometerGapAnalyzer {
                         expectedOdometer = prevEnd,
                         actualOdometer = next.odometerStart,
                         gapKm = diff,
-                        gapTimeStart = prevEndTime,
-                        gapTimeEnd = next.startTime,
+                        gapTimeStart = timeStart,
+                        gapTimeEnd = timeEnd,
                         suggestedFixes = generateFixes(
                             gapType = gapType,
                             gapKm = diff,
@@ -191,7 +197,7 @@ object OdometerGapAnalyzer {
                     gapTimeStart = lastTripEndTime,
                     gapTimeEnd = System.currentTimeMillis(),
                     suggestedFixes = generateFixes(
-                        gapType = gapType,
+                        gapType = GapType.CURRENT_STAND_GAP,
                         gapKm = currentDiff,
                         prevTrip = lastTrip,
                         nextTrip = null,
@@ -228,7 +234,7 @@ object OdometerGapAnalyzer {
                 fixes.add(
                     SuggestedFix(
                         type = FixType.CREATE_PRIVATE_TRIP,
-                        title = "Privérit toevoegen ($gapKm km)",
+                        title = "Rit toevoegen ($gapKm km)",
                         description = "Maak een sluitende aansluitende rit van $fromAddr naar $toAddr."
                     )
                 )
@@ -237,7 +243,7 @@ object OdometerGapAnalyzer {
                     SuggestedFix(
                         type = FixType.CREATE_PRIVATE_TRIP,
                         title = "Verzamelrit toevoegen ($gapKm km)",
-                        description = "Maak één privérit van $fromAddr naar $toAddr. Tip: Bij meerdere ritten is handmatig los toevoegen via 'Rit Toevoegen' fiscaal zuiverder."
+                        description = "Maak één rit van $fromAddr naar $toAddr. Tip: Bij meerdere ritten is handmatig los toevoegen via 'Rit Toevoegen' fiscaal zuiverder."
                     )
                 )
             }
@@ -252,6 +258,19 @@ object OdometerGapAnalyzer {
                     )
                 )
             }
+        }
+
+        // For current stand discrepancy: option to synchronize vehicle odometer with latest trip
+        if (gapType == GapType.CURRENT_STAND_GAP && prevTrip != null) {
+            val endStand = prevTrip.effectiveOdometerEnd()
+            fixes.add(
+                0,
+                SuggestedFix(
+                    type = FixType.SYNC_VEHICLE_ODOMETER,
+                    title = "Actuele tellerstand gelijkzetten ($endStand km)",
+                    description = "Zet de actuele tellerstand van het voertuig gelijk aan de eindstand van rit #${prevTrip.id} ($endStand km)."
+                )
+            )
         }
 
         // Always available: Mark as explained for Dutch tax compliance

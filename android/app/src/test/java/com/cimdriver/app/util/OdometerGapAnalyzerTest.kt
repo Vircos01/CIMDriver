@@ -227,4 +227,48 @@ class OdometerGapAnalyzerTest {
         assertTrue(fixTypes.contains(FixType.IGNORE))
         assertFalse(fixTypes.contains(FixType.ADJUST_SINGLE_TRIP))
     }
+
+    @Test
+    fun testOverlappingTripsInTimeDoNotProduceInvertedDateRange() {
+        // Trip 1 ends at 17:05 (3000L), Trip 2 starts at 16:38 (2500L)
+        val trip1 = Trip(
+            id = 81L,
+            vehicleId = 1L,
+            startTime = 2000L,
+            endTime = 3000L,
+            startAddress = "A",
+            endAddress = "B",
+            distanceMeters = 8000,
+            tripType = "BUSINESS",
+            note = null,
+            status = "DONE",
+            isManual = false,
+            odometerStart = 32864,
+            odometerEnd = 32872
+        )
+        val trip2 = Trip(
+            id = 89L,
+            vehicleId = 1L,
+            startTime = 2500L,
+            endTime = 3500L,
+            startAddress = "A",
+            endAddress = "B",
+            distanceMeters = 8000,
+            tripType = "BUSINESS",
+            note = null,
+            status = "DONE",
+            isManual = true,
+            odometerStart = 32904,
+            odometerEnd = 32912
+        )
+
+        val testVehicle = vehicle.copy(odometerStart = 32864, odometerCurrent = 32912)
+        val gaps = OdometerGapAnalyzer.analyze(testVehicle, listOf(trip1, trip2))
+        
+        assertFalse(gaps.isEmpty())
+        val gap = gaps.first { it.previousTrip?.id == 81L && it.nextTrip?.id == 89L }
+        assertTrue("gapTimeStart must be <= gapTimeEnd", gap.gapTimeStart <= gap.gapTimeEnd)
+        assertEquals(2000L, gap.gapTimeStart)
+        assertEquals(3500L, gap.gapTimeEnd)
+    }
 }
