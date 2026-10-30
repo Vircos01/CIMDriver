@@ -19,6 +19,7 @@ class PreviewContainer {
             AppSettings.self,
             FavoriteRoute.self,
             OdometerCheck.self,
+            OdometerGapResolution.self,
             FuelFillUp.self,
             Client.self,
             ProjectCode.self,

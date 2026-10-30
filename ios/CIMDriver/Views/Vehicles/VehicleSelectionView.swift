@@ -27,6 +27,9 @@ struct VehicleSelectionView: View {
                                 Text("\(vehicle.make) \(vehicle.model) - \(vehicle.licensePlate)")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
+                                Text("Tellerstand: \(vehicle.odometerCurrent) km")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
                             }
                             Spacer()
                             if vehicle.isDefault {
@@ -34,6 +37,12 @@ struct VehicleSelectionView: View {
                                     .foregroundColor(.cimGreen)
                                     .font(.title2)
                             }
+                            
+                            NavigationLink(destination: OdometerGapReviewView(vehicle: vehicle)) {
+                                EmptyView()
+                            }
+                            .opacity(0)
+                            .frame(width: 0)
                             
                             Button(action: {
                                 vehicleToEdit = vehicle
@@ -43,6 +52,14 @@ struct VehicleSelectionView: View {
                                     .padding(.leading, 8)
                             }
                         }
+                    }
+                    .swipeActions(edge: .leading) {
+                        NavigationLink {
+                            OdometerGapReviewView(vehicle: vehicle)
+                        } label: {
+                            Label("Gaten", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                        .tint(.orange)
                     }
                 }
                 .onDelete(perform: deleteVehicles)
@@ -171,6 +188,15 @@ struct VehicleEditView: View {
             }
             
             if let v = existingVehicle {
+                Section("Kilometerketen & Kalibratie") {
+                    NavigationLink(destination: OdometerGapReviewView(vehicle: v)) {
+                        Label("Gaten in registratie & Herberekenen", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    NavigationLink(destination: OdometerCalibrationView(vehicle: v)) {
+                        Label("Tellerstand Kalibreren / IJken", systemImage: "gauge")
+                    }
+                }
+                
                 Section("Bluetooth Carkit") {
                     NavigationLink(destination: VehicleBluetoothView(vehicle: v)) {
                         Label("Beheer Bluetooth Carkits", systemImage: "car.side")
@@ -382,19 +408,21 @@ struct OdometerCalibrationView: View {
         
         // Simpele logica: updaten we gewoon de teller, in een echte app genereren we hier een correctie.
         if vehicle.odometerCorrectionStrategy == "CREATE_TRIP" && diff != 0 {
+            let now = Date()
+            let duration = max(300, min(3600, Double(abs(diff)) * 60))
             let correctionTrip = Trip(
                 vehicle: vehicle,
-                startTime: Date(),
-                endTime: Date(),
+                startTime: now.addingTimeInterval(-duration),
+                endTime: now,
                 startAddress: "Kalibratie Correctie",
                 endAddress: "Kalibratie Correctie",
-                distanceMeters: diff * 1000,
+                distanceMeters: abs(diff) * 1000,
                 tripType: "PRIVATE",
                 note: "Automatische correctierit",
                 status: "APPROVED",
                 isManual: true,
-                odometerStart: vehicle.odometerCurrent,
-                odometerEnd: newStand
+                odometerStart: min(vehicle.odometerCurrent, newStand),
+                odometerEnd: max(vehicle.odometerCurrent, newStand)
             )
             modelContext.insert(correctionTrip)
         }

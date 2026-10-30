@@ -32,7 +32,9 @@
 		38F2CF464B5709C50EB5E948 /* ManualWorkDayEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A11D0103E807E977ECA7609 /* ManualWorkDayEntryView.swift */; };
 		3904C7925C884DCE5289454A /* AddressMatchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9E3893C011580CC1912EB0 /* AddressMatchingTests.swift */; };
 		39A2BEF941F0B49D07F96E07 /* FuelFillUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B679D2713354E096A94A3FB7 /* FuelFillUp.swift */; };
+		3D58D805DFCACB4ECE8BD00A /* OdometerRecalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 394A48FB268905CD0D577289 /* OdometerRecalculator.swift */; };
 		449FB3BA5BDE238029153A93 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9526DBAEDBD7A44598BA34F /* CameraPicker.swift */; };
+		4D0F4EF444E202540FCED9D8 /* OdometerGapReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D8636BADCEB68275FAF154 /* OdometerGapReviewView.swift */; };
 		4F2C9B707B9F4139B7AD130B /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE595306EA41A3F24E3B4FA0 /* AboutView.swift */; };
 		55F1D11DFE019AFA79677125 /* LicenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9788B7B502CE09826157524D /* LicenseView.swift */; };
 		571CA11270CC7D27B15B65F0 /* RecoveryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2402D8498ECE60C4FA70BC /* RecoveryManager.swift */; };
@@ -65,6 +67,7 @@
 		AEFB23AF8B03F92A3A4DF4D9 /* DataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D25F5D9123C44B9096C4489 /* DataManagementView.swift */; };
 		B149FE30CB0B53B758D9EA64 /* Color+CIMDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31079D71E0F81FBBD170E7D3 /* Color+CIMDriver.swift */; };
 		B17E9392269621773DD6AE2C /* ClientProjectCatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E32066C107ED3A727163B6 /* ClientProjectCatalogView.swift */; };
+		B2996614084F6F52AA7EDFAC /* OdometerGapResolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EF1F7C1213C0A8AF50E440 /* OdometerGapResolution.swift */; };
 		B80D31FF07593491ADBCE63C /* WorkHoursView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCE9548F1A17BD62B7BE3DFB /* WorkHoursView.swift */; };
 		BD2B08203D224A84C00B23FD /* TargetCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7DCD42B3BA6B7602A2DA35 /* TargetCalculatorTests.swift */; };
 		C1C2FDD82E7A28AF52083590 /* TripDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E43D8518F2C320B8C88C017 /* TripDetailView.swift */; };
@@ -76,8 +79,10 @@
 		E7FC34E75E17E6422499F4D4 /* TripClassificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */; };
 		E8589E61ADA4202B0246AB90 /* Charts.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE683ADFEE7F43C24325CE5 /* Charts.swift */; };
 		F0E5613CF4EDBA46D96B2EE4 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6EAD0D5EFFCDC3EA7024D07 /* PreviewContainer.swift */; };
+		F4C6307A0ECE437EA96CDB67 /* OdometerGapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE992979A2FCFB9CF983B573 /* OdometerGapTests.swift */; };
 		F7CEC0D3E62C668FE988E096 /* AddressMatching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FD64C61936699E2D7CEDDFA /* AddressMatching.swift */; };
 		FA2CCB26617AB3562F7AE2C7 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49894BF1458B3FFF48A75B5 /* BackupManager.swift */; };
+		FB43C4186C3DF1B6C98C9D60 /* OdometerGapAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B78E2DE90FFD72B4DCEDD12 /* OdometerGapAnalyzer.swift */; };
 		FCA90E12EA0EE7A980446800 /* VehicleBluetoothView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14538E4755BB6AF13228E162 /* VehicleBluetoothView.swift */; };
 		FD2823B6EEC9F6D9BA57CE36 /* WorkDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9A9442B18494001CCE4C6E /* WorkDay.swift */; };
 /* End PBXBuildFile section */
@@ -127,6 +132,7 @@
 		16C4FD9554B67CFB71D2EE23 /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
 		174BF299555097EF06882B3B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1A88ADB337BB974C46585D19 /* DashboardStatsCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatsCalculatorTests.swift; sourceTree = "<group>"; };
+		1B78E2DE90FFD72B4DCEDD12 /* OdometerGapAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerGapAnalyzer.swift; sourceTree = "<group>"; };
 		1C9D9EA8AF0A98E7C7A609E2 /* ExportUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportUtil.swift; sourceTree = "<group>"; };
 		1F31C4CEFBD0B33D3E41FB69 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripClassificationTests.swift; sourceTree = "<group>"; };
@@ -137,10 +143,13 @@
 		31079D71E0F81FBBD170E7D3 /* Color+CIMDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+CIMDriver.swift"; sourceTree = "<group>"; };
 		3322E5982DC0605FCC79513D /* Date+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Formatting.swift"; sourceTree = "<group>"; };
 		333A9B8F91A86F595F76041C /* CIMDriverWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIMDriverWidgetBundle.swift; sourceTree = "<group>"; };
+		394A48FB268905CD0D577289 /* OdometerRecalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerRecalculator.swift; sourceTree = "<group>"; };
 		3BE69B5F1775BFE41BC8CE77 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		3C7B5B36CBDB2CF2D2B9C49B /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
 		3D21B52CD30A1FD2BC433CB4 /* OdometerCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerCheck.swift; sourceTree = "<group>"; };
 		41D0248C488F6B2CC190EFC1 /* AddressSelectionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSelectionSheet.swift; sourceTree = "<group>"; };
+		41D8636BADCEB68275FAF154 /* OdometerGapReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerGapReviewView.swift; sourceTree = "<group>"; };
+		41EF1F7C1213C0A8AF50E440 /* OdometerGapResolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerGapResolution.swift; sourceTree = "<group>"; };
 		4A11D0103E807E977ECA7609 /* ManualWorkDayEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualWorkDayEntryView.swift; sourceTree = "<group>"; };
 		4B15FB6EA070D185D3D4000B /* AddressListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressListView.swift; sourceTree = "<group>"; };
 		4B773B4B97CB18A63CD3E6C1 /* TripClassification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripClassification.swift; sourceTree = "<group>"; };
@@ -186,6 +195,7 @@
 		DAB389E5DC8F3A1AEF6E1EB9 /* CIMDriverTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CIMDriverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBAD76699A491F8B011DD3BF /* TrackingLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingLiveActivity.swift; sourceTree = "<group>"; };
 		DDA2935467659DC98FB5497C /* HoursTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoursTarget.swift; sourceTree = "<group>"; };
+		DE992979A2FCFB9CF983B573 /* OdometerGapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerGapTests.swift; sourceTree = "<group>"; };
 		E677294ADA606565D97B1360 /* CIMDriver.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CIMDriver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0442975784DD40204073573 /* AddressSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressSearchViewModel.swift; sourceTree = "<group>"; };
 		F8B4017C96741764EE9116DF /* ProjectCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectCode.swift; sourceTree = "<group>"; };
@@ -202,6 +212,8 @@
 				B9526DBAEDBD7A44598BA34F /* CameraPicker.swift */,
 				5C3EBA862BF6E73DBE7B9C23 /* DashboardStatsCalculator.swift */,
 				1C9D9EA8AF0A98E7C7A609E2 /* ExportUtil.swift */,
+				1B78E2DE90FFD72B4DCEDD12 /* OdometerGapAnalyzer.swift */,
+				394A48FB268905CD0D577289 /* OdometerRecalculator.swift */,
 				855F4A732842FD95163D675C /* OdometerTextRecognizer.swift */,
 				A6EAD0D5EFFCDC3EA7024D07 /* PreviewContainer.swift */,
 				C0ABBAC837802FC1807D2421 /* TargetCalculator.swift */,
@@ -331,6 +343,7 @@
 			children = (
 				5E9E3893C011580CC1912EB0 /* AddressMatchingTests.swift */,
 				1A88ADB337BB974C46585D19 /* DashboardStatsCalculatorTests.swift */,
+				DE992979A2FCFB9CF983B573 /* OdometerGapTests.swift */,
 				539237327ADD0DAB0288EC0C /* OdometerTextRecognizerTests.swift */,
 				CC7DCD42B3BA6B7602A2DA35 /* TargetCalculatorTests.swift */,
 				1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */,
@@ -369,6 +382,7 @@
 		DE126860F9370680C052768A /* Vehicles */ = {
 			isa = PBXGroup;
 			children = (
+				41D8636BADCEB68275FAF154 /* OdometerGapReviewView.swift */,
 				14538E4755BB6AF13228E162 /* VehicleBluetoothView.swift */,
 				D177D6920682FDD9279E7579 /* VehicleSelectionView.swift */,
 			);
@@ -405,6 +419,7 @@
 				DDA2935467659DC98FB5497C /* HoursTarget.swift */,
 				2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */,
 				3D21B52CD30A1FD2BC433CB4 /* OdometerCheck.swift */,
+				41EF1F7C1213C0A8AF50E440 /* OdometerGapResolution.swift */,
 				F8B4017C96741764EE9116DF /* ProjectCode.swift */,
 				2A07621028FC2304C57F43C4 /* SavedAddress.swift */,
 				3C7B5B36CBDB2CF2D2B9C49B /* Trip.swift */,
@@ -602,6 +617,10 @@
 				8F207F538A0CB454DA81F7E0 /* ManualTripEntryView.swift in Sources */,
 				38F2CF464B5709C50EB5E948 /* ManualWorkDayEntryView.swift in Sources */,
 				94DE3582C146A411C3170C6C /* OdometerCheck.swift in Sources */,
+				FB43C4186C3DF1B6C98C9D60 /* OdometerGapAnalyzer.swift in Sources */,
+				B2996614084F6F52AA7EDFAC /* OdometerGapResolution.swift in Sources */,
+				4D0F4EF444E202540FCED9D8 /* OdometerGapReviewView.swift in Sources */,
+				3D58D805DFCACB4ECE8BD00A /* OdometerRecalculator.swift in Sources */,
 				0ECA0D997602577E4D051F42 /* OdometerTextRecognizer.swift in Sources */,
 				F0E5613CF4EDBA46D96B2EE4 /* PreviewContainer.swift in Sources */,
 				C762613676ADF2A17FD712F9 /* ProjectCode.swift in Sources */,
@@ -632,6 +651,7 @@
 			files = (
 				3904C7925C884DCE5289454A /* AddressMatchingTests.swift in Sources */,
 				A7E78D53C71B7838FFBE78EF /* DashboardStatsCalculatorTests.swift in Sources */,
+				F4C6307A0ECE437EA96CDB67 /* OdometerGapTests.swift in Sources */,
 				7E0E272F4BA128C2DCCCD443 /* OdometerTextRecognizerTests.swift in Sources */,
 				BD2B08203D224A84C00B23FD /* TargetCalculatorTests.swift in Sources */,
 				E7FC34E75E17E6422499F4D4 /* TripClassificationTests.swift in Sources */,
@@ -673,14 +693,14 @@
 				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GIT_COMMIT = unknown;
 				INFOPLIST_FILE = CIMDriver/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.6;
+				MARKETING_VERSION = 0.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -756,14 +776,14 @@
 				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GIT_COMMIT = unknown;
 				INFOPLIST_FILE = CIMDriver/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.6;
+				MARKETING_VERSION = 0.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -774,7 +794,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -782,7 +802,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.6;
+				MARKETING_VERSION = 0.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
 				PRODUCT_NAME = CIMDriverWidget;
 				SDKROOT = iphoneos;
@@ -868,7 +888,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -876,7 +896,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.6;
+				MARKETING_VERSION = 0.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
 				PRODUCT_NAME = CIMDriverWidget;
 				SDKROOT = iphoneos;

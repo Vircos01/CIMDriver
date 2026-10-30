@@ -94,6 +94,7 @@ struct ModelContainerSetup {
             HoursTarget.self,
             FavoriteRoute.self,
             OdometerCheck.self,
+            OdometerGapResolution.self,
             FuelFillUp.self
         ])
         

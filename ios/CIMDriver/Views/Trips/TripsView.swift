@@ -180,6 +180,7 @@ struct TripsView: View {
             let trip = group[index]
             modelContext.delete(trip)
         }
+        try? modelContext.save()
     }
     
     private func batchUpdate(type: String) {

@@ -39,8 +39,10 @@ struct TripDetailView: View {
             // Background Map
             if !coordinates.isEmpty {
                 Map {
-                    MapPolyline(coordinates: coordinates)
-                        .stroke(.blue, lineWidth: 5)
+                    if coordinates.count >= 2 {
+                        MapPolyline(coordinates: coordinates)
+                            .stroke(.blue, lineWidth: 5)
+                    }
                     
                     if let first = coordinates.first {
                         Annotation("Start", coordinate: first) {
@@ -50,7 +52,7 @@ struct TripDetailView: View {
                                 .clipShape(Circle())
                         }
                     }
-                    if let last = coordinates.last {
+                    if coordinates.count >= 2, let last = coordinates.last {
                         Annotation("Eind", coordinate: last) {
                             Image(systemName: "mappin.circle.fill")
                                 .foregroundColor(.red)
@@ -168,18 +170,23 @@ struct TripDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Menu {
+                HStack(spacing: 16) {
                     Button(action: { showingEditSheet = true }) {
-                        Label("Bewerken", systemImage: "pencil")
+                        Image(systemName: "pencil")
                     }
-                    Button(action: { showingFavoriteAlert = true }) {
-                        Label("Opslaan als favoriet", systemImage: "star")
-                    }
+                    
                     Button(role: .destructive, action: { showingDeleteAlert = true }) {
-                        Label("Verwijderen", systemImage: "trash")
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
                     }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
+                    
+                    Menu {
+                        Button(action: { showingFavoriteAlert = true }) {
+                            Label("Opslaan als favoriet", systemImage: "star")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
                 }
             }
         }
@@ -271,6 +278,10 @@ struct EditTripView: View {
     @State private var distanceString: String
     @State private var notes: String
     @State private var projectCode: String
+    @State private var startTime: Date
+    @State private var endTime: Date
+    @State private var odometerStartString: String
+    @State private var odometerEndString: String
     
     @State private var suggestedRule: ClassificationRule?
     @State private var showingSuggestionAlert = false
@@ -289,6 +300,11 @@ struct EditTripView: View {
         _distanceString = State(initialValue: String(format: "%.1f", Double(trip.distanceMeters) / 1000.0))
         _notes = State(initialValue: trip.note ?? "")
         _projectCode = State(initialValue: trip.projectCode ?? "")
+        _startTime = State(initialValue: trip.startTime)
+        _endTime = State(initialValue: trip.endTime ?? trip.startTime.addingTimeInterval(Double(max(60, trip.distanceMeters / 15))))
+        _odometerStartString = State(initialValue: String(trip.odometerStart))
+        let effectiveEnd = trip.odometerEnd ?? (trip.odometerStart + Int(round(Double(trip.distanceMeters) / 1000.0)))
+        _odometerEndString = State(initialValue: String(effectiveEnd))
     }
     
     var body: some View {
@@ -322,6 +338,28 @@ struct EditTripView: View {
                     
                     TextField("Optionele notitie", text: $notes, axis: .vertical)
                         .lineLimit(3...6)
+                }
+                
+                Section("Tijdstippen") {
+                    DatePicker("Starttijd", selection: $startTime)
+                    DatePicker("Eindtijd", selection: $endTime)
+                }
+                
+                Section("Tellerstanden") {
+                    HStack {
+                        Text("Beginstand (km)")
+                        Spacer()
+                        TextField("Beginstand", text: $odometerStartString)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    HStack {
+                        Text("Eindstand (km)")
+                        Spacer()
+                        TextField("Eindstand", text: $odometerEndString)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                    }
                 }
                 
                 Section("Locatie") {
@@ -378,16 +416,34 @@ struct EditTripView: View {
         trip.endAddress = endAddress.isEmpty ? nil : endAddress
         trip.note = notes.isEmpty ? nil : notes
         trip.projectCode = projectCode.isEmpty ? nil : projectCode
+        trip.startTime = startTime
+        trip.endTime = endTime
         
         let formatter = NumberFormatter()
         formatter.decimalSeparator = ","
+        var parsedDistanceMeters = trip.distanceMeters
         if let dist = formatter.number(from: distanceString)?.doubleValue {
-            trip.distanceMeters = Int(dist * 1000)
+            parsedDistanceMeters = max(0, Int(dist * 1000))
         } else {
             formatter.decimalSeparator = "."
             if let dist = formatter.number(from: distanceString)?.doubleValue {
-                trip.distanceMeters = Int(dist * 1000)
+                parsedDistanceMeters = max(0, Int(dist * 1000))
             }
+        }
+        trip.distanceMeters = parsedDistanceMeters
+        
+        if let odoStart = Int(odometerStartString) {
+            trip.odometerStart = odoStart
+        }
+        if let odoEnd = Int(odometerEndString) {
+            trip.odometerEnd = odoEnd
+        } else {
+            trip.odometerEnd = trip.odometerStart + Int(round(Double(trip.distanceMeters) / 1000.0))
+        }
+        
+        // Ensure vehicle current odometer reflects latest trip end
+        if let vehicle = trip.vehicle, let end = trip.odometerEnd, end > vehicle.odometerCurrent {
+            vehicle.odometerCurrent = end
         }
         
         trip.status = "APPROVED" // Rit is handmatig goedgekeurd door te bewerken

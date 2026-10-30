@@ -4,6 +4,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
+## Versie 0.0.7 Alpha
+*Releasedatum: 30 oktober 2026*
+
+!!! success "Nieuwe functies"
+    * **Controle op gaten in de kilometerregistratie:** Automatische detectie van ontbrekende of overlappende kilometers tussen opeenvolgende ritten, afwijkingen in de beginstand en verschillen met de actuele tellerstand van het voertuig.
+    * **Tellerstanden herberekenen:** Mogelijkheid om alle kilometerstanden chronologisch opnieuw door te rekenen op basis van de ritafstanden en geregistreerde kilometerijkers (met behoud van geijkte checkpoints).
+    * **Gaten oplossen:** Direct gaten oplossen via aansluitende ritten (privé, zakelijk of woon-werk met handige suggesties), de actuele tellerstand synchroniseren, of toelichtingen registreren voor de Belastingdienst (zoals APK, garagebezoek of proefrit).
+    * **Verbeterde ritbewerking:** Direct bewerken en verwijderen van ritten vanuit het detailscherm, inclusief aanpasbare start- en eindtijden en kilometerstanden.
+    * **Stabielere kaartweergave:** Veilige verwerking van ritten zonder routepunten of met één enkel punt.
+
 ## Versie 0.0.6 Alpha
 *Releasedatum: 9 oktober 2026*
 

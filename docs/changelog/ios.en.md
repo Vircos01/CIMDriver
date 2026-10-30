@@ -4,6 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
+## Version 0.0.7 Alpha
+*Release date: October 30, 2026*
+
+!!! success "New features"
+    * **Odometer gap detection:** Automatically detect missing or overlapping kilometers between consecutive trips, start odometer discrepancies, and current vehicle odometer mismatches.
+    * **Chronological odometer recalculation:** Recalculate trip odometer readings based on trip distances and verified odometer checkpoints while preserving audited anchors.
+    * **Gap resolution workflow:** Resolve detected gaps with connecting trips (private, business, or commute with quick presets), synchronize current vehicle odometer, or record audit explanations (MOT/APK, maintenance, test drive).
+    * **Enhanced trip editing:** Direct edit and delete actions from the trip details screen, with editable timestamps, addresses, and odometer readings.
+    * **Resilient map rendering:** Safe map polyline rendering for single-coordinate or short manual trips.
+
 ## Version 0.0.6 Alpha
 *Release date: October 9, 2026*
 
