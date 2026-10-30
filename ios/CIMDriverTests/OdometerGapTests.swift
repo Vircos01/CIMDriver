@@ -271,3 +271,4 @@ final class OdometerGapTests: XCTestCase {
         XCTAssertEqual(update2.newEnd, 1065)
     }
 }
+

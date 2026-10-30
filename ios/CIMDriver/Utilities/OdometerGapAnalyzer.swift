@@ -253,7 +253,7 @@ struct OdometerGapAnalyzer {
                 )
             }
         } else if gapKm < 0 {
-            if let prev = prevTrip {
+            if prevTrip != nil {
                 fixes.append(
                     SuggestedFix(
                         type: .adjustSingleTrip,
@@ -298,3 +298,4 @@ struct OdometerGapAnalyzer {
         return fixes
     }
 }
+

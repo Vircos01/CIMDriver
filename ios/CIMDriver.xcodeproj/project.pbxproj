@@ -545,6 +545,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		7B9638F9767E802A6287BE0A /* Stamp Git version */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);

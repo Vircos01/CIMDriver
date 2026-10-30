@@ -35,6 +35,7 @@ targets:
         GIT_COMMIT: unknown
     postBuildScripts:
       - name: Stamp Git version
+        basedOnDependencyAnalysis: false
         script: |
           COMMIT=$(/usr/bin/git -C "$SRCROOT" rev-parse --short HEAD 2>/dev/null)
           if [ -z "$COMMIT" ]; then COMMIT=unknown; fi
