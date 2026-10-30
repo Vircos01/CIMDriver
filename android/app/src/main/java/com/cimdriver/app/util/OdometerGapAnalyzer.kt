@@ -16,7 +16,6 @@ enum class GapType {
 
 enum class FixType {
     CREATE_PRIVATE_TRIP,   // Create private trip for missing km
-    DISTRIBUTE_OVER_TRIPS, // Distribute gap proportionally
     ADJUST_SINGLE_TRIP,    // Adjust adjacent trip
     MARK_AS_EXPLAINED,     // Mark with explanation (e.g. maintenance/garage)
     IGNORE                 // Deliberately ignore
@@ -225,28 +224,25 @@ object OdometerGapAnalyzer {
             // Missing km: option to create a private trip
             val fromAddr = prevTrip?.endAddress ?: "Onbekend vertrekpunt"
             val toAddr = nextTrip?.startAddress ?: "Onbekend eindpunt"
-            fixes.add(
-                SuggestedFix(
-                    type = FixType.CREATE_PRIVATE_TRIP,
-                    title = "Privérit aanmaken ($gapKm km)",
-                    description = "Maak een sluitende privérit aan van $fromAddr naar $toAddr voor het ontbrekende verschil."
-                )
-            )
-
-            // Option to distribute over context trips
-            if (contextTrips.isNotEmpty()) {
-                val preview = calculateDistributionPreview(contextTrips, gapKm)
+            if (gapKm <= 30) {
                 fixes.add(
                     SuggestedFix(
-                        type = FixType.DISTRIBUTE_OVER_TRIPS,
-                        title = "Verschil verdelen over ${contextTrips.size} ritten",
-                        description = "Verhoog de afstand van aangrenzende ritten evenredig met in totaal $gapKm km.",
-                        previewChanges = preview
+                        type = FixType.CREATE_PRIVATE_TRIP,
+                        title = "Privérit toevoegen ($gapKm km)",
+                        description = "Maak een sluitende aansluitende rit van $fromAddr naar $toAddr."
+                    )
+                )
+            } else {
+                fixes.add(
+                    SuggestedFix(
+                        type = FixType.CREATE_PRIVATE_TRIP,
+                        title = "Verzamelrit toevoegen ($gapKm km)",
+                        description = "Maak één privérit van $fromAddr naar $toAddr. Tip: Bij meerdere ritten is handmatig los toevoegen via 'Rit Toevoegen' fiscaal zuiverder."
                     )
                 )
             }
         } else if (gapKm < 0) {
-            // Overlapping km: adjust single trip or distribute
+            // Overlapping km: adjust single trip
             if (prevTrip != null) {
                 fixes.add(
                     SuggestedFix(
@@ -279,41 +275,5 @@ object OdometerGapAnalyzer {
         return fixes
     }
 
-    /**
-     * Calculates proportional preview changes if a gap of [gapKm] is distributed over [trips].
-     */
-    fun calculateDistributionPreview(trips: List<Trip>, gapKm: Int): List<TripChange> {
-        if (trips.isEmpty()) return emptyList()
 
-        val totalDistKm = trips.sumOf { (it.distanceMeters / 1000.0) }
-        if (totalDistKm <= 0.0) return emptyList()
-
-        val ratio = (totalDistKm + gapKm) / totalDistKm
-        val changes = mutableListOf<TripChange>()
-
-        var currentStart = trips.first().odometerStart
-
-        for (trip in trips) {
-            val oldDist = (trip.distanceMeters / 1000.0).roundToInt()
-            val newDist = maxOf(1, (oldDist * ratio).roundToInt())
-            val newStart = currentStart
-            val newEnd = newStart + newDist
-
-            changes.add(
-                TripChange(
-                    tripId = trip.id,
-                    oldOdoStart = trip.odometerStart,
-                    newOdoStart = newStart,
-                    oldOdoEnd = trip.effectiveOdometerEnd(),
-                    newOdoEnd = newEnd,
-                    oldDistanceKm = oldDist,
-                    newDistanceKm = newDist
-                )
-            )
-
-            currentStart = newEnd
-        }
-
-        return changes
-    }
 }

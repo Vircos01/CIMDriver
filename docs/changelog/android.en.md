@@ -4,12 +4,23 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.1 (Current Version)
+## Version 1.3.2 (Current Version)
+*Release date: October 30, 2026*
+
+!!! success "Improvements & Bug Fixes"
+    * **Fix Odometer Rounding Errors:** Resolved integer division truncation in distance calculation, ensuring meters round mathematically. Prevents gradual distance loss and spontaneous gaps during business trips.
+    * **Eliminated Fictitious Distance Distribution:** Completely removed the option to artificially spread gaps across historical trips, ensuring full compliance with tax audit requirements.
+    * **Customizable Addresses in Gap Review:** Start and destination addresses can now be freely edited during gap resolution.
+    * **Quick Preset Chips for Short Gaps (4-5 km):** One-tap presets for common short private trips ("Groceries", "Local", "Fueling") and audited gap reasons ("Odometer calibration / rounding", "Garage / Inspection").
+    * **Distance Display on Frequent Routes:** Route chips now clearly display route distance (e.g. `38 km`).
+    * **Enhanced Odometer Check Alerts:** Warning for discrepancies over 30 km and consistent decimal display for trip distances.
+
+## Version 1.3.1
 *Release date: October 30, 2026*
 
 !!! success "New Features & Improvements"
     * **Airtight Odometer Registration (Tax Authority Compliant):** Full chain integrity and gap resolution between consecutive trips and periodic odometer checks.
-    * **Interactive Check Analysis:** When registering an odometer check with discrepancies, the app provides immediate root-cause analysis and resolution options (assign as trip, distribute across trips, or log audited explanation).
+    * **Interactive Check Analysis:** When registering an odometer check with discrepancies, the app provides immediate root-cause analysis and realistic resolution options (assign as private trip, log audited explanation for garage/APK, or defer for manual entry). Unrealistic inflation/distribution of kilometers across existing routes has been eliminated for tax audit compliance.
     * **Retroactive Gap Detection & Review:** Automatically detects gaps and discontinuities in trip history with one-tap batch fixing.
     * **PDF Integrity Report:** Export an official integrity and audit report containing all checks, deviations, and resolutions for tax audit compliance.
     * **Thousands Separators:** Targets (revenue and hours) on the dashboard and detail screens now format numbers with readable thousands separators.

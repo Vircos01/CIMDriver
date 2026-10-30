@@ -286,7 +286,7 @@ fun AddTripScreen(
                                     endAddress = trip.endAddress ?: ""
                                     tripType = trip.tripType
                                 },
-                                label = { Text("${trip.startAddress?.split(",")?.first()} ➔ ${trip.endAddress?.split(",")?.first()}") },
+                                label = { Text("${trip.startAddress?.split(",")?.first() ?: "?"} ➔ ${trip.endAddress?.split(",")?.first() ?: "?"} (${trip.distanceMeters / 1000} km)") },
                                 leadingIcon = { Icon(Icons.Filled.History, contentDescription = null, modifier = Modifier.size(16.dp)) }
                             )
                         }

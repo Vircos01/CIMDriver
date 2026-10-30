@@ -41,11 +41,7 @@ import kotlin.math.abs
 enum class CheckResolutionStrategy(val title: String, val description: String) {
     CREATE_TRIP(
         title = "Sluitende privérit toevoegen",
-        description = "Maakt een rit aan tussen de ritten om de keten sluitend te maken voor de Belastingdienst."
-    ),
-    DISTRIBUTE(
-        title = "Verschil evenredig verdelen",
-        description = "Verhoogt of verlaagt de geregistreerde kilometers van de afgelopen ritten evenredig."
+        description = "Maakt een rit aan om de keten sluitend te maken voor de Belastingdienst."
     ),
     GAP_WITH_REASON(
         title = "Als verklaard gat vastleggen",
@@ -79,8 +75,7 @@ fun OdometerCheckAnalysisScreen(
 
     var selectedStrategy by remember(diff) {
         mutableStateOf(
-            if (diff > 0) CheckResolutionStrategy.CREATE_TRIP
-            else if (diff < 0) CheckResolutionStrategy.DISTRIBUTE
+            if (diff > 0 && diff <= 30) CheckResolutionStrategy.CREATE_TRIP
             else CheckResolutionStrategy.GAP_WITH_REASON
         )
     }
@@ -142,7 +137,6 @@ fun OdometerCheckAnalysisScreen(
                                 isSaving = true
                                 val strategyName = when (selectedStrategy) {
                                     CheckResolutionStrategy.CREATE_TRIP -> "CREATE_TRIP"
-                                    CheckResolutionStrategy.DISTRIBUTE -> "DISTRIBUTE"
                                     CheckResolutionStrategy.GAP_WITH_REASON -> "GAP_WITH_REASON"
                                     CheckResolutionStrategy.MANUAL -> "MANUAL"
                                 }
@@ -338,7 +332,13 @@ fun OdometerCheckAnalysisScreen(
                 )
             }
 
-            items(CheckResolutionStrategy.values()) { strategy ->
+            val availableStrategies = if (diff > 0) {
+                listOf(CheckResolutionStrategy.CREATE_TRIP, CheckResolutionStrategy.GAP_WITH_REASON, CheckResolutionStrategy.MANUAL)
+            } else {
+                listOf(CheckResolutionStrategy.GAP_WITH_REASON, CheckResolutionStrategy.MANUAL)
+            }
+
+            items(availableStrategies) { strategy ->
                 val isSelected = selectedStrategy == strategy
                 Card(
                     modifier = Modifier
@@ -406,6 +406,33 @@ fun OdometerCheckAnalysisScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true
                             )
+
+                            if (diff > 30) {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(10.dp),
+                                        verticalAlignment = Alignment.Top
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Warning,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Let op: bij grote afstanden ($diff km) is het fiscaal niet aannemelijk om dit als één directe rit op te voeren tussen dezelfde of nabijgelegen locaties als het in werkelijkheid meerdere ritten betrof. Overweeg 'Later handmatig oplossen' om de daadwerkelijke ritten via 'Rit Toevoegen' in te voeren, of 'Als verklaard gat' bij onderhoud/garage.",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onErrorContainer
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -431,6 +458,27 @@ fun OdometerCheckAnalysisScreen(
                             minLines = 2,
                             maxLines = 4
                         )
+
+                        if (selectedStrategy == CheckResolutionStrategy.GAP_WITH_REASON) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Veelvoorkomende verklaringen:",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                listOf("APK / Keuring", "Garage / Onderhoud", "Proefrit monteur").forEach { preset ->
+                                    SuggestionChip(
+                                        onClick = { reasonText = preset },
+                                        label = { Text(preset, style = MaterialTheme.typography.labelSmall) }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -462,35 +510,20 @@ fun OdometerCheckAnalysisScreen(
 
                         when (selectedStrategy) {
                             CheckResolutionStrategy.CREATE_TRIP -> {
-                                if (diff > 0) {
-                                    Text(
-                                        text = "• Er wordt 1 nieuwe privérit aangemaakt van $diff km ($tripStartAddress naar $tripEndAddress).\n• Tellerstand van de rit loopt van $registeredOdo naar $enteredOdometer km.\n• Voertuigtellerstand wordt bijgewerkt naar $enteredOdometer km.",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                } else {
-                                    Text(
-                                        text = "• Afwijking is negatief ($diff km). Een rit toevoegen is niet mogelijk; kies 'Verschil verdelen' of 'Als verklaard vastleggen'.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            }
-                            CheckResolutionStrategy.DISTRIBUTE -> {
-                                val count = recentTrips.size
                                 Text(
-                                    text = "• Het verschil van ${if (diff > 0) "+$diff" else "$diff"} km wordt evenredig verdeeld over de $count meest recente ritten.\n• Begin- en eindstanden van deze ritten worden sluitend herberekend.\n• Voertuigtellerstand wordt bijgewerkt naar $enteredOdometer km.",
+                                    text = "• Er wordt 1 nieuwe privérit aangemaakt van $diff km ($tripStartAddress naar $tripEndAddress).\n• Tellerstand van de rit loopt van $registeredOdo naar $enteredOdometer km.\n• Voertuigtellerstand wordt bijgewerkt naar $enteredOdometer km.",
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
                             CheckResolutionStrategy.GAP_WITH_REASON -> {
                                 Text(
-                                    text = "• Er worden geen ritten gewijzigd.\n• In het integriteitsrapport wordt een officiële verklaring van ${if (diff > 0) "+$diff" else "$diff"} km opgenomen met reden: '${reasonText.ifBlank { "..." }}'.\n• Voertuigtellerstand wordt bijgewerkt naar $enteredOdometer km.",
+                                    text = "• Er worden geen ritten gewijzigd of kunstmatig opgehoogd.\n• In het integriteitsrapport wordt een officiële verklaring van ${if (diff > 0) "+$diff" else "$diff"} km opgenomen met reden: '${reasonText.ifBlank { "..." }}'.\n• Voertuigtellerstand wordt bijgewerkt naar $enteredOdometer km.",
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
                             CheckResolutionStrategy.MANUAL -> {
                                 Text(
-                                    text = "• Tellerstand wordt bijgewerkt naar $enteredOdometer km.\n• Dit verschil (${if (diff > 0) "+$diff" else "$diff"} km) blijft openstaan in het overzicht 'Gaten in registratie' om later nader te onderzoeken.",
+                                    text = "• Tellerstand wordt bijgewerkt naar $enteredOdometer km.\n• Dit verschil (${if (diff > 0) "+$diff" else "$diff"} km) blijft openstaan in het overzicht 'Gaten in registratie' om later losse ritten voor toe te voegen via Rit Toevoegen.",
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -539,7 +572,7 @@ fun OdometerCheckAnalysisScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = "${trip.distanceMeters / 1000} km",
+                                    text = "${String.format(Locale.getDefault(), "%.1f", trip.distanceMeters / 1000.0)} km",
                                     style = MaterialTheme.typography.labelLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = CIMDriverGreen

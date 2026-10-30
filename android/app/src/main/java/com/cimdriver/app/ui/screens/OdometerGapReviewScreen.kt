@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -324,11 +326,13 @@ fun OdometerGapReviewScreen(
         ResolveGapDialog(
             gap = selectedGapForResolution!!,
             onDismiss = { selectedGapForResolution = null },
-            onApply = { fixType, note ->
+            onApply = { fixType, note, customStart, customEnd ->
                 viewModel.resolveGap(
                     gap = selectedGapForResolution!!,
                     fixType = fixType,
                     note = note,
+                    customStartAddress = customStart,
+                    customEndAddress = customEnd,
                     onComplete = {
                         selectedGapForResolution = null
                         refreshGaps()
@@ -541,19 +545,49 @@ fun ResolutionHistoryCard(
 fun ResolveGapDialog(
     gap: OdometerGap,
     onDismiss: () -> Unit,
-    onApply: (FixType, String?) -> Unit
+    onApply: (FixType, String?, String?, String?) -> Unit
 ) {
     var selectedFix by remember { mutableStateOf(gap.suggestedFixes.firstOrNull()?.type ?: FixType.CREATE_PRIVATE_TRIP) }
     var note by remember { mutableStateOf("") }
+
+    val initialStart = gap.previousTrip?.endAddress ?: "Onbekend vertrekpunt"
+    val isSameLocation = gap.previousTrip?.endAddress == gap.nextTrip?.startAddress
+    val initialEnd = if (isSameLocation && !initialStart.startsWith("Onbekend")) "$initialStart (retour)" else gap.nextTrip?.startAddress ?: initialStart
+
+    var startAddress by remember { mutableStateOf(initialStart) }
+    var endAddress by remember { mutableStateOf(initialEnd) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Gat oplossen (${if (gap.gapKm > 0) "+${gap.gapKm}" else "${gap.gapKm}"} km)") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Text(
+                            text = "Stand: ${gap.expectedOdometer} ➔ ${gap.actualOdometer} km (${if (gap.gapKm > 0) "+${gap.gapKm}" else "${gap.gapKm}"} km)",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Afstand en tellerstanden worden exact sluitend vastgelegd op ${kotlin.math.abs(gap.gapKm)} km.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
                 Text(
-                    text = "Kies hoe dit gat sluitend gemaakt moet worden voor de administratie:",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "Kies de oplossing:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
 
                 gap.suggestedFixes.forEach { fix ->
@@ -586,18 +620,100 @@ fun ResolveGapDialog(
                     }
                 }
 
+                if (selectedFix == FixType.CREATE_PRIVATE_TRIP) {
+                    Text(
+                        text = "Ritdetails voor Belastingdienst:",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    OutlinedTextField(
+                        value = startAddress,
+                        onValueChange = { startAddress = it },
+                        label = { Text("Vertreklocatie") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+
+                    OutlinedTextField(
+                        value = endAddress,
+                        onValueChange = { endAddress = it },
+                        label = { Text("Bestemming") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+
+                    Text(
+                        text = "Snelle keuze voor korte rit (${gap.gapKm} km):",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        SuggestionChip(
+                            onClick = {
+                                endAddress = "Supermarkt / Boodschappen"
+                                note = "Boodschappen"
+                            },
+                            label = { Text("Boodschappen", style = MaterialTheme.typography.labelSmall) }
+                        )
+                        SuggestionChip(
+                            onClick = {
+                                endAddress = "Lokaal / Dorpscentrum"
+                                note = "Lokaal privégebruik"
+                            },
+                            label = { Text("Lokaal", style = MaterialTheme.typography.labelSmall) }
+                        )
+                        SuggestionChip(
+                            onClick = {
+                                endAddress = "Tankstation / Wasstraat"
+                                note = "Tanken / wassen"
+                            },
+                            label = { Text("Tanken", style = MaterialTheme.typography.labelSmall) }
+                        )
+                    }
+                }
+
+                if (selectedFix == FixType.MARK_AS_EXPLAINED) {
+                    Text(
+                        text = "Veelvoorkomende verklaringen:",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf("APK / Keuring", "Garage / Onderhoud", "Proefrit monteur").forEach { preset ->
+                            SuggestionChip(
+                                onClick = { note = preset },
+                                label = { Text(preset, style = MaterialTheme.typography.labelSmall) }
+                            )
+                        }
+                    }
+                }
+
                 OutlinedTextField(
                     value = note,
                     onValueChange = { note = it },
-                    label = { Text("Toelichting voor Belastingdienst (optioneel)") },
-                    placeholder = { Text("Bijv. APK, privékilometers, garage...") },
+                    label = { Text("Toelichting / omschrijving (optioneel)") },
+                    placeholder = { Text("Bijv. Boodschappen, sportclub, APK...") },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
         confirmButton = {
             Button(
-                onClick = { onApply(selectedFix, note.takeIf { it.isNotBlank() }) },
+                onClick = {
+                    onApply(
+                        selectedFix,
+                        note.takeIf { it.isNotBlank() },
+                        startAddress.takeIf { it.isNotBlank() },
+                        endAddress.takeIf { it.isNotBlank() }
+                    )
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = CIMDriverGreen)
             ) {
                 Text("Toepassen")

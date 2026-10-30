@@ -44,7 +44,7 @@ fun AddVehicleScreen(
     var model by remember(existingVehicle) { mutableStateOf(existingVehicle?.model ?: "") }
     var odometerStart by remember(existingVehicle) { mutableStateOf(existingVehicle?.odometerStart?.toString() ?: "") }
     var odometerCurrent by remember(existingVehicle) { mutableStateOf(existingVehicle?.odometerCurrent?.toString() ?: "") }
-    var odometerCorrectionStrategy by remember(existingVehicle) { mutableStateOf(existingVehicle?.odometerCorrectionStrategy ?: "DISTRIBUTE") }
+    var odometerCorrectionStrategy by remember(existingVehicle) { mutableStateOf(existingVehicle?.odometerCorrectionStrategy ?: "CREATE_TRIP") }
     var usageType by remember(existingVehicle) { mutableStateOf(existingVehicle?.usageType ?: "MIXED") }
     var engineType by remember(existingVehicle) { mutableStateOf(existingVehicle?.engineType ?: "ICE") }
     var privateKmYearlyLimitStr by remember(existingVehicle) { mutableStateOf(existingVehicle?.privateKmYearlyLimit?.toString() ?: "500") }
@@ -363,14 +363,18 @@ fun AddVehicleScreen(
                     Text(text = "Correctiestrategie KM-stand", style = MaterialTheme.typography.titleSmall)
                     
                     var strategyExpanded by remember { mutableStateOf(false) }
-                    val strategyOptions = listOf("DISTRIBUTE" to "Verschil verdelen over eerdere ritten", "CREATE_TRIP" to "Correctierit aanmaken (Privé)", "LEAVE_GAP" to "Gat laten staan")
+                    val strategyOptions = listOf(
+                        "CREATE_TRIP" to "Correctierit aanmaken (Privé)",
+                        "GAP_WITH_REASON" to "Als verklaard gat vastleggen",
+                        "LEAVE_GAP" to "Gat laten staan (later handmatig)"
+                    )
                     
                     ExposedDropdownMenuBox(
                         expanded = strategyExpanded,
                         onExpandedChange = { strategyExpanded = it }
                     ) {
                         OutlinedTextField(
-                            value = strategyOptions.find { it.first == odometerCorrectionStrategy }?.second ?: "Verschil verdelen over eerdere ritten",
+                            value = strategyOptions.find { it.first == odometerCorrectionStrategy }?.second ?: "Correctierit aanmaken (Privé)",
                             onValueChange = {},
                             readOnly = true,
                             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),

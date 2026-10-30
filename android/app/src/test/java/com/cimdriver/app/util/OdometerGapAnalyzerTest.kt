@@ -175,7 +175,7 @@ class OdometerGapAnalyzerTest {
     }
 
     @Test
-    fun testCalculateDistributionPreview() {
+    fun testGapFixesCompliantWithoutDistribute() {
         val trips = listOf(
             Trip(
                 id = 1L,
@@ -209,18 +209,22 @@ class OdometerGapAnalyzerTest {
             )
         )
 
-        // Distribute 10 km over a total of 100 km (40 km + 60 km)
-        val preview = OdometerGapAnalyzer.calculateDistributionPreview(trips, 10)
-        assertEquals(2, preview.size)
+        // 10 km gap between 10040 and 10050
+        val tripsWithGap = listOf(
+            trips[0],
+            trips[1].copy(odometerStart = 10050, odometerEnd = 10110)
+        )
+        val testVehicle = vehicle.copy(odometerCurrent = 10110)
+        val gaps = OdometerGapAnalyzer.analyze(testVehicle, tripsWithGap)
+        assertEquals(1, gaps.size)
+        val gap = gaps.first()
+        assertEquals(10, gap.gapKm)
 
-        // Trip 1 (40% of 100) should get approx 4 extra km -> 44 km
-        assertEquals(44, preview[0].newDistanceKm)
-        assertEquals(10000, preview[0].newOdoStart)
-        assertEquals(10044, preview[0].newOdoEnd)
-
-        // Trip 2 (60% of 100) should get approx 6 extra km -> 66 km
-        assertEquals(66, preview[1].newDistanceKm)
-        assertEquals(10044, preview[1].newOdoStart)
-        assertEquals(10110, preview[1].newOdoEnd)
+        // Verify FixType.CREATE_PRIVATE_TRIP and MARK_AS_EXPLAINED are offered, not ADJUST_SINGLE_TRIP
+        val fixTypes = gap.suggestedFixes.map { it.type }
+        assertTrue(fixTypes.contains(FixType.CREATE_PRIVATE_TRIP))
+        assertTrue(fixTypes.contains(FixType.MARK_AS_EXPLAINED))
+        assertTrue(fixTypes.contains(FixType.IGNORE))
+        assertFalse(fixTypes.contains(FixType.ADJUST_SINGLE_TRIP))
     }
 }

@@ -190,29 +190,6 @@ class VehiclesViewModel @Inject constructor(
                             affectedTripIds.add(newTripId)
                         }
                     }
-                    "DISTRIBUTE" -> {
-                        val trips = tripDao.getTripsByVehicleSync(vehicle.id)
-                        var totalDistance = 0.0
-                        trips.forEach { totalDistance += (it.distanceMeters / 1000.0) }
-                        
-                        val actualDistance = correctedOdometer - vehicle.odometerStart
-                        if (totalDistance > 0 && actualDistance > 0) {
-                            val ratio = actualDistance / totalDistance
-                            var currentOdo = vehicle.odometerStart
-                            
-                            for (trip in trips) {
-                                val newDistanceKm = Math.round((trip.distanceMeters / 1000.0) * ratio).toInt()
-                                val updatedTrip = trip.copy(
-                                    distanceMeters = newDistanceKm * 1000,
-                                    odometerStart = currentOdo,
-                                    odometerEnd = currentOdo + newDistanceKm
-                                )
-                                tripDao.updateTrip(updatedTrip)
-                                affectedTripIds.add(trip.id)
-                                currentOdo += newDistanceKm
-                            }
-                        }
-                    }
                     "GAP_WITH_REASON" -> {
                         val gapResolution = OdometerGapResolution(
                             vehicleId = vehicle.id,
@@ -278,15 +255,26 @@ class VehiclesViewModel @Inject constructor(
         }
     }
 
-    fun resolveGap(gap: OdometerGap, fixType: FixType, note: String?, onComplete: () -> Unit = {}) {
+    fun resolveGap(
+        gap: OdometerGap,
+        fixType: FixType,
+        note: String?,
+        customStartAddress: String? = null,
+        customEndAddress: String? = null,
+        onComplete: () -> Unit = {}
+    ) {
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             val affectedIds = mutableListOf<Long>()
 
             when (fixType) {
                 FixType.CREATE_PRIVATE_TRIP -> {
-                    val startAddr = gap.previousTrip?.endAddress ?: "Laatste bekende bestemming"
-                    val endAddr = gap.nextTrip?.startAddress ?: startAddr
+                    val startAddr = customStartAddress?.takeIf { it.isNotBlank() }
+                        ?: gap.previousTrip?.endAddress
+                        ?: "Laatste bekende bestemming"
+                    val endAddr = customEndAddress?.takeIf { it.isNotBlank() }
+                        ?: gap.nextTrip?.startAddress
+                        ?: startAddr
                     val trip = Trip(
                         vehicleId = gap.vehicleId,
                         startTime = gap.gapTimeStart,
@@ -304,41 +292,19 @@ class VehiclesViewModel @Inject constructor(
                     val newId = tripDao.insertTrip(trip)
                     affectedIds.add(newId)
                 }
-                FixType.DISTRIBUTE_OVER_TRIPS -> {
-                    val allTrips = tripDao.getTripsByVehicleSync(gap.vehicleId).sortedBy { it.startTime }
-                    val nextTripEndTime = gap.nextTrip?.endTime ?: gap.nextTrip?.startTime ?: Long.MAX_VALUE
-                    val contextTrips = if (gap.previousTrip != null && gap.nextTrip != null) {
-                        allTrips.filter { it.startTime >= gap.previousTrip.startTime && (it.endTime ?: it.startTime) <= nextTripEndTime }
-                    } else if (gap.previousTrip != null) {
-                        allTrips.takeLast(minOf(5, allTrips.size))
-                    } else {
-                        allTrips.take(minOf(5, allTrips.size))
-                    }
-
-                    val preview = OdometerGapAnalyzer.calculateDistributionPreview(contextTrips, gap.gapKm)
-                    for (change in preview) {
-                        val original = contextTrips.find { it.id == change.tripId }
-                        if (original != null) {
-                            tripDao.updateTrip(original.copy(
-                                distanceMeters = change.newDistanceKm * 1000,
-                                odometerStart = change.newOdoStart,
-                                odometerEnd = change.newOdoEnd
-                            ))
-                            affectedIds.add(change.tripId)
-                        }
-                    }
-                }
                 FixType.ADJUST_SINGLE_TRIP -> {
                     if (gap.previousTrip != null) {
-                        val newDist = maxOf(1, (gap.previousTrip.distanceMeters / 1000) + gap.gapKm)
+                        val prevDistKm = kotlin.math.round(gap.previousTrip.distanceMeters / 1000.0).toInt()
+                        val newDist = maxOf(1, prevDistKm + gap.gapKm)
                         tripDao.updateTrip(gap.previousTrip.copy(
                             distanceMeters = newDist * 1000,
                             odometerEnd = gap.previousTrip.odometerStart + newDist
                         ))
                         affectedIds.add(gap.previousTrip.id)
                     } else if (gap.nextTrip != null) {
-                        val newDist = maxOf(1, (gap.nextTrip.distanceMeters / 1000) - gap.gapKm)
-                        val nextEnd = gap.nextTrip.odometerEnd ?: (gap.nextTrip.odometerStart + (gap.nextTrip.distanceMeters / 1000))
+                        val nextDistKm = kotlin.math.round(gap.nextTrip.distanceMeters / 1000.0).toInt()
+                        val newDist = maxOf(1, nextDistKm - gap.gapKm)
+                        val nextEnd = gap.nextTrip.odometerEnd ?: (gap.nextTrip.odometerStart + nextDistKm)
                         tripDao.updateTrip(gap.nextTrip.copy(
                             distanceMeters = newDist * 1000,
                             odometerStart = nextEnd - newDist
@@ -372,7 +338,7 @@ class VehiclesViewModel @Inject constructor(
             val vehicle = vehicleDao.getVehicleById(gap.vehicleId)
             if (vehicle != null) {
                 val latest = tripDao.getTripsByVehicleSync(gap.vehicleId).maxByOrNull { it.startTime }
-                val latestEnd = latest?.odometerEnd ?: latest?.let { it.odometerStart + (it.distanceMeters / 1000) }
+                val latestEnd = latest?.odometerEnd ?: latest?.let { it.odometerStart + kotlin.math.round(it.distanceMeters / 1000.0).toInt() }
                 if (latestEnd != null && latestEnd > vehicle.odometerCurrent) {
                     vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = latestEnd))
                 }

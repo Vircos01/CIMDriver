@@ -2,6 +2,16 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.2] - 2026-10-30
+
+### Opgelost & Verbeterd
+- **Oplossen afrondingsfouten bij meter- en ritberekeningen:** Integer-afkapfouten (`distanceMeters / 1000`) in de kilometertelling gecorrigeerd naar wiskundige afronding (`roundToInt()`). Hiermee wordt voorkomen dat ritten structureel meters verliezen en er spontaan gaten ontstaan in de zakelijke ritten.
+- **Geen fictieve kilometerverdeling (`DISTRIBUTE` verwijderd):** De optie om gaten kunstmatig evenredig te verspreiden over eerdere ritten is volledig uitgefaseerd. Dit voorkomt onrealistische afwijkingen op bestaande routes en waarborgt een fiscaal zuivere audit trail.
+- **Flexibele adressen bij gatanalyse:** In het herstelscherm voor kilometergaten kunnen vertrek- en aankomstlocaties nu direct handmatig worden aangepast in plaats van vast te zitten aan standaard adressen.
+- **Snelle suggesties voor veelvoorkomende korte gaten (4-5 km):** Handige keuzeknoppen toegevoegd voor veelvoorkomende privéritten ("Boodschappen", "Lokaal", "Tanken") en verklaarde gaten ("Tellerafwijking / kalibratie", "Garage / APK", "Proefrit").
+- **Afstandsindicatie bij frequente routes:** Veelgebruikte routeknoppen tonen nu direct de berekende afstand (bijv. `(38 km)`) om vergissingen bij snelle ritinvoer te voorkomen.
+- **Verbeterde waarschuwingen bij controle:** Waarschuwing bij afwijkingen groter dan 30 km en consistente weergave van decimalen bij ritten.
+
 ## [1.3.1] - 2026-10-30
 
 ### Toegevoegd & Verbeterd

@@ -24,7 +24,7 @@ data class Vehicle(
     val engineType: String = "ICE", // "ICE", "PHEV", "EV"
     val lastOdometerCheckTimestamp: Long = 0L,
     val isDefault: Boolean = false,
-    val odometerCorrectionStrategy: String = "DISTRIBUTE", // "DISTRIBUTE", "CREATE_TRIP", "LEAVE_GAP"
+    val odometerCorrectionStrategy: String = "CREATE_TRIP", // "CREATE_TRIP", "GAP_WITH_REASON", "LEAVE_GAP"
     val inServiceDate: Long? = null,
     val endServiceDate: Long? = null
 )

@@ -6,12 +6,23 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.1 (Huidige Versie)
+## Versie 1.3.2 (Huidige Versie)
+*Releasedatum: 30 oktober 2026*
+
+!!! success "Verbeteringen & Bugfixes"
+    * **Oplossen afrondingsfouten bij kilometertelling:** Foutieve integer-afkapping gecorrigeerd naar wiskundige afronding. Voorkomt dat ritten structureel meters verliezen en er spontaan gaten ontstaan in zakelijke ritten.
+    * **Geen fictieve kilometerverdeling meer:** Het automatisch uitsmeren van kilometers over bestaande routes is definitief verwijderd ter waarborging van een fiscaal zuivere Belastingdienst-administratie.
+    * **Flexibele adressen bij gatanalyse:** In de gat-detectie kunnen vertrek- en bestemmingsadressen nu direct handmatig worden ingegeven.
+    * **Snelle suggesties voor korte gaten (4-5 km):** Snelkeuzes voor veelvoorkomende privéritten ("Boodschappen", "Lokaal", "Tanken") en verklaringen ("Tellerafwijking / kalibratie", "Garage / APK").
+    * **Afstandsindicatie bij frequente routes:** Routeknoppen tonen direct de berekende afstand (bijv. `38 km`).
+    * **Verbeterde controlewaarschuwingen:** Duidelijke waarschuwing bij afwijkingen boven 30 km en consistente weergave van decimalen bij ritten.
+
+## Versie 1.3.1
 *Releasedatum: 30 oktober 2026*
 
 !!! success "Nieuwe Functies & Verbeteringen"
     * **Sluitende kilometerregistratie (Belastingdienst-proof):** Voorkomt en herstelt hiaten in de rittenregistratie tussen opeenvolgende ritten en periodieke kilometercontroles.
-    * **Interactieve controle-analyse:** Bij afwijkingen tijdens een km-controle toont de app direct een analyse met oplossingen (rit toevoegen, gat verdelen of toelichten).
+    * **Interactieve controle-analyse:** Bij afwijkingen tijdens een km-controle toont de app direct een analyse met fiscaal zuivere oplossingen (sluitende privérit toevoegen, verklaard gat met toelichting zoals garage/APK, of later handmatig losse ritten invoeren). Onrealistisch opblazen of uitsmeren van kilometers over bestaande routes is volledig uitgesloten.
     * **Gat-detectie & Ketencontrole:** Achteraf automatisch opsporen en batchgewijs herstellen van ontbrekende kilometers in de rithistorie.
     * **PDF Integriteitsrapport:** Exporteer een compleet integriteitsverslag voor de Belastingdienst met alle controles, afwijkingen en correcties.
     * **Duizendtallen scheidingstekens:** Verbeterde leesbaarheid van targets (omzet en uren) op het dashboard met duizendtalscheiding.

@@ -97,7 +97,7 @@ struct VehicleEditView: View {
     @State private var privateKmYearlyLimit: String = "500"
     @State private var odometerStart: String = "0"
     @State private var usageType: String = "MIXED"
-    @State private var odometerCorrectionStrategy: String = "DISTRIBUTE"
+    @State private var odometerCorrectionStrategy: String = "CREATE_TRIP"
     
     @State private var hasInServiceDate: Bool = false
     @State private var inServiceDate: Date = Date()
@@ -164,9 +164,9 @@ struct VehicleEditView: View {
                 }
                 
                 Picker("Kilometer Kalibratie", selection: $odometerCorrectionStrategy) {
-                    Text("Verschil uitsmeren over ritten").tag("DISTRIBUTE")
-                    Text("Correctierit aanmaken").tag("CREATE_TRIP")
-                    Text("Gat openlaten").tag("LEAVE_GAP")
+                    Text("Correctierit aanmaken (Privé)").tag("CREATE_TRIP")
+                    Text("Als verklaard gat vastleggen").tag("GAP_WITH_REASON")
+                    Text("Gat openlaten (later handmatig)").tag("LEAVE_GAP")
                 }
             }
             
@@ -368,10 +368,10 @@ struct OdometerCalibrationView: View {
     
     private func correctionStrategyText() -> String {
         switch vehicle.odometerCorrectionStrategy {
-        case "DISTRIBUTE": return "Uitsmeren over ritten"
-        case "CREATE_TRIP": return "Correctierit aanmaken"
+        case "CREATE_TRIP": return "Correctierit (Privé)"
+        case "GAP_WITH_REASON": return "Verklaard gat"
         case "LEAVE_GAP": return "Gat openlaten"
-        default: return "Onbekend"
+        default: return "Correctierit (Privé)"
         }
     }
     

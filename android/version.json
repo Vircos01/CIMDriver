@@ -1,6 +1,6 @@
 {
-  "versionCode": 28,
-  "versionName": "1.3.1",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.3.1.apk",
-  "releaseNotes": "Versie 1.3.1: Sluitende kilometerregistratie (Belastingdienst-proof). Slimme controle-flow bij afwijkingen, automatische gat-detectie & ketencontrole, PDF-integriteitsrapportage en duizendtallen scheidingstekens voor dashboard targets."
+  "versionCode": 29,
+  "versionName": "1.3.2",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.3.2.apk",
+  "releaseNotes": "Versie 1.3.2: Oplossing voor afrondingsverschillen bij meter- en ritberekeningen, verwijdering van onrealistische kilometerverdeling, flexibele adressen en snelle suggestie-chips voor korte gaten (4-5 km), en afstandsindicatie bij frequente routes."
 }
