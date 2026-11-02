@@ -122,16 +122,36 @@ struct TripsView: View {
                     
                     if !isEditing {
                         Menu {
-                            Button {
-                                exportTripsCSV()
-                            } label: {
-                                Label("Exporteer CSV", systemImage: "tablecells")
+                            if !groupedTrips.isEmpty {
+                                Section("Per maand") {
+                                    ForEach(groupedTrips, id: \.key) { group in
+                                        Menu(group.key) {
+                                            Button {
+                                                exportTripsPDF(trips: group.value, title: group.key)
+                                            } label: {
+                                                Label("PDF (\(group.key))", systemImage: "doc.richtext")
+                                            }
+                                            Button {
+                                                exportTripsCSV(trips: group.value, title: group.key)
+                                            } label: {
+                                                Label("CSV (\(group.key))", systemImage: "tablecells")
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             
-                            Button {
-                                exportTripsPDF()
-                            } label: {
-                                Label("Exporteer PDF", systemImage: "doc.richtext")
+                            Section("Alles") {
+                                Button {
+                                    exportTripsPDF(trips: filteredTrips, title: "Alles")
+                                } label: {
+                                    Label("Exporteer alles (PDF)", systemImage: "doc.richtext")
+                                }
+                                Button {
+                                    exportTripsCSV(trips: filteredTrips, title: "Alles")
+                                } label: {
+                                    Label("Exporteer alles (CSV)", systemImage: "tablecells")
+                                }
                             }
                         } label: {
                             Image(systemName: "square.and.arrow.up")
@@ -265,18 +285,20 @@ struct TripsView: View {
         return notes.joined(separator: "\n")
     }
     
-    private func exportTripsCSV() {
-        exportURL = ExportUtil.generateTripsCSV(trips: filteredTrips)
+    private func exportTripsCSV(trips: [Trip]? = nil, title: String? = nil) {
+        let targetTrips = trips ?? filteredTrips
+        exportURL = ExportUtil.generateTripsCSV(trips: targetTrips, periodTitle: title)
     }
     
-    private func exportTripsPDF() {
-        exportURL = ExportUtil.generateTripsPDF(trips: filteredTrips)
+    private func exportTripsPDF(trips: [Trip]? = nil, title: String? = nil) {
+        let targetTrips = trips ?? filteredTrips
+        exportURL = ExportUtil.generateTripsPDF(trips: targetTrips, periodTitle: title)
     }
     
     @ViewBuilder
     private var tripListContent: some View {
         ForEach(groupedTrips, id: \.key) { group in
-            Section(header: Text(group.key).font(.headline)) {
+            Section {
                 ForEach(group.value) { trip in
                     NavigationLink(value: trip) {
                         TripRowView(trip: trip)
@@ -285,6 +307,31 @@ struct TripsView: View {
                 }
                 .onDelete { offsets in
                     deleteTrips(at: offsets, in: group.value)
+                }
+            } header: {
+                HStack {
+                    Text(group.key)
+                        .font(.headline)
+                    Spacer()
+                    Menu {
+                        Button {
+                            exportTripsPDF(trips: group.value, title: group.key)
+                        } label: {
+                            Label("Exporteer PDF (\(group.key))", systemImage: "doc.richtext")
+                        }
+                        Button {
+                            exportTripsCSV(trips: group.value, title: group.key)
+                        } label: {
+                            Label("Exporteer CSV (\(group.key))", systemImage: "tablecells")
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "square.and.arrow.up")
+                            Text("Deel")
+                                .font(.caption)
+                        }
+                        .foregroundColor(.accentColor)
+                    }
                 }
             }
         }

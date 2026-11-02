@@ -6,10 +6,12 @@ struct ExportUtil {
     
     // MARK: - CSV Export
     
-    static func generateTripsCSV(trips: [Trip]) -> URL? {
-        let fileName = "CIMDriver_Ritten_\(Date().formatted(date: .numeric, time: .omitted)).csv"
+    static func generateTripsCSV(trips: [Trip], periodTitle: String? = nil) -> URL? {
+        let suffix = periodTitle?.replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: "/", with: "-")
+            ?? Date().formatted(date: .numeric, time: .omitted).replacingOccurrences(of: "/", with: "-")
+        let fileName = "CIMDriver_Ritten_\(suffix).csv"
         let tempDir = FileManager.default.temporaryDirectory
-        let fileURL = tempDir.appendingPathComponent(fileName.replacingOccurrences(of: "/", with: "-"))
+        let fileURL = tempDir.appendingPathComponent(fileName)
         
         var csvString = "Datum,Vertrek,Aankomst,Start Adres,Eind Adres,Afstand (km),Type,Status,Notities\n"
         
@@ -90,10 +92,12 @@ struct ExportUtil {
     
     // MARK: - PDF Export
     
-    static func generateTripsPDF(trips: [Trip]) -> URL? {
-        let fileName = "CIMDriver_Ritten_\(Date().formatted(date: .numeric, time: .omitted)).pdf"
+    static func generateTripsPDF(trips: [Trip], periodTitle: String? = nil) -> URL? {
+        let suffix = periodTitle?.replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: "/", with: "-")
+            ?? Date().formatted(date: .numeric, time: .omitted).replacingOccurrences(of: "/", with: "-")
+        let fileName = "CIMDriver_Ritten_\(suffix).pdf"
         let tempDir = FileManager.default.temporaryDirectory
-        let fileURL = tempDir.appendingPathComponent(fileName.replacingOccurrences(of: "/", with: "-"))
+        let fileURL = tempDir.appendingPathComponent(fileName)
         
         let pdfMetaData = [
             kCGPDFContextCreator: "CIMDriver iOS",
@@ -114,17 +118,18 @@ struct ExportUtil {
             context.beginPage()
             
             let titleAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.boldSystemFont(ofSize: 24)
+                .font: UIFont.boldSystemFont(ofSize: 22)
             ]
-            let title = "Ritten Registratie"
+            let title = periodTitle != nil ? "Ritten Registratie - \(periodTitle!)" : "Ritten Registratie"
             title.draw(at: CGPoint(x: 20, y: 20), withAttributes: titleAttributes)
             
             let dateAttributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 12),
+                .font: UIFont.systemFont(ofSize: 11),
                 .foregroundColor: UIColor.gray
             ]
-            let dateStr = "Gegenereerd op: \(Date().formatted(date: .abbreviated, time: .shortened))"
-            dateStr.draw(at: CGPoint(x: 20, y: 55), withAttributes: dateAttributes)
+            let totalKm = String(format: "%.1f", Double(trips.reduce(0) { $0 + $1.distanceMeters }) / 1000.0)
+            let dateStr = "Gegenereerd op: \(Date().formatted(date: .abbreviated, time: .shortened)) • \(trips.count) ritten • \(totalKm) km"
+            dateStr.draw(at: CGPoint(x: 20, y: 52), withAttributes: dateAttributes)
             
             // Draw table header
             var currentY = 100.0

@@ -211,6 +211,10 @@ fun TripsScreen(
                         onVehicleSelected = { viewModel.setGlobalSelectedVehicleId(it) }
                     )
                     Box {
+                        val monthGroups = remember(trips) {
+                            val fmt = java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
+                            trips.groupBy { fmt.format(java.util.Date(it.startTime)) }
+                        }
                         IconButton(onClick = { showExportMenu = true }) {
                             Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.export), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
                         }
@@ -218,25 +222,58 @@ fun TripsScreen(
                             expanded = showExportMenu,
                             onDismissRequest = { showExportMenu = false }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Deel (CSV)") },
-                                onClick = {
-                                    showExportMenu = false
-                                    com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                                        context, "cimdriver_export.csv", "text/csv"
-                                    ) { uri ->
-                                        com.cimdriver.app.util.ExportUtil.exportToCsv(context, uri, trips, savedAddresses, classificationRules)
-                                    }
+                            if (monthGroups.size > 1) {
+                                DropdownMenuItem(
+                                    text = { Text("Per maand:", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
+                                    onClick = {},
+                                    enabled = false
+                                )
+                                monthGroups.forEach { (monthName, mTrips) ->
+                                    val slug = monthName.replace(" ", "_")
+                                    DropdownMenuItem(
+                                        text = { Text("  $monthName (PDF)") },
+                                        onClick = {
+                                            showExportMenu = false
+                                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                                context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
+                                            ) { uri ->
+                                                com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, mTrips, savedAddresses, classificationRules)
+                                            }
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("  $monthName (CSV)") },
+                                        onClick = {
+                                            showExportMenu = false
+                                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                                context, "cimdriver_ritten_${slug}.csv", "text/csv"
+                                            ) { uri ->
+                                                com.cimdriver.app.util.ExportUtil.exportToCsv(context, uri, mTrips, savedAddresses, classificationRules)
+                                            }
+                                        }
+                                    )
                                 }
-                            )
+                                HorizontalDivider()
+                            }
                             DropdownMenuItem(
-                                text = { Text("Deel (PDF)") },
+                                text = { Text(if (monthGroups.size > 1) "Alle ritten (PDF)" else "Deel (PDF)") },
                                 onClick = {
                                     showExportMenu = false
                                     com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                         context, "cimdriver_export.pdf", "application/pdf"
                                     ) { uri ->
                                         com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, trips, savedAddresses, classificationRules)
+                                    }
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(if (monthGroups.size > 1) "Alle ritten (CSV)" else "Deel (CSV)") },
+                                onClick = {
+                                    showExportMenu = false
+                                    com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                        context, "cimdriver_export.csv", "text/csv"
+                                    ) { uri ->
+                                        com.cimdriver.app.util.ExportUtil.exportToCsv(context, uri, trips, savedAddresses, classificationRules)
                                     }
                                 }
                             )

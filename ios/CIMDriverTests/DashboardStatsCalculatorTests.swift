@@ -21,12 +21,12 @@ final class DashboardStatsCalculatorTests: XCTestCase {
             odometerStart: 0
         )
         
-        // 2. Woon-werk rit (gisteren)
-        let yesterday = cal.date(byAdding: .day, value: -1, to: now)!
+        // 2. Woon-werk rit (eerder vandaag)
+        let earlierToday = cal.date(byAdding: .hour, value: -2, to: now)!
         let tripCommute = Trip(
             vehicle: vehicle,
-            startTime: yesterday,
-            endTime: yesterday.addingTimeInterval(1800), // 30 min
+            startTime: earlierToday,
+            endTime: earlierToday.addingTimeInterval(1800), // 30 min
             endAddress: "Kantoor",
             distanceMeters: 25000,
             tripType: "COMMUTE",

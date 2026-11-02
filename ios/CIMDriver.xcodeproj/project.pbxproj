@@ -18,6 +18,7 @@
 		143F6719FB543ED24A01CADC /* CIMDriverWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333A9B8F91A86F595F76041C /* CIMDriverWidgetBundle.swift */; };
 		1895ABB40FAC8E07A639D7F8 /* TargetCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABBAC837802FC1807D2421 /* TargetCalculator.swift */; };
 		1E6364C35011DCB0504D27C3 /* GeocoderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591C5D6C84265B6C61B5021E /* GeocoderService.swift */; };
+		1F10FEF82A363836AAAE5281 /* ExportUtilTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE4CA0DC08EDA2DC9D44E99 /* ExportUtilTests.swift */; };
 		2002D5F6CDF2059755CDD821 /* AddressListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B15FB6EA070D185D3D4000B /* AddressListView.swift */; };
 		20E4E80CBF9F198CAD2AF1DD /* DashboardStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B910BE207AC49CFDB7768B /* DashboardStats.swift */; };
 		24DB4F8833385A61E767B584 /* LocationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */; };
@@ -137,6 +138,7 @@
 		1F31C4CEFBD0B33D3E41FB69 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripClassificationTests.swift; sourceTree = "<group>"; };
 		1F9585770616888E9E1ECB75 /* EditClassificationRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditClassificationRuleView.swift; sourceTree = "<group>"; };
+		1FE4CA0DC08EDA2DC9D44E99 /* ExportUtilTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportUtilTests.swift; sourceTree = "<group>"; };
 		246321B84451354E540BC461 /* TripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripsView.swift; sourceTree = "<group>"; };
 		2A07621028FC2304C57F43C4 /* SavedAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAddress.swift; sourceTree = "<group>"; };
 		2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPoint.swift; sourceTree = "<group>"; };
@@ -343,6 +345,7 @@
 			children = (
 				5E9E3893C011580CC1912EB0 /* AddressMatchingTests.swift */,
 				1A88ADB337BB974C46585D19 /* DashboardStatsCalculatorTests.swift */,
+				1FE4CA0DC08EDA2DC9D44E99 /* ExportUtilTests.swift */,
 				DE992979A2FCFB9CF983B573 /* OdometerGapTests.swift */,
 				539237327ADD0DAB0288EC0C /* OdometerTextRecognizerTests.swift */,
 				CC7DCD42B3BA6B7602A2DA35 /* TargetCalculatorTests.swift */,
@@ -652,6 +655,7 @@
 			files = (
 				3904C7925C884DCE5289454A /* AddressMatchingTests.swift in Sources */,
 				A7E78D53C71B7838FFBE78EF /* DashboardStatsCalculatorTests.swift in Sources */,
+				1F10FEF82A363836AAAE5281 /* ExportUtilTests.swift in Sources */,
 				F4C6307A0ECE437EA96CDB67 /* OdometerGapTests.swift in Sources */,
 				7E0E272F4BA128C2DCCCD443 /* OdometerTextRecognizerTests.swift in Sources */,
 				BD2B08203D224A84C00B23FD /* TargetCalculatorTests.swift in Sources */,
