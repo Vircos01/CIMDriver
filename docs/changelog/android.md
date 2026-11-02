@@ -6,7 +6,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.4 (Huidige Versie)
+## Versie 1.3.5 (Huidige Versie)
+*Releasedatum: 2 november 2026*
+
+!!! success "Nieuwe Functies & Verbeteringen"
+    * **Rittenoverzicht per maand delen (PDF en CSV):** Exporteer en deel eenvoudig ritten gefilterd per individuele maand in plaats van alleen het volledige overzicht.
+    * **Maandsecties met directe deelknop:** Het overzicht toont duidelijke maandheaders met totalen (aantal ritten, kilometers) en een directe "Deel"-actie per maand.
+    * **Maandtitels in rapporten:** PDF- en CSV-exporten bevatten nu de specifieke maandnaam in zowel de paginakop als bestandsnaam.
+    * **Uitgebreid exportmenu:** Snelle keuze tussen maandelijkse exports en het volledige rittenarchief via het exportmenu in de titelbalk.
+
+## Versie 1.3.4
 *Releasedatum: 30 oktober 2026*
 
 !!! success "Verbeteringen & Bugfixes"

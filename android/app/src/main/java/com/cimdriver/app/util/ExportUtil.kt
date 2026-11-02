@@ -142,7 +142,8 @@ object ExportUtil {
         trips: List<Trip>,
         savedAddresses: List<SavedAddress> = emptyList(),
         rules: List<ClassificationRule> = emptyList(),
-        settings: com.cimdriver.app.data.local.entity.Settings? = null
+        settings: com.cimdriver.app.data.local.entity.Settings? = null,
+        title: String? = null
     ) {
         val outputStream = context.contentResolver.openOutputStream(uri) ?: return
         
@@ -163,7 +164,8 @@ object ExportUtil {
         }
         
         var yPosition = 50f
-        canvas.drawText("CIMDriver Rittenregistratie", 50f, yPosition, titlePaint)
+        val docTitle = if (!title.isNullOrBlank()) "CIMDriver Rittenregistratie - $title" else "CIMDriver Rittenregistratie"
+        canvas.drawText(docTitle, 50f, yPosition, titlePaint)
         yPosition += 40f
         
         val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", java.util.Locale.forLanguageTag("nl-NL"))

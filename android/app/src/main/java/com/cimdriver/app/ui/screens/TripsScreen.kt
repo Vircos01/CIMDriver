@@ -114,6 +114,11 @@ fun TripsScreen(
     var viewMode by remember { mutableStateOf("LIST") } // "LIST" or "CALENDAR"
     val coroutineScope = rememberCoroutineScope()
     
+    val monthGroups = remember(trips) {
+        val fmt = java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
+        trips.groupBy { fmt.format(java.util.Date(it.startTime)) }
+    }
+    
     val suggestRuleState by viewModel.suggestRuleState.collectAsState()
 
     if (suggestRuleState != null) {
@@ -211,10 +216,6 @@ fun TripsScreen(
                         onVehicleSelected = { viewModel.setGlobalSelectedVehicleId(it) }
                     )
                     Box {
-                        val monthGroups = remember(trips) {
-                            val fmt = java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
-                            trips.groupBy { fmt.format(java.util.Date(it.startTime)) }
-                        }
                         IconButton(onClick = { showExportMenu = true }) {
                             Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.export), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
                         }
@@ -222,27 +223,28 @@ fun TripsScreen(
                             expanded = showExportMenu,
                             onDismissRequest = { showExportMenu = false }
                         ) {
-                            if (monthGroups.size > 1) {
+                            if (monthGroups.isNotEmpty()) {
                                 DropdownMenuItem(
                                     text = { Text("Per maand:", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
                                     onClick = {},
                                     enabled = false
                                 )
                                 monthGroups.forEach { (monthName, mTrips) ->
+                                    val capitalizedMonth = monthName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
                                     val slug = monthName.replace(" ", "_")
                                     DropdownMenuItem(
-                                        text = { Text("  $monthName (PDF)") },
+                                        text = { Text("  $capitalizedMonth (PDF)") },
                                         onClick = {
                                             showExportMenu = false
                                             com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                                 context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
                                             ) { uri ->
-                                                com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, mTrips, savedAddresses, classificationRules)
+                                                com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, mTrips, savedAddresses, classificationRules, title = capitalizedMonth)
                                             }
                                         }
                                     )
                                     DropdownMenuItem(
-                                        text = { Text("  $monthName (CSV)") },
+                                        text = { Text("  $capitalizedMonth (CSV)") },
                                         onClick = {
                                             showExportMenu = false
                                             com.cimdriver.app.util.ExportUtil.shareExportedFile(
@@ -256,7 +258,7 @@ fun TripsScreen(
                                 HorizontalDivider()
                             }
                             DropdownMenuItem(
-                                text = { Text(if (monthGroups.size > 1) "Alle ritten (PDF)" else "Deel (PDF)") },
+                                text = { Text(if (monthGroups.isNotEmpty()) "Alle ritten (PDF)" else "Deel (PDF)") },
                                 onClick = {
                                     showExportMenu = false
                                     com.cimdriver.app.util.ExportUtil.shareExportedFile(
@@ -267,7 +269,7 @@ fun TripsScreen(
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text(if (monthGroups.size > 1) "Alle ritten (CSV)" else "Deel (CSV)") },
+                                text = { Text(if (monthGroups.isNotEmpty()) "Alle ritten (CSV)" else "Deel (CSV)") },
                                 onClick = {
                                     showExportMenu = false
                                     com.cimdriver.app.util.ExportUtil.shareExportedFile(
@@ -509,96 +511,107 @@ fun TripsScreen(
                         modifier = Modifier.fillMaxSize().weight(1f)
                     ) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(trips, key = { it.id }) { trip ->
-                            val isSelected = selectedTrips.contains(trip)
-                            val dismissState = rememberSwipeToDismissBoxState(
-                                positionalThreshold = { it * .25f }
-                            )
-
-                            LaunchedEffect(dismissState.currentValue) {
-                                when (dismissState.currentValue) {
-                                    SwipeToDismissBoxValue.StartToEnd -> {
-                                        tripToClassify = trip
-                                        dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-                                    }
-                                    SwipeToDismissBoxValue.EndToStart -> {
-                                        tripToDelete = trip
-                                        dismissState.snapTo(SwipeToDismissBoxValue.Settled)
-                                    }
-                                    else -> {}
-                                }
-                            }
-
-                            SwipeToDismissBox(
-                                modifier = Modifier.animateItem(),
-                                state = dismissState,
-                                backgroundContent = {
-                                    val direction = dismissState.dismissDirection
-                                    val color by androidx.compose.animation.animateColorAsState(
-                                        when (direction) {
-                                            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
-                                            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
-                                            else -> Color.Transparent
-                                        }
-                                    )
-                                    val alignment = when (direction) {
-                                        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-                                        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-                                        else -> Alignment.Center
-                                    }
-                                    val icon = when (direction) {
-                                        SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Check
-                                        SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete
-                                        else -> Icons.Default.Delete
-                                    }
-                            
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(vertical = 4.dp, horizontal = 16.dp)
-                                            .background(color = color, shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-                                            .padding(horizontal = 20.dp),
-                                        contentAlignment = alignment
-                                    ) {
-                                        if (direction != SwipeToDismissBoxValue.Settled) {
-                                            Icon(
-                                                imageVector = icon,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onPrimary
-                                            )
-                                        }
-                                    }
-                                }
-                            ) {
-                                TripItem(
-                                    trip = trip,
+                        monthGroups.forEach { (monthName, monthTrips) ->
+                            item(key = "header_$monthName") {
+                                MonthHeaderItem(
+                                    monthName = monthName,
+                                    trips = monthTrips,
+                                    context = context,
                                     savedAddresses = savedAddresses,
-                                    classificationSettings = classificationSettings,
-                                    classificationRules = classificationRules,
-                                    onQuickReview = { reviewedTrip, tripType -> 
-                                        val expected = reviewedTrip.expectedDistanceMeters
-                                        val distance = reviewedTrip.distanceMeters
-                                        val diff = java.lang.Math.abs(distance - (expected ?: distance))
-                                        if (expected != null && diff > 2000 && diff > (expected * 0.1) && reviewedTrip.note.isNullOrBlank()) {
-                                            tripToReviewWithNote = Pair(reviewedTrip, tripType)
-                                            reviewNoteText = ""
-                                        } else {
-                                            viewModel.reviewTrip(reviewedTrip, tripType)
-                                        }
-                                    },
-                                    isSelected = isSelected,
-                                    onClick = { 
-                                        if (selectedTrips.isNotEmpty()) {
-                                            if (isSelected) selectedTrips = selectedTrips - trip else selectedTrips = selectedTrips + trip
-                                        } else {
-                                            onTripClick(trip)
-                                        }
-                                    },
-                                    onLongClick = {
-                                        if (isSelected) selectedTrips = selectedTrips - trip else selectedTrips = selectedTrips + trip
-                                    },
-                                    onDelete = { tripToDelete = it }
+                                    classificationRules = classificationRules
                                 )
+                            }
+                            items(monthTrips, key = { it.id }) { trip ->
+                                val isSelected = selectedTrips.contains(trip)
+                                val dismissState = rememberSwipeToDismissBoxState(
+                                    positionalThreshold = { it * .25f }
+                                )
+
+                                LaunchedEffect(dismissState.currentValue) {
+                                    when (dismissState.currentValue) {
+                                        SwipeToDismissBoxValue.StartToEnd -> {
+                                            tripToClassify = trip
+                                            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+                                        }
+                                        SwipeToDismissBoxValue.EndToStart -> {
+                                            tripToDelete = trip
+                                            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+                                        }
+                                        else -> {}
+                                    }
+                                }
+
+                                SwipeToDismissBox(
+                                    modifier = Modifier.animateItem(),
+                                    state = dismissState,
+                                    backgroundContent = {
+                                        val direction = dismissState.dismissDirection
+                                        val color by androidx.compose.animation.animateColorAsState(
+                                            when (direction) {
+                                                SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primary
+                                                SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error
+                                                else -> Color.Transparent
+                                            }
+                                        )
+                                        val alignment = when (direction) {
+                                            SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                                            SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                                            else -> Alignment.Center
+                                        }
+                                        val icon = when (direction) {
+                                            SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Check
+                                            SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete
+                                            else -> Icons.Default.Delete
+                                        }
+                                
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(vertical = 4.dp, horizontal = 16.dp)
+                                                .background(color = color, shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                                                .padding(horizontal = 20.dp),
+                                            contentAlignment = alignment
+                                        ) {
+                                            if (direction != SwipeToDismissBoxValue.Settled) {
+                                                Icon(
+                                                    imageVector = icon,
+                                                    contentDescription = null,
+                                                    tint = MaterialTheme.colorScheme.onPrimary
+                                                )
+                                            }
+                                        }
+                                    }
+                                ) {
+                                    TripItem(
+                                        trip = trip,
+                                        savedAddresses = savedAddresses,
+                                        classificationSettings = classificationSettings,
+                                        classificationRules = classificationRules,
+                                        onQuickReview = { reviewedTrip, tripType -> 
+                                            val expected = reviewedTrip.expectedDistanceMeters
+                                            val distance = reviewedTrip.distanceMeters
+                                            val diff = java.lang.Math.abs(distance - (expected ?: distance))
+                                            if (expected != null && diff > 2000 && diff > (expected * 0.1) && reviewedTrip.note.isNullOrBlank()) {
+                                                tripToReviewWithNote = Pair(reviewedTrip, tripType)
+                                                reviewNoteText = ""
+                                            } else {
+                                                viewModel.reviewTrip(reviewedTrip, tripType)
+                                            }
+                                        },
+                                        isSelected = isSelected,
+                                        onClick = { 
+                                            if (selectedTrips.isNotEmpty()) {
+                                                if (isSelected) selectedTrips = selectedTrips - trip else selectedTrips = selectedTrips + trip
+                                            } else {
+                                                onTripClick(trip)
+                                            }
+                                        },
+                                        onLongClick = {
+                                            if (isSelected) selectedTrips = selectedTrips - trip else selectedTrips = selectedTrips + trip
+                                        },
+                                        onDelete = { tripToDelete = it }
+                                    )
+                                }
                             }
                         }
                     }
@@ -707,6 +720,84 @@ fun TripsScreen(
                 TextButton(onClick = { tripToReviewWithNote = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
+    }
+}
+
+@Composable
+private fun MonthHeaderItem(
+    monthName: String,
+    trips: List<Trip>,
+    context: Context,
+    savedAddresses: List<com.cimdriver.app.data.local.entity.SavedAddress>,
+    classificationRules: List<com.cimdriver.app.data.local.entity.ClassificationRule>
+) {
+    val capitalizedMonth = monthName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
+    val totalKm = trips.sumOf { it.distanceMeters } / 1000.0
+    var showMenu by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = capitalizedMonth,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "${trips.size} ritten • ${String.format(java.util.Locale.getDefault(), "%.1f", totalKm)} km",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Box {
+            OutlinedButton(
+                onClick = { showMenu = true },
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
+                modifier = Modifier.height(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = "Deel $capitalizedMonth",
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Deel", style = MaterialTheme.typography.labelMedium)
+            }
+            val slug = monthName.replace(" ", "_")
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Exporteer PDF ($capitalizedMonth)") },
+                    onClick = {
+                        showMenu = false
+                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                            context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
+                        ) { uri ->
+                            com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, trips, savedAddresses, classificationRules, title = capitalizedMonth)
+                        }
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Exporteer CSV ($capitalizedMonth)") },
+                    onClick = {
+                        showMenu = false
+                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                            context, "cimdriver_ritten_${slug}.csv", "text/csv"
+                        ) { uri ->
+                            com.cimdriver.app.util.ExportUtil.exportToCsv(context, uri, trips, savedAddresses, classificationRules)
+                        }
+                    }
+                )
+            }
+        }
     }
 }
 

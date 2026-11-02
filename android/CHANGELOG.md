@@ -2,6 +2,14 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.5] - 2026-11-02
+
+### Toegevoegd & Verbeterd
+- **Rittenoverzicht per maand delen (PDF en CSV):** Gebruikers kunnen nu ritten exporteren en delen gefilterd per specifieke maand in plaats van alleen het volledige archief.
+- **Maandsecties met directe deelknop:** Het rittenoverzicht is nu gegroepeerd per maand, inclusief subtotalen (aantal ritten en gereden kilometers) en een directe "Deel"-knop per maandsectie.
+- **Gepersonaliseerde documenttitels en bestandsnamen:** PDF- en CSV-rapporten bevatten nu de specifieke maandnaam in zowel de bestandsnaam (`cimdriver_ritten_Oktober_2026.pdf`) als de paginakop.
+- **Uitgebreid exportmenu in de navigatiebalk:** Het exportmenu biedt direct toegang tot export per maand én export van het volledige archief.
+
 ## [1.3.4] - 2026-10-30
 
 ### Opgelost & Verbeterd

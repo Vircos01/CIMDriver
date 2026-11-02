@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.4 (Current Version)
+## Version 1.3.5 (Current Version)
+*Release date: November 2, 2026*
+
+!!! success "New Features & Improvements"
+    * **Share Trips by Month (PDF & CSV):** Easily export and share trips filtered by individual month instead of the entire archive only.
+    * **Monthly Sections with Direct Share Action:** Trip list displays clear monthly section headers with trip & distance totals, plus a direct "Share" action per month.
+    * **Custom Month Titles in Reports:** PDF and CSV exports now display the specific month name in report headers and filenames.
+    * **Comprehensive Top Bar Export Menu:** Quick selection between monthly exports and the full trips archive.
+
+## Version 1.3.4
 *Release date: October 30, 2026*
 
 !!! success "Improvements & Bug Fixes"
