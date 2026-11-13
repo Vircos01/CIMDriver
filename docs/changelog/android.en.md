@@ -4,7 +4,14 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.8.0 (Current Version)
+## Version 1.8.1 (Current Version)
+*Release date: November 13, 2026*
+
+!!! info "Patch: Pro Rata Fleet Card & Inbox Clarification"
+    * **Pro Rata Fleet Card:** The private km limit on the Dashboard fleet card (`MultiVehicleFleetCard`) now calculates pro rata limits dynamically based on in/end of service dates and configured vehicle limits, including a "(naar rato)" label and accurate remaining km guidance.
+    * **Daily Inbox Empty State:** The message when all items are reviewed clarifies that no trips, work hours, or fuel/charging drafts require attention.
+
+## Version 1.8.0
 *Release date: November 13, 2026*
 
 !!! success "Phase 8: Tax Month-End Closing, Route Presets & Odometer Audit Evidence"

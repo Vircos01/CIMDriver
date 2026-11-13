@@ -4,7 +4,14 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
-## Version 0.0.12 Alpha (Current Version)
+## Version 0.0.13 Alpha (Current Version)
+*Release date: November 13, 2026*
+
+!!! info "Patch: Pro Rata Fleet Card & Inbox Clarification"
+    * **Pro Rata Fleet Card:** The private km limit on the Dashboard fleet card (`multiVehicleFleetCard`) now calculates pro rata limits dynamically based on in/end of service dates and configured vehicle limits, including a "(naar rato)" label and accurate remaining km guidance.
+    * **Daily Inbox Empty State:** The message when all items are reviewed clarifies that no trips, work hours, or alerts require attention.
+
+## Version 0.0.12 Alpha
 *Release date: November 13, 2026*
 
 !!! success "Phase 8: Tax Month-End Closing, Route Presets & Odometer Audit Evidence (Android Feature Sync)"

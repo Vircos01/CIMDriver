@@ -981,10 +981,19 @@ private fun MultiVehicleFleetCard(
                 val yearPrivateKm = remember(yearPrivateTrips) {
                     yearPrivateTrips.sumOf { it.distanceMeters + it.privateDetourMeters } / 1000.0
                 }
-                val privateProgress = (yearPrivateKm / 500.0).toFloat().coerceIn(0f, 1f)
+                val proRataLimit = remember(vehicle) {
+                    com.cimdriver.app.domain.DashboardStatsCalculator.calculateProRataLimit(
+                        yearlyLimit = if (vehicle.privateKmYearlyLimit > 0) vehicle.privateKmYearlyLimit else 500,
+                        inServiceDate = vehicle.inServiceDate,
+                        endServiceDate = vehicle.endServiceDate
+                    )
+                }
+                val isProRata = vehicle.inServiceDate != null || vehicle.endServiceDate != null
+                val privateProgress = if (proRataLimit > 0) (yearPrivateKm / proRataLimit.toDouble()).toFloat().coerceIn(0f, 1f) else 0f
+                val warningThreshold = proRataLimit * 0.8
                 val statusColor = when {
-                    yearPrivateKm > 500 -> Color(0xFFE53935)
-                    yearPrivateKm >= 400 -> Color(0xFFFFB300)
+                    yearPrivateKm > proRataLimit -> Color(0xFFE53935)
+                    yearPrivateKm >= warningThreshold -> Color(0xFFFFB300)
                     else -> CIMDriverGreen
                 }
 
@@ -1042,19 +1051,29 @@ private fun MultiVehicleFleetCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // 500 km Privé Grens Progress Bar
+                    // Privé Grens Progress Bar (naar rato)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Privé dit jaar:",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            if (isProRata) {
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "(naar rato)",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
                         Text(
-                            text = "Privé dit jaar:",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "${String.format(locale, "%.1f", yearPrivateKm)} / 500 km",
+                            text = "${String.format(locale, "%.1f", yearPrivateKm)} / $proRataLimit km",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = statusColor
@@ -1072,9 +1091,12 @@ private fun MultiVehicleFleetCard(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     val statusHint = when {
-                        yearPrivateKm > 500 -> "Fiscaal bijtellingsrisico (overschreden)"
-                        yearPrivateKm >= 400 -> "Nog ${(500 - yearPrivateKm).toInt()} km tot fiscale bijtellingsgrens"
-                        else -> "Veilig binnen 500 km privé-norm"
+                        yearPrivateKm > proRataLimit -> "Fiscaal bijtellingsrisico (overschreden)"
+                        yearPrivateKm >= warningThreshold -> {
+                            val remaining = (proRataLimit - yearPrivateKm).toInt().coerceAtLeast(0)
+                            "Nog $remaining km tot fiscale bijtellingsgrens"
+                        }
+                        else -> if (isProRata) "Veilig binnen $proRataLimit km privé-norm (pro rata)" else "Veilig binnen $proRataLimit km privé-norm"
                     }
                     Text(
                         text = statusHint,

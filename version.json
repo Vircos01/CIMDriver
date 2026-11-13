@@ -1,6 +1,6 @@
 {
-  "versionCode": 40,
-  "versionName": "1.8.0",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.0.apk",
-  "releaseNotes": "Versie 1.8.0: Fase 8 - Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs: Lokale maandelijkse notificatie voor fiscale maandafsluiting en direct exporteren/delen via native share sheet (PDF/CSV), discrete maandafsluitingstegel op het Dashboard (eerste 7 dagen), 1-tik presets voor favoriete routes bij handmatige invoer met 95% triage-confidence matching, odometer fotobewijs in km-controle historie en als audit-appendix met dashboardsfoto's in de Belastingdienst PDF-export, en een compacte Multi-Voertuig Wagenpark-kaart met 500 km privégrens indicator."
+  "versionCode": 41,
+  "versionName": "1.8.1",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.1.apk",
+  "releaseNotes": "Versie 1.8.1: Patch - Wagenparkoverzicht op het Dashboard berekent de fiscale privégrens nu naar rato (pro rata) conform de in-/uitdienstdata en grenzen per voertuig. Verduidelijking van de leeg-status in de Dagelijkse Inbox (ritten, werkuren en tank-/laadsessies)."
 }

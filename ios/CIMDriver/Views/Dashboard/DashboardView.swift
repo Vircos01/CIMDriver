@@ -542,10 +542,17 @@ struct DashboardView: View {
                         $0 + (Double($1.distanceMeters + $1.privateDetourMeters) / 1000.0)
                     }
                     
-                    let privateProgress = min(1.0, max(0.0, yearPrivateKm / 500.0))
+                    let proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
+                        yearlyLimit: vehicle.privateKmYearlyLimit > 0 ? vehicle.privateKmYearlyLimit : 500,
+                        inServiceDate: vehicle.inServiceDate,
+                        endServiceDate: vehicle.endServiceDate
+                    )
+                    let isProRata = vehicle.inServiceDate != nil || vehicle.endServiceDate != nil
+                    let privateProgress = proRataLimit > 0 ? min(1.0, max(0.0, yearPrivateKm / Double(proRataLimit))) : 0.0
+                    let warningThreshold = Double(proRataLimit) * 0.8
                     let statusColor: Color = {
-                        if yearPrivateKm > 500 { return .red }
-                        if yearPrivateKm >= 400 { return .orange }
+                        if yearPrivateKm > Double(proRataLimit) { return .red }
+                        if yearPrivateKm >= warningThreshold { return .orange }
                         return .cimGreen
                     }()
                     
@@ -580,14 +587,19 @@ struct DashboardView: View {
                             }
                         }
                         
-                        // 500 km Privé Progress Bar
+                        // Privé Progress Bar (naar rato)
                         VStack(spacing: 3) {
                             HStack {
                                 Text("Privé dit jaar:")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
+                                if isProRata {
+                                    Text("(naar rato)")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary.opacity(0.8))
+                                }
                                 Spacer()
-                                Text(String(format: "%.1f / 500 km", yearPrivateKm))
+                                Text(String(format: "%.1f / %d km", yearPrivateKm, proRataLimit))
                                     .font(.caption2.bold())
                                     .foregroundStyle(statusColor)
                             }
@@ -597,9 +609,12 @@ struct DashboardView: View {
                             
                             HStack {
                                 let hint: String = {
-                                    if yearPrivateKm > 500 { return "Fiscaal bijtellingsrisico (overschreden)" }
-                                    if yearPrivateKm >= 400 { return "Nog \(Int(500 - yearPrivateKm)) km tot bijtellingsgrens" }
-                                    return "Veilig binnen 500 km privé-norm"
+                                    if yearPrivateKm > Double(proRataLimit) { return "Fiscaal bijtellingsrisico (overschreden)" }
+                                    if yearPrivateKm >= warningThreshold {
+                                        let remaining = max(0, Int(Double(proRataLimit) - yearPrivateKm))
+                                        return "Nog \(remaining) km tot bijtellingsgrens"
+                                    }
+                                    return isProRata ? "Veilig binnen \(proRataLimit) km privé-norm (pro rata)" : "Veilig binnen \(proRataLimit) km privé-norm"
                                 }()
                                 Text(hint)
                                     .font(.caption2)
@@ -735,7 +750,7 @@ struct DashboardView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(Color.cimGreen)
-                    Text("Alles staat goed. Geen ritten of uren die aandacht vereisen.")
+                    Text("Alles staat goed. Geen ritten, uren of meldingen die aandacht vereisen.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

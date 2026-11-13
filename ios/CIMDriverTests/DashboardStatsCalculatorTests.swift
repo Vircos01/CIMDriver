@@ -111,4 +111,20 @@ final class DashboardStatsCalculatorTests: XCTestCase {
         XCTAssertGreaterThan(projection, 490.0)
         XCTAssertLessThan(projection, 510.0)
     }
+
+    func testCalculateProRataLimit() {
+        let fullYearLimit = DashboardStatsCalculator.calculateProRataLimit(yearlyLimit: 500, inServiceDate: nil, endServiceDate: nil)
+        XCTAssertEqual(fullYearLimit, 500)
+
+        let cal = Calendar.current
+        let currentYear = cal.component(.year, from: Date())
+        var components = DateComponents()
+        components.year = currentYear
+        components.month = 7
+        components.day = 1
+        let midYear = cal.date(from: components)!
+
+        let halfYearLimit = DashboardStatsCalculator.calculateProRataLimit(yearlyLimit: 500, inServiceDate: midYear, endServiceDate: nil)
+        XCTAssertEqual(halfYearLimit, 250)
+    }
 }

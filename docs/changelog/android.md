@@ -6,7 +6,14 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.8.0 (Huidige Versie)
+## Versie 1.8.1 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! info "Patch: Wagenparkoverzicht naar rato & Inbox verduidelijking"
+    * **Wagenparkoverzicht naar rato:** De privégrens op de wagenparkkaart (`MultiVehicleFleetCard`) berekent de limiet nu dynamisch *naar rato* (pro rata) conform de in- en uitdiensttredingsdata en de ingestelde grens per voertuig, inclusief "(naar rato)" label en accurate statusmelding.
+    * **Dagelijkse Inbox Leeg-status:** De melding bij een bijgewerkte berichtenbox verduidelijkt nu dat er geen openstaande ritten, werkuren óf tank-/laadsessies ter beoordeling staan.
+
+## Versie 1.8.0
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 8: Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs"

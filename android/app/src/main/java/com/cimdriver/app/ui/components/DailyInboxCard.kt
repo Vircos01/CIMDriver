@@ -86,7 +86,7 @@ fun DailyInboxCard(
                         color = if (totalCount > 0) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFF15803D)
                     )
                     Text(
-                        text = if (totalCount > 0) "$totalCount openstaande actiepunten" else "Geen ritten of werkuren ter beoordeling",
+                        text = if (totalCount > 0) "$totalCount openstaande actiepunten" else "Geen ritten, uren of tank-/laadsessies ter beoordeling",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                     )

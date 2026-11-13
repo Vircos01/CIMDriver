@@ -4,7 +4,14 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
-## Versie 0.0.12 Alpha (Huidige Versie)
+## Versie 0.0.13 Alpha (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! info "Patch: Wagenparkoverzicht naar rato & Inbox verduidelijking"
+    * **Wagenparkoverzicht naar rato:** De privégrens op de wagenparkkaart (`multiVehicleFleetCard`) berekent de limiet nu dynamisch *naar rato* (pro rata) conform de in- en uitdiensttredingsdata en de ingestelde jaargrens per specifiek voertuig, inclusief "(naar rato)" label en accurate statusmelding.
+    * **Dagelijkse Inbox Leeg-status:** De melding bij een bijgewerkte berichtenbox verduidelijkt nu dat er geen openstaande ritten, werkuren óf meldingen ter beoordeling staan.
+
+## Versie 0.0.12 Alpha
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 8: Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs (Android Feature Sync)"

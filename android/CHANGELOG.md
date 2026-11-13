@@ -2,6 +2,12 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.8.1] - 2026-11-13
+
+### Gecorrigeerd & Verbeterd
+- **Wagenparkoverzicht naar rato:** De privégrens op de wagenparkkaart (`MultiVehicleFleetCard`) op het Dashboard berekent de limiet nu dynamisch *naar rato* (pro rata) op basis van de in- en uitdiensttredingsdata en de ingestelde jaargrens per specifiek voertuig, inclusief "(naar rato)" label en accurate resterende km-melding.
+- **Dagelijkse Inbox Leeg-status:** De melding in de Dagelijkse Inbox bij een volledig bijgewerkte administratie verduidelijkt nu dat er geen openstaande ritten, werkuren óf tank-/laadsessies ter controle staan.
+
 ## [1.8.0] - 2026-11-13
 
 ### Toegevoegd & Verbeterd
