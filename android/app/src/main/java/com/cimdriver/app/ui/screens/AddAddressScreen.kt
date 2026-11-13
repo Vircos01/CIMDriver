@@ -17,6 +17,8 @@ import com.cimdriver.app.ui.viewmodel.AddressBookViewModel
 import com.cimdriver.app.ui.viewmodel.SettingsViewModel
 import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.platform.LocalContext
@@ -66,22 +68,10 @@ fun AddAddressScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        if (addressId == null) stringResource(R.string.new_address) else stringResource(R.string.edit_address),
-                        color = com.cimdriver.app.ui.theme.CIMDriverWhite
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                            tint = com.cimdriver.app.ui.theme.CIMDriverWhite
-                        )
-                    }
-                },
+            CimDriverTopBar(
+                title = if (addressId == null) stringResource(R.string.new_address) else stringResource(R.string.edit_address),
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack,
                 actions = {
                     IconButton(
                         onClick = {
@@ -121,10 +111,7 @@ fun AddAddressScreen(
                                 com.cimdriver.app.ui.theme.CIMDriverWhite.copy(alpha = 0.5f)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-                )
+                }
             )
         }
     ) { padding ->

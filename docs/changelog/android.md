@@ -6,7 +6,18 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.8.1 (Huidige Versie)
+## Versie 1.8.2 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "UI-Consistentie & Design System Harmonisatie"
+    * **Volledige UI-Consistentie & Core Design System:**
+        * **Design System Tokens (`Dimensions.kt`):** Uniforme tokens voor spacing (`AppSpacing`), afgeronde hoeken (`AppShapes` met 16.dp kaarten) en iconen (`AppIconSizes`).
+        * **Gestandaardiseerde `CimDriverTopBar`:** Alle sub-schermen (Diagnostiek, Brandstof, Voertuigen, Tellerstanden, Adresboek, Klanten & Projectcodes, Urentargets, Ritdetails en Instellingen) delen dezelfde elegante navigatiebalk met CIMDriver Navy achtergrond, gecentreerde titels en correcte terugknoppen en acties.
+        * **Gestandaardiseerde `CimDriverEmptyState`:** Overal in de app (o.a. Ritten, Werkuren, Brandstof, Wagenpark, Tellerstanden, Adresboek en Klanten & Projecten) zijn lege lijsten vervangen door een uniforme, vriendelijke statusweergave met passend icoon, toelichting en directe 1-tik actieknop.
+    * **Dagelijkse Inbox Leeg-status:** Volledige harmonisatie van de berichtenbox op het Dashboard bij 0 openstaande punten, inclusief vermelding van ritten, uren en tank-/laadsessies.
+    * **Klanten & Projectcodes Herstel-fix:** Betrouwbare herstelactie voor gearchiveerde projectcodes en naadloze navigatie tussen schermen zonder statusverlies.
+
+## Versie 1.8.1
 *Releasedatum: 13 november 2026*
 
 !!! info "Patch: Wagenparkoverzicht naar rato & Inbox verduidelijking"

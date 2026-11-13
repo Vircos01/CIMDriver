@@ -28,6 +28,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.cimdriver.app.R
 import com.cimdriver.app.data.local.entity.Trip
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import com.cimdriver.app.data.local.entity.Vehicle
 import com.cimdriver.app.ui.theme.CIMDriverGreen
 import com.cimdriver.app.ui.theme.CIMDriverNavy
@@ -97,25 +99,10 @@ fun OdometerCheckAnalysisScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Km-controle Analyse",
-                        color = CIMDriverWhite
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Terug",
-                            tint = CIMDriverWhite
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CIMDriverNavy
-                )
+            CimDriverTopBar(
+                title = "Km-controle Analyse",
+                navType = TopBarNavType.BACK,
+                onNavClick = onNavigateBack
             )
         },
         bottomBar = {

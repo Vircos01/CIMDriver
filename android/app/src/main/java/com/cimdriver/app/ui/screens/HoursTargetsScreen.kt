@@ -24,6 +24,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.data.local.entity.HoursTarget
 import com.cimdriver.app.ui.viewmodel.ClientProjectViewModel
 import com.cimdriver.app.ui.viewmodel.HoursTargetViewModel
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,16 +46,10 @@ fun HoursTargetsScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Targets $currentYear", color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug", tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-                )
+            CimDriverTopBar(
+                title = "Targets $currentYear",
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack
             )
         },
         floatingActionButton = {

@@ -13,6 +13,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.R
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import com.cimdriver.app.ui.components.OdometerSettingsCard
 import com.cimdriver.app.ui.viewmodel.SettingsViewModel
 import android.widget.Toast
@@ -34,13 +36,10 @@ fun NotificationSettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.notifications), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.cancel), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                    }
-                },
+            CimDriverTopBar(
+                title = stringResource(R.string.notifications),
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack,
                 actions = {
                     IconButton(onClick = {
                         val odoDays = odometerIntervalStr.toIntOrNull() ?: 30
@@ -51,8 +50,7 @@ fun NotificationSettingsScreen(
                     }) {
                         Icon(Icons.Filled.Check, stringResource(R.string.save), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy)
+                }
             )
         }
     ) { padding ->

@@ -27,6 +27,8 @@ import com.cimdriver.app.ui.theme.CIMDriverNavy
 import com.cimdriver.app.ui.theme.CIMDriverWhite
 import com.cimdriver.app.ui.viewmodel.VehiclesViewModel
 import com.cimdriver.app.util.FixType
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import com.cimdriver.app.util.GapType
 import com.cimdriver.app.util.OdometerGap
 import com.cimdriver.app.util.OdometerGapAnalyzer.effectiveOdometerEnd
@@ -92,22 +94,10 @@ fun OdometerGapReviewScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = vehicle?.let { "Gaten in ${it.name}" } ?: "Gaten in registratie",
-                        color = CIMDriverWhite
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Terug",
-                            tint = CIMDriverWhite
-                        )
-                    }
-                },
+            CimDriverTopBar(
+                title = vehicle?.let { "Gaten in ${it.name}" } ?: "Gaten in registratie",
+                navType = TopBarNavType.BACK,
+                onNavClick = onNavigateBack,
                 actions = {
                     IconButton(
                         onClick = {
@@ -132,10 +122,7 @@ fun OdometerGapReviewScreen(
                             tint = CIMDriverWhite
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CIMDriverNavy
-                )
+                }
             )
         }
     ) { paddingValues ->

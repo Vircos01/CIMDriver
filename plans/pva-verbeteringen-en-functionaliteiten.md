@@ -401,6 +401,13 @@ flowchart TD
 #### 8.4 Multi-Voertuig Wagenpark-kaart
 - **Concept:** Voor gebruikers met 2 of meer actieve voertuigen toont het Dashboard een compacte wagenparkkaart met per voertuig de actuele tellerstand, ritten deze maand en de status van de 500 km privégrens.
 
+#### 8.5 UI-Consistentie & Design System Harmonisatie (v1.8.2 / iOS v0.0.14)
+- **Concept:** Integrale harmonisatie van de Jetpack Compose UI-architectuur:
+  1. **Core Design System Tokens (`Dimensions.kt`):** Uniforme afstanden (`AppSpacing`), kaartradii (`AppShapes` met 16.dp standard) en iconografie (`AppIconSizes`).
+  2. **Gestandaardiseerde `CimDriverTopBar`:** Universele app bar met `TopBarNavType` (MENU, BACK, CLOSE, NONE), gecentreerde titels en correcte `AutoMirrored` terugknoppen over alle sub-schermen.
+  3. **Gestandaardiseerde `CimDriverEmptyState`:** Eenduidig, vriendelijk leeg-scherm patroon met passend icoon, toelichting en 1-tik actieknop over alle lijst- en beheerschermen.
+  4. **Dagelijkse Inbox Leeg-status:** Volledige weergave bij 0 openstaande punten inclusief ritten, werkuren en tank-/laadsessies.
+
 ---
 
 ## 4. Prioriterings- en Impactmatrix
@@ -438,6 +445,7 @@ flowchart TD
 | **8.2 Favoriete Routes als 1-Tik Presets & Triage-Match** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
 | **8.3 Odometer Fotobewijs in Historie & PDF-Bijlage** | 🔴 Zeer hoog | 🟢 Hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
 | **8.4 Multi-Voertuig Wagenpark-kaart op Dashboard** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
+| **8.5 UI-Consistentie & Design System Harmonisatie** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.8.2 / iOS v0.0.14) |
 
 ---
 

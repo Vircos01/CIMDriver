@@ -28,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cimdriver.app.R
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import com.cimdriver.app.ui.theme.CIMDriverWhite
 import androidx.compose.ui.res.stringResource
 
@@ -38,9 +40,10 @@ fun AboutScreen(onOpenDrawer: () -> Unit) {
 
     Scaffold(
         topBar = {
-            CimDriverTopAppBar(
-                onOpenDrawer = onOpenDrawer,
-                title = { Text(stringResource(R.string.about_cimdriver), color = CIMDriverWhite) }
+            CimDriverTopBar(
+                title = stringResource(R.string.about_cimdriver),
+                navType = TopBarNavType.MENU,
+                onNavClick = onOpenDrawer
             )
         }
     ) { padding ->

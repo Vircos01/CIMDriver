@@ -4,7 +4,15 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
-## Version 0.0.13 Alpha (Current Version)
+## Version 0.0.14 Alpha (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "UI Consistency & Design System Parity"
+    * **UI Consistency & Design System Parity:**
+        * **Design System Tokens & ContentUnavailableViews:** Visual styling and empty state harmonization aligned with the new Jetpack Compose design system on Android.
+        * **Improved Daily Inbox Zero State:** Clarified message when all trips, hours, and alerts have been handled.
+
+## Version 0.0.13 Alpha
 *Release date: November 13, 2026*
 
 !!! info "Patch: Pro Rata Fleet Card & Inbox Clarification"

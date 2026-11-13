@@ -1,6 +1,6 @@
 {
-  "versionCode": 41,
-  "versionName": "1.8.1",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.1.apk",
-  "releaseNotes": "Versie 1.8.1: Patch - Wagenparkoverzicht op het Dashboard berekent de fiscale privégrens nu naar rato (pro rata) conform de in-/uitdienstdata en grenzen per voertuig. Verduidelijking van de leeg-status in de Dagelijkse Inbox (ritten, werkuren en tank-/laadsessies)."
+  "versionCode": 42,
+  "versionName": "1.8.2",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.2.apk",
+  "releaseNotes": "Versie 1.8.2: Volledige UI-consistentie en Design System Harmonisatie in Jetpack Compose (gestandaardiseerde TopBar, lege statussen, uniforme paddings en kaarten) & Dagelijkse Inbox uitbreiding."
 }

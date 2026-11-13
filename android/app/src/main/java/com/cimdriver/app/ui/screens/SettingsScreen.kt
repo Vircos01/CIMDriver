@@ -27,6 +27,8 @@ import com.cimdriver.app.ui.components.WorkHoursSettingsCard
 import com.cimdriver.app.ui.components.ClassificationSettingsCard
 import com.cimdriver.app.ui.components.PrivacySettingsCard
 import com.cimdriver.app.ui.components.PermissionsSettingsCard
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.material3.Checkbox
@@ -156,9 +158,10 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = { 
-            CimDriverTopAppBar(
-                onOpenDrawer = onOpenDrawer,
-                title = { Text(stringResource(R.string.settings), color = com.cimdriver.app.ui.theme.CIMDriverWhite) }
+            CimDriverTopBar(
+                title = stringResource(R.string.settings),
+                navType = TopBarNavType.MENU,
+                onNavClick = onOpenDrawer
             ) 
         }
     ) { padding ->

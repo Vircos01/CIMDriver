@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.data.local.entity.WorkDay
 import com.cimdriver.app.ui.viewmodel.WorkHoursViewModel
+import com.cimdriver.app.ui.components.core.CimDriverEmptyState
+import androidx.compose.material.icons.filled.Schedule
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -242,11 +244,15 @@ fun WorkHoursScreen(
 
             if (groupedWorkDays.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    if (searchQuery.isNotBlank()) {
-                        Text(stringResource(R.string.no_work_hours_search_results, searchQuery))
-                    } else {
-                        Text(stringResource(R.string.no_work_hours))
-                    }
+                    CimDriverEmptyState(
+                        icon = Icons.Filled.Schedule,
+                        title = if (searchQuery.isNotBlank()) "Geen werkuren gevonden" else stringResource(R.string.no_work_hours),
+                        message = if (searchQuery.isNotBlank()) "Geen resultaten voor \"$searchQuery\"."
+                                  else "Er zijn nog geen werkdagen geregistreerd voor deze periode.",
+                        actionText = if (searchQuery.isBlank()) "Werkdag toevoegen" else null,
+                        actionIcon = Icons.Filled.Add,
+                        onActionClick = if (searchQuery.isBlank()) onAddWorkDay else null
+                    )
                 }
             } else {
                 val dateFormat = SimpleDateFormat("EEEE d MMM", java.util.Locale.forLanguageTag("nl-NL"))

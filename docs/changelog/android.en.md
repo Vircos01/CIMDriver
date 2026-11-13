@@ -4,7 +4,18 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.8.1 (Current Version)
+## Version 1.8.2 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "UI Consistency & Design System Harmonization"
+    * **Comprehensive UI Consistency & Core Design System:**
+        * **Design System Tokens (`Dimensions.kt`):** Unified tokens for spacing (`AppSpacing`), rounded corners (`AppShapes` with 16.dp cards), and iconography (`AppIconSizes`).
+        * **Standardized `CimDriverTopBar`:** All sub-screens (Diagnostics, Fuel, Vehicles, Odometer Checks, Address Book, Clients & Project Codes, Hours Targets, Trip Detail, and Settings) share the same branded app bar with CIMDriver Navy background, centered titles, and auto-mirrored back buttons.
+        * **Standardized `CimDriverEmptyState`:** Across all list screens (Trips, Work Hours, Fuel, Fleet, Odometer Checks, Address Book, and Clients & Project Codes), empty states are replaced by a clean, consistent view with custom icons, clear guidance, and a direct 1-tap action button.
+    * **Daily Inbox Empty State:** Harmonized zero-state message on the Dashboard acknowledging trips, work hours, and fuel/charging sessions.
+    * **Clients & Project Codes Restore Fix:** Reliable restore behavior for archived project codes and seamless navigation between screens without state loss.
+
+## Version 1.8.1
 *Release date: November 13, 2026*
 
 !!! info "Patch: Pro Rata Fleet Card & Inbox Clarification"

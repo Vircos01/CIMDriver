@@ -28,6 +28,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import com.cimdriver.app.domain.DashboardStatsCalculator
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,13 +89,10 @@ fun AddVehicleScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(if (vehicleId == null) "Nieuwe Auto" else "Auto Bewerken", color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                    }
-                },
+            CimDriverTopBar(
+                title = if (vehicleId == null) "Nieuwe Auto" else "Auto Bewerken",
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack,
                 actions = {
                     IconButton(
                         onClick = {
@@ -117,10 +116,7 @@ fun AddVehicleScreen(
                             tint = if (name.isNotBlank() && plate.isNotBlank()) com.cimdriver.app.ui.theme.CIMDriverWhite else com.cimdriver.app.ui.theme.CIMDriverWhite.copy(alpha = 0.5f)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-                )
+                }
             )
         }
     ) { padding ->

@@ -27,6 +27,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.cimdriver.app.data.local.entity.OdometerCheck
 import com.cimdriver.app.ui.viewmodel.VehiclesViewModel
+import com.cimdriver.app.ui.components.core.CimDriverEmptyState
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -51,22 +54,10 @@ fun OdometerChecksScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = vehicle?.let { "Km-controles ${it.name}" } ?: "Km-controles",
-                        color = com.cimdriver.app.ui.theme.CIMDriverWhite
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Terug",
-                            tint = com.cimdriver.app.ui.theme.CIMDriverWhite
-                        )
-                    }
-                },
+            CimDriverTopBar(
+                title = vehicle?.let { "Km-controles ${it.name}" } ?: "Km-controles",
+                navType = TopBarNavType.BACK,
+                onNavClick = onNavigateBack,
                 actions = {
                     if (vehicle != null) {
                         IconButton(onClick = {
@@ -92,10 +83,7 @@ fun OdometerChecksScreen(
                             )
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-                )
+                }
             )
         }
     ) { paddingValues ->
@@ -106,26 +94,11 @@ fun OdometerChecksScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Filled.Speed,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Geen km-controles gevonden",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                    )
-                    Text(
-                        text = "Controles worden aangemaakt via de maandelijkse melding",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
+                CimDriverEmptyState(
+                    icon = Icons.Filled.Speed,
+                    title = "Geen km-controles gevonden",
+                    message = "Controles worden aangemaakt via de maandelijkse melding of periodieke km-stand controle."
+                )
             }
         } else {
             LazyColumn(

@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.R
 import com.cimdriver.app.ui.viewmodel.SettingsViewModel
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,14 +67,10 @@ fun DataManagementScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.data_management), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cancel), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy)
+            CimDriverTopBar(
+                title = stringResource(R.string.data_management),
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack
             )
         }
     ) { padding ->

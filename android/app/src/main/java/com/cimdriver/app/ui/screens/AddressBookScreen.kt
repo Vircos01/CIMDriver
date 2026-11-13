@@ -24,6 +24,8 @@ import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.LocationOn
+import com.cimdriver.app.ui.components.core.CimDriverEmptyState
 
 @Composable
 fun AddressBookScreen(
@@ -124,7 +126,15 @@ fun AddressBookScreen(
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (filteredAddresses.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(if (addresses.isEmpty()) stringResource(R.string.no_addresses_saved) else stringResource(R.string.no_search_results))
+                    CimDriverEmptyState(
+                        icon = Icons.Filled.LocationOn,
+                        title = if (addresses.isEmpty()) stringResource(R.string.no_addresses_saved) else stringResource(R.string.no_search_results),
+                        message = if (addresses.isEmpty()) "Voeg veelbezochte adressen (thuis, werk, klanten) toe voor automatische ritclassificatie."
+                                  else "Geen adressen gevonden voor \"$searchQuery\".",
+                        actionText = if (addresses.isEmpty()) stringResource(R.string.add_address) else null,
+                        actionIcon = Icons.Filled.Add,
+                        onActionClick = if (addresses.isEmpty()) onAddAddress else null
+                    )
                 }
             } else {
                 LazyColumn(contentPadding = PaddingValues(16.dp)) {

@@ -16,6 +16,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.data.local.entity.FuelFillUp
 import com.cimdriver.app.ui.viewmodel.FuelViewModel
 import com.cimdriver.app.ui.components.VehicleSelectionCard
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,22 +75,18 @@ fun AddFuelScreen(
         }
     }
 
+    val titleText = when {
+        existingFillUp?.status == "DRAFT" -> if (isEV) "Laadsessie Voltooien" else "Tankbeurt Voltooien"
+        fillUpId == null -> if (isEV) "Laadsessie Toevoegen" else "Tankbeurt Toevoegen"
+        else -> if (isEV) "Laadsessie Bewerken" else "Tankbeurt Bewerken"
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    val titleText = when {
-                        existingFillUp?.status == "DRAFT" -> if (isEV) "Laadsessie Voltooien" else "Tankbeurt Voltooien"
-                        fillUpId == null -> if (isEV) "Laadsessie Toevoegen" else "Tankbeurt Toevoegen"
-                        else -> if (isEV) "Laadsessie Bewerken" else "Tankbeurt Bewerken"
-                    }
-                    Text(titleText, color = com.cimdriver.app.ui.theme.CIMDriverWhite) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug", tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                    }
-                },
+            CimDriverTopBar(
+                title = titleText,
+                navType = TopBarNavType.BACK,
+                onNavClick = onNavigateBack,
                 actions = {
                     IconButton(
                         onClick = {
@@ -128,10 +126,7 @@ fun AddFuelScreen(
                             tint = com.cimdriver.app.ui.theme.CIMDriverWhite
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-                )
+                }
             )
         }
     ) { paddingValues ->

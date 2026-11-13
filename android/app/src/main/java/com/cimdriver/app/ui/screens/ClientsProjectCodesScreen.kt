@@ -20,6 +20,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.data.local.entity.Client
 import com.cimdriver.app.data.local.entity.ProjectCode
 import com.cimdriver.app.ui.viewmodel.ClientProjectViewModel
+import com.cimdriver.app.ui.components.core.CimDriverEmptyState
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,29 +41,51 @@ fun ClientsProjectCodesScreen(
     var showAddProjectDialogForClient by remember { mutableStateOf<Long?>(null) }
     var projectToEdit by remember { mutableStateOf<ProjectCode?>(null) }
 
+    val noClientProjects = projectCodes.filter { it.clientId == null }
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Klanten & Projectcodes", color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug", tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
+            CimDriverTopBar(
+                title = "Klanten & Projectcodes",
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack,
+                actions = {
+                    IconButton(onClick = { showAddClientDialog = true }) {
+                        Icon(
+                            Icons.Filled.Add,
+                            contentDescription = "Klant Toevoegen",
+                            tint = com.cimdriver.app.ui.theme.CIMDriverWhite
+                        )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-                )
+                }
             )
         },
         floatingActionButton = {}
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        if (clients.isEmpty() && noClientProjects.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CimDriverEmptyState(
+                    icon = Icons.Filled.Business,
+                    title = "Nog geen klanten of projecten",
+                    message = "Voeg klanten en projectcodes toe om ritten en gewerkte uren eenvoudig te categoriseren en te factureren.",
+                    actionText = "Klant Toevoegen",
+                    actionIcon = Icons.Filled.Add,
+                    onActionClick = { showAddClientDialog = true }
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -97,7 +122,7 @@ fun ClientsProjectCodesScreen(
                             }
                         }
                         
-                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         
                         if (clientProjects.isEmpty()) {
                             Text("Geen projectcodes", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -172,7 +197,7 @@ fun ClientsProjectCodesScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text("Zonder klant", style = MaterialTheme.typography.titleMedium)
-                            Divider(modifier = Modifier.padding(vertical = 8.dp))
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             
                             noClientProjects.forEach { project ->
                                 Row(
@@ -238,18 +263,9 @@ fun ClientsProjectCodesScreen(
                      }
                 }
             }
-            
-            if (clients.isEmpty() && noClientProjects.isEmpty()) {
-                item {
-                    Text(
-                        "Je hebt nog geen klanten of projectcodes toegevoegd. Gebruik de knop hieronder om te beginnen.",
-                        modifier = Modifier.padding(top = 32.dp),
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                    )
-                }
-            }
         }
     }
+}
 
     if (showAddClientDialog || clientToEdit != null) {
         val isEdit = clientToEdit != null

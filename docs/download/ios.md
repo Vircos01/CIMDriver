@@ -5,7 +5,7 @@ hide:
 
 # 📦 Installatie: iOS (iPhone)
 
-De huidige stabiele testversie is **Versie 0.0.13 Alpha** (Build 9).
+De huidige stabiele testversie is **Versie 0.0.14 Alpha** (Build 10).
 
 Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 8 (Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs):
 - Lokale fiscale maandafsluiting & deel-notificatie op de 1e van de maand (100% privacy-first)

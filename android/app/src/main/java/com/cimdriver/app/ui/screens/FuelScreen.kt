@@ -21,6 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.R
 import com.cimdriver.app.ui.viewmodel.FuelViewModel
+import com.cimdriver.app.ui.components.core.CimDriverEmptyState
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -47,9 +50,10 @@ fun FuelScreen(
 
     Scaffold(
         topBar = { 
-            CimDriverTopAppBar(
-                onOpenDrawer = onOpenDrawer,
-                title = { Text(stringResource(R.string.fuel), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
+            CimDriverTopBar(
+                title = stringResource(R.string.fuel),
+                navType = TopBarNavType.MENU,
+                onNavClick = onOpenDrawer,
                 actions = {
                     if (vehicles.size > 1) {
                         VehicleSelectorTopBarAction(
@@ -94,22 +98,17 @@ fun FuelScreen(
             }
 
             if (displayedFillUps.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Filled.LocalGasStation,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp).padding(bottom = 16.dp),
-                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-                        )
-                        Text(
-                            text = "Geen tankbeurten gevonden.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
+                val isEV = selectedVehicle?.engineType == "EV"
+                CimDriverEmptyState(
+                    icon = Icons.Filled.LocalGasStation,
+                    title = if (isEV) "Nog geen laadsessies geregistreerd" else "Nog geen tankbeurten geregistreerd",
+                    message = if (isEV) "Registreer een laadsessie of laat CIMDriver automatisch tussenstops detecteren tijdens het rijden."
+                              else "Voer een tankbeurt in om je brandstofverbruik en kosten nauwkeurig bij te houden.",
+                    actionText = if (isEV) "Laadsessie toevoegen" else "Tankbeurt toevoegen",
+                    actionIcon = Icons.Default.Add,
+                    onActionClick = onAddFuelClick,
+                    modifier = Modifier.weight(1f)
+                )
             } else {
                 val drafts = displayedFillUps.filter { it.status == "DRAFT" }
                 val history = displayedFillUps.filter { it.status != "DRAFT" }.sortedByDescending { it.dateTimestamp }

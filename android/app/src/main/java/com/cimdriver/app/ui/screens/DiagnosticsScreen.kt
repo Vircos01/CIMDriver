@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import com.cimdriver.app.util.HealthMonitorHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,13 +47,10 @@ fun DiagnosticsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.system_diagnostics)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                }
+            CimDriverTopBar(
+                title = stringResource(R.string.system_diagnostics),
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack
             )
         }
     ) { paddingValues ->

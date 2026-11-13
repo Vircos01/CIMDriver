@@ -2,6 +2,16 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.8.2] - 2026-11-13
+
+### Toegevoegd & Verbeterd
+- **Volledige UI-Consistentie & Core Design System (Jetpack Compose):**
+  - **Design System Tokens (`Dimensions.kt`):** Centrale definities voor spacing (`AppSpacing`), afgeronde hoeken (`AppShapes` met uniforme 16.dp kaarten) en iconografie (`AppIconSizes`).
+  - **Gestandaardiseerde `CimDriverTopBar`:** Alle sub-schermen (Diagnostiek, Brandstof, Voertuigen, Tellerstanden, Adresboek, Klanten/Projecten, Urentargets, Ritdetails en Instellingen) maken nu gebruik van dezelfde uniforme navigatiebalk met CIMDriver Navy achtergrond, gecentreerde titels en correcte `AutoMirrored` terugknoppen en acties.
+  - **Gestandaardiseerde `CimDriverEmptyState`:** Overal in de app (o.a. Ritten, Werkuren, Brandstof, Wagenpark, Tellerstanden, Adresboek en Klanten & Projecten) zijn lege lijsten vervangen door een uniforme, vriendelijke statusweergave met passend icoon, duidelijke toelichting en directe 1-tik actieknop.
+  - **Verbeterde Dagelijkse Inbox Leeg-status:** Volledige harmonisatie van de berichtenbox op het Dashboard bij 0 openstaande punten, inclusief vermelding van ritten, uren en tank-/laadsessies.
+  - **Klanten & Projectcodes Herstel-fix:** Betrouwbare herstelactie voor gearchiveerde projectcodes en naadloze schakeling tussen schermen zonder verlies van actieve status.
+
 ## [1.8.1] - 2026-11-13
 
 ### Gecorrigeerd & Verbeterd

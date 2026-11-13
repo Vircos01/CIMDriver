@@ -26,6 +26,8 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import androidx.compose.ui.window.PopupProperties
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,13 +118,10 @@ fun AddWorkDayScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(if (workDayId == null) stringResource(R.string.new_work_day) else stringResource(R.string.edit_work_day), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                    }
-                },
+            CimDriverTopBar(
+                title = if (workDayId == null) stringResource(R.string.new_work_day) else stringResource(R.string.edit_work_day),
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack,
                 actions = {
                     IconButton(
                         onClick = {
@@ -160,10 +159,7 @@ fun AddWorkDayScreen(
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.save), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-                )
+                }
             )
         }
     ) { padding ->

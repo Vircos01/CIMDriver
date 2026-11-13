@@ -27,6 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.ui.components.VehicleItem
+import com.cimdriver.app.ui.components.core.CimDriverEmptyState
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import kotlinx.coroutines.launch
 import com.cimdriver.app.data.local.entity.Trip
 import com.cimdriver.app.data.local.entity.Vehicle
@@ -87,10 +90,13 @@ fun VehiclesScreen(
     val context = LocalContext.current
 
     Scaffold(
-        topBar = { CimDriverTopAppBar(
-            onOpenDrawer = onOpenDrawer,
-            title = { Text(stringResource(R.string.vehicles_title), color = com.cimdriver.app.ui.theme.CIMDriverWhite) }
-        ) },
+        topBar = {
+            CimDriverTopBar(
+                title = stringResource(R.string.vehicles_title),
+                navType = TopBarNavType.MENU,
+                onNavClick = onOpenDrawer
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { onAddVehicle() }) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_vehicle))
@@ -98,16 +104,15 @@ fun VehiclesScreen(
         }
     ) { padding ->
         if (vehicles.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding).padding(top = 16.dp), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Filled.DirectionsCar,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp).padding(bottom = 16.dp),
-                        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-                    )
-                    Text(stringResource(R.string.no_vehicles_added), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f))
-                }
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CimDriverEmptyState(
+                    icon = Icons.Filled.DirectionsCar,
+                    title = stringResource(R.string.no_vehicles_added),
+                    message = "Voeg je auto toe om ritten, kilometerstanden en verbruik bij te houden.",
+                    actionText = stringResource(R.string.add_vehicle),
+                    actionIcon = Icons.Filled.Add,
+                    onActionClick = onAddVehicle
+                )
             }
         } else {
             LazyColumn(

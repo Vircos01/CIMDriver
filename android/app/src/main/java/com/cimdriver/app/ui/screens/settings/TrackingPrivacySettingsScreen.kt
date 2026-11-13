@@ -15,6 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.R
 import com.cimdriver.app.ui.components.TrackingSettingsCard
 import com.cimdriver.app.ui.viewmodel.SettingsViewModel
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import com.cimdriver.app.ui.components.PrivacySettingsCard
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
@@ -36,13 +38,10 @@ fun TrackingPrivacySettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.tracking_and_privacy), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.cancel), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
-                    }
-                },
+            CimDriverTopBar(
+                title = stringResource(R.string.tracking_and_privacy),
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack,
                 actions = {
                     IconButton(onClick = {
                         val graceSec = (gracePeriodMinsStr.toIntOrNull() ?: 3) * 60
@@ -53,8 +52,7 @@ fun TrackingPrivacySettingsScreen(
                     }) {
                         Icon(Icons.Filled.Check, stringResource(R.string.save), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy)
+                }
             )
         }
     ) { padding ->

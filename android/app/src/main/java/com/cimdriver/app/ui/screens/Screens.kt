@@ -21,21 +21,11 @@ fun CimDriverTopAppBar(
     title: @Composable () -> Unit = { },
     actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = { }
 ) {
-    CenterAlignedTopAppBar(
-        title = title,
-        navigationIcon = {
-            IconButton(onClick = onOpenDrawer) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = stringResource(R.string.open_menu),
-                    tint = com.cimdriver.app.ui.theme.CIMDriverWhite
-                )
-            }
-        },
-        actions = actions,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy
-        )
+    com.cimdriver.app.ui.components.core.CimDriverTopBar(
+        titleContent = title,
+        navType = com.cimdriver.app.ui.components.core.TopBarNavType.MENU,
+        onNavClick = onOpenDrawer,
+        actions = actions
     )
 }
 

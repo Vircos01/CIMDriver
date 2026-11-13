@@ -26,6 +26,7 @@ import com.cimdriver.app.ui.components.WorkHoursBarChart
 import com.cimdriver.app.ui.components.TripItem
 import com.cimdriver.app.ui.components.TripsCalendarView
 import com.cimdriver.app.ui.components.ExportPreCheckDialog
+import com.cimdriver.app.ui.components.core.CimDriverEmptyState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.rememberCoroutineScope
@@ -611,6 +612,20 @@ fun TripsScreen(
                                 selectedCalendarDayTrips = dayTrips
                             }
                         )
+                    } else if (monthGroups.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize().weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CimDriverEmptyState(
+                                icon = Icons.Filled.DirectionsCar,
+                                title = "Geen ritten gevonden",
+                                message = "Er zijn geen ritten die voldoen aan de geselecteerde filters.",
+                                actionText = "Rit handmatig toevoegen",
+                                actionIcon = Icons.Filled.Add,
+                                onActionClick = onAddTrip
+                            )
+                        }
                     } else {
                         PullToRefreshBox(
                         isRefreshing = isRefreshing,

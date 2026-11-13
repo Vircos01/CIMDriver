@@ -4,7 +4,15 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
-## Versie 0.0.13 Alpha (Huidige Versie)
+## Versie 0.0.14 Alpha (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "UI-Consistentie & Design System Pariteit"
+    * **UI-Consistentie & Design System Pariteit:**
+        * **Design System Tokens & ContentUnavailableViews:** Harmonisatie van de weergave en lege statussen met de nieuwe Jetpack Compose design tokens op Android.
+        * **Verbeterde Leeg-status in Dagelijkse Inbox:** Verduidelijking bij een bijgewerkte berichtenbox dat alle ritten, werkuren en controles zijn afgehandeld.
+
+## Versie 0.0.13 Alpha
 *Releasedatum: 13 november 2026*
 
 !!! info "Patch: Wagenparkoverzicht naar rato & Inbox verduidelijking"

@@ -33,15 +33,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HelpScreen(onOpenDrawer: () -> Unit) {
     Scaffold(
         topBar = {
-            com.cimdriver.app.ui.screens.CimDriverTopAppBar(
-                onOpenDrawer = onOpenDrawer,
-                title = { Text(stringResource(R.string.help), color = com.cimdriver.app.ui.theme.CIMDriverWhite) }
+            CimDriverTopBar(
+                title = stringResource(R.string.help),
+                navType = TopBarNavType.MENU,
+                onNavClick = onOpenDrawer
             )
         }
     ) { padding ->

@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cimdriver.app.ui.components.DashboardPermissionsSection
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import com.cimdriver.app.data.local.entity.Trip
@@ -224,9 +226,10 @@ fun DashboardScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { 
-            CimDriverTopAppBar(
-                onOpenDrawer = onOpenDrawer,
-                title = { Text(stringResource(R.string.dashboard), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
+            CimDriverTopBar(
+                title = stringResource(R.string.dashboard),
+                navType = TopBarNavType.MENU,
+                onNavClick = onOpenDrawer,
                 actions = {
                     VehicleSelectorTopBarAction(
                         vehicles = vehicles,

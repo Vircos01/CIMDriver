@@ -40,6 +40,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import com.cimdriver.app.ui.components.core.CimDriverTopBar
+import com.cimdriver.app.ui.components.core.TopBarNavType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -198,13 +200,10 @@ fun TripDetailScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.trip_details)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                },
+            CimDriverTopBar(
+                title = stringResource(R.string.trip_details),
+                navType = TopBarNavType.BACK,
+                onNavClick = onBack,
                 actions = {
                     var expanded by remember { mutableStateOf(false) }
                     var showRecalculateConfirm by remember { mutableStateOf(false) }
@@ -347,13 +346,7 @@ fun TripDetailScreen(
                             }
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = com.cimdriver.app.ui.theme.CIMDriverNavy,
-                    titleContentColor = com.cimdriver.app.ui.theme.CIMDriverWhite,
-                    navigationIconContentColor = com.cimdriver.app.ui.theme.CIMDriverWhite,
-                    actionIconContentColor = com.cimdriver.app.ui.theme.CIMDriverWhite
-                )
+                }
             )
         }
     ) { padding ->
