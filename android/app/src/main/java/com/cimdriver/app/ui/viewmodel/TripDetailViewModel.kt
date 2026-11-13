@@ -127,12 +127,13 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveReview(tripType: String, projectCode: String? = null) {
+    fun saveReview(tripType: String, projectCode: String? = null, privateDetourMeters: Int = 0) {
         val currentTrip = _trip.value ?: return
         viewModelScope.launch {
             val updatedTrip = currentTrip.copy(
                 tripType = tripType,
                 projectCode = projectCode,
+                privateDetourMeters = privateDetourMeters,
                 status = "DONE"
             )
             tripDao.updateTrip(updatedTrip)
@@ -141,13 +142,14 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveReviewWithNote(tripType: String, note: String, projectCode: String? = null) {
+    fun saveReviewWithNote(tripType: String, note: String, projectCode: String? = null, privateDetourMeters: Int = 0) {
         val currentTrip = _trip.value ?: return
         viewModelScope.launch {
             val updatedTrip = currentTrip.copy(
                 tripType = tripType,
                 note = note,
                 projectCode = projectCode,
+                privateDetourMeters = privateDetourMeters,
                 status = "DONE"
             )
             tripDao.updateTrip(updatedTrip)

@@ -369,7 +369,18 @@ class TripsViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DashboardUiState())
 
-    fun addManualTrip(vehicleId: Long?, startAddress: String, endAddress: String, distanceKm: Double, type: String, startTime: Long = System.currentTimeMillis(), endTime: Long = startTime + (1000 * 60 * 30), note: String? = null, projectCode: String? = null) {
+    fun addManualTrip(
+        vehicleId: Long?,
+        startAddress: String,
+        endAddress: String,
+        distanceKm: Double,
+        type: String,
+        startTime: Long = System.currentTimeMillis(),
+        endTime: Long = startTime + (1000 * 60 * 30),
+        note: String? = null,
+        projectCode: String? = null,
+        privateDetourMeters: Int = 0
+    ) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             android.util.Log.d("CIMDriver", "addManualTrip started for $startAddress to $endAddress")
             var odoStart = 0
@@ -420,7 +431,8 @@ class TripsViewModel @Inject constructor(
                 status = TripStatus.DONE.value,
                 note = note,
                 projectCode = projectCode,
-                isManual = true
+                isManual = true,
+                privateDetourMeters = privateDetourMeters
             )
             try {
                 val id = tripRepository.insertTrip(trip)
@@ -463,7 +475,19 @@ class TripsViewModel @Inject constructor(
         }
     }
 
-    fun updateManualTrip(tripId: Long, vehicleId: Long?, startAddress: String, endAddress: String, distanceKm: Double, type: String, startTime: Long, endTime: Long, note: String? = null, projectCode: String? = null) {
+    fun updateManualTrip(
+        tripId: Long,
+        vehicleId: Long?,
+        startAddress: String,
+        endAddress: String,
+        distanceKm: Double,
+        type: String,
+        startTime: Long,
+        endTime: Long,
+        note: String? = null,
+        projectCode: String? = null,
+        privateDetourMeters: Int = 0
+    ) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             val existingTrip = tripRepository.getTripById(tripId)
             if (existingTrip != null) {
@@ -486,7 +510,8 @@ class TripsViewModel @Inject constructor(
                     note = note,
                     projectCode = projectCode,
                     odometerEnd = existingTrip.odometerStart +
-                        TripDistance.metersToOdometerKilometers(distanceM)
+                        TripDistance.metersToOdometerKilometers(distanceM),
+                    privateDetourMeters = privateDetourMeters
                 )
                 tripRepository.updateTrip(updatedTrip)
                 

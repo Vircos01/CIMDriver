@@ -66,6 +66,9 @@ fun AddTripScreen(
     var distance by remember(refTrip) { 
         mutableStateOf(existingTrip?.let { String.format(Locale.getDefault(), "%.1f", it.distanceMeters / 1000.0) } ?: copyTrip?.let { String.format(Locale.getDefault(), "%.1f", it.distanceMeters / 1000.0) } ?: "") 
     }
+    var privateDetourKm by remember(refTrip) {
+        mutableStateOf(if ((refTrip?.privateDetourMeters ?: 0) > 0) String.format(Locale.getDefault(), "%.1f", (refTrip?.privateDetourMeters ?: 0) / 1000.0) else "")
+    }
     val classificationRules by viewModel.classificationRules.collectAsState()
     val tripOptions = remember(classificationRules) {
         classificationRules.mapNotNull { it.tripType }.distinct().ifEmpty { 
@@ -221,6 +224,7 @@ fun AddTripScreen(
                     IconButton(
                         onClick = {
                             val dist = distance.replace(",", ".").toDoubleOrNull() ?: 0.0
+                            val detourM = ((privateDetourKm.replace(",", ".").toDoubleOrNull() ?: 0.0) * 1000).toInt()
                             val type = tripType
                             val actualStart = AddressMatching.findSavedAddress(startAddress, savedAddresses)?.address ?: startAddress
                             val actualEnd = AddressMatching.findSavedAddress(endAddress, savedAddresses)?.address ?: endAddress
@@ -235,7 +239,8 @@ fun AddTripScreen(
                                     startTime = getSelectedTimestamp(),
                                     endTime = getSelectedEndTimestamp(),
                                     note = note.takeIf { it.isNotBlank() },
-                                    projectCode = projectCode.takeIf { it.isNotBlank() }
+                                    projectCode = projectCode.takeIf { it.isNotBlank() },
+                                    privateDetourMeters = detourM
                                 )
                             } else {
                                 viewModel.updateManualTrip(
@@ -248,7 +253,8 @@ fun AddTripScreen(
                                     startTime = getSelectedTimestamp(),
                                     endTime = getSelectedEndTimestamp(),
                                     note = note.takeIf { it.isNotBlank() },
-                                    projectCode = projectCode.takeIf { it.isNotBlank() }
+                                    projectCode = projectCode.takeIf { it.isNotBlank() },
+                                    privateDetourMeters = detourM
                                 )
                             }
                             onBack()
@@ -510,6 +516,21 @@ fun AddTripScreen(
                                 CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                             }
                         }
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = privateDetourKm,
+                        onValueChange = { privateDetourKm = it },
+                        label = { Text("Privé-omrijkilometers (optioneel)") },
+                        supportingText = { Text("Kilometers omgereden voor privédoeleinden tijdens zakelijke/woon-werk rit") },
+                        suffix = { Text("km") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                        )
                     )
                 }
             }

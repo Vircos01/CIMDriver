@@ -57,30 +57,38 @@ flowchart TD
 
 ---
 
-### 🟢 Fase 1: Fiscale Compliance & Belastingdienst-zekerheid (Prio 1)
+### 🟢 Fase 1: Fiscale Compliance & Belastingdienst-zekerheid (✅ Gerealiseerd)
 
 > [!IMPORTANT]
-> Volgens art. 3.17 Wet IB 2001 en de Uitvoeringsregeling loonbelasting 2011 eist de Belastingdienst dat een sluitende rittenadministratie per rit de **begin- en eindstand van de kilometerteller** bevat, evenals duidelijke identificatie van het voertuig (kenteken, merk, type).
+> Volgens art. 3.17 Wet IB 2001 en de Uitvoeringsregeling loonbelasting 2011 eist de Belastingdienst dat een sluitende rittenadministratie per rit de **begin- en eindstand van de kilometerteller** bevat, evenals duidelijke identificatie van het voertuig (kenteken, merk, type). Deze functionaliteit is volledig gerealiseerd in codebase (Room DB v49, exports en invoervelden).
 
-#### 1.1 Start- en Eindstand in PDF & CSV Export
-- **Probleem:** In `ExportUtil.kt` ontbreken momenteel de velden `odometerStart` en `odometerEnd` in zowel `exportToCsv()` als `exportToPdf()`.
-- **Oplossing:**
-  - **CSV:** Kolommen toevoegen: `odometer_start;odometer_end;license_plate;vehicle_name;...`.
-  - **PDF:** Tabel uitbreiden met kolommen *Beginstand* en *Eindstand*.
-  - **Paginakop:** Bovenin het PDF-document altijd een header tonen met kenteken, merk, model en de geselecteerde periode.
+#### 1.1 Start- en Eindstand in PDF & CSV Export (✅ Gerealiseerd)
+- **Probleem:** In `ExportUtil.kt` ontbraken voorheen de velden `odometerStart` en `odometerEnd` in zowel `exportToCsv()` als `exportToPdf()`.
+- **Oplossing & Implementatie:**
+  - **CSV:** Kolommen uitgebreid: `datum;vertrektijd;aankomsttijd;kenteken;voertuig;teller_start;teller_eind;afstand_km;prive_omrij_km;karakter;vertrekadres;aankomstadres;ritdoel_project;route_toelichting`.
+  - **PDF:** Volledige omschakeling naar liggend A4 (Landscape 842x595) met kolommen: Datum, Vertrek, Aankomst, Beginstand (km), Eindstand (km), Afstand (km), Privé omrijden (km), Karakter, Vertrekadres, Aankomstadres, Doel / Toelichting.
+  - **Paginakop & Totalen:** Bovenin het document voertuig (merk, model, kenteken) en fiscale periode; onderaan een overzichtelijk totalenblok (totaal gereden km, zakelijk km, woon-werk km, privé km, privé-omrij km).
 - **Betrokken bestanden:**
   - `android/app/src/main/java/com/cimdriver/app/util/ExportUtil.kt`
-  - `ios/CIMDriver/Utilities/ExportUtil.swift`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/TripsScreen.kt`
 
-#### 1.2 Registratie van Privé-omrijkilometers
-- **Probleem:** Bij een zakelijke rit kan sprake zijn van een privé-tussenstop (bijv. kind naar school brengen). De Belastingdienst vereist dat de extra gereden privékilometers apart vermeld worden.
-- **Oplossing:**
-  - Voeg een optioneel numeriek veld `privateDetourMeters` toe aan de `Trip`-entiteit.
-  - In `TripDetailScreen` en `AddTripScreen` een optionele invoer bieden: *"Waarvan privé-omrijkilometers"*.
-  - Neem deze kilometers mee in de berekening van de 500km-privégrens.
+#### 1.2 Registratie van Privé-omrijkilometers (✅ Gerealiseerd)
+- **Probleem:** Bij een zakelijke of woon-werk rit kan sprake zijn van een privé-tussenstop (bijv. school, supermarkt). De Belastingdienst vereist dat de extra gereden privékilometers apart vermeld worden en meetellen voor de 500km-privégrens.
+- **Oplossing & Implementatie:**
+  - `Trip`-entiteit uitgebreid met `@ColumnInfo(defaultValue = "0") val privateDetourMeters: Int = 0`.
+  - Room database migratie `MIGRATION_48_49` gerealiseerd en geregistreerd in `AppDatabase.kt`.
+  - `DashboardStatsCalculator.kt`: `privateDetourMeters` telt mee voor `ytdPriveMeters` en verplaatst de omgereden kilometers van zakelijk naar privé in de periodestatistieken en grafieken.
+  - `AddTripScreen.kt` & `TripDetailScreen.kt`: Invoerveld voor *"Privé-omrijkilometers (optioneel)"* toegevoegd bij zowel handmatig toevoegen, bewerken als bij het beoordelen van afwijkende ritten (`TO_REVIEW`).
+  - `TripComponents.kt`: Rittenlijst toont nu *"• waarvan X.X km privé"* indien van toepassing.
 - **Betrokken bestanden:**
-  - `android/app/src/main/java/com/cimdriver/app/data/local/entity/Entities.kt` (Database migratie)
+  - `android/app/src/main/java/com/cimdriver/app/data/local/entity/Entities.kt`
+  - `android/app/src/main/java/com/cimdriver/app/data/local/AppDatabase.kt`
+  - `android/app/src/main/java/com/cimdriver/app/domain/DashboardStatsCalculator.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/AddTripScreen.kt`
   - `android/app/src/main/java/com/cimdriver/app/ui/screens/TripDetailScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/components/TripComponents.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/viewmodel/TripsViewModel.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/viewmodel/TripDetailViewModel.kt`
 
 ---
 
@@ -192,3 +200,4 @@ Voor elke oplevering binnen dit PvA gelden de strikte CIMDriver kwaliteitsstanda
 2. **5-Bestands Versiebeheer:** Versie-ophoging wordt synchroon doorgevoerd in `build.gradle.kts`, root `version.json`, `android/version.json`, `README.md` en `CHANGELOG.md`.
 3. **Bilingual Docs:** Documentatie en downloadpagina's in `docs/` worden altijd bijgewerkt in zowel het Nederlands (`.md`) als het Engels (`.en.md`).
 4. **Keystore Integrity:** Releases worden gesigneerd via `android/keystore.properties` met `release.jks`.
+

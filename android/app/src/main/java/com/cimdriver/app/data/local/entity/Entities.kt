@@ -78,7 +78,8 @@ data class Trip(
     val expectedDistanceMeters: Int? = null,
     val projectCode: String? = null,
     val appliedRuleName: String? = null,
-    val projectCodeId: Long? = null
+    val projectCodeId: Long? = null,
+    @ColumnInfo(defaultValue = "0") val privateDetourMeters: Int = 0
 )
 
 @Entity(

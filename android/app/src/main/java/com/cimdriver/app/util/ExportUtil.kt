@@ -107,29 +107,46 @@ object ExportUtil {
         uri: Uri,
         trips: List<Trip>,
         savedAddresses: List<SavedAddress> = emptyList(),
-        rules: List<ClassificationRule> = emptyList()
+        rules: List<ClassificationRule> = emptyList(),
+        settings: com.cimdriver.app.data.local.entity.Settings? = null,
+        vehicles: List<Vehicle> = emptyList()
     ) {
         val outputStream = context.contentResolver.openOutputStream(uri) ?: return
         val writer = OutputStreamWriter(outputStream)
         
-        val dateFormat = SimpleDateFormat("d-M-yyyy", java.util.Locale.forLanguageTag("nl-NL"))
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy", java.util.Locale.forLanguageTag("nl-NL"))
+        val timeFormat = SimpleDateFormat("HH:mm", java.util.Locale.forLanguageTag("nl-NL"))
         
-        // Write CSV Header
-        writer.append("date;departure;arrival;kilometers;businesspurpose;purposeexplanation;deviatingexplanation\n")
+        // Write CSV Header - Belastingdienst compliant
+        writer.append("datum;vertrektijd;aankomsttijd;kenteken;voertuig;teller_start;teller_eind;afstand_km;prive_omrij_km;karakter;vertrekadres;aankomstadres;ritdoel_project;route_toelichting\n")
         
         trips.forEach { trip ->
             val dateStr = dateFormat.format(Date(trip.startTime))
-            val distanceKm = Math.round(trip.distanceMeters / 1000.0).toString()
+            val startTimeStr = timeFormat.format(Date(trip.startTime))
+            val endTimeStr = trip.endTime?.let { timeFormat.format(Date(it)) } ?: ""
+            val vehicle = vehicles.find { it.id == trip.vehicleId }
+            val plate = vehicle?.licensePlate ?: ""
+            val vehicleName = vehicle?.let { "${it.make} ${it.model}".trim() } ?: ""
             
-            // Escape semicolons in strings
-            val startAddr = trip.startAddress?.replace(";", ",") ?: ""
-            val endAddr = trip.endAddress?.replace(";", ",") ?: ""
+            val odoStart = trip.odometerStart
+            val odoEnd = trip.odometerEnd ?: (trip.odometerStart + Math.round(trip.distanceMeters / 1000.0).toInt())
+            val distanceKm = String.format(Locale.US, "%.1f", trip.distanceMeters / 1000.0)
+            val detourKm = if (trip.privateDetourMeters > 0) String.format(Locale.US, "%.1f", trip.privateDetourMeters / 1000.0) else "0.0"
             
+            val category = classifyForExport(trip, savedAddresses, rules, settings)
+            val typeStr = when (category) {
+                TripCategory.BUSINESS -> "Zakelijk"
+                TripCategory.COMMUTE -> "Woon-werk"
+                TripCategory.PRIVATE -> "Privé"
+                null -> trip.tripType
+            }
+            
+            val startAddr = trip.startAddress?.replace(";", ",")?.replace("\n", " ") ?: ""
+            val endAddr = trip.endAddress?.replace(";", ",")?.replace("\n", " ") ?: ""
+            val purpose = trip.projectCode?.replace(";", ",") ?: trip.tripType.replace(";", ",")
             val deviatingExplanation = trip.note?.replace(";", ",")?.replace("\n", " ") ?: ""
             
-            val businessPurpose = trip.projectCode?.replace(";", ",") ?: trip.tripType.replace(" ", "_")
-            
-            writer.append("$dateStr;$startAddr;$endAddr;$distanceKm;$businessPurpose;;$deviatingExplanation\n")
+            writer.append("$dateStr;$startTimeStr;$endTimeStr;$plate;$vehicleName;$odoStart;$odoEnd;$distanceKm;$detourKm;$typeStr;$startAddr;$endAddr;$purpose;$deviatingExplanation\n")
         }
         
         writer.flush()
@@ -143,71 +160,159 @@ object ExportUtil {
         savedAddresses: List<SavedAddress> = emptyList(),
         rules: List<ClassificationRule> = emptyList(),
         settings: com.cimdriver.app.data.local.entity.Settings? = null,
-        title: String? = null
+        title: String? = null,
+        vehicles: List<Vehicle> = emptyList()
     ) {
         val outputStream = context.contentResolver.openOutputStream(uri) ?: return
         
         val pdfDocument = PdfDocument()
-        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 size
+        val pageInfo = PdfDocument.PageInfo.Builder(842, 595, 1).create() // Landscape A4
         var page = pdfDocument.startPage(pageInfo)
         var canvas = page.canvas
         
-        val paint = Paint().apply {
+        val bodyPaint = Paint().apply {
             color = Color.BLACK
-            textSize = 12f
+            textSize = 9f
+        }
+        
+        val headerPaint = Paint().apply {
+            color = Color.BLACK
+            textSize = 9f
+            isFakeBoldText = true
+        }
+
+        val metaPaint = Paint().apply {
+            color = Color.DKGRAY
+            textSize = 10f
         }
         
         val titlePaint = Paint().apply {
             color = Color.BLACK
-            textSize = 18f
+            textSize = 16f
             isFakeBoldText = true
         }
+
+        val linePaint = Paint().apply {
+            color = Color.LTGRAY
+            strokeWidth = 1f
+        }
         
-        var yPosition = 50f
+        var yPosition = 35f
         val docTitle = if (!title.isNullOrBlank()) "CIMDriver Rittenregistratie - $title" else "CIMDriver Rittenregistratie"
-        canvas.drawText(docTitle, 50f, yPosition, titlePaint)
-        yPosition += 40f
+        canvas.drawText(docTitle, 35f, yPosition, titlePaint)
+        yPosition += 16f
+        canvas.drawText("Sluitende rittenadministratie conform richtlijnen Belastingdienst Nederland", 35f, yPosition, metaPaint)
+        yPosition += 18f
+
+        // Document header met voertuig- en periodedetails
+        val defaultVehicle = trips.firstNotNullOfOrNull { t -> vehicles.find { it.id == t.vehicleId } } 
+            ?: vehicles.find { it.isDefault } ?: vehicles.firstOrNull()
+        val vehicleStr = defaultVehicle?.let { "${it.make} ${it.model} (${it.licensePlate})" } ?: "Alle voertuigen"
+        val periodStr = if (!title.isNullOrBlank()) title else "Volledig overzicht"
+        canvas.drawText("Voertuig: $vehicleStr   |   Periode: $periodStr   |   Aantal ritten: ${trips.size}", 35f, yPosition, metaPaint)
+        yPosition += 18f
         
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", java.util.Locale.forLanguageTag("nl-NL"))
+        canvas.drawLine(35f, yPosition, 807f, yPosition, linePaint)
+        yPosition += 14f
+
+        fun drawTableHeader(c: Canvas, y: Float) {
+            c.drawText("Datum & Tijd", 35f, y, headerPaint)
+            c.drawText("Kenteken", 120f, y, headerPaint)
+            c.drawText("Start km", 185f, y, headerPaint)
+            c.drawText("Eind km", 240f, y, headerPaint)
+            c.drawText("Afstand", 295f, y, headerPaint)
+            c.drawText("Omrij", 345f, y, headerPaint)
+            c.drawText("Type", 390f, y, headerPaint)
+            c.drawText("Vertrekadres", 420f, y, headerPaint)
+            c.drawText("Aankomstadres", 570f, y, headerPaint)
+            c.drawText("Doel / Notitie", 720f, y, headerPaint)
+        }
+
+        drawTableHeader(canvas, yPosition)
+        yPosition += 6f
+        canvas.drawLine(35f, yPosition, 807f, yPosition, linePaint)
+        yPosition += 14f
         
-        // Draw header
-        canvas.drawText(context.getString(R.string.date), 50f, yPosition, paint)
-        canvas.drawText(context.getString(R.string.from), 150f, yPosition, paint)
-        canvas.drawText(context.getString(R.string.to), 300f, yPosition, paint)
-        canvas.drawText(context.getString(R.string.km), 450f, yPosition, paint)
-        canvas.drawText(context.getString(R.string.type), 500f, yPosition, paint)
-        yPosition += 20f
-        
-        canvas.drawLine(50f, yPosition, 545f, yPosition, paint)
-        yPosition += 20f
-        
+        val dateTimeFormat = SimpleDateFormat("dd-MM-yy HH:mm", java.util.Locale.forLanguageTag("nl-NL"))
+        var totalDistMeters = 0L
+        var totalZakelijkMeters = 0L
+        var totalWoonWerkMeters = 0L
+        var totalPriveMeters = 0L
+        var totalDetourMeters = 0L
+
         trips.forEach { trip ->
-            if (yPosition > 800f) {
+            if (yPosition > 520f) {
                 pdfDocument.finishPage(page)
                 page = pdfDocument.startPage(pageInfo)
                 canvas = page.canvas
-                yPosition = 50f
+                yPosition = 35f
+                drawTableHeader(canvas, yPosition)
+                yPosition += 6f
+                canvas.drawLine(35f, yPosition, 807f, yPosition, linePaint)
+                yPosition += 14f
             }
             
-            val dateStr = dateFormat.format(Date(trip.startTime))
-            val startAddr = trip.startAddress?.take(20) ?: ""
-            val endAddr = trip.endAddress?.take(20) ?: ""
-            val distanceKm = String.format(Locale.getDefault(), "%.1f", trip.distanceMeters / 1000.0)
-            val typeStr = when (classifyForExport(trip, savedAddresses, rules, settings)) {
-                TripCategory.BUSINESS -> "Z"
-                TripCategory.PRIVATE -> "P"
-                TripCategory.COMMUTE -> "W"
+            val dateStr = dateTimeFormat.format(Date(trip.startTime))
+            val vehicle = vehicles.find { it.id == trip.vehicleId }
+            val plateStr = (vehicle?.licensePlate ?: "").take(9)
+            val odoStartStr = String.format(Locale.US, "%,d", trip.odometerStart).replace(',', '.')
+            val odoEndVal = trip.odometerEnd ?: (trip.odometerStart + Math.round(trip.distanceMeters / 1000.0).toInt())
+            val odoEndStr = String.format(Locale.US, "%,d", odoEndVal).replace(',', '.')
+            val distStr = String.format(Locale.getDefault(), "%.1f km", trip.distanceMeters / 1000.0)
+            val detourStr = if (trip.privateDetourMeters > 0) String.format(Locale.getDefault(), "%.1f km", trip.privateDetourMeters / 1000.0) else "-"
+            
+            val category = classifyForExport(trip, savedAddresses, rules, settings)
+            val typeStr = when (category) {
+                TripCategory.BUSINESS -> "Zakelijk"
+                TripCategory.PRIVATE -> "Privé"
+                TripCategory.COMMUTE -> "Woon-werk"
                 null -> ""
             }
+
+            totalDistMeters += trip.distanceMeters
+            totalDetourMeters += trip.privateDetourMeters
+            when (category) {
+                TripCategory.BUSINESS -> totalZakelijkMeters += trip.distanceMeters
+                TripCategory.COMMUTE -> totalWoonWerkMeters += trip.distanceMeters
+                TripCategory.PRIVATE -> totalPriveMeters += trip.distanceMeters
+                null -> {}
+            }
             
-            canvas.drawText(dateStr, 50f, yPosition, paint)
-            canvas.drawText(startAddr, 150f, yPosition, paint)
-            canvas.drawText(endAddr, 300f, yPosition, paint)
-            canvas.drawText(distanceKm, 450f, yPosition, paint)
-            canvas.drawText(typeStr, 500f, yPosition, paint)
+            val startAddr = (trip.startAddress ?: "").take(25)
+            val endAddr = (trip.endAddress ?: "").take(25)
+            val noteOrPurpose = (trip.projectCode ?: trip.note ?: "").take(16)
             
-            yPosition += 20f
+            canvas.drawText(dateStr, 35f, yPosition, bodyPaint)
+            canvas.drawText(plateStr, 120f, yPosition, bodyPaint)
+            canvas.drawText(odoStartStr, 185f, yPosition, bodyPaint)
+            canvas.drawText(odoEndStr, 240f, yPosition, bodyPaint)
+            canvas.drawText(distStr, 295f, yPosition, bodyPaint)
+            canvas.drawText(detourStr, 345f, yPosition, bodyPaint)
+            canvas.drawText(typeStr, 390f, yPosition, bodyPaint)
+            canvas.drawText(startAddr, 420f, yPosition, bodyPaint)
+            canvas.drawText(endAddr, 570f, yPosition, bodyPaint)
+            canvas.drawText(noteOrPurpose, 720f, yPosition, bodyPaint)
+            
+            yPosition += 15f
         }
+
+        // Totals summary block at bottom
+        if (yPosition > 470f) {
+            pdfDocument.finishPage(page)
+            page = pdfDocument.startPage(pageInfo)
+            canvas = page.canvas
+            yPosition = 35f
+        }
+        yPosition += 10f
+        canvas.drawLine(35f, yPosition, 807f, yPosition, linePaint)
+        yPosition += 16f
+        val zakelijkKmStr = String.format(Locale.getDefault(), "%.1f", totalZakelijkMeters / 1000.0)
+        val woonWerkKmStr = String.format(Locale.getDefault(), "%.1f", totalWoonWerkMeters / 1000.0)
+        val priveKmStr = String.format(Locale.getDefault(), "%.1f", totalPriveMeters / 1000.0)
+        val detourKmStr = String.format(Locale.getDefault(), "%.1f", totalDetourMeters / 1000.0)
+        val totaalKmStr = String.format(Locale.getDefault(), "%.1f", totalDistMeters / 1000.0)
+
+        canvas.drawText("TOTALEN: Totaal: $totaalKmStr km   |   Zakelijk: $zakelijkKmStr km   |   Woon-werk: $woonWerkKmStr km   |   Privé: $priveKmStr km   |   Privé-omrijden: $detourKmStr km", 35f, yPosition, headerPaint)
         
         pdfDocument.finishPage(page)
         pdfDocument.writeTo(outputStream)

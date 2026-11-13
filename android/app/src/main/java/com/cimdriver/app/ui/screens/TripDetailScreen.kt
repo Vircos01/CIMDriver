@@ -380,6 +380,15 @@ fun TripDetailScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
+                    if (trip!!.privateDetourMeters > 0) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Waarvan privé-omrijden: ${String.format(locale, "%.1f km", trip!!.privateDetourMeters / 1000.0)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+
                     if (!trip!!.projectCode.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         HorizontalDivider()
@@ -407,6 +416,9 @@ fun TripDetailScreen(
                 var showNoteRequiredDialog by remember { mutableStateOf(false) }
                 var reviewNoteText by remember { mutableStateOf(trip!!.note ?: "") }
                 var reviewProjectCode by remember { mutableStateOf(trip!!.projectCode ?: "") }
+                var reviewPrivateDetourKm by remember(trip!!.privateDetourMeters) {
+                    mutableStateOf(if (trip!!.privateDetourMeters > 0) String.format(locale, "%.1f", trip!!.privateDetourMeters / 1000.0) else "")
+                }
                 val projectCodes by viewModel.projectCodes.collectAsState()
                 var projectCodeExpanded by remember { mutableStateOf(false) }
 
@@ -432,7 +444,8 @@ fun TripDetailScreen(
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    viewModel.saveReviewWithNote(selectedType, reviewNoteText, reviewProjectCode.takeIf { it.isNotBlank() })
+                                    val detourMeters = ((reviewPrivateDetourKm.replace(",", ".").toDoubleOrNull() ?: 0.0) * 1000).toInt()
+                                    viewModel.saveReviewWithNote(selectedType, reviewNoteText, reviewProjectCode.takeIf { it.isNotBlank() }, privateDetourMeters = detourMeters)
                                     showNoteRequiredDialog = false
                                 },
                                 enabled = reviewNoteText.isNotBlank()
@@ -517,15 +530,30 @@ fun TripDetailScreen(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            value = reviewPrivateDetourKm,
+                            onValueChange = { reviewPrivateDetourKm = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Privé-omrijkilometers (optioneel)") },
+                            suffix = { Text("km") },
+                            singleLine = true,
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
                         Button(
                             onClick = {
                                 val expected = trip!!.expectedDistanceMeters
                                 val distance = trip!!.distanceMeters
                                 val diff = java.lang.Math.abs(distance - (expected ?: distance))
+                                val detourMeters = ((reviewPrivateDetourKm.replace(",", ".").toDoubleOrNull() ?: 0.0) * 1000).toInt()
                                 if (expected != null && diff > 2000 && diff > (expected * 0.1) && trip!!.note.isNullOrBlank()) {
                                     showNoteRequiredDialog = true
                                 } else {
-                                    viewModel.saveReview(selectedType, reviewProjectCode.takeIf { it.isNotBlank() })
+                                    viewModel.saveReview(selectedType, reviewProjectCode.takeIf { it.isNotBlank() }, privateDetourMeters = detourMeters)
                                 }
                             },
                             modifier = Modifier.fillMaxWidth()

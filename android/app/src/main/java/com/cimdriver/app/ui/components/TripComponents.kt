@@ -158,6 +158,13 @@ fun TripItem(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (trip.privateDetourMeters > 0) {
+                        Text(
+                            text = " • waarvan ${String.format(locale, "%.1f", trip.privateDetourMeters / 1000.0)} km privé",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
                 if (trip.status == "TO_REVIEW") {
                     Row(

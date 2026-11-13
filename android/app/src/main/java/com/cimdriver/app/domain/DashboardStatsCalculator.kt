@@ -136,18 +136,25 @@ object DashboardStatsCalculator {
                     val durationMs = (trip.endTime ?: trip.startTime) - trip.startTime
                     val category = classifyTrip(trip, addresses, rules, settings)
                     
-                    if (cal.get(Calendar.YEAR) == currentYear && category == TripCategory.PRIVATE) {
+                    if (cal.get(Calendar.YEAR) == currentYear) {
                         if (trip.startTime >= inServiceDate) {
-                            ytdPriveMeters += trip.distanceMeters
+                            if (category == TripCategory.PRIVATE) {
+                                ytdPriveMeters += trip.distanceMeters
+                            } else if (trip.privateDetourMeters > 0) {
+                                ytdPriveMeters += trip.privateDetourMeters
+                            }
                         }
                     }
 
                     if (isMatch) {
                         if (category == TripCategory.BUSINESS || category == TripCategory.COMMUTE) {
-                            totalZakelijkMeters += trip.distanceMeters
+                            val detour = trip.privateDetourMeters.coerceIn(0, trip.distanceMeters)
+                            val netBusiness = trip.distanceMeters - detour
+                            totalZakelijkMeters += netBusiness
+                            totalPriveMeters += detour
                             totalZakelijkMs += durationMs
                             if (category == TripCategory.COMMUTE) {
-                                totalWoonWerkMeters += trip.distanceMeters
+                                totalWoonWerkMeters += netBusiness
                                 totalWoonWerkMs += durationMs
                             }
                         } else if (category == TripCategory.PRIVATE) {
@@ -158,9 +165,12 @@ object DashboardStatsCalculator {
                     
                     if (isPrevMatch) {
                         if (category == TripCategory.BUSINESS || category == TripCategory.COMMUTE) {
-                            prevZakelijkMeters += trip.distanceMeters
+                            val detour = trip.privateDetourMeters.coerceIn(0, trip.distanceMeters)
+                            val netBusiness = trip.distanceMeters - detour
+                            prevZakelijkMeters += netBusiness
+                            prevPriveMeters += detour
                             if (category == TripCategory.COMMUTE) {
-                                prevWoonWerkMeters += trip.distanceMeters
+                                prevWoonWerkMeters += netBusiness
                             }
                         } else if (category == TripCategory.PRIVATE) {
                             prevPriveMeters += trip.distanceMeters
@@ -271,11 +281,17 @@ object DashboardStatsCalculator {
                             cal.timeInMillis = trip.startTime
                             if (cal.get(Calendar.YEAR) == currentYear && cal.get(Calendar.WEEK_OF_YEAR) == currentWeek && cal.get(Calendar.DAY_OF_WEEK) == i) {
                                 val km = trip.distanceMeters / 1000.0
+                                val detourKm = (trip.privateDetourMeters.coerceIn(0, trip.distanceMeters)) / 1000.0
+                                val netKm = km - detourKm
                                 val category = classifyTrip(trip, addresses, rules, settings)
                                 
-                                if (category == TripCategory.BUSINESS) zKm += km
+                                if (category == TripCategory.BUSINESS) {
+                                    zKm += netKm
+                                    pKm += detourKm
+                                }
                                 if (category == TripCategory.COMMUTE) {
-                                    wKm += km
+                                    wKm += netKm
+                                    pKm += detourKm
                                 }
                                 if (category == TripCategory.PRIVATE) pKm += km
                             }
@@ -301,11 +317,17 @@ object DashboardStatsCalculator {
                             tCal.timeInMillis = trip.startTime
                             if (tCal.get(Calendar.YEAR) == currentYear && tCal.get(Calendar.MONTH) == currentMonth && tCal.get(Calendar.DAY_OF_MONTH) == i) {
                                 val km = trip.distanceMeters / 1000.0
+                                val detourKm = (trip.privateDetourMeters.coerceIn(0, trip.distanceMeters)) / 1000.0
+                                val netKm = km - detourKm
                                 val category = classifyTrip(trip, addresses, rules, settings)
                                 
-                                if (category == TripCategory.BUSINESS) zKm += km
+                                if (category == TripCategory.BUSINESS) {
+                                    zKm += netKm
+                                    pKm += detourKm
+                                }
                                 if (category == TripCategory.COMMUTE) {
-                                    wKm += km
+                                    wKm += netKm
+                                    pKm += detourKm
                                 }
                                 if (category == TripCategory.PRIVATE) pKm += km
                             }
@@ -330,11 +352,17 @@ object DashboardStatsCalculator {
                             tCal.timeInMillis = trip.startTime
                             if (tCal.get(Calendar.YEAR) == currentYear && tCal.get(Calendar.WEEK_OF_YEAR) == i) {
                                 val km = trip.distanceMeters / 1000.0
+                                val detourKm = (trip.privateDetourMeters.coerceIn(0, trip.distanceMeters)) / 1000.0
+                                val netKm = km - detourKm
                                 val category = classifyTrip(trip, addresses, rules, settings)
                                 
-                                if (category == TripCategory.BUSINESS) zKm += km
+                                if (category == TripCategory.BUSINESS) {
+                                    zKm += netKm
+                                    pKm += detourKm
+                                }
                                 if (category == TripCategory.COMMUTE) {
-                                    wKm += km
+                                    wKm += netKm
+                                    pKm += detourKm
                                 }
                                 if (category == TripCategory.PRIVATE) pKm += km
                             }

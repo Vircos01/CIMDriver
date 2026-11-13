@@ -97,6 +97,7 @@ fun TripsScreen(
     var tripToClassify by remember { mutableStateOf<Trip?>(null) }
     var tripToReviewWithNote by remember { mutableStateOf<Pair<Trip, String>?>(null) }
     var reviewNoteText by remember { mutableStateOf("") }
+    var reviewDetourKm by remember { mutableStateOf("") }
     
     val currentFilter = uiState.tripFilter
     val selectedYear = uiState.selectedYear
@@ -239,7 +240,10 @@ fun TripsScreen(
                                             com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                                 context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
                                             ) { uri ->
-                                                com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, mTrips, savedAddresses, classificationRules, title = capitalizedMonth)
+                                                com.cimdriver.app.util.ExportUtil.exportToPdf(
+                                                    context, uri, mTrips, savedAddresses, classificationRules,
+                                                    title = capitalizedMonth, vehicles = vehicles, settings = classificationSettings
+                                                )
                                             }
                                         }
                                     )
@@ -250,7 +254,9 @@ fun TripsScreen(
                                             com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                                 context, "cimdriver_ritten_${slug}.csv", "text/csv"
                                             ) { uri ->
-                                                com.cimdriver.app.util.ExportUtil.exportToCsv(context, uri, mTrips, savedAddresses, classificationRules)
+                                                com.cimdriver.app.util.ExportUtil.exportToCsv(
+                                                    context, uri, mTrips, savedAddresses, classificationRules, vehicles = vehicles
+                                                )
                                             }
                                         }
                                     )
@@ -264,7 +270,10 @@ fun TripsScreen(
                                     com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                         context, "cimdriver_export.pdf", "application/pdf"
                                     ) { uri ->
-                                        com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, trips, savedAddresses, classificationRules)
+                                        com.cimdriver.app.util.ExportUtil.exportToPdf(
+                                            context, uri, trips, savedAddresses, classificationRules,
+                                            vehicles = vehicles, settings = classificationSettings
+                                        )
                                     }
                                 }
                             )
@@ -275,7 +284,9 @@ fun TripsScreen(
                                     com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                         context, "cimdriver_export.csv", "text/csv"
                                     ) { uri ->
-                                        com.cimdriver.app.util.ExportUtil.exportToCsv(context, uri, trips, savedAddresses, classificationRules)
+                                        com.cimdriver.app.util.ExportUtil.exportToCsv(
+                                            context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
+                                        )
                                     }
                                 }
                             )
@@ -518,7 +529,9 @@ fun TripsScreen(
                                     trips = monthTrips,
                                     context = context,
                                     savedAddresses = savedAddresses,
-                                    classificationRules = classificationRules
+                                    classificationRules = classificationRules,
+                                    vehicles = vehicles,
+                                    settings = classificationSettings
                                 )
                             }
                             items(monthTrips, key = { it.id }) { trip ->
@@ -594,6 +607,7 @@ fun TripsScreen(
                                             if (expected != null && diff > 2000 && diff > (expected * 0.1) && reviewedTrip.note.isNullOrBlank()) {
                                                 tripToReviewWithNote = Pair(reviewedTrip, tripType)
                                                 reviewNoteText = ""
+                                                reviewDetourKm = if (reviewedTrip.privateDetourMeters > 0) String.format(Locale.getDefault(), "%.1f", reviewedTrip.privateDetourMeters / 1000.0) else ""
                                             } else {
                                                 viewModel.reviewTrip(reviewedTrip, tripType)
                                             }
@@ -703,12 +717,25 @@ fun TripsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text(stringResource(R.string.note_label)) }
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = reviewDetourKm,
+                        onValueChange = { reviewDetourKm = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Privé-omrijkilometers (optioneel)") },
+                        suffix = { Text("km") },
+                        singleLine = true,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                        )
+                    )
                 }
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.reviewTrip(trip.copy(note = reviewNoteText), tripType)
+                        val detourM = ((reviewDetourKm.replace(",", ".").toDoubleOrNull() ?: 0.0) * 1000).toInt()
+                        viewModel.reviewTrip(trip.copy(note = reviewNoteText, privateDetourMeters = detourM), tripType)
                         tripToReviewWithNote = null
                     },
                     enabled = reviewNoteText.isNotBlank()
@@ -729,7 +756,9 @@ private fun MonthHeaderItem(
     trips: List<Trip>,
     context: Context,
     savedAddresses: List<com.cimdriver.app.data.local.entity.SavedAddress>,
-    classificationRules: List<com.cimdriver.app.data.local.entity.ClassificationRule>
+    classificationRules: List<com.cimdriver.app.data.local.entity.ClassificationRule>,
+    vehicles: List<com.cimdriver.app.data.local.entity.Vehicle> = emptyList(),
+    settings: com.cimdriver.app.data.local.entity.Settings? = null
 ) {
     val capitalizedMonth = monthName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
     val totalKm = trips.sumOf { it.distanceMeters } / 1000.0
@@ -781,7 +810,10 @@ private fun MonthHeaderItem(
                         com.cimdriver.app.util.ExportUtil.shareExportedFile(
                             context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
                         ) { uri ->
-                            com.cimdriver.app.util.ExportUtil.exportToPdf(context, uri, trips, savedAddresses, classificationRules, title = capitalizedMonth)
+                            com.cimdriver.app.util.ExportUtil.exportToPdf(
+                                context, uri, trips, savedAddresses, classificationRules,
+                                title = capitalizedMonth, vehicles = vehicles, settings = settings
+                            )
                         }
                     }
                 )
@@ -792,7 +824,9 @@ private fun MonthHeaderItem(
                         com.cimdriver.app.util.ExportUtil.shareExportedFile(
                             context, "cimdriver_ritten_${slug}.csv", "text/csv"
                         ) { uri ->
-                            com.cimdriver.app.util.ExportUtil.exportToCsv(context, uri, trips, savedAddresses, classificationRules)
+                            com.cimdriver.app.util.ExportUtil.exportToCsv(
+                                context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
+                            )
                         }
                     }
                 )
