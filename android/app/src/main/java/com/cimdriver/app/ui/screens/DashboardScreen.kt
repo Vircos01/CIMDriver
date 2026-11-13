@@ -95,7 +95,8 @@ fun DashboardScreen(
     onNavigateToWorkHours: () -> Unit = {},
     onNavigateToDiagnostics: () -> Unit = {},
     onNavigateToGaps: (Long) -> Unit = {},
-    onNavigateToFuelDraft: (Long) -> Unit = {}
+    onNavigateToFuelDraft: (Long) -> Unit = {},
+    onNavigateToHoursTargets: () -> Unit = {}
 ) {
     val locale = currentAppLocale()
     val context = LocalContext.current
@@ -696,8 +697,19 @@ fun DashboardScreen(
                 
                 if (targetProgresses.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(text = "Targets", style = MaterialTheme.typography.titleLarge)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onNavigateToHoursTargets() },
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "Targets", style = MaterialTheme.typography.titleLarge)
+                        TextButton(onClick = onNavigateToHoursTargets) {
+                            Text("Beheren", style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                     
                     val defaultColor = MaterialTheme.colorScheme.primary
                     targetProgresses.forEach { progress ->
@@ -705,7 +717,10 @@ fun DashboardScreen(
                         val barColor = try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(target.color)) } catch (e: Exception) { defaultColor }
                         
                         Card(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                                .clickable { onNavigateToHoursTargets() },
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {

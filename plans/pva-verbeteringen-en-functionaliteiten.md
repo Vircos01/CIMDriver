@@ -127,30 +127,36 @@ flowchart TD
 
 ---
 
-### 🟡 Fase 3: Werkuren, Kalender & Dashboard (Prio 3)
+### 🟡 Fase 3: Werkuren, Kalender & Dashboard (✅ Gerealiseerd)
 
-#### 3.1 Werkuren Delen per Week / Maand
-- **Probleem:** In `WorkHoursScreen.kt` deelt de deelknop momenteel blind alle werkdagen uit de hele geschiedenis, ongeacht de geselecteerde week of maand.
-- **Oplossing:**
-  - Pas de exportactie in het menu aan zodat deze het huidige filter volgt (bijv. *"Deel Week 46 (CSV/PDF)"* of *"Deel November 2026"*).
+#### 3.1 Werkuren Delen per Week / Maand (✅ Gerealiseerd)
+- **Probleem:** In `WorkHoursScreen.kt` deelde de deelknop voorheen blind alle werkdagen uit de hele geschiedenis, ongeacht de geselecteerde week of maand.
+- **Oplossing & Implementatie:**
+  - `ExportUtil.kt`: `exportWorkHoursToPdf` ondersteunt nu een aangepaste periodetitel en berekent automatisch een totaalregel met gewerkte uren onderaan het document.
+  - `WorkHoursScreen.kt`: Zowel in de topbarmenu-export als via de nieuwe *"Deel"*-knop per periodeheader (`WorkHoursHeaderItem`) kan nu direct een specifieke week of maand worden geëxporteerd naar PDF of CSV (bijv. `cimdriver_werkuren_Week_46.pdf`), inclusief fallback naar volledige export.
 - **Betrokken bestanden:**
   - `android/app/src/main/java/com/cimdriver/app/ui/screens/WorkHoursScreen.kt`
   - `android/app/src/main/java/com/cimdriver/app/util/ExportUtil.kt`
 
-#### 3.2 Kalenderweergave Dag-Klik Interactie
-- **Probleem:** In `TripsScreen.kt` schakelt het klikken op een dag in `TripsCalendarView` momenteel alleen terug naar de lijst, zonder naar die specifieke dag te scrollen of te filteren.
-- **Oplossing:**
-  - Laat de dag-klik óf een popup/bottom-sheet tonen met de ritten van die dag, óf stel het datumfilter van de lijstweergave in op die specifieke datum.
+#### 3.2 Kalenderweergave Dag-Klik Interactie (✅ Gerealiseerd)
+- **Probleem:** In `TripsScreen.kt` schakelde het klikken op een dag in `TripsCalendarView` voorheen alleen terug naar de lijst, zonder de ritten van die dag te tonen of te inspecteren.
+- **Oplossing & Implementatie:**
+  - `TripsScreen.kt`: Bij het klikken op een dag in de kalender opent een dialoog met alle ritten van die dag:
+    - Titel met datum, aantal ritten en totale kilometers.
+    - Interactieve rittenkaarten (tijden, adressen, kilometers, categorie en eventuele privé-omrijkilometers) die direct doorklikken naar `TripDetailScreen`.
+    - Actieknop *"Toon in lijst"* om direct naar de lijstweergave te schakelen.
 - **Betrokken bestanden:**
   - `android/app/src/main/java/com/cimdriver/app/ui/screens/TripsScreen.kt`
   - `android/app/src/main/java/com/cimdriver/app/ui/components/TripsCalendarView.kt`
 
-#### 3.3 Dashboard Targets direct doorklikbaar
-- **Probleem:** De voortgangsbalken van doelen op het dashboard zijn statisch en niet klikbaar. Om doelen te bewerken moet de gebruiker diep het instellingenmenu in.
-- **Oplossing:**
-  - Maak de doelkaarten op het dashboard klikbaar, zodat ze direct navigeren naar `HoursTargetsRoute`.
+#### 3.3 Dashboard Targets direct doorklikbaar (✅ Gerealiseerd)
+- **Probleem:** De voortgangsbalken van doelen op het dashboard waren statisch en niet klikbaar.
+- **Oplossing & Implementatie:**
+  - `DashboardScreen.kt`: De "Targets"-sectie header bevat nu een actieknop *"Beheren"*, en elke doelvoortgangskaart is direct klikbaar gemaakt.
+  - `Navigation.kt`: Gekoppeld aan `HoursTargetsRoute`, zodat aantikken de gebruiker direct naar het beheer van de doelen brengt.
 - **Betrokken bestanden:**
   - `android/app/src/main/java/com/cimdriver/app/ui/screens/DashboardScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/navigation/Navigation.kt`
 
 ---
 

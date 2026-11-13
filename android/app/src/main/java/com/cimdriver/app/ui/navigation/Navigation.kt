@@ -426,6 +426,9 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     },
                     onNavigateToFuelDraft = { fillUpId ->
                         navController.navigate(AddFuelRoute(fillUpId = fillUpId))
+                    },
+                    onNavigateToHoursTargets = {
+                        navController.navigate(HoursTargetsRoute)
                     }
                 ) 
             }

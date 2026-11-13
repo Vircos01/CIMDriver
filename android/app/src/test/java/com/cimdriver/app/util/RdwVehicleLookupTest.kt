@@ -40,3 +40,4 @@ class RdwVehicleLookupTest {
         assertEquals("ICE", RdwVehicleLookup.determineEngineTypeFromFuels(emptyList(), "Golf 1.4 TSI"))
     }
 }
+

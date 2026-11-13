@@ -98,6 +98,7 @@ fun TripsScreen(
     var tripToReviewWithNote by remember { mutableStateOf<Pair<Trip, String>?>(null) }
     var reviewNoteText by remember { mutableStateOf("") }
     var reviewDetourKm by remember { mutableStateOf("") }
+    var selectedCalendarDayTrips by remember { mutableStateOf<List<Trip>?>(null) }
     
     val currentFilter = uiState.tripFilter
     val selectedYear = uiState.selectedYear
@@ -504,9 +505,7 @@ fun TripsScreen(
                             trips = trips,
                             selectedYear = selectedYear,
                             onDayClick = { dayTrips ->
-                                // Optional: handle day click, e.g. scroll list to this day, or show dialog.
-                                // For now we'll switch back to list and perhaps in future filter it.
-                                viewMode = "LIST"
+                                selectedCalendarDayTrips = dayTrips
                             }
                         )
                     } else {
@@ -745,6 +744,92 @@ fun TripsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { tripToReviewWithNote = null }) { Text(stringResource(R.string.cancel)) }
+            }
+        )
+    }
+
+    if (!selectedCalendarDayTrips.isNullOrEmpty()) {
+        val dayTrips = selectedCalendarDayTrips!!
+        val sampleTrip = dayTrips.first()
+        val dayDateFormat = java.text.SimpleDateFormat("EEEE d MMMM yyyy", java.util.Locale.getDefault())
+        val dateTitle = dayDateFormat.format(java.util.Date(sampleTrip.startTime)).replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
+        val totalDayKm = dayTrips.sumOf { it.distanceMeters } / 1000.0
+        val timeFmt = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+
+        AlertDialog(
+            onDismissRequest = { selectedCalendarDayTrips = null },
+            title = {
+                Column {
+                    Text(dateTitle, style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "${dayTrips.size} ritten • ${String.format(java.util.Locale.getDefault(), "%.1f", totalDayKm)} km",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    dayTrips.forEach { trip ->
+                        val startAddr = trip.startAddress?.let { com.cimdriver.app.util.AddressMatching.findSavedAddress(it, savedAddresses)?.label ?: it } ?: "..."
+                        val endAddr = trip.endAddress?.let { com.cimdriver.app.util.AddressMatching.findSavedAddress(it, savedAddresses)?.label ?: it } ?: "..."
+                        val timeStr = "${timeFmt.format(java.util.Date(trip.startTime))} - ${trip.endTime?.let { timeFmt.format(java.util.Date(it)) } ?: "..."}"
+                        val distStr = String.format(java.util.Locale.getDefault(), "%.1f km", trip.distanceMeters / 1000.0)
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedCalendarDayTrips = null
+                                    onTripClick(trip)
+                                },
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(timeStr, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                                    Text(distStr, style = MaterialTheme.typography.labelSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "$startAddr ➔ $endAddr",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    maxLines = 2,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                )
+                                if (trip.privateDetourMeters > 0) {
+                                    Text(
+                                        text = "Waarvan ${String.format(java.util.Locale.getDefault(), "%.1f", trip.privateDetourMeters / 1000.0)} km privé",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    selectedCalendarDayTrips = null
+                    viewMode = "LIST"
+                }) {
+                    Text("Toon in lijst")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { selectedCalendarDayTrips = null }) {
+                    Text(stringResource(R.string.close))
+                }
             }
         )
     }

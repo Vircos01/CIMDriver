@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.data.local.entity.WorkDay
 import com.cimdriver.app.ui.viewmodel.WorkHoursViewModel
+import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -110,25 +111,58 @@ fun WorkHoursScreen(
                             expanded = showExportMenu,
                             onDismissRequest = { showExportMenu = false }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Deel (CSV)") },
-                                onClick = {
-                                    showExportMenu = false
-                                    com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                                        context, "cimdriver_werkuren.csv", "text/csv"
-                                    ) { uri ->
-                                        com.cimdriver.app.util.ExportUtil.exportWorkHoursToCsv(context, uri, workDays)
-                                    }
+                            if (groupedWorkDays.isNotEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("Per periode:", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
+                                    onClick = {},
+                                    enabled = false
+                                )
+                                groupedWorkDays.forEach { (groupName, days) ->
+                                    val slug = groupName.replace(" ", "_").replace("-", "_")
+                                    DropdownMenuItem(
+                                        text = { Text("  $groupName (PDF)") },
+                                        onClick = {
+                                            showExportMenu = false
+                                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                                context, "cimdriver_werkuren_${slug}.pdf", "application/pdf"
+                                            ) { uri ->
+                                                com.cimdriver.app.util.ExportUtil.exportWorkHoursToPdf(context, uri, days, title = groupName)
+                                            }
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("  $groupName (CSV)") },
+                                        onClick = {
+                                            showExportMenu = false
+                                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                                context, "cimdriver_werkuren_${slug}.csv", "text/csv"
+                                            ) { uri ->
+                                                com.cimdriver.app.util.ExportUtil.exportWorkHoursToCsv(context, uri, days)
+                                            }
+                                        }
+                                    )
                                 }
-                            )
+                                HorizontalDivider()
+                            }
                             DropdownMenuItem(
-                                text = { Text("Deel (PDF)") },
+                                text = { Text(if (groupedWorkDays.isNotEmpty()) "Alle werkdagen (PDF)" else "Deel (PDF)") },
                                 onClick = {
                                     showExportMenu = false
                                     com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                         context, "cimdriver_werkuren.pdf", "application/pdf"
                                     ) { uri ->
                                         com.cimdriver.app.util.ExportUtil.exportWorkHoursToPdf(context, uri, workDays)
+                                    }
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(if (groupedWorkDays.isNotEmpty()) "Alle werkdagen (CSV)" else "Deel (CSV)") },
+                                onClick = {
+                                    showExportMenu = false
+                                    com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                        context, "cimdriver_werkuren.csv", "text/csv"
+                                    ) { uri ->
+                                        com.cimdriver.app.util.ExportUtil.exportWorkHoursToCsv(context, uri, workDays)
                                     }
                                 }
                             )
@@ -211,12 +245,11 @@ fun WorkHoursScreen(
 
                 LazyColumn(contentPadding = PaddingValues(16.dp)) {
                     groupedWorkDays.forEach { (groupName, days) ->
-                        item {
-                            Text(
-                                text = groupName,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                        item(key = "header_$groupName") {
+                            WorkHoursHeaderItem(
+                                groupName = groupName,
+                                days = days,
+                                context = context
                             )
                         }
                         items(days, key = { it.id }) { workDay ->
@@ -351,6 +384,72 @@ fun WorkHoursScreen(
         )
     }
 }
+}
+
+@Composable
+private fun WorkHoursHeaderItem(
+    groupName: String,
+    days: List<WorkDay>,
+    context: Context
+) {
+    var showMenu by remember { mutableStateOf(false) }
+    val slug = groupName.replace(" ", "_").replace("-", "_")
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, bottom = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = groupName,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Box {
+            OutlinedButton(
+                onClick = { showMenu = true },
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
+                modifier = Modifier.height(30.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = "Deel $groupName",
+                    modifier = Modifier.size(13.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Deel", style = MaterialTheme.typography.labelSmall)
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Exporteer PDF ($groupName)") },
+                    onClick = {
+                        showMenu = false
+                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                            context, "cimdriver_werkuren_${slug}.pdf", "application/pdf"
+                        ) { uri ->
+                            com.cimdriver.app.util.ExportUtil.exportWorkHoursToPdf(context, uri, days, title = groupName)
+                        }
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Exporteer CSV ($groupName)") },
+                    onClick = {
+                        showMenu = false
+                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                            context, "cimdriver_werkuren_${slug}.csv", "text/csv"
+                        ) { uri ->
+                            com.cimdriver.app.util.ExportUtil.exportWorkHoursToCsv(context, uri, days)
+                        }
+                    }
+                )
+            }
+        }
+    }
 }
 
 

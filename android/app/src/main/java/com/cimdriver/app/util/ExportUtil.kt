@@ -351,7 +351,12 @@ object ExportUtil {
         writer.close()
     }
 
-    fun exportWorkHoursToPdf(context: Context, uri: Uri, workDays: List<com.cimdriver.app.data.local.entity.WorkDay>) {
+    fun exportWorkHoursToPdf(
+        context: Context,
+        uri: Uri,
+        workDays: List<com.cimdriver.app.data.local.entity.WorkDay>,
+        title: String? = null
+    ) {
         val outputStream = context.contentResolver.openOutputStream(uri) ?: return
         
         val pdfDocument = PdfDocument()
@@ -371,7 +376,8 @@ object ExportUtil {
         }
         
         var yPosition = 50f
-        canvas.drawText("CIMDriver Werkurenregistratie", 50f, yPosition, titlePaint)
+        val headerTitle = if (!title.isNullOrBlank()) "CIMDriver Werkuren - $title" else "CIMDriver Werkurenregistratie"
+        canvas.drawText(headerTitle, 50f, yPosition, titlePaint)
         yPosition += 40f
         
         val dateFormat = SimpleDateFormat("dd-MM-yyyy", java.util.Locale.forLanguageTag("nl-NL"))
@@ -389,7 +395,7 @@ object ExportUtil {
         yPosition += 20f
         
         workDays.forEach { workDay ->
-            if (yPosition > 800f) {
+            if (yPosition > 780f) {
                 pdfDocument.finishPage(page)
                 page = pdfDocument.startPage(pageInfo)
                 canvas = page.canvas
@@ -404,7 +410,7 @@ object ExportUtil {
             
             val effectiveStart = workDay.roundedArrivalTime ?: exactArr
             val effectiveEnd = workDay.roundedDepartureTime ?: exactDep
-            val totalMillis = effectiveEnd - effectiveStart - (workDay.breakMinutes * 60000L)
+            val totalMillis = (effectiveEnd - effectiveStart - (workDay.breakMinutes * 60000L)).coerceAtLeast(0L)
             val totalHours = String.format(Locale.getDefault(), "%.1f", totalMillis / 3600000f)
             
             canvas.drawText(dateStr, 50f, yPosition, paint)
@@ -414,6 +420,23 @@ object ExportUtil {
             canvas.drawText(totalHours, 450f, yPosition, paint)
             
             yPosition += 20f
+        }
+
+        if (workDays.isNotEmpty()) {
+            yPosition += 10f
+            canvas.drawLine(50f, yPosition, 545f, yPosition, paint)
+            yPosition += 20f
+            val totalHoursSum = workDays.sumOf { workDay ->
+                val exactArr = workDay.arrivalTime
+                val exactDep = workDay.departureTime ?: workDay.lastArrivalTime ?: exactArr
+                val effectiveStart = workDay.roundedArrivalTime ?: exactArr
+                val effectiveEnd = workDay.roundedDepartureTime ?: exactDep
+                val totalMillis = (effectiveEnd - effectiveStart - (workDay.breakMinutes * 60000L)).coerceAtLeast(0L)
+                totalMillis / 3600000.0
+            }
+            val boldPaint = Paint(paint).apply { isFakeBoldText = true }
+            canvas.drawText("Totaal gewerkte uren:", 50f, yPosition, boldPaint)
+            canvas.drawText(String.format(Locale.getDefault(), "%.1f uur", totalHoursSum), 450f, yPosition, boldPaint)
         }
         
         pdfDocument.finishPage(page)
