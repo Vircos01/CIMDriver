@@ -365,5 +365,6 @@ data class FuelFillUp(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val address: String? = null,
-    val status: String = "COMPLETED" // "DRAFT" or "COMPLETED"
+    val status: String = "COMPLETED", // "DRAFT" or "COMPLETED"
+    @ColumnInfo(defaultValue = "NULL") val chargingType: String? = null // "HOME", "PUBLIC", "FAST", "CUSTOM"
 )

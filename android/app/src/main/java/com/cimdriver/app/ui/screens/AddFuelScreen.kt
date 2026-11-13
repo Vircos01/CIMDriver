@@ -29,8 +29,9 @@ fun AddFuelScreen(
     
     var selectedVehicleId by remember { mutableStateOf(vehicles.firstOrNull()?.id ?: 0L) }
     val selectedVehicle = vehicles.find { it.id == selectedVehicleId }
-    val isEV = selectedVehicle?.engineType == "EV"
+    val isEV = selectedVehicle?.engineType == "EV" || selectedVehicle?.engineType == "PHEV"
     
+    var chargingType by remember { mutableStateOf<String?>(null) }
     var litersStr by remember { mutableStateOf("") }
     var pricePerLiterStr by remember { mutableStateOf("") }
     var totalCostStr by remember { mutableStateOf("") }
@@ -54,6 +55,12 @@ fun AddFuelScreen(
             if (fillUp != null) {
                 existingFillUp = fillUp
                 selectedVehicleId = fillUp.vehicleId
+                chargingType = fillUp.chargingType ?: when (fillUp.pricePerLiter) {
+                    0.28 -> "HOME"
+                    0.45 -> "PUBLIC"
+                    0.69 -> "FAST"
+                    else -> if (fillUp.pricePerLiter > 0) "CUSTOM" else null
+                }
                 if (fillUp.liters > 0) litersStr = fillUp.liters.toString()
                 if (fillUp.pricePerLiter > 0) pricePerLiterStr = fillUp.pricePerLiter.toString()
                 if (fillUp.totalCost > 0) totalCostStr = fillUp.totalCost.toString()
@@ -103,7 +110,8 @@ fun AddFuelScreen(
                                     latitude = latitude,
                                     longitude = longitude,
                                     notes = notes,
-                                    status = "COMPLETED"
+                                    status = "COMPLETED",
+                                    chargingType = if (isEV) (chargingType ?: "CUSTOM") else null
                                 )
                                 if (existingFillUp != null) {
                                     viewModel.updateFillUp(fillUp.copy(id = existingFillUp!!.id, dateTimestamp = existingFillUp!!.dateTimestamp))
@@ -150,6 +158,67 @@ fun AddFuelScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Details", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    if (isEV) {
+                        Text(
+                            "Tariefvoorkeur",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            FilterChip(
+                                selected = chargingType == "HOME",
+                                onClick = {
+                                    chargingType = "HOME"
+                                    pricePerLiterStr = "0.28"
+                                    val l = litersStr.replace(',', '.').toDoubleOrNull()
+                                    if (l != null && l > 0) {
+                                        totalCostStr = String.format(java.util.Locale.US, "%.2f", l * 0.28)
+                                    }
+                                    if (stationName.isBlank()) {
+                                        stationName = "Thuislaadpaal"
+                                    }
+                                },
+                                label = { Text("Thuis €0,28") }
+                            )
+                            FilterChip(
+                                selected = chargingType == "PUBLIC",
+                                onClick = {
+                                    chargingType = "PUBLIC"
+                                    pricePerLiterStr = "0.45"
+                                    val l = litersStr.replace(',', '.').toDoubleOrNull()
+                                    if (l != null && l > 0) {
+                                        totalCostStr = String.format(java.util.Locale.US, "%.2f", l * 0.45)
+                                    }
+                                    if (stationName == "Thuislaadpaal") {
+                                        stationName = ""
+                                    }
+                                },
+                                label = { Text("Publiek €0,45") }
+                            )
+                            FilterChip(
+                                selected = chargingType == "FAST",
+                                onClick = {
+                                    chargingType = "FAST"
+                                    pricePerLiterStr = "0.69"
+                                    val l = litersStr.replace(',', '.').toDoubleOrNull()
+                                    if (l != null && l > 0) {
+                                        totalCostStr = String.format(java.util.Locale.US, "%.2f", l * 0.69)
+                                    }
+                                    if (stationName == "Thuislaadpaal") {
+                                        stationName = ""
+                                    }
+                                },
+                                label = { Text("Snellader €0,69") }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
                     OutlinedTextField(
                         value = litersStr,
                         onValueChange = { 
@@ -170,6 +239,12 @@ fun AddFuelScreen(
                         onValueChange = { 
                             pricePerLiterStr = it
                             val p = it.replace(',', '.').toDoubleOrNull()
+                            chargingType = when (p) {
+                                0.28 -> "HOME"
+                                0.45 -> "PUBLIC"
+                                0.69 -> "FAST"
+                                else -> if (p != null && p > 0) "CUSTOM" else null
+                            }
                             val l = litersStr.replace(',', '.').toDoubleOrNull()
                             if (l != null && p != null && l > 0 && p > 0) {
                                 totalCostStr = String.format(java.util.Locale.US, "%.2f", l * p)
@@ -187,7 +262,14 @@ fun AddFuelScreen(
                             val t = it.replace(',', '.').toDoubleOrNull()
                             val l = litersStr.replace(',', '.').toDoubleOrNull()
                             if (t != null && l != null && l > 0 && t > 0) {
-                                pricePerLiterStr = String.format(java.util.Locale.US, "%.3f", t / l)
+                                val p = t / l
+                                pricePerLiterStr = String.format(java.util.Locale.US, "%.3f", p)
+                                chargingType = when (String.format(java.util.Locale.US, "%.2f", p).toDoubleOrNull()) {
+                                    0.28 -> "HOME"
+                                    0.45 -> "PUBLIC"
+                                    0.69 -> "FAST"
+                                    else -> "CUSTOM"
+                                }
                             }
                         },
                         label = { Text("Totale kosten (€)") },

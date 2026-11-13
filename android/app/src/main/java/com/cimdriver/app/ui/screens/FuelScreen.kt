@@ -157,7 +157,7 @@ fun FuelCard(fillUp: com.cimdriver.app.data.local.entity.FuelFillUp, vehicles: L
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        val isEV = vehicle?.engineType == "EV"
+        val isEV = vehicle?.engineType == "EV" || vehicle?.engineType == "PHEV"
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
@@ -170,12 +170,22 @@ fun FuelCard(fillUp: com.cimdriver.app.data.local.entity.FuelFillUp, vehicles: L
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text("Voertuig: ${vehicle?.name ?: "Onbekend"}")
+            if (isEV && !fillUp.chargingType.isNullOrBlank()) {
+                val typeLabel = when (fillUp.chargingType) {
+                    "HOME" -> "🏠 Thuis laden (€ 0,28/kWh)"
+                    "PUBLIC" -> "🔌 Publieke laadpaal (€ 0,45/kWh)"
+                    "FAST" -> "⚡ Snellader (€ 0,69/kWh)"
+                    "CUSTOM" -> "✏️ Aangepast tarief"
+                    else -> fillUp.chargingType
+                }
+                Text("Tarief: $typeLabel", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+            }
             Text("${if (isEV) "Geladen (kWh)" else "Getankt (Liters)"}: ${String.format("%.2f", fillUp.liters)}")
             Text("Totale kosten: €${String.format("%.2f", fillUp.totalCost)}")
             Text("Prijs per ${if (isEV) "kWh" else "liter"}: €${String.format("%.2f", fillUp.pricePerLiter)}")
             Text("Kilometerstand: ${fillUp.odometer} km")
             if (!fillUp.stationName.isNullOrBlank()) {
-                Text("Locatie: ${fillUp.stationName}")
+                Text("${if (isEV) "Laadlocatie" else "Locatie"}: ${fillUp.stationName}")
             }
         }
     }

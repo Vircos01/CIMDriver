@@ -11,6 +11,22 @@ import com.cimdriver.app.data.local.AppDatabase
 import com.cimdriver.app.data.local.entity.Vehicle
 
 object CarUtil {
+    fun getLocalizedTripType(tripType: String?): String {
+        return when (tripType) {
+            "Home To Work", "COMMUTE" -> "Woon-werk"
+            "Business Meeting" -> "Zakelijk overleg"
+            "Customer Visit" -> "Klantbezoek"
+            "Customer Billable" -> "Klant declarabel"
+            "Commissioned By CIMSOLUTIONS" -> "In opdracht CIMSOLUTIONS"
+            "Exam Course" -> "Cursus / Examen"
+            "Car Maintenance" -> "Auto-onderhoud"
+            "PRIVATE", "PERSONAL" -> "Privé"
+            "BUSINESS" -> "Zakelijk"
+            null -> "Onbekend"
+            else -> tripType
+        }
+    }
+
     suspend fun getContextVehicleId(context: Context, db: AppDatabase, vehicles: List<Vehicle>): Long? {
         try {
             val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

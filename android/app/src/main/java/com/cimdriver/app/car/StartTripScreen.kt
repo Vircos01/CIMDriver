@@ -52,51 +52,58 @@ class StartTripScreen(carContext: CarContext) : Screen(carContext) {
         val itemListBuilder = ItemList.Builder()
             .addItem(
                 Row.Builder()
-                    .setTitle("Home To Work")
+                    .setTitle("Woon-werk")
                     .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_commute)).setTint(androidx.car.app.model.CarColor.GREEN).build())
                     .setOnClickListener { startTrip("Home To Work") }
                     .build()
             )
             .addItem(
                 Row.Builder()
-                    .setTitle("Business Meeting")
+                    .setTitle("Zakelijk overleg")
                     .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_business)).setTint(androidx.car.app.model.CarColor.PRIMARY).build())
                     .setOnClickListener { startTrip("Business Meeting") }
                     .build()
             )
             .addItem(
                 Row.Builder()
-                    .setTitle("Customer Visit")
+                    .setTitle("Klantbezoek")
                     .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_business)).setTint(androidx.car.app.model.CarColor.PRIMARY).build())
                     .setOnClickListener { startTrip("Customer Visit") }
                     .build()
             )
             .addItem(
                 Row.Builder()
-                    .setTitle("Customer Billable")
+                    .setTitle("Klant declarabel")
                     .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_business)).setTint(androidx.car.app.model.CarColor.PRIMARY).build())
                     .setOnClickListener { startTrip("Customer Billable") }
                     .build()
             )
             .addItem(
                 Row.Builder()
-                    .setTitle("Commissioned By CIMSOLUTIONS")
+                    .setTitle("In opdracht CIMSOLUTIONS")
                     .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_business)).setTint(androidx.car.app.model.CarColor.PRIMARY).build())
                     .setOnClickListener { startTrip("Commissioned By CIMSOLUTIONS") }
                     .build()
             )
             .addItem(
                 Row.Builder()
-                    .setTitle("Exam Course")
+                    .setTitle("Cursus / Examen")
                     .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_business)).setTint(androidx.car.app.model.CarColor.PRIMARY).build())
                     .setOnClickListener { startTrip("Exam Course") }
                     .build()
             )
             .addItem(
                 Row.Builder()
-                    .setTitle("Car Maintenance")
+                    .setTitle("Auto-onderhoud")
                     .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_business)).setTint(androidx.car.app.model.CarColor.PRIMARY).build())
                     .setOnClickListener { startTrip("Car Maintenance") }
+                    .build()
+            )
+            .addItem(
+                Row.Builder()
+                    .setTitle("Privé")
+                    .setImage(androidx.car.app.model.CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_location)).setTint(androidx.car.app.model.CarColor.BLUE).build())
+                    .setOnClickListener { startTrip("PRIVATE") }
                     .build()
             )
 

@@ -160,22 +160,40 @@ flowchart TD
 
 ---
 
-### 🟣 Fase 4: Android Auto & EV Verfijningen (Prio 4)
+### 🟣 Fase 4: Android Auto & EV Verfijningen (✅ Gerealiseerd)
 
-#### 4.1 Volledige Nederlandse Lokalisatie in Android Auto
-- **Probleem:** In `StartTripScreen.kt` staan momenteel hardcoded Engelse categorieën ("Home To Work", "Business Meeting", "Customer Visit").
-- **Oplossing:**
-  - Vervang deze door nette Nederlandse termen conform de rest van de app: *"Woon-werk"*, *"Zakelijk overleg"*, *"Klantbezoek"*, *"Privé"*.
+#### 4.1 Volledige Nederlandse Lokalisatie in Android Auto (✅ Gerealiseerd)
+- **Probleem:** In `StartTripScreen.kt`, `ReviewTripScreen.kt` en `RecentTripsCarScreen.kt` stonden hardcoded Engelse categorienamen ("Home To Work", "Business Meeting", "Customer Visit", etc.) en ontbrak een directe optie voor privé-ritten.
+- **Oplossing & Implementatie:**
+  - `CarUtil.kt`: Centrale `getLocalizedTripType(tripType: String?): String` mapping geïntroduceerd (vertaalt "Home To Work"/"COMMUTE" naar "Woon-werk", "Business Meeting" naar "Zakelijk overleg", "Customer Visit" naar "Klantbezoek", "Customer Billable" naar "Klant declarabel", "Commissioned By CIMSOLUTIONS" naar "In opdracht CIMSOLUTIONS", "Exam Course" naar "Cursus / Examen", "Car Maintenance" naar "Auto-onderhoud", "PRIVATE"/"PERSONAL" naar "Privé").
+  - `StartTripScreen.kt`: Alle keuzerijen voorzien van Nederlandse titels conform het design en uitgebreid met *"Privé"* (blauwe car-locatie icoon).
+  - `ReviewTripScreen.kt`: Beoordelingsopties worden gelokaliseerd getoond aan de bestuurder.
+  - `RecentTripsCarScreen.kt`: Rittenhistorie toont Nederlandse categorietitels tussen haakjes in plaats van ruwe databasetypes.
+  - `CarUtilTest.kt`: JUnit tests gerealiseerd en geslaagd voor alle standaard en aangepaste categorieën.
 - **Betrokken bestanden:**
+  - `android/app/src/main/java/com/cimdriver/app/car/CarUtil.kt`
   - `android/app/src/main/java/com/cimdriver/app/car/StartTripScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/car/ReviewTripScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/car/RecentTripsCarScreen.kt`
+  - `android/app/src/test/java/com/cimdriver/app/car/CarUtilTest.kt`
 
-#### 4.2 EV Laadsessies & Tariefdifferentiatie
-- **Doel:** EV-rijders meer gemak bieden bij het registreren van laadkosten (bijv. thuis laden tegen energietarief versus publiek laden via laadpas).
-- **Uitwerking:**
-  - Ondersteuning voor presets: Thuislaadtarief (bijv. € 0,28/kWh) versus publiek tarief.
+#### 4.2 EV Laadsessies & Tariefdifferentiatie (✅ Gerealiseerd)
+- **Doel:** EV- en PHEV-rijders optimaal gemak bieden bij het registreren van laadkosten (thuis laden tegen energietarief versus publiek laden via laadpas of snelladen).
+- **Oplossing & Implementatie:**
+  - `Entities.kt`: `FuelFillUp` uitgebreid met `@ColumnInfo(defaultValue = "NULL") val chargingType: String? = null` ("HOME", "PUBLIC", "FAST", "CUSTOM").
+  - `AppDatabase.kt`: Room database migratie `MIGRATION_49_50` gerealiseerd en geregistreerd (databaseversie 50).
+  - `AddFuelScreen.kt`:
+    - Snelle tariefkeuzechips toegevoegd voor elektrische voertuigen:
+      - 🏠 **Thuis (€ 0,28/kWh)** - stelt prijs in, herberekent totale kosten en suggereert *"Thuislaadpaal"*.
+      - 🔌 **Publiek (€ 0,45/kWh)** - stelt standaard publiek AC-tarief in en herberekent kosten.
+      - ⚡ **Snellader (€ 0,69/kWh)** - stelt snellaadtarief (Fastned/Ionity) in en herberekent kosten.
+    - Volledige bidirectionele synchronisatie: handmatige invoer van kWh of totaalprijs past automatisch het tarief/laadtype aan.
+  - `FuelScreen.kt`: `FuelCard` toont nu het tarieftype (bijv. *"🏠 Thuis laden (€ 0,28/kWh)"*) en *"Laadlocatie"* voor EV-laadsessies.
 - **Betrokken bestanden:**
-  - `android/app/src/main/java/com/cimdriver/app/ui/screens/AddFuelScreen.kt`
   - `android/app/src/main/java/com/cimdriver/app/data/local/entity/Entities.kt`
+  - `android/app/src/main/java/com/cimdriver/app/data/local/AppDatabase.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/AddFuelScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/FuelScreen.kt`
 
 ---
 

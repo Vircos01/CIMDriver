@@ -141,7 +141,7 @@ class RecentTripsCarScreen(carContext: CarContext) : Screen(carContext) {
                         iconRes = com.cimdriver.app.R.drawable.ic_car_commute
                         carColor = CarColor.GREEN
                     }
-                    val categoryStr = trip.tripType
+                    val categoryStr = CarUtil.getLocalizedTripType(trip.tripType)
                     
                     val titleSpan = android.text.SpannableString("${formatDate(trip.startTime)} - $afstandKm ($categoryStr)")
                     

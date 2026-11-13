@@ -51,7 +51,7 @@ class ReviewTripScreen(carContext: CarContext, private val tripId: Long) : Scree
         tripTypes.forEach { tripType ->
             itemListBuilder.addItem(
                 Row.Builder()
-                    .setTitle(tripType)
+                    .setTitle(CarUtil.getLocalizedTripType(tripType))
                     .setOnClickListener { updateTripType(tripType) }
                     .build()
             )
