@@ -12,20 +12,27 @@
 
 CIMDriver is in korte tijd uitgegroeid tot een volwaardige ritten- en werkurenadministratie voor zakelijke rijders, ZZP'ers en leaserijders in Nederland. Na de recente lancering van **v1.3.6** (slimme parkeergaragedetectie met segment-correctie) en **v1.3.7** (betrouwbare tankstation- en laadpaaldetectie bij tussenstops) is de app technisch en functioneel gescand.
 
-Dit Plan van Aanpak bundelt de geconstateerde **aandachtspunten, compliance-eisen en potentiële functionaliteiten** in vier concrete fasen:
-1. **Fiscale Compliance & Belastingdienst-zekerheid** (tellerstanden in export, privé-omrijkilometers).
-2. **Gebruikersgemak & Automatisering** (RDW kentekencheck, live rit-toggles, interactieve widget).
-3. **Rapportage & Werkurenverfijning** (uren export per periode, kalenderinteractie, dashboard targets).
-4. **Android Auto & EV-optimalisaties** (Nederlandse car-interface, laadpaaldeclaraties).
+Dit Plan van Aanpak bundelt de geconstateerde **aandachtspunten, compliance-eisen en potentiële functionaliteiten** in vijf concrete fasen:
+1. **Fiscale Compliance & Belastingdienst-zekerheid** (tellerstanden in export, privé-omrijkilometers) — *✅ Gerealiseerd*.
+2. **Gebruikersgemak & Automatisering** (RDW kentekencheck, live rit-toggles, interactieve widget) — *✅ Gerealiseerd*.
+3. **Rapportage & Werkurenverfijning** (uren export per periode, kalenderinteractie, dashboard targets) — *✅ Gerealiseerd*.
+4. **Android Auto & EV-optimalisaties** (Nederlandse car-interface, laadpaaldeclaraties) — *✅ Gerealiseerd*.
+5. **Assisted Decision-Making & Slimme Rust** (dagelijkse inbox voor uitzonderingen, confidence scoring, contextuele defaults, battery & permission health checks, netwerk- en securityhygiëne) — *⏳ In planning*.
 
 ---
 
 ## 2. Status Quo & Reeds Gerealiseerd
 
-In de afgelopen releases zijn al grote stappen gezet:
-- ✅ **v1.3.5:** Export van ritten per maand (PDF en CSV) inclusief maandtotalen en subsecties.
-- ✅ **v1.3.6:** Detectie van vertrek uit parkeergarages zonder GPS-fix; behoud van gereden routes met OSRM-segmenttoevoeging en automatische synchronisatie van de tellerstand.
-- ✅ **v1.3.7:** Herkenning van tankstations en laadpalen bij tussenstops (Bluetooth-onderbreking) én ritafronding, heads-up notificatie (`FuelAlertChannel`), actiekaart op het dashboard, voertuigkiezer in brandstofbeheer en correctie van ritstatus in Android Auto.
+In de recente releases zijn de eerste vier fasen volledig gerealiseerd en in productie genomen:
+- ✅ **v1.3.5 / v1.3.6 / v1.3.7:** Maandexport, parkeergaragedetectie met OSRM-segmenttoevoeging en tankstation-/laadpaalherkenning bij tussenstops.
+- ✅ **v1.4.0 / v1.4.1 (Android) & v0.0.8 (iOS):** Volledige afronding van Fase 1 t/m 4:
+  - Belastingdienst-sluitende liggende A4 PDF & CSV export met tellerstanden en totalen.
+  - Registratie en fiscale toewijzing van privé-omrijkilometers (Room DB v49/v50 & SwiftData).
+  - Open data RDW kentekencheck voor automatische merk-, model- en brandstofherkenning.
+  - Live rit-toggle (Zakelijk ↔ Privé) tijdens tracking via notificatie, Android Auto en iOS dashboard.
+  - Interactieve startschermwidget (Android Glance).
+  - Kalenderweergave met dag-inspectie en ritdrilldown; urenexport per week/maand.
+  - EV-specifieke laadpresets (Thuis €0,28, Publiek €0,45, Snellader €0,69) en volledige Nederlandse Android Auto lokalisatie.
 
 ---
 
@@ -33,26 +40,33 @@ In de afgelopen releases zijn al grote stappen gezet:
 
 ```mermaid
 flowchart TD
-    subgraph Fase 1: Fiscaal Sluitend
+    subgraph Fase 1: Fiscaal Sluitend (✅ Gerealiseerd)
         A1[Start/Eindteller in PDF & CSV Export] --> A2[Voertuig & Kenteken in Documentkop]
         A2 --> A3[Privé-omrijkilometers Veld]
     end
 
-    subgraph Fase 2: Gebruikersgemak & Automatisch Invoeren
+    subgraph Fase 2: Gebruikersgemak & Automatisering (✅ Gerealiseerd)
         B1[RDW Open Data Kentekencheck] --> B2[Live Rit-Toggle Notificatie/Auto]
         B2 --> B3[Interactieve Startscherm Widget]
     end
 
-    subgraph Fase 3: Werkuren & Dashboard
+    subgraph Fase 3: Werkuren & Dashboard (✅ Gerealiseerd)
         C1[Werkuren Export per Week/Maand] --> C2[Kalenderfilter op Geselecteerde Dag]
         C2 --> C3[Dashboard Targets doorklikbaar]
     end
 
-    subgraph Fase 4: EV & Automotive
+    subgraph Fase 4: EV & Automotive (✅ Gerealiseerd)
         D1[EV Specifieke Labeling kWh/Snellader] --> D2[Android Auto Volledige Lokalisatie]
     end
 
-    Fase 1 --> Fase 2 --> Fase 3 --> Fase 4
+    subgraph Fase 5: Assisted Decision-Making & Slimme Rust (⏳ In voorbereiding)
+        E1[Dagelijkse Uitzonderingen-Inbox] --> E2[Confidence Score & 1-Tap Goedkeuren]
+        E2 --> E3[Contextuele Smart Defaults & Menselijke Diagnostiek]
+        E3 --> E4[Permission & Battery Health Monitor]
+        E4 --> E5[Netwerk- & Securityhygiëne / Cleartext Opschoning]
+    end
+
+    Fase 1 --> Fase 2 --> Fase 3 --> Fase 4 --> Fase 5
 ```
 
 ---
@@ -197,28 +211,118 @@ flowchart TD
 
 ---
 
+### 🟠 Fase 5: Assisted Decision-Making & Slimme Rust (Roadmap v1.5) (⏳ In voorbereiding)
+
+> [!TIP]
+> Nu de functionele kern (tracking, exports, RDW, widgets en auto-integraties) staat, verschuift de meerwaarde naar **begeleiding en rust**: de app denkt proactief mee bij twijfelgevallen, lost uitzonderingen op met één tik en bewaakt op de achtergrond de technische en fiscale betrouwbaarheid.
+
+#### 5.1 Dagelijkse Uitzonderingen-Inbox ("Daily Triage")
+- **Probleem:** Actiepunten zijn momenteel verspreid over verschillende schermen (ritten ter beoordeling in Ritten, ontbrekende werkuren in Werkuren, tellergaten in Voertuigen en tankbonnen in Brandstof).
+- **Oplossing & Implementatie:**
+  - Eén centrale en rustige **"Dagelijkse Inbox"** op het dashboard (`DailyInboxCard` of compact triagescherm).
+  - Bundelt direct alle openstaande items van vandaag en deze week:
+    - 🚗 Ritten met status `TO_REVIEW` (met voorgestelde categorie).
+    - ⏱️ Werkdagen zonder vertrektijd of met afwijkende pauze.
+    - ⚠️ Gaten in de kilometertellerstand (`OdometerGap`).
+    - ⛽ Tankstation-/laadpaal-tussenstops waar nog geen bon voor is ingevoerd.
+  - Voorzien van een **"Alles goedkeuren"**-knop voor ritten met een hoge betrouwbaarheidsscore.
+- **Betrokken bestanden:**
+  - `android/app/src/main/java/com/cimdriver/app/ui/viewmodel/DailyInboxViewModel.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/components/DailyInboxCard.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/DashboardScreen.kt`
+  - `ios/CIMDriver/Views/Dashboard/DailyInboxView.swift`
+
+#### 5.2 Confidence Score & Zachte Reviewvoorstellen
+- **Doel:** Niet blind alles automatisch goedkeuren of de gebruiker overspoelen met pop-ups, maar betrouwbare suggesties doen met 1-tap acceptatie.
+- **Oplossing & Implementatie:**
+  - Introductie van een `confidenceScore` (0–100%) en `suggestedCategory` per rit in `TripClassification`.
+  - **Scoringsfactoren:**
+    - Vertrek en aankomst matchen met bekende `SavedAddress` (Thuis/Werk/Klant): +40%.
+    - Rit valt binnen reguliere werktijden en werkdagen: +25%.
+    - Rit is gestart via een bekende Bluetooth-carkit: +20%.
+    - Historische consistentie (rit is al vaker identiek gereden): +15%.
+  - Ritten met score ≥ 90% worden gemarkeerd als *"Vrijwel zeker Zakelijk"* of *"Woon-werk"*; in de inbox of notificatie volstaat één tik op `[✓ Klopt]` om de rit definitief te fiatteren.
+- **Betrokken bestanden:**
+  - `android/app/src/main/java/com/cimdriver/app/util/TripClassification.kt`
+  - `android/app/src/main/java/com/cimdriver/app/data/local/entity/Entities.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/components/TripComponents.kt`
+  - `ios/CIMDriver/Utilities/TripClassification.swift`
+
+#### 5.3 Contextuele Smart Defaults & Menselijke Diagnostiek
+- **Doel:** Minimaliseer handmatig invoerwerk en geef begrijpelijke uitleg over automatische ritbeslissingen.
+- **Oplossing & Implementatie:**
+  - **Smart Defaults:** Wanneer een rit eindigt bij een klantlocatie, wordt direct de gekoppelde `projectCode` en het uurtarief voorgesteld. Bij aankomst op een werklocatie worden de begintijd (afgerond) en standaard pauze direct vooringevuld.
+  - **Menselijke Ritaudit:** In plaats van puur technische logs toont het ritdetailscherm begrijpelijke context:
+    - *"Rit automatisch beëindigd na 3 minuten stilstand zonder carkit."*
+    - *"GPS-onderbreking in parkeergarage automatisch overbrugd via routenetwerk."*
+- **Betrokken bestanden:**
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/AddTripScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/TripDetailScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/service/TrackingService.kt`
+
+#### 5.4 Permission & Battery Health Monitor
+- **Probleem:** Android-fabrikanten (Samsung, Xiaomi, OnePlus) leggen achtergrondservices agressief stil door batterijbesparingsmechanismen, wat leidt tot gemiste ritten en onbegrip bij gebruikers.
+- **Oplossing & Implementatie:**
+  - `HealthMonitorHelper`: Controleert periodiek en bij app-start:
+    - `PowerManager.isIgnoringBatteryOptimizations(packageName)`
+    - `ACCESS_BACKGROUND_LOCATION` permissie ("Altijd toestaan")
+    - `POST_NOTIFICATIONS` permissie
+    - GPS / Location Provider status
+  - **Proactieve Waarschuwingskaart:** Toont een rustige banner op het Dashboard of in Diagnostics als een instelling de betrouwbaarheid bedreigt, inclusief een directe 1-tap knop naar het juiste Android-instellingenscherm (`ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` of app-details).
+- **Betrokken bestanden:**
+  - `android/app/src/main/java/com/cimdriver/app/util/HealthMonitorHelper.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/DashboardScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/ui/screens/DiagnosticsScreen.kt`
+
+#### 5.5 Netwerk- & Securityhygiëne (Network Security Config)
+- **Probleem:** In `AndroidManifest.xml` staat momenteel `android:usesCleartextTraffic="true"`. Dit stelt de gehele applicatie open voor onversleuteld HTTP-verkeer, terwijl externe services (OSRM, Nominatim, RDW) uitsluitend via HTTPS behoren te lopen.
+- **Oplossing & Implementatie:**
+  - Verwijder de globale `android:usesCleartextTraffic="true"` uit `AndroidManifest.xml`.
+  - Voeg `android:networkSecurityConfig="@xml/network_security_config"` toe.
+  - Maak `res/xml/network_security_config.xml` aan waarin cleartext HTTP uitsluitend wordt toegestaan voor `127.0.0.1` en `localhost` ten behoeve van de lokale `ZeppCompanionServer` (smartwatch companion).
+  - Dwing strikte HTTPS (TLS 1.2+) af voor alle overige netwerkverbindingen.
+- **Betrokken bestanden:**
+  - `android/app/src/main/AndroidManifest.xml`
+  - `android/app/src/main/res/xml/network_security_config.xml`
+
+#### 5.6 Adaptieve Trackingintensiteit & Fiscale Jaarprognose
+- **Adaptieve Tracking:** Dynamische schaling van de locatie-interval: energiezuinige significante bewegingsdetectie bij stilstand, opschalen naar 1-seconde GPS-polling bij rijsnelheden (>15 km/u) of actieve Bluetooth-carkitverbinding.
+- **Fiscale Jaarprognose:** Voorspelling van het aantal privékilometers op 31 december op basis van het huidige seizoens- en weekpatroon (*"Bij het huidige rijgedrag kom je uit op 410 km privé — veilig onder de 500 km grens"* of tijdig waarschuwen bij overschrijdingsrisico).
+- **Betrokken bestanden:**
+  - `android/app/src/main/java/com/cimdriver/app/service/LocationClient.kt`
+  - `android/app/src/main/java/com/cimdriver/app/domain/DashboardStatsCalculator.kt`
+
+---
+
 ## 4. Prioriterings- en Impactmatrix
 
-| Taak / Verbetering | Fiscale Noodzaak | Gebruikersimpact | Complexiteit | Aanbevolen Sprint |
+| Taak / Verbetering | Fiscale Noodzaak | Gebruikersimpact | Complexiteit | Status / Sprint |
 | :--- | :---: | :---: | :---: | :---: |
-| **1.1 Belastingdienst Tellerstanden in Export (PDF/CSV)** | 🔴 Zeer hoog | 🟢 Hoog | ⚡ Laag (1-2 uur) | **Sprint 1 (Direct)** |
-| **2.1 RDW Kenteken Check API** | ⚪ Laag | 🟢 Zeer hoog | ⚡ Laag (2-3 uur) | **Sprint 1** |
-| **3.1 Werkuren Export per Periode (Week/Maand)** | ⚪ Laag | 🟢 Hoog | ⚡ Laag (1-2 uur) | **Sprint 1** |
-| **3.3 Dashboard Targets klikbaar maken** | ⚪ Laag | 🟡 Gemiddeld | ⚡ Minimaal (15 min) | **Sprint 1** |
-| **4.1 Android Auto Nederlandse teksten** | ⚪ Laag | 🟡 Gemiddeld | ⚡ Minimaal (30 min) | **Sprint 1** |
-| **2.2 Live Rit-Toggle Notificatie/Car** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld (3-4 uur) | **Sprint 2** |
-| **1.2 Privé-omrijkilometers Veld & DB Migratie** | 🔴 Hoog | 🟡 Gemiddeld | 🔶 Gemiddeld (3-4 uur) | **Sprint 2** |
-| **3.2 Kalenderweergave filter per dag** | ⚪ Laag | 🟡 Gemiddeld | 🔶 Gemiddeld (2-3 uur) | **Sprint 2** |
-| **2.3 Interactieve Home Screen Widget (Start/Stop)** | ⚪ Laag | 🟢 Hoog | 🔶 Gemiddeld (4-5 uur) | **Sprint 3** |
-| **4.2 EV Tariefdifferentiatie** | ⚪ Laag | 🟡 Gemiddeld | 🔶 Gemiddeld (3-4 uur) | **Sprint 3** |
+| **1.1 Belastingdienst Tellerstanden in Export (PDF/CSV)** | 🔴 Zeer hoog | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.4.0) |
+| **2.1 RDW Kenteken Check API** | ⚪ Laag | 🟢 Zeer hoog | ⚡ Laag | ✅ Gerealiseerd (v1.4.0) |
+| **3.1 Werkuren Export per Periode (Week/Maand)** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.4.0) |
+| **3.3 Dashboard Targets klikbaar maken** | ⚪ Laag | 🟡 Gemiddeld | ⚡ Minimaal | ✅ Gerealiseerd (v1.4.0) |
+| **4.1 Android Auto Nederlandse teksten** | ⚪ Laag | 🟡 Gemiddeld | ⚡ Minimaal | ✅ Gerealiseerd (v1.4.0) |
+| **2.2 Live Rit-Toggle Notificatie/Car** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.0) |
+| **1.2 Privé-omrijkilometers Veld & DB Migratie** | 🔴 Hoog | 🟡 Gemiddeld | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.0) |
+| **3.2 Kalenderweergave filter per dag** | ⚪ Laag | 🟡 Gemiddeld | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.0) |
+| **2.3 Interactieve Home Screen Widget (Start/Stop)** | ⚪ Laag | 🟢 Hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.0) |
+| **4.2 EV Tariefdifferentiatie & Laadpresets** | ⚪ Laag | 🟡 Gemiddeld | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.1) |
+| **5.5 Netwerk- & Securityhygiëne (Network Security Config)** | ⚪ Laag | 🟢 Hoog (Beveiliging) | ⚡ Laag (1-2 uur) | **Sprint 5.1 (Direct)** |
+| **5.4 Permission & Battery Health Monitor** | 🟡 Gemiddeld | 🟢 Zeer hoog | ⚡ Laag (2-3 uur) | **Sprint 5.1 (Direct)** |
+| **5.1 Dagelijkse Uitzonderingen-Inbox ("Daily Triage")** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld (4-5 uur) | **Sprint 5.2** |
+| **5.2 Confidence Score & Zachte 1-Tap Reviews** | ⚪ Laag | 🟢 Hoog | 🔶 Gemiddeld (3-4 uur) | **Sprint 5.2** |
+| **5.3 Contextuele Smart Defaults & Ritaudit** | ⚪ Laag | 🟡 Gemiddeld | ⚡ Laag (2-3 uur) | **Sprint 5.3** |
+| **5.6 Adaptieve Tracking & Fiscale Jaarprognose** | 🔴 Hoog | 🟢 Hoog | 🔶 Gemiddeld (4-5 uur) | **Sprint 5.3** |
 
 ---
 
 ## 5. Beheer & Kwaliteitsborging
 
 Voor elke oplevering binnen dit PvA gelden de strikte CIMDriver kwaliteitsstandaarden:
-1. **Unit Tests:** Alle berekeningen (afstand, tellersynchronisatie, urennormalisatie) worden gedekt door JUnit-tests via `./gradlew testDebugUnitTest`.
+1. **Unit Tests:** Alle berekeningen (afstand, tellersynchronisatie, urennormalisatie, confidence scoring) worden gedekt door JUnit-tests via `./gradlew testDebugUnitTest` en XCTest via `xcodebuild test`.
 2. **5-Bestands Versiebeheer:** Versie-ophoging wordt synchroon doorgevoerd in `build.gradle.kts`, root `version.json`, `android/version.json`, `README.md` en `CHANGELOG.md`.
 3. **Bilingual Docs:** Documentatie en downloadpagina's in `docs/` worden altijd bijgewerkt in zowel het Nederlands (`.md`) als het Engels (`.en.md`).
-4. **Keystore Integrity:** Releases worden gesigneerd via `android/keystore.properties` met `release.jks`.
+4. **Keystore Integrity:** Android-releases worden gesigneerd via `android/keystore.properties` met `release.jks`.
+5. **Cross-Platform Pariteit:** Functionaliteiten in Fase 5 worden na Android direct gespiegeld naar iOS om beide apps gelijkwaardig te houden.
 
