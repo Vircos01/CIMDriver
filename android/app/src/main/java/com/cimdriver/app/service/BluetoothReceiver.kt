@@ -97,12 +97,18 @@ class BluetoothReceiver : BroadcastReceiver() {
                         // Reconnecting during the grace period resumes the active trip.
                         val activeTrip = tripDao.getActiveTripForVehicle(linkedDevice.vehicleId)
                         val isNewTrip = activeTrip == null
+                        val prevTrip = if (isNewTrip) tripDao.getLatestTripForVehicle(linkedDevice.vehicleId) else null
+                        val initialStartAddress = if (prevTrip != null && !prevTrip.endAddress.isNullOrBlank() && prevTrip.status != "ACTIVE") {
+                            prevTrip.endAddress
+                        } else {
+                            context.getString(com.cimdriver.app.R.string.tracking_retrieving_location)
+                        }
                         val tripId = activeTrip?.id ?: tripDao.insertTrip(
                             Trip(
                                 vehicleId = linkedDevice.vehicleId,
                                 startTime = System.currentTimeMillis(),
                                 endTime = null,
-                                startAddress = context.getString(com.cimdriver.app.R.string.tracking_retrieving_location),
+                                startAddress = initialStartAddress,
                                 endAddress = null,
                                 distanceMeters = 0,
                                 tripType = computedTripType,

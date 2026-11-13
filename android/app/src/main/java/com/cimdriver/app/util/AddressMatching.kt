@@ -50,6 +50,17 @@ object AddressMatching {
         val reason: MatchReason
     )
 
+    fun computeDistanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val r = 6371000.0 // Earth radius in meters
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return (r * c).toFloat()
+    }
+
     fun findBestMatch(
         lat: Double?,
         lon: Double?,
@@ -67,14 +78,12 @@ object AddressMatching {
         var bestMatch: SavedAddress? = null
         var minDistance = Float.MAX_VALUE
         var bestPriority = -1
-        val results = FloatArray(1)
 
         for (address in addresses) {
             val addrLat = address.latitude ?: continue
             val addrLon = address.longitude ?: continue
 
-            Location.distanceBetween(lat, lon, addrLat, addrLon, results)
-            val distance = results[0]
+            val distance = computeDistanceMeters(lat, lon, addrLat, addrLon)
             if (distance <= maxDistanceMeters) {
                 val priority = when {
                     address.isHomeLocation -> 2
@@ -91,5 +100,51 @@ object AddressMatching {
         }
 
         return bestMatch?.let { AddressMatch(it, minDistance, MatchReason.COORDINATE) }
+    }
+
+    /**
+     * Resolves a departure location when exiting a parking garage or starting with delayed GPS fix.
+     * Checks if the first acquired GPS point is within [maxExitRadiusMeters] (default 1500m) of the
+     * location where the vehicle was last parked or a known saved address.
+     */
+    fun findParkingGarageDepartureMatch(
+        firstGpsLat: Double?,
+        firstGpsLon: Double?,
+        parkedLat: Double?,
+        parkedLon: Double?,
+        parkedAddressLabel: String?,
+        addresses: List<SavedAddress>,
+        maxExitRadiusMeters: Float = 1500f
+    ): AddressMatch? {
+        val parkedSavedAddress = findSavedAddress(parkedAddressLabel, addresses)
+        
+        // If no GPS fix was acquired, use the parked address if available
+        if (firstGpsLat == null || firstGpsLon == null) {
+            return parkedSavedAddress?.let { AddressMatch(it, 0f, MatchReason.EXACT_TEXT) }
+        }
+
+        // Check if first GPS fix is within the garage exit radius of the last parked position
+        val targetParkedLat = parkedSavedAddress?.latitude ?: parkedLat
+        val targetParkedLon = parkedSavedAddress?.longitude ?: parkedLon
+
+        if (targetParkedLat != null && targetParkedLon != null) {
+            val distance = computeDistanceMeters(firstGpsLat, firstGpsLon, targetParkedLat, targetParkedLon)
+            if (distance <= maxExitRadiusMeters) {
+                if (parkedSavedAddress != null) {
+                    return AddressMatch(parkedSavedAddress, distance, MatchReason.COORDINATE)
+                } else if (!parkedAddressLabel.isNullOrBlank()) {
+                    val fallbackAddress = SavedAddress(
+                        label = parkedAddressLabel,
+                        address = parkedAddressLabel,
+                        latitude = targetParkedLat,
+                        longitude = targetParkedLon
+                    )
+                    return AddressMatch(fallbackAddress, distance, MatchReason.COORDINATE)
+                }
+            }
+        }
+
+        // Check if any saved address (e.g. Work, Home) is within maxExitRadiusMeters
+        return findBestMatch(firstGpsLat, firstGpsLon, null, addresses, maxDistanceMeters = maxExitRadiusMeters)
     }
 }

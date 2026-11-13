@@ -273,26 +273,25 @@ class TrackingService : Service(), LocationListener {
             )
             totalDistance += results[0]
         }
-        
-        val distanceM = totalDistance.toInt()
-        // Trip distances are stored in metres, while odometer readings are whole kilometres.
-        val odoEnd = TripDistance.updatedOdometer(currentTrip.odometerStart, distanceM)
-        
-        val vehicleDao = database.vehicleDao()
-        val vehicle = vehicleDao.getVehicleById(vehicleId)
-        if (vehicle != null) {
-            vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = odoEnd))
-        }
+        val recordedDistance = totalDistance.toInt()
+
+        val savedAddressDao = database.savedAddressDao()
+        val allAddresses = savedAddressDao.getAllAddressesSync()
+
+        // Check where the vehicle was parked prior to this trip (e.g. underground parking garage)
+        val previousTrip = tripDao.getPreviousCompletedTripForVehicle(vehicleId, currentTrip.id)
+        val prevTripLastPoint = previousTrip?.let { database.locationPointDao().getLastPointForTrip(it.id) }
+        val prevSavedAddress = if (!previousTrip?.endAddress.isNullOrBlank()) AddressMatching.findSavedAddress(previousTrip.endAddress, allAddresses) else null
+        val parkedLat = prevSavedAddress?.latitude ?: prevTripLastPoint?.latitude
+        val parkedLon = prevSavedAddress?.longitude ?: prevTripLastPoint?.longitude
+        val parkedAddressLabel = prevSavedAddress?.label ?: previousTrip?.endAddress
 
         var resolvedStartAddress = currentTrip.startAddress ?: getString(R.string.tracking_retrieving_location)
         var resolvedEndAddress = "Onbekend"
         
-        val savedAddressDao = database.savedAddressDao()
-        val allAddresses = savedAddressDao.getAllAddressesSync()
-        
         // Use trip GPS points for coordinate-based matching when available
-        val startLat = if (points.isNotEmpty()) points.first().latitude else null
-        val startLon = if (points.isNotEmpty()) points.first().longitude else null
+        val rawStartLat = if (points.isNotEmpty()) points.first().latitude else null
+        val rawStartLon = if (points.isNotEmpty()) points.first().longitude else null
         val endLat = if (points.isNotEmpty()) points.last().latitude else null
         val endLon = if (points.isNotEmpty()) points.last().longitude else null
 
@@ -302,7 +301,7 @@ class TrackingService : Service(), LocationListener {
         if (points.isNotEmpty()) {
             if (resolvedStartAddress == getString(R.string.tracking_retrieving_location)) {
                 resolvedStartAddress = kotlinx.coroutines.withTimeoutOrNull(5000L) {
-                    geocoderService.getAddressFromLocation(startLat!!, startLon!!)
+                    geocoderService.getAddressFromLocation(rawStartLat!!, rawStartLon!!)
                 } ?: "Onbekend"
             }
             
@@ -310,8 +309,56 @@ class TrackingService : Service(), LocationListener {
                 geocoderService.getAddressFromLocation(endLat!!, endLon!!)
             } ?: "Onbekend"
             
-            startMatch = AddressMatching.findBestMatch(startLat, startLon, resolvedStartAddress, allAddresses)
+            startMatch = AddressMatching.findBestMatch(rawStartLat, rawStartLon, resolvedStartAddress, allAddresses)
             endMatch = AddressMatching.findBestMatch(endLat, endLon, resolvedEndAddress, allAddresses)
+        }
+
+        // Parking garage / delayed GPS fix check:
+        // If standard 200m match didn't find the departure location, check if the first GPS fix is within
+        // the exit radius (1500m) of where the vehicle was parked or a known saved address.
+        if (startMatch == null) {
+            startMatch = AddressMatching.findParkingGarageDepartureMatch(
+                firstGpsLat = rawStartLat,
+                firstGpsLon = rawStartLon,
+                parkedLat = parkedLat,
+                parkedLon = parkedLon,
+                parkedAddressLabel = parkedAddressLabel,
+                addresses = allAddresses,
+                maxExitRadiusMeters = 1500f
+            )
+        }
+
+        if (resolvedStartAddress == getString(R.string.tracking_retrieving_location) && startMatch == null && !parkedAddressLabel.isNullOrBlank()) {
+            resolvedStartAddress = parkedAddressLabel
+        }
+
+        val finalStartAddress = startMatch?.address?.label ?: resolvedStartAddress
+        val finalEndAddress = endMatch?.address?.label ?: resolvedEndAddress
+
+        val trueStartLat = startMatch?.address?.latitude ?: parkedLat ?: rawStartLat
+        val trueStartLon = startMatch?.address?.longitude ?: parkedLon ?: rawStartLon
+        val trueEndLat = endMatch?.address?.latitude ?: endLat
+        val trueEndLon = endMatch?.address?.longitude ?: endLon
+
+        // If the first GPS fix occurred after exiting the garage, prepend a location point at the garage/address
+        var distanceToFirstGpsPoint = 0f
+        if (trueStartLat != null && trueStartLon != null && points.isNotEmpty()) {
+            val distResults = FloatArray(1)
+            android.location.Location.distanceBetween(trueStartLat, trueStartLon, points.first().latitude, points.first().longitude, distResults)
+            distanceToFirstGpsPoint = distResults[0]
+            if (distanceToFirstGpsPoint > 100f) {
+                database.locationPointDao().insertPoint(
+                    com.cimdriver.app.data.local.entity.LocationPoint(
+                        tripId = tripId,
+                        latitude = trueStartLat,
+                        longitude = trueStartLon,
+                        altitude = points.first().altitude,
+                        speed = 0f,
+                        accuracy = 10f,
+                        timestamp = currentTrip.startTime
+                    )
+                )
+            }
         }
         
         var isCommute = false
@@ -320,10 +367,7 @@ class TrackingService : Service(), LocationListener {
         var arrivedAtHome = false
         var leftHome = false
         var matchedWorkLabel = ""
-        
-        val finalStartAddress = startMatch?.address?.label ?: resolvedStartAddress
-        val finalEndAddress = endMatch?.address?.label ?: resolvedEndAddress
-        
+
         val startLoc = startMatch?.address
         val endLoc = endMatch?.address
         
@@ -410,18 +454,45 @@ class TrackingService : Service(), LocationListener {
         )
 
         var expectedDistance: Int? = null
-        if (startLat != null && startLon != null && endLat != null && endLon != null) {
-            val distPair = geocoderService.getOsrmDistance(startLat, startLon, endLat, endLon)
+        if (trueStartLat != null && trueStartLon != null && trueEndLat != null && trueEndLon != null) {
+            val distPair = geocoderService.getOsrmDistance(trueStartLat, trueStartLon, trueEndLat, trueEndLon)
             if (distPair != null) {
                 expectedDistance = distPair.first.toInt()
             }
+        }
+        if (expectedDistance == null && finalStartAddress.isNotBlank() && finalEndAddress.isNotBlank()) {
+            val distPair = geocoderService.calculateDistance(finalStartAddress, finalEndAddress)
+            if (distPair != null) {
+                expectedDistance = distPair.first.toInt()
+            }
+        }
+
+        // Check if GPS was missing/delayed at departure (e.g. parking garage) and recorded distance is less than route query
+        val isDelayedGpsFix = points.isEmpty() ||
+                (distanceToFirstGpsPoint > 100f) ||
+                (startMatch != null && startMatch.reason == com.cimdriver.app.util.AddressMatching.MatchReason.COORDINATE && startMatch.distanceMeters > 100f)
+
+        val finalDistanceM = TripDistance.adjustForParkingGarageOrDelayedGps(
+            recordedDistanceMeters = recordedDistance,
+            expectedDistanceMeters = expectedDistance,
+            isDelayedGpsFix = isDelayedGpsFix
+        )
+        if (finalDistanceM != recordedDistance) {
+            Log.i("TrackingService", "Parkeergarage / vertraagde GPS-fix: ritafstand bijgesteld van $recordedDistance m naar verwachte routeafstand $finalDistanceM m ($finalStartAddress -> $finalEndAddress)")
+        }
+
+        val odoEnd = TripDistance.updatedOdometer(currentTrip.odometerStart, finalDistanceM)
+        val vehicleDao = database.vehicleDao()
+        val vehicle = vehicleDao.getVehicleById(vehicleId)
+        if (vehicle != null) {
+            vehicleDao.updateVehicle(vehicle.copy(odometerCurrent = odoEnd))
         }
 
         tripDao.updateTrip(currentTrip.copy(
             endTime = System.currentTimeMillis() - gracePeriodMs,
             startAddress = finalStartAddress,
             endAddress = finalEndAddress,
-            distanceMeters = distanceM,
+            distanceMeters = finalDistanceM,
             odometerEnd = odoEnd,
             expectedDistanceMeters = expectedDistance,
             tripType = finalTripType,

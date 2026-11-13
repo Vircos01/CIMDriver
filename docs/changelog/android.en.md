@@ -4,7 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.5 (Current Version)
+## Version 1.3.6 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "New Features & Improvements"
+    * **Smart Parking Garage Departure Detection:** Automatically determines the correct departure address when exiting an underground garage without GPS coverage, using the parked location and saved addresses within a 1500m radius.
+    * **Automatic Distance Correction (OSRM):** When recorded GPS distance is shorter than the true route due to delayed satellite acquisition upon leaving the garage, the app automatically adjusts the trip distance to match the calculated route.
+    * **Prevents Odometer Gaps:** The vehicle's odometer reading is updated using the corrected distance, eliminating odometer drift caused by parking structures.
+    * **Seamless Map Route:** The map trace automatically connects the departure location in the garage with the first GPS fix.
+    * **Pre-filled Departure Address:** When connecting to Bluetooth in a parking garage, the departure address is pre-filled from the previous trip.
+
+## Version 1.3.5
 *Release date: November 2, 2026*
 
 !!! success "New Features & Improvements"

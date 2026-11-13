@@ -1,6 +1,6 @@
 {
-  "versionCode": 32,
-  "versionName": "1.3.5",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.3.5.apk",
-  "releaseNotes": "Versie 1.3.5: Rittenregistratie delen per maand (PDF en CSV), inclusief maandsecties met directe deelknop in het rittenoverzicht en documenttitels per maand."
+  "versionCode": 33,
+  "versionName": "1.3.6",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.3.6.apk",
+  "releaseNotes": "Versie 1.3.6: Slimme vertrekdetectie bij parkeergarages en automatische bijstelling van ritafstand en tellerstand op basis van route-opvraag bij vertraagde GPS-fix."
 }

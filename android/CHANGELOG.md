@@ -2,6 +2,15 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.6] - 2026-11-13
+
+### Toegevoegd & Verbeterd
+- **Slimme vertrekdetectie bij parkeergarages:** Bepaalt automatisch het juiste vertrekadres wanneer je uit een parkeergarage vertrekt waar nog geen GPS-dekking is. Het geparkeerde adres van de vorige rit en opgeslagen locaties worden binnen een uitrijradius (1500m) nauwkeurig gekoppeld.
+- **Automatische afstandscorrectie op basis van route-opvraag:** Wanneer de geregistreerde GPS-afstand korter is dan de werkelijk gereden route doordat satellieten pas buiten de garage werden ontvangen, wordt de ritafstand automatisch gecorrigeerd naar de officiële route-afstand via OSRM.
+- **Kilometerteller synchronisatie:** De eindstand van de auto-kilometerteller wordt berekend op basis van de gecorrigeerde ritafstand, waardoor kilometerafwijkingen en gaten door parkeergarages structureel worden voorkomen.
+- **Naadloze kaartverbinding:** Als de eerste GPS-fix buiten de garage plaatsvindt, wordt de route op de kaart automatisch aangevuld vanaf de parkeergarage/het vertrekadres.
+- **Directe vertrekherkenning bij Bluetooth-verbinding:** Bij het inschakelen van het contact in een parkeergarage wordt het vertrekadres alvast vooraf ingevuld op basis van de laatste rit.
+
 ## [1.3.5] - 2026-11-02
 
 ### Toegevoegd & Verbeterd

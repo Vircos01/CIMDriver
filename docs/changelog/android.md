@@ -6,7 +6,17 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.5 (Huidige Versie)
+## Versie 1.3.6 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Nieuwe Functies & Verbeteringen"
+    * **Slimme vertrekdetectie bij parkeergarages:** Bepaalt automatisch het juiste vertrekadres wanneer je uit een ondergrondse garage vertrekt waar nog geen GPS-dekking is, op basis van de geparkeerde positie en opgeslagen adressen binnen 1500m.
+    * **Automatische afstandscorrectie (OSRM):** Wanneer de geregistreerde GPS-afstand korter is dan de werkelijke route doordat satellieten pas na het uitrijden werden vergrendeld, stelt de app de afstand automatisch bij naar de berekende route-afstand.
+    * **Voorkomen van kilometerafwijkingen:** De kilometerteller van het voertuig telt met de bijgestelde afstand, waardoor er geen tellergaten meer ontstaan door ritten vanuit parkeergarages.
+    * **Naadloze kaartverbinding:** De kaartroute wordt automatisch aangevuld vanaf het daadwerkelijke vertrekpunt tot aan de eerste GPS-fix.
+    * **Vooraf ingevuld vertrekadres:** Bij Bluetooth-connectie in de garage wordt direct het geparkeerde adres als vertrekpunt klaargezet.
+
+## Versie 1.3.5
 *Releasedatum: 2 november 2026*
 
 !!! success "Nieuwe Functies & Verbeteringen"

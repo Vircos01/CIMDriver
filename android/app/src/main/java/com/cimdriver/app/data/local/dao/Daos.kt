@@ -48,6 +48,9 @@ interface TripDao {
     @Query("SELECT * FROM trips WHERE vehicleId = :vehicleId ORDER BY startTime DESC LIMIT 1")
     suspend fun getLatestTripForVehicle(vehicleId: Long): Trip?
 
+    @Query("SELECT * FROM trips WHERE vehicleId = :vehicleId AND id != :excludeTripId AND status != 'ACTIVE' ORDER BY startTime DESC LIMIT 1")
+    suspend fun getPreviousCompletedTripForVehicle(vehicleId: Long, excludeTripId: Long): Trip?
+
     @Query("SELECT * FROM trips WHERE vehicleId = :vehicleId AND status = 'ACTIVE' ORDER BY startTime DESC LIMIT 1")
     suspend fun getActiveTripForVehicle(vehicleId: Long): Trip?
 

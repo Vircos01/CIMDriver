@@ -119,12 +119,18 @@ class StartTripScreen(carContext: CarContext) : Screen(carContext) {
                 val startOdo = vehicle?.odometerCurrent ?: 0
 
                 val activeTrip = tripDao.getActiveTripForVehicle(vehicleId)
+                val prevTrip = if (activeTrip == null) tripDao.getLatestTripForVehicle(vehicleId) else null
+                val initialStartAddress = if (prevTrip != null && !prevTrip.endAddress.isNullOrBlank() && prevTrip.status != "ACTIVE") {
+                    prevTrip.endAddress
+                } else {
+                    "Locatie ophalen..."
+                }
                 val tripId = activeTrip?.id ?: tripDao.insertTrip(
                     com.cimdriver.app.data.local.entity.Trip(
                         vehicleId = vehicleId,
                         startTime = System.currentTimeMillis(),
                         endTime = null,
-                        startAddress = "Locatie ophalen...",
+                        startAddress = initialStartAddress,
                         endAddress = null,
                         distanceMeters = 0,
                         tripType = tripType,
