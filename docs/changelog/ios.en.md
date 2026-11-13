@@ -4,6 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
+## Version 0.0.9 Alpha (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 5: Assisted Decision-Making & Dashboard Calmness (Android Feature Sync)"
+    * **Daily Exceptions Inbox:** Consolidated triage card on the Dashboard grouping pending trips to review and unconfirmed workdays into a calm, focused overview.
+    * **Confidence Scoring & Gentle Review Suggestions:** Algorithmic confidence scoring (0–100%) based on route rules, commute patterns, and work hours. In Trip Details, the suggested category can be approved with a single tap.
+    * **Trip Audit & Context:** Transparent context block in Trip Details indicating registration origin (GPS background tracking vs manual), vehicle association, and private detour calculations.
+    * **Adaptive GPS Jitter Filter:** Suppression of stationary GPS drift (< 3m at < 0.8 m/s within 30 seconds) to prevent phantom distance and reduce battery impact.
+    * **Fiscal Year-End Private Km Projection:** The private limit card now extrapolates full-year private kilometers with an early alert if projected usage risks exceeding the 500 km ceiling.
+
 ## Version 0.0.8 Alpha
 *Release date: November 13, 2026*
 

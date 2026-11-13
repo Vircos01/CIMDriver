@@ -11,6 +11,7 @@ struct DashboardStats {
     var prevPriveKm: Double = 0
     var prevWoonWerkKm: Double = 0
     var ytdPriveKm: Double = 0
+    var projectedYearEndPriveKm: Double = 0
 }
 
 enum TimeFilter: String, CaseIterable, Identifiable {

@@ -286,143 +286,27 @@ fun DashboardScreen(
             }
 
             if (allGranted) {
-                if (pendingFuelDrafts.isNotEmpty()) {
-                    pendingFuelDrafts.forEach { draft ->
-                        val draftVehicle = vehicles.find { it.id == draft.vehicleId }
-                        val isEV = draftVehicle?.engineType == "EV"
-                        val title = if (isEV) "Laadsessie registreren" else "Tankbeurt registreren"
-                        val station = draft.stationName ?: if (isEV) "Laadpaal" else "Tankstation"
-                        val odoText = if (draft.odometer > 0) " (${String.format(locale, "%,d", draft.odometer).replace(',', '.')} km)" else ""
-                        val promptText = if (isEV) {
-                            "Je stond bij $station$odoText. Voer kWh en laadkosten in om je administratie compleet te maken."
-                        } else {
-                            "Je stond bij $station$odoText. Voer liters en bedrag in om je administratie compleet te maken."
-                        }
+                // Systeem- & Batterijgezondheid monitor
+                com.cimdriver.app.ui.components.HealthIssueBanner(
+                    modifier = Modifier.padding(top = 16.dp)
+                )
 
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2FE))
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Filled.LocalGasStation,
-                                        contentDescription = null,
-                                        tint = Color(0xFF0369A1),
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = title,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = Color(0xFF0369A1),
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(6.dp))
-                                Text(
-                                    text = promptText,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color(0xFF0C4A6E)
-                                )
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    OutlinedButton(
-                                        onClick = { fuelViewModel.deleteFillUp(draft) }
-                                    ) {
-                                        Text("Negeren", color = Color(0xFF0369A1))
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Button(
-                                        onClick = { onNavigateToFuelDraft(draft.id) },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(0xFF0284C7),
-                                            contentColor = Color.White
-                                        )
-                                    ) {
-                                        Text("Gegevens invoeren")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (reviewCount > 0) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = stringResource(R.string.action_required), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = stringResource(R.string.trips_to_review, reviewCount), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onErrorContainer)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = onNavigateToTrips,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.onErrorContainer,
-                                    contentColor = MaterialTheme.colorScheme.errorContainer
-                                )
-                            ) {
-                                Text(stringResource(R.string.view_trips))
-                            }
-                        }
-                    }
-                }
-
-                if (workDayReviewCount > 0) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = stringResource(R.string.check_work_hours), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onTertiaryContainer)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = stringResource(R.string.work_days_to_review, workDayReviewCount), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onTertiaryContainer)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = onNavigateToWorkHours,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.tertiaryContainer
-                                )
-                            ) {
-                                Text(stringResource(R.string.view_work_hours))
-                            }
-                        }
-                    }
-                }
-
-                if (openGapsCount > 0 && defaultVehicle != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "Gaten in KM-Registratie", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = "Er zijn $openGapsCount onopgeloste gaten gedetecteerd in de registratie van ${defaultVehicle.name}. Los deze op voor een sluitende administratie.", textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onErrorContainer)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = { onNavigateToGaps(defaultVehicle.id) },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.onErrorContainer,
-                                    contentColor = MaterialTheme.colorScheme.errorContainer
-                                )
-                            ) {
-                                Text("Gaten bekijken en oplossen")
-                            }
-                        }
-                    }
-                }
+                // Dagelijkse Uitzonderingen Inbox (Triage met 1-tap acceptatie & confidence)
+                val reviewCandidates by viewModel.tripsToReviewCandidates.collectAsState()
+                Spacer(modifier = Modifier.height(16.dp))
+                com.cimdriver.app.ui.components.DailyInboxCard(
+                    reviewCandidates = reviewCandidates,
+                    workDayReviewCount = workDayReviewCount,
+                    openGapsCount = openGapsCount,
+                    pendingFuelDrafts = pendingFuelDrafts,
+                    vehicles = vehicles,
+                    onQuickApproveTrip = { candidate -> viewModel.quickApproveTrip(candidate) },
+                    onApproveAllHighConfidence = { viewModel.approveAllHighConfidenceTrips(reviewCandidates) },
+                    onNavigateToTrips = onNavigateToTrips,
+                    onNavigateToWorkHours = onNavigateToWorkHours,
+                    onNavigateToGaps = { defaultVehicle?.let { onNavigateToGaps(it.id) } },
+                    onNavigateToFuelDraft = onNavigateToFuelDraft
+                )
 
                 if (defaultVehicle != null && defaultVehicle.lastOdometerCheckTimestamp > 0) {
                     val daysSinceCheck = ((System.currentTimeMillis() - defaultVehicle.lastOdometerCheckTimestamp) / (1000 * 60 * 60 * 24)).toInt()
@@ -519,6 +403,18 @@ fun DashboardScreen(
                                     text = "Aangepaste grens (pro rata).",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (stats.projectedYearEndPriveKm > 0.0) {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                val isProjectedOver = stats.projectedYearEndPriveKm > limit
+                                val projKm = String.format(Locale.getDefault(), "%.0f km", stats.projectedYearEndPriveKm)
+                                Text(
+                                    text = if (isProjectedOver) "⚠️ Verwachte eindstand 31 dec: $projKm (dreigt grens te overschrijden!)"
+                                           else "✨ Verwachte eindstand 31 dec: $projKm (veilig binnen de grens)",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (isProjectedOver) MaterialTheme.colorScheme.error else Color(0xFF16A34A),
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }

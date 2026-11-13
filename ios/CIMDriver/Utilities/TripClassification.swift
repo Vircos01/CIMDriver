@@ -181,6 +181,81 @@ enum TripClassification {
         
         return false
     }
+
+    struct ConfidenceAssessment {
+        let category: TripCategory
+        let confidenceScore: Int // 0 - 100
+        let reasoning: String
+        var isHighConfidence: Bool { confidenceScore >= 85 }
+    }
+
+    static func assessConfidence(
+        tripType: String?,
+        startAddressType: String? = nil,
+        endAddressType: String? = nil,
+        startAddress: String? = nil,
+        endAddress: String? = nil,
+        rules: [ClassificationRule] = [],
+        timestamp: Date? = nil,
+        appSettings: AppSettings? = nil,
+        isBluetoothTriggered: Bool = false,
+        defaultCategory: TripCategory = .privateTrip
+    ) -> ConfidenceAssessment {
+        let matchedRule = matchingRule(
+            tripType: tripType,
+            startAddressType: startAddressType,
+            endAddressType: endAddressType,
+            startAddress: startAddress,
+            endAddress: endAddress,
+            rules: rules
+        )
+        let isCommutePair = (startAddressType == "THUIS" && endAddressType == "WERK") ||
+            (startAddressType == "WERK" && endAddressType == "THUIS")
+        let isCustomer = startAddressType == "KLANT" || endAddressType == "KLANT"
+        let outsideHours = timestamp != nil ? isOutsideWorkHours(timestamp: timestamp!, appSettings: appSettings) : false
+
+        var score = 50
+        let category: TripCategory
+        let reasoning: String
+
+        if let rule = matchedRule {
+            switch rule.category {
+            case "BUSINESS": category = .business
+            case "COMMUTE": category = .commute
+            case "PRIVATE": category = .privateTrip
+            default: category = defaultCategory
+            }
+            let isExact = !(rule.startAddress?.isEmpty ?? true) && !(rule.endAddress?.isEmpty ?? true)
+            score = isExact ? 96 : 88
+            reasoning = isExact ? "Vaste route-regel matched exact" : "Classificatieregel matched adrestypes"
+        } else if isCommutePair || tripType == "COMMUTE" || tripType == dynamicsHomeToWork {
+            category = .commute
+            score = isBluetoothTriggered ? 92 : 88
+            reasoning = "Herkend als reguliere woon-werk route"
+        } else if isCustomer {
+            category = .business
+            score = 85
+            reasoning = "Adres is gemarkeerd als klantlocatie"
+        } else if outsideHours {
+            category = .privateTrip
+            score = 80
+            reasoning = "Rit viel buiten geconfigureerde werktijden"
+        } else if let type = tripType, businessTripTypes.contains(type) {
+            category = .business
+            score = 75
+            reasoning = "Rit bevat zakelijk rittype"
+        } else {
+            category = defaultCategory
+            score = 55
+            reasoning = "Standaard categorie toegepast bij gebrek aan specifieke regels"
+        }
+
+        return ConfidenceAssessment(
+            category: category,
+            confidenceScore: min(100, max(0, score)),
+            reasoning: reasoning
+        )
+    }
 }
 import Foundation
 import SwiftData

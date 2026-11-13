@@ -1,6 +1,5 @@
 package com.cimdriver.app.ui.screens
 
-import android.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -25,6 +26,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -47,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -68,6 +71,8 @@ import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import com.cimdriver.app.R
 import com.cimdriver.app.util.AddressMatching
+import com.cimdriver.app.util.TripClassification
+import com.cimdriver.app.util.TripCategory
 
 val osmStyleJson = """
 {
@@ -110,7 +115,35 @@ fun TripDetailScreen(
     val trip by viewModel.trip.collectAsState()
     val points by viewModel.points.collectAsState()
     val savedAddresses by viewModel.savedAddresses.collectAsState()
+    val classificationRules by viewModel.classificationRules.collectAsState()
+    val settings by viewModel.settings.collectAsState()
     val suggestRuleState by viewModel.suggestRuleState.collectAsState()
+
+    val assessment = remember(trip, classificationRules, savedAddresses, settings) {
+        val t = trip ?: return@remember null
+        fun addressType(address: String?): String? {
+            val saved = AddressMatching.findSavedAddress(address, savedAddresses) ?: return null
+            return saved.addressType ?: when {
+                saved.isHomeLocation -> "THUIS"
+                saved.isWorkLocation -> "WERK"
+                saved.isCustomerLocation -> "KLANT"
+                else -> null
+            }
+        }
+        TripClassification.assessConfidence(
+            tripType = t.tripType,
+            startAddressType = addressType(t.startAddress),
+            endAddressType = addressType(t.endAddress),
+            startAddress = t.startAddress,
+            endAddress = t.endAddress,
+            rules = classificationRules,
+            timestamp = t.startTime,
+            workDaysStr = settings?.workDays,
+            workStartTime = settings?.workStartTime,
+            workEndTime = settings?.workEndTime,
+            isBluetoothTriggered = t.vehicleId != null
+        )
+    }
 
     if (suggestRuleState != null) {
         val (startAddr, endAddr, tripType) = suggestRuleState!!
@@ -407,6 +440,28 @@ fun TripDetailScreen(
                 }
             }
 
+            // Ritaudit & Diagnostiek
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text("ℹ️ Ritaudit & Context", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    val auditPoints = buildList {
+                        if (trip!!.isManual) add("Handmatig ingevoerde rit")
+                        else add("Automatisch geregistreerd via GPS-achtergrondservice")
+                        if (trip!!.vehicleId != null) add("Gekoppeld aan actieve carkit / voertuig")
+                        if (!trip!!.appliedRuleName.isNullOrBlank()) add("Automatische regel: ${trip!!.appliedRuleName}")
+                        if (trip!!.privateDetourMeters > 0) add("Privé-omrijden: ${String.format(locale, "%.1f km", trip!!.privateDetourMeters / 1000.0)} verwerkt")
+                    }
+                    auditPoints.forEach { item ->
+                        Text("• $item", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+
             if (trip!!.status == "TO_REVIEW") {
                 val tripOptions = listOf("Home To Work", "Business Meeting", "Customer Visit", "Customer Billable", "Commissioned By CIMSOLUTIONS", "Exam Course", "Car Maintenance")
                 var selectedType by remember(trip!!.tripType) { 
@@ -457,6 +512,67 @@ fun TripDetailScreen(
                             TextButton(onClick = { showNoteRequiredDialog = false }) { Text(stringResource(R.string.cancel)) }
                         }
                     )
+                }
+
+                if (assessment != null) {
+                    val suggestedTypeName = when (assessment.category) {
+                        TripCategory.COMMUTE -> "Woon-werk"
+                        TripCategory.BUSINESS -> "Zakelijk"
+                        TripCategory.PRIVATE -> "Privé"
+                    }
+                    val targetTripType = when (assessment.category) {
+                        TripCategory.COMMUTE -> "Home To Work"
+                        TripCategory.BUSINESS -> if (trip!!.tripType in listOf("Home To Work", "Business Meeting", "Customer Visit", "Customer Billable", "Commissioned By CIMSOLUTIONS", "Exam Course", "Car Maintenance")) trip!!.tripType else "Business Meeting"
+                        TripCategory.PRIVATE -> "Private"
+                    }
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (assessment.isHighConfidence) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("💡 Suggestie van CIMDriver", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                Surface(
+                                    color = if (assessment.isHighConfidence) Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text(
+                                        text = "${assessment.confidenceScore}% zeker",
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "Voorstel: $suggestedTypeName ($targetTripType)",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = assessment.reasoning,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Button(
+                                onClick = { viewModel.quickApprove(targetTripType) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("✓ Direct accepteren ($suggestedTypeName)")
+                            }
+                        }
+                    }
                 }
 
                 Card(
@@ -608,7 +724,7 @@ fun MapLibreMapView(points: List<com.cimdriver.app.data.local.entity.LocationPoi
                             val latLngs = points.map { LatLng(it.latitude, it.longitude) }
 
                             if (latLngs.size > 1) {
-                                mapboxMap.addPolyline(PolylineOptions().addAll(latLngs).color(Color.BLUE).width(5f))
+                                mapboxMap.addPolyline(PolylineOptions().addAll(latLngs).color(android.graphics.Color.BLUE).width(5f))
                             }
                             mapboxMap.addMarker(MarkerOptions().position(latLngs.first()).title(context.getString(R.string.start)))
 

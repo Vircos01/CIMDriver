@@ -2,6 +2,20 @@ import Foundation
 
 struct DashboardStatsCalculator {
     
+    static func calculateFiscalYearProjection(
+        ytdPriveKm: Double,
+        now: Date = Date()
+    ) -> Double {
+        let cal = Calendar.current
+        guard let dayOfYear = cal.ordinality(of: .day, in: .year, for: now),
+              let rangeOfDays = cal.range(of: .day, in: .year, for: now) else {
+            return ytdPriveKm
+        }
+        let totalDays = rangeOfDays.count
+        guard dayOfYear > 0 else { return ytdPriveKm }
+        return (ytdPriveKm / Double(dayOfYear)) * Double(totalDays)
+    }
+
     static func calculateProRataLimit(
         yearlyLimit: Int,
         inServiceDate: Date?,
@@ -180,7 +194,8 @@ struct DashboardStatsCalculator {
             prevZakelijkKm: Double(prevZakelijkMeters) / 1000.0,
             prevPriveKm: Double(prevPriveMeters) / 1000.0,
             prevWoonWerkKm: Double(prevWoonWerkMeters) / 1000.0,
-            ytdPriveKm: Double(ytdPriveMeters) / 1000.0
+            ytdPriveKm: Double(ytdPriveMeters) / 1000.0,
+            projectedYearEndPriveKm: calculateFiscalYearProjection(ytdPriveKm: Double(ytdPriveMeters) / 1000.0)
         )
     }
     

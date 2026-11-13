@@ -118,28 +118,8 @@ struct DashboardView: View {
                     // 1. Tracking Status (Bestaand)
                     statusCard
                     
-                    // 1.5 Actiekaarten (TO_REVIEW)
-                    if tripsToReviewCount > 0 {
-                        reviewCard(
-                            title: "Actie vereist",
-                            message: "\(tripsToReviewCount) ritten moeten nog beoordeeld worden.",
-                            buttonTitle: "Bekijk ritten",
-                            color: .red
-                        ) {
-                            selectedTab = 1
-                        }
-                    }
-                    
-                    if workDaysToReviewCount > 0 {
-                        reviewCard(
-                            title: "Controleer werkuren",
-                            message: "\(workDaysToReviewCount) werkdagen moeten nog bevestigd worden.",
-                            buttonTitle: "Bekijk werkuren",
-                            color: .orange
-                        ) {
-                            selectedTab = 2
-                        }
-                    }
+                    // 1.5 Dagelijkse Inbox (Uitzonderingen & Triage)
+                    dailyInboxCard
                     
                     // 2. Voertuig Info & Waarschuwingen
                     if let activeVehicle = activeVehicle {
@@ -433,6 +413,20 @@ struct DashboardView: View {
                     .foregroundColor(.secondary)
                     .padding(.top, -4)
             }
+
+            if stats.projectedYearEndPriveKm > 0 {
+                let projected = Int(stats.projectedYearEndPriveKm)
+                let exceedsProjected = projected > limit
+                HStack(spacing: 6) {
+                    Image(systemName: exceedsProjected ? "exclamationmark.triangle.fill" : "chart.line.uptrend.xyaxis")
+                        .foregroundColor(exceedsProjected ? .red : .secondary)
+                        .font(.caption)
+                    Text("Prognose jaareinde: ~\(projected) km\(exceedsProjected ? " (overschrijding verwacht!)" : "")")
+                        .font(.caption)
+                        .foregroundColor(exceedsProjected ? .red : .secondary)
+                }
+                .padding(.top, -2)
+            }
         }
         .padding()
         .background(Color(.secondarySystemGroupedBackground))
@@ -468,30 +462,88 @@ struct DashboardView: View {
         .padding(.horizontal)
     }
     
-    private func reviewCard(title: String, message: String, buttonTitle: String, color: Color, action: @escaping () -> Void) -> some View {
-        VStack(spacing: 12) {
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(color)
-            Text(message)
-                .font(.subheadline)
-                .multilineTextAlignment(.center)
-            Button(action: action) {
-                Text(buttonTitle)
-                    .bold()
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
+    private var dailyInboxCard: some View {
+        let totalItems = tripsToReviewCount + workDaysToReviewCount
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("Dagelijkse Inbox", systemImage: "tray.full.fill")
+                    .font(.headline)
+                    .foregroundColor(totalItems > 0 ? Color.cimNavy : .secondary)
+                Spacer()
+                if totalItems > 0 {
+                    Text("\(totalItems) open")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.red.opacity(0.15))
+                        .foregroundColor(.red)
+                        .clipShape(Capsule())
+                } else {
+                    Text("Bijgewerkt")
+                        .font(.caption.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.cimGreen.opacity(0.15))
+                        .foregroundColor(Color.cimGreen)
+                        .clipShape(Capsule())
+                }
             }
-            .buttonStyle(.borderedProminent)
-            .tint(color)
+            
+            if totalItems == 0 {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(Color.cimGreen)
+                    Text("Alles staat goed. Geen ritten of uren die aandacht vereisen.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
+            } else {
+                if tripsToReviewCount > 0 {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(tripsToReviewCount) ritten te beoordelen")
+                                .font(.subheadline.bold())
+                            Text("Classificeer type en projectcode")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button("Beoordelen") {
+                            selectedTab = 1
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color.cimNavy)
+                        .controlSize(.small)
+                    }
+                }
+                
+                if workDaysToReviewCount > 0 {
+                    if tripsToReviewCount > 0 {
+                        Divider()
+                    }
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(workDaysToReviewCount) werkdagen te bevestigen")
+                                .font(.subheadline.bold())
+                            Text("Aanwezigheid en uren afronden")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button("Bevestigen") {
+                            selectedTab = 2
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color.orange)
+                        .controlSize(.small)
+                    }
+                }
+            }
         }
         .padding()
-        .background(color.opacity(0.1))
+        .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(color.opacity(0.3), lineWidth: 1)
-        )
         .padding(.horizontal)
     }
     

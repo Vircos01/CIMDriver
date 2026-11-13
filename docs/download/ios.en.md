@@ -5,9 +5,14 @@ hide:
 
 # 📦 Installation: iOS (iPhone)
 
-The current stable preview is **Version 0.0.8 Alpha** (Build 4).
+The current stable preview is **Version 0.0.9 Alpha** (Build 5).
 
-This release brings the iOS app into full parity with Android:
+This release brings the iOS app into full parity with Android Phase 5 (Assisted Decision-Making):
+- Daily Exceptions Inbox ("Daily Triage") on the Dashboard
+- Confidence scoring (0–100%) & gentle single-tap review suggestions
+- Trip audit & contextual details in Trip Details
+- Adaptive GPS jitter filtering while stationary
+- Fiscal year-end private km projection with early threshold alert
 - Fiscal compliance & private detour kilometers (Belastingdienst guidelines)
 - Landscape A4 PDF trip export & periodic work hours export
 - RDW license plate lookup & vehicle powertrain classification (ICE, PHEV, EV)

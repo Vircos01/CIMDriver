@@ -41,4 +41,35 @@ class TripClassificationTest {
             TripClassification.classify("Business Meeting", "KLANT", "KANTOOR", rules = listOf(rule))
         )
     }
+
+    @Test
+    fun confidenceAssessmentHighForCommute() {
+        val assessment = TripClassification.assessConfidence(
+            tripType = null,
+            startAddressType = "THUIS",
+            endAddressType = "WERK",
+            isBluetoothTriggered = true
+        )
+        assertEquals(TripCategory.COMMUTE, assessment.category)
+        assert(assessment.confidenceScore >= 90)
+        assert(assessment.isHighConfidence)
+    }
+
+    @Test
+    fun confidenceAssessmentForExactRule() {
+        val rule = ClassificationRule(
+            name = "Vaste route",
+            startAddress = "Kerkstraat 1",
+            endAddress = "Dorpsplein 5",
+            category = "BUSINESS"
+        )
+        val assessment = TripClassification.assessConfidence(
+            tripType = null,
+            startAddress = "Kerkstraat 1",
+            endAddress = "Dorpsplein 5",
+            rules = listOf(rule)
+        )
+        assertEquals(TripCategory.BUSINESS, assessment.category)
+        assert(assessment.confidenceScore >= 95)
+    }
 }

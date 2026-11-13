@@ -2,6 +2,17 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.5.0] - 2026-11-13
+
+### Toegevoegd & Verbeterd
+- **Fase 5: Assisted Decision-Making & Slimme Rust:**
+  - **Dagelijkse Uitzonderingen-Inbox ("Daily Triage"):** Eén overzichtelijke inbox-kaart op het Dashboard die alle openstaande items bundelt (te beoordelen ritten, onbevestigde werkdagen, ontbrekende kilometerstanden en concept-tankbeurten). Inclusief een 1-tik goedkeurknop om alle ritten met hoge betrouwbaarheid in één keer af te handelen.
+  - **Confidence Score & Zachte Reviewvoorstellen:** Elk reviewgeval krijgt een dynamische betrouwbaarheidsscore (0–100%) en een duidelijke menselijke redenatie. In ritdetails kan het voorstel direct met één tik worden overgenomen.
+  - **Ritaudit & Contextuele Diagnostiek:** Nieuwe transparante ritauditkaart in ritdetails met vermelding of de rit via de GPS-achtergrondservice of handmatig is gestart, welke bluetooth/voertuigverbinding actief was en of er privé-omrijkilometers zijn verrekend.
+  - **Permission & Battery Health Monitor:** Proactieve bewaking van essentiële achtergrondinstellingen (batterij-optimalisatie/doze-mode uitschakeling, notificaties, locatietoegang en Bluetooth) met een directe herstelknop bij potentiële problemen.
+  - **Netwerk- & Securityhygiëne:** In `AndroidManifest.xml` is het permissieve `usesCleartextTraffic="true"` vervangen door een restrictieve `network_security_config.xml`. Externe API's (RDW, OSRM, Nominatim) communiceren strikt via HTTPS en onversleuteld verkeer is uitsluitend toegestaan voor de lokale Zepp-companion op localhost (`127.0.0.1:8765`).
+  - **Adaptieve Tracking & Fiscale Jaarprognose:** GPS-jitter bij stilstand (bijvoorbeeld voor stoplichten of tijdens parkeren) wordt adaptief gefilterd om onnodige afstandstoename te voorkomen. Op het dashboard toont de privékilometerkaart nu een nauwkeurige extrapolatie naar het einde van het fiscale jaar met een tijdige waarschuwing bij nadering van de 500 km grens.
+
 ## [1.4.1] - 2026-11-13
 
 ### Opgelost & Verbeterd

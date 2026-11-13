@@ -4,7 +4,18 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.4.1 (Current Version)
+## Version 1.5.0 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 5: Assisted Decision-Making & Calm Autonomy"
+    * **Daily Exceptions Inbox ("Daily Triage"):** Unified inbox on the Dashboard consolidating all open action items (trips to review, unconfirmed workdays, odometer gaps, and fuel drafts) with a single-tap bulk approval for high-confidence trips.
+    * **Confidence Scoring & Review Suggestions:** Algorithmic confidence scoring (0–100%) for review cases with transparent reasoning ("Exact route rule matched", "Regular commute", etc.) and single-tap approval in Trip Details.
+    * **Trip Audit & Contextual Diagnostics:** Clear audit card in Trip Details showing registration origin (GPS background service vs manual), connected vehicle/carkit, and private detour calculations.
+    * **Permission & Battery Health Monitor:** Proactive alerts on the dashboard if battery optimization (Doze mode), location, notifications, or Bluetooth permissions risk tracking reliability, with 1-tap system setting repair intents.
+    * **Hardened Network & Security Hygiene:** Replaced global cleartext traffic with strict `network_security_config.xml`. All external traffic (RDW, OSRM, Nominatim) is enforced over HTTPS; cleartext is restricted to localhost (`127.0.0.1:8765`) for the local Zepp companion server.
+    * **Adaptive Tracking & Fiscal Year Projection:** Stationary GPS jitter filter suppresses drift while stopped at traffic lights. The dashboard private kilometers card displays a predictive fiscal year-end extrapolation with early warning before exceeding the 500 km limit.
+
+## Version 1.4.1
 *Release date: November 13, 2026*
 
 !!! bug "Bug Fixes & Stability"

@@ -1,6 +1,6 @@
 {
-  "versionCode": 36,
-  "versionName": "1.4.1",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.4.1.apk",
-  "releaseNotes": "Versie 1.4.1: Hotfix voor crash direct bij het openen van de app (tabelnaam in database-migratie gecorrigeerd)."
+  "versionCode": 37,
+  "versionName": "1.5.0",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.5.0.apk",
+  "releaseNotes": "Versie 1.5.0: Fase 5 - Assisted Decision-Making & Slimme Rust: Dagelijkse Uitzonderingen-Inbox, Confidence Scoring & 1-tap review suggesties, Ritaudit Context, Permission & Battery Health Monitor, adaptieve GPS-jitter filtering, netwerk security config en fiscale jaareindprognose voor privékilometers."
 }

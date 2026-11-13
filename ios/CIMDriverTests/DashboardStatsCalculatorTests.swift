@@ -100,4 +100,15 @@ final class DashboardStatsCalculatorTests: XCTestCase {
         XCTAssertEqual(stats.priveKm, 5.0, "Private distance should receive private detour")
         XCTAssertEqual(stats.ytdPriveKm, 5.0, "YTD private distance should include private detour")
     }
+
+    func testFiscalYearProjection() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        // Mid-year test date (day ~182.5)
+        let midYear = formatter.date(from: "2024-07-01")!
+        let projection = DashboardStatsCalculator.calculateFiscalYearProjection(ytdPriveKm: 250.0, now: midYear)
+        // 2024 is leap year (366 days), July 1 is day 183
+        XCTAssertGreaterThan(projection, 490.0)
+        XCTAssertLessThan(projection, 510.0)
+    }
 }

@@ -111,6 +111,84 @@ object TripClassification {
         listOf(rule.startAddressType, rule.endAddressType, rule.tripType, rule.startAddress, rule.endAddress).count { !it.isNullOrBlank() }
     }
 
+    data class ConfidenceAssessment(
+        val category: TripCategory,
+        val confidenceScore: Int, // 0 - 100
+        val reasoning: String
+    ) {
+        val isHighConfidence: Boolean get() = confidenceScore >= 85
+    }
+
+    fun assessConfidence(
+        tripType: String?,
+        startAddressType: String? = null,
+        endAddressType: String? = null,
+        startAddress: String? = null,
+        endAddress: String? = null,
+        rules: List<ClassificationRule> = emptyList(),
+        timestamp: Long? = null,
+        workDaysStr: String? = null,
+        workStartTime: String? = null,
+        workEndTime: String? = null,
+        isBluetoothTriggered: Boolean = false,
+        defaultCategory: TripCategory = TripCategory.PRIVATE
+    ): ConfidenceAssessment {
+        val matchingRule = findMatchingRule(tripType, startAddressType, endAddressType, startAddress, endAddress, rules)
+        val isCommutePair = (startAddressType == "THUIS" && endAddressType == "WERK") ||
+            (startAddressType == "WERK" && endAddressType == "THUIS")
+        val isCustomer = startAddressType == "KLANT" || endAddressType == "KLANT"
+        val outsideHours = if (timestamp != null && workDaysStr != null && workStartTime != null && workEndTime != null) {
+            isOutsideWorkHours(timestamp, workDaysStr, workStartTime, workEndTime)
+        } else false
+
+        var score = 50
+        val category: TripCategory
+        val reasoning: String
+
+        if (matchingRule != null) {
+            val ruleCat = when (matchingRule.category) {
+                "BUSINESS" -> TripCategory.BUSINESS
+                "COMMUTE" -> TripCategory.COMMUTE
+                "PRIVATE" -> TripCategory.PRIVATE
+                else -> defaultCategory
+            }
+            category = ruleCat
+            val isExact = !matchingRule.startAddress.isNullOrBlank() && !matchingRule.endAddress.isNullOrBlank()
+            score = if (isExact) 96 else 88
+            reasoning = if (isExact) "Vaste route-regel matched exact" else "Classificatieregel matched adrestypes"
+        } else if (isCommutePair || tripType == "COMMUTE" || tripType == DYNAMICS_HOME_TO_WORK) {
+            category = TripCategory.COMMUTE
+            score = 92
+            reasoning = "Herkend als vaste woon-werktraject (Thuis ↔ Werk)"
+        } else if (isCustomer) {
+            category = TripCategory.BUSINESS
+            score = 88
+            reasoning = "Rit van of naar een opgeslagen klantlocatie"
+        } else if (outsideHours) {
+            category = TripCategory.PRIVATE
+            score = 82
+            reasoning = "Gereden buiten reguliere werktijden of in het weekend"
+        } else if (tripType in businessTripTypes) {
+            category = TripCategory.BUSINESS
+            score = 75
+            reasoning = "Zakelijk rittype geselecteerd"
+        } else if (tripType == "PRIVATE" || tripType == DYNAMICS_PERSONAL) {
+            category = TripCategory.PRIVATE
+            score = 75
+            reasoning = "Privé rittype geselecteerd"
+        } else {
+            category = defaultCategory
+            score = 45
+            reasoning = "Onbekende route; controleer de classificatie"
+        }
+
+        if (isBluetoothTriggered && score < 95) {
+            score = minOf(98, score + 6)
+        }
+
+        return ConfidenceAssessment(category = category, confidenceScore = score, reasoning = reasoning)
+    }
+
     fun isOutsideWorkHours(timestamp: Long, workDaysStr: String, workStartTime: String, workEndTime: String): Boolean {
         if (workDaysStr.isBlank() || workStartTime.isBlank() || workEndTime.isBlank()) return false
         

@@ -6,7 +6,18 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.4.1 (Huidige Versie)
+## Versie 1.5.0 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 5: Assisted Decision-Making & Slimme Rust"
+    * **Dagelijkse Uitzonderingen-Inbox ("Daily Triage"):** Eén gecombineerde inbox op het Dashboard die alle openstaande acties verzamelt (te beoordelen ritten, onbevestigde werkdagen, ontbrekende kilometerstanden en concept-tankbeurten). Bevat een snelle 1-tik goedkeurknop om alle ritten met hoge betrouwbaarheid in één keer te fiatteren.
+    * **Confidence Scoring & Reviewvoorstellen:** Automatische betrouwbaarheidsscore (0–100%) voor twijfelgevallen met een duidelijke uitleg ("Vaste route-regel matched exact", "Reguliere woon-werk route", etc.). In de ritdetails kan het voorstel direct met één tik worden goedgekeurd.
+    * **Ritaudit & Contextuele Diagnostiek:** Nieuwe transparante ritauditkaart in ritdetails die precies toont hoe de rit is geregistreerd (GPS-achtergrondservice of handmatig), welk voertuig/carkit was verbonden en of er privé-omrijden is verrekend.
+    * **Permission & Battery Health Monitor:** Proactieve waarschuwingen op het dashboard als batterij-optimalisatie, locatietoegang, notificaties of bluetooth-permissies de trackingbetrouwbaarheid bedreigen, inclusief directe herstelknoppen naar de Android-systeeminstellingen.
+    * **Hardere Netwerk- & Securityhygiëne:** `usesCleartextTraffic` is verwijderd en vervangen door een strikte `network_security_config.xml`. Externe API's (RDW, OSRM, Nominatim) draaien uitsluitend over HTTPS; onversleuteld verkeer is strikt beperkt tot de lokale Zepp-companion op localhost (`127.0.0.1:8765`).
+    * **Adaptieve GPS-Tracking & Fiscale Prognose:** Stilstand-jitterfilter die mini-bewegingen bij stoplichten negeert. De privékilometerkaart op het dashboard toont nu een voorspellende jaareindprognose en waarschuwt tijdig wanneer de fiscale 500 km-grens dreigt te worden overschreden.
+
+## Versie 1.4.1
 *Releasedatum: 13 november 2026*
 
 !!! bug "Bugfixes & Stabiliteit"

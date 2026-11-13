@@ -4,6 +4,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
+## Versie 0.0.9 Alpha (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 5: Assisted Decision-Making & Dashboard Rust (Android Feature Sync)"
+    * **Dagelijkse Uitzonderingen-Inbox:** Geconsolideerde triage-kaart op het Dashboard die openstaande ritten en niet-bevestigde werkdagen bundelt in één rustig overzicht.
+    * **Confidence Scoring & Zachte Reviewvoorstellen:** Automatische betrouwbaarheidsscore (0–100%) op basis van classificatieregels, vaste routes en werktijden. In het ritdetailscherm kan de voorgestelde categorie direct met één tik worden overgenomen.
+    * **Ritaudit & Context:** Uitgebreid contextblok in ritdetails met vermelding of de rit via de GPS-achtergrondservice of handmatig is gestart, welk voertuig gekoppeld was en of er privé-omrijden is verrekend.
+    * **Adaptieve GPS-Jitter Filtering:** Onderdrukking van GPS-ruis bij stilstand (< 3m bij < 0.8 m/s binnen 30 seconden) om onnodige batterijbelasting en spookkilometers te voorkomen.
+    * **Fiscale Jaarprognose voor Privékilometers:** De privégrenskaart berekent nu een betrouwbare extrapolatie naar het einde van het fiscale jaar en waarschuwt bij dreigende overschrijding van de 500 km grens.
+
 ## Versie 0.0.8 Alpha
 *Releasedatum: 13 november 2026*
 

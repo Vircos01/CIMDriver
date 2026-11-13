@@ -149,4 +149,37 @@ final class TripClassificationTests: XCTestCase {
         )
         XCTAssertEqual(catWeekend, .privateTrip, "Weekend should force PRIVATE")
     }
+
+    func testAssessConfidence() {
+        let rule = ClassificationRule(
+            name: "Exact",
+            startAddress: "Thuisadres 1",
+            endAddress: "Werkkantoor 2",
+            category: "COMMUTE"
+        )
+        let exactAssessment = TripClassification.assessConfidence(
+            tripType: nil,
+            startAddress: "Thuisadres 1",
+            endAddress: "Werkkantoor 2",
+            rules: [rule]
+        )
+        XCTAssertEqual(exactAssessment.category, .commute)
+        XCTAssertTrue(exactAssessment.isHighConfidence)
+        XCTAssertGreaterThanOrEqual(exactAssessment.confidenceScore, 90)
+
+        let commutePairAssessment = TripClassification.assessConfidence(
+            tripType: nil,
+            startAddressType: "THUIS",
+            endAddressType: "WERK"
+        )
+        XCTAssertEqual(commutePairAssessment.category, .commute)
+        XCTAssertTrue(commutePairAssessment.isHighConfidence)
+
+        let customerAssessment = TripClassification.assessConfidence(
+            tripType: nil,
+            startAddressType: "KLANT"
+        )
+        XCTAssertEqual(customerAssessment.category, .business)
+        XCTAssertTrue(customerAssessment.isHighConfidence)
+    }
 }

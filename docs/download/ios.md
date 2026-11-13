@@ -5,9 +5,14 @@ hide:
 
 # 📦 Installatie: iOS (iPhone)
 
-De huidige stabiele testversie is **Versie 0.0.8 Alpha** (Build 4).
+De huidige stabiele testversie is **Versie 0.0.9 Alpha** (Build 5).
 
-Deze release brengt de iOS-versie volledig in sync met alle functies van Android:
+Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 5 (Assisted Decision-Making):
+- Dagelijkse Uitzonderingen-Inbox ("Daily Triage") op het Dashboard
+- Confidence scoring (0–100%) & zachte 1-tik reviewvoorstellen
+- Ritaudit & contextuele gegevens in ritdetails
+- Adaptieve GPS-jitter filtering bij stilstand
+- Fiscale jaarprognose voor privékilometers met tijdige waarschuwing
 - Fiscale compliance & privé-omrijkilometers (Belastingdienst)
 - Liggende A4 PDF rittenadministratie & periodieke werkuren-export
 - RDW Kentekencheck & automatische voertuigclassificatie (ICE, PHEV, EV)

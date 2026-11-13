@@ -59,7 +59,7 @@ flowchart TD
         D1[EV Specifieke Labeling kWh/Snellader] --> D2[Android Auto Volledige Lokalisatie]
     end
 
-    subgraph Fase 5: Assisted Decision-Making & Slimme Rust (⏳ In voorbereiding)
+    subgraph Fase 5: Assisted Decision-Making & Slimme Rust (✅ Gerealiseerd)
         E1[Dagelijkse Uitzonderingen-Inbox] --> E2[Confidence Score & 1-Tap Goedkeuren]
         E2 --> E3[Contextuele Smart Defaults & Menselijke Diagnostiek]
         E3 --> E4[Permission & Battery Health Monitor]
@@ -211,7 +211,7 @@ flowchart TD
 
 ---
 
-### 🟠 Fase 5: Assisted Decision-Making & Slimme Rust (Roadmap v1.5) (⏳ In voorbereiding)
+### 🟢 Fase 5: Assisted Decision-Making & Slimme Rust (Roadmap v1.5) (✅ Gerealiseerd)
 
 > [!TIP]
 > Nu de functionele kern (tracking, exports, RDW, widgets en auto-integraties) staat, verschuift de meerwaarde naar **begeleiding en rust**: de app denkt proactief mee bij twijfelgevallen, lost uitzonderingen op met één tik en bewaakt op de achtergrond de technische en fiscale betrouwbaarheid.

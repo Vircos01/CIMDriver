@@ -42,7 +42,14 @@ data class DashboardStats(
     val prevZakelijkKm: Double = 0.0,
     val prevPriveKm: Double = 0.0,
     val prevWoonWerkKm: Double = 0.0,
-    val ytdPriveKm: Double = 0.0
+    val ytdPriveKm: Double = 0.0,
+    val projectedYearEndPriveKm: Double = 0.0
+)
+
+data class TripReviewCandidate(
+    val trip: Trip,
+    val assessment: TripClassification.ConfidenceAssessment,
+    val suggestedCategoryName: String
 )
 
 data class DistanceChartItem(
@@ -91,6 +98,67 @@ class TripsViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    val tripsToReviewCandidates: StateFlow<List<TripReviewCandidate>> = kotlinx.coroutines.flow.combine(
+        trips, classificationRules, savedAddresses, database.settingsDao().getSettings()
+    ) { allTrips, rules, addresses, settings ->
+        val toReview = allTrips.filter { it.status == TripStatus.TO_REVIEW.value }
+        toReview.map { trip ->
+            fun addressType(address: String?): String? {
+                val saved = AddressMatching.findSavedAddress(address, addresses) ?: return null
+                return saved.addressType ?: when {
+                    saved.isHomeLocation -> "THUIS"
+                    saved.isWorkLocation -> "WERK"
+                    saved.isCustomerLocation -> "KLANT"
+                    else -> null
+                }
+            }
+
+            val assessment = TripClassification.assessConfidence(
+                tripType = trip.tripType,
+                startAddressType = addressType(trip.startAddress),
+                endAddressType = addressType(trip.endAddress),
+                startAddress = trip.startAddress,
+                endAddress = trip.endAddress,
+                rules = rules,
+                timestamp = trip.startTime,
+                workDaysStr = settings?.workDays,
+                workStartTime = settings?.workStartTime,
+                workEndTime = settings?.workEndTime,
+                isBluetoothTriggered = trip.vehicleId != null
+            )
+
+            val catName = when (assessment.category) {
+                TripCategory.BUSINESS -> "Zakelijk"
+                TripCategory.COMMUTE -> "Woon-werk"
+                TripCategory.PRIVATE -> "Privé"
+            }
+
+            TripReviewCandidate(trip, assessment, catName)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun quickApproveTrip(candidate: TripReviewCandidate) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val updated = candidate.trip.copy(
+                status = "DONE",
+                tripType = candidate.assessment.category.name
+            )
+            tripRepository.updateTrip(updated)
+        }
+    }
+
+    fun approveAllHighConfidenceTrips(candidates: List<TripReviewCandidate>) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            candidates.filter { it.assessment.isHighConfidence }.forEach { candidate ->
+                val updated = candidate.trip.copy(
+                    status = "DONE",
+                    tripType = candidate.assessment.category.name
+                )
+                tripRepository.updateTrip(updated)
+            }
+        }
+    }
 
     private val _dismissedMerges = MutableStateFlow<Set<Pair<Long, Long>>>(emptySet())
 

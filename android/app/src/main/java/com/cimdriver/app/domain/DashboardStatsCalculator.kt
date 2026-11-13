@@ -16,6 +16,14 @@ import java.util.Calendar
 
 object DashboardStatsCalculator {
 
+    fun calculateFiscalYearProjection(ytdPrivateKm: Double): Double {
+        val cal = Calendar.getInstance()
+        val dayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+        val totalDays = if (cal.getActualMaximum(Calendar.DAY_OF_YEAR) == 366) 366.0 else 365.0
+        if (dayOfYear <= 0) return ytdPrivateKm
+        return (ytdPrivateKm / dayOfYear.toDouble()) * totalDays
+    }
+
     fun calculateProRataLimit(
         yearlyLimit: Int,
         inServiceDate: Long?,
@@ -180,6 +188,7 @@ object DashboardStatsCalculator {
             }
         }
         
+        val ytdKm = ytdPriveMeters / 1000.0
         return DashboardStats(
             zakelijkKm = totalZakelijkMeters / 1000.0,
             priveKm = totalPriveMeters / 1000.0,
@@ -190,7 +199,8 @@ object DashboardStatsCalculator {
             prevZakelijkKm = prevZakelijkMeters / 1000.0,
             prevPriveKm = prevPriveMeters / 1000.0,
             prevWoonWerkKm = prevWoonWerkMeters / 1000.0,
-            ytdPriveKm = ytdPriveMeters / 1000.0
+            ytdPriveKm = ytdKm,
+            projectedYearEndPriveKm = calculateFiscalYearProjection(ytdKm)
         )
     }
 

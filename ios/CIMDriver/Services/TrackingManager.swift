@@ -426,6 +426,16 @@ class TrackingManager: NSObject, BluetoothServiceDelegate, LocationServiceDelega
     func didUpdateLocation(_ location: CLLocation) {
         guard let context = modelContext, let trip = activeTrip else { return }
         
+        if let lastPoint = trip.locationPoints.last {
+            let lastLoc = CLLocation(latitude: lastPoint.latitude, longitude: lastPoint.longitude)
+            let distance = location.distance(from: lastLoc)
+            let elapsed = location.timestamp.timeIntervalSince(lastPoint.timestamp)
+            // Adaptive tracking: suppress stationary GPS jitter (< 3m at < 0.8 m/s within 30s)
+            if distance < 3.0 && location.speed < 0.8 && elapsed < 30.0 && elapsed >= 0 {
+                return
+            }
+        }
+
         let point = LocationPoint(
             trip: trip,
             latitude: location.coordinate.latitude,

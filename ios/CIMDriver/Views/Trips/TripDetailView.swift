@@ -5,6 +5,9 @@ import MapKit
 struct TripDetailView: View {
     @Environment(\.modelContext) private var modelContext
     let trip: Trip
+    @Query private var rules: [ClassificationRule]
+    @Query private var addresses: [SavedAddress]
+    @Query private var settingsList: [AppSettings]
     @State private var showingEditSheet = false
     @Environment(\.dismiss) private var dismiss
     
@@ -13,6 +16,30 @@ struct TripDetailView: View {
     @State private var showingDeleteAlert = false
     @State private var showingFavoriteAlert = false
     @State private var favoriteRouteName = ""
+    
+    private var assessment: TripClassification.ConfidenceAssessment {
+        let startAddrType = addresses.first(where: { $0.address.lowercased() == (trip.startAddress ?? "").lowercased() })?.addressType
+        let endAddrType = addresses.first(where: { $0.address.lowercased() == (trip.endAddress ?? "").lowercased() })?.addressType
+        return TripClassification.assessConfidence(
+            tripType: trip.tripType,
+            startAddressType: startAddrType,
+            endAddressType: endAddrType,
+            startAddress: trip.startAddress,
+            endAddress: trip.endAddress,
+            rules: rules,
+            timestamp: trip.startTime,
+            appSettings: settingsList.first,
+            isBluetoothTriggered: trip.vehicle != nil
+        )
+    }
+
+    private var suggestedTripTypeString: String {
+        switch assessment.category {
+        case .commute: return "COMMUTE"
+        case .business: return "BUSINESS"
+        case .privateTrip: return "PRIVATE"
+        }
+    }
     
     private var coordinates: [CLLocationCoordinate2D] {
         trip.locationPoints.sorted { $0.timestamp < $1.timestamp }.map {
@@ -24,6 +51,164 @@ struct TripDetailView: View {
         guard let end = trip.endTime else { return "-" }
         let minutes = max(0, Int(end.timeIntervalSince(trip.startTime) / 60))
         return "\(minutes)m"
+    }
+
+    private var odometerSummaryText: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = "."
+        formatter.locale = Locale(identifier: "nl_NL")
+        let start = formatter.string(from: NSNumber(value: trip.odometerStart)) ?? "\(trip.odometerStart)"
+        let end = trip.odometerEnd.flatMap { formatter.string(from: NSNumber(value: $0)) } ?? "—"
+        return "Km-stand: \(start) km → \(end) km"
+    }
+
+    private var auditContextView: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text("ℹ️ Ritaudit & Context")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+            Text(trip.isManual ? "• Handmatig ingevoerde rit" : "• Automatisch geregistreerd via GPS")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            if let vehicle = trip.vehicle {
+                Text("• Voertuig: \(vehicle.make) \(vehicle.model) (\(vehicle.licensePlate))")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            if trip.privateDetourMeters > 0 {
+                Text("• Privé-omrijden verwerkt: \(String(format: "%.1f km", Double(trip.privateDetourMeters) / 1000.0))")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private var reviewActionOverlay: some View {
+        VStack(spacing: 8) {
+            Spacer()
+            
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("💡 Suggestie van CIMDriver")
+                        .font(.caption.bold())
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text("\(assessment.confidenceScore)% zeker")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(assessment.isHighConfidence ? Color.cimGreen.opacity(0.15) : Color.blue.opacity(0.15))
+                        .foregroundColor(assessment.isHighConfidence ? Color.cimGreen : Color.blue)
+                        .clipShape(Capsule())
+                }
+                
+                let catTitle = assessment.category == .commute ? "Woon-Werk" : (assessment.category == .business ? "Zakelijk" : "Privé")
+                Text("Voorstel: \(catTitle) — \(assessment.reasoning)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Button(action: { quickClassify(suggestedTripTypeString) }) {
+                    Text("✓ Accepteren (\(catTitle))")
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(assessment.isHighConfidence ? Color.cimGreen : Color.cimNavy)
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+            }
+            .padding()
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(radius: 3)
+            .padding(.horizontal)
+            
+            HStack(spacing: 12) {
+                Button(action: { quickClassify("BUSINESS") }) {
+                    Text("Zakelijk")
+                        .font(.caption.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.cimNavy.opacity(0.15))
+                        .foregroundColor(Color.cimNavy)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                
+                Button(action: { quickClassify("COMMUTE") }) {
+                    Text("Woon-Werk")
+                        .font(.caption.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.blue.opacity(0.15))
+                        .foregroundColor(.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                
+                Button(action: { quickClassify("PRIVATE") }) {
+                    Text("Privé")
+                        .font(.caption.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.orange.opacity(0.15))
+                        .foregroundColor(.orange)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+        }
+        .background(Color(.systemBackground).opacity(0.95))
+        .shadow(radius: 5, y: -2)
+    }
+
+    private var infoCardOverlay: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            let dateStr = trip.startTime.formatted(date: .abbreviated, time: .omitted)
+            let startT = trip.startTime.formatted(date: .omitted, time: .shortened)
+            let endT = trip.endTime?.formatted(date: .omitted, time: .shortened) ?? "-"
+            
+            Text("Datum: \(dateStr), \(startT) - \(endT)")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            
+            Text("Van: \(trip.startAddress ?? "Onbekend")")
+                .font(.subheadline)
+                .bold()
+            Text("Naar: \(trip.endAddress ?? "Onbekend")")
+                .font(.subheadline)
+                .bold()
+            
+            HStack {
+                Text("Afstand: ") + Text(String(format: "%.1f km", Double(trip.distanceMeters) / 1000.0)).bold()
+                Text("Duur: \(durationString)")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("Type: \(typeString)")
+                    .foregroundStyle(.secondary)
+            }
+            .font(.subheadline)
+            .padding(.top, 4)
+            
+            Text(odometerSummaryText)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
+            if trip.privateDetourMeters > 0 {
+                Text("Privé-omrijden: \(String(format: "%.1f km", Double(trip.privateDetourMeters) / 1000.0))")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+
+            Divider()
+
+            auditContextView
+        }
+        .padding()
+        .background(Color(.systemBackground).opacity(0.95))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(radius: 5)
+        .padding()
     }
     
     private var typeString: String {
@@ -77,99 +262,11 @@ struct TripDetailView: View {
             }
             
             // Info Card Overlay
-            VStack(alignment: .leading, spacing: 8) {
-                let dateStr = trip.startTime.formatted(date: .abbreviated, time: .omitted)
-                let startT = trip.startTime.formatted(date: .omitted, time: .shortened)
-                let endT = trip.endTime?.formatted(date: .omitted, time: .shortened) ?? "-"
-                
-                Text("Datum: \(dateStr), \(startT) - \(endT)")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                
-                Text("Van: \(trip.startAddress ?? "Onbekend")")
-                    .font(.subheadline)
-                    .bold()
-                Text("Naar: \(trip.endAddress ?? "Onbekend")")
-                    .font(.subheadline)
-                    .bold()
-                
-                HStack {
-                    Text("Afstand: ") + Text(String(format: "%.1f km", Double(trip.distanceMeters) / 1000.0)).bold()
-                    Text("Duur: \(durationString)")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text("Type: \(typeString)")
-                        .foregroundStyle(.secondary)
-                }
-                .font(.subheadline)
-                .padding(.top, 4)
-                
-                let numberFormatter: NumberFormatter = {
-                    let formatter = NumberFormatter()
-                    formatter.numberStyle = .decimal
-                    formatter.groupingSeparator = "."
-                    formatter.locale = Locale(identifier: "nl_NL")
-                    return formatter
-                }()
-                let odometerStartText = numberFormatter.string(from: NSNumber(value: trip.odometerStart)) ?? String(trip.odometerStart)
-                let odometerEndText = trip.odometerEnd.map {
-                    numberFormatter.string(from: NSNumber(value: $0)) ?? String($0)
-                } ?? "—"
-                Text("Km-stand: \(odometerStartText) km → \(odometerEndText) km")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                
-                if trip.privateDetourMeters > 0 {
-                    Text("Privé-omrijden: \(String(format: "%.1f km", Double(trip.privateDetourMeters) / 1000.0))")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                }
-            }
-            .padding()
-            .background(Color(.systemBackground).opacity(0.95))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(radius: 5)
-            .padding()
+            infoCardOverlay
             
             // Action Buttons for TO_REVIEW
             if trip.status == TripStatus.toReview.rawValue {
-                VStack {
-                    Spacer()
-                    HStack(spacing: 12) {
-                        Button(action: { quickClassify("BUSINESS") }) {
-                            Text("Zakelijk")
-                                .bold()
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.cimNavy)
-                                .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
-                        
-                        Button(action: { quickClassify("COMMUTE") }) {
-                            Text("Woon-Werk")
-                                .bold()
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
-                        
-                        Button(action: { quickClassify("PRIVATE") }) {
-                            Text("Privé")
-                                .bold()
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.orange)
-                                .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemBackground).opacity(0.95))
-                    .shadow(radius: 5, y: -2)
-                }
+                reviewActionOverlay
             }
         }
         .navigationTitle("Rit Details")

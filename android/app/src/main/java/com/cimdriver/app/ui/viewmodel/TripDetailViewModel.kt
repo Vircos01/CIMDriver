@@ -30,6 +30,12 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
     val projectCodes: StateFlow<List<String>> = tripDao.getUniqueProjectCodes()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val classificationRules: StateFlow<List<com.cimdriver.app.data.local.entity.ClassificationRule>> = database.classificationRuleDao().getAllRules()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val settings: StateFlow<com.cimdriver.app.data.local.entity.Settings?> = database.settingsDao().getSettings()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     private val _trip = MutableStateFlow<Trip?>(null)
     val trip: StateFlow<Trip?> = _trip.asStateFlow()
 
@@ -155,6 +161,19 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
             tripDao.updateTrip(updatedTrip)
             _trip.value = updatedTrip
             checkRuleSuggestion(updatedTrip, tripType)
+        }
+    }
+
+    fun quickApprove(suggestedType: String) {
+        val currentTrip = _trip.value ?: return
+        viewModelScope.launch {
+            val updatedTrip = currentTrip.copy(
+                tripType = suggestedType,
+                status = "DONE"
+            )
+            tripDao.updateTrip(updatedTrip)
+            _trip.value = updatedTrip
+            checkRuleSuggestion(updatedTrip, suggestedType)
         }
     }
 

@@ -1009,7 +1009,12 @@ class TrackingService : Service(), LocationListener {
                         location.latitude, location.longitude,
                         result
                     )
-                    if (result[0] / elapsedSeconds > MAX_PLAUSIBLE_SPEED_METERS_PER_SECOND) return@launch
+                    val distanceMeters = result[0]
+                    // Adaptive tracking: suppress stationary GPS jitter (< 3m at < 0.8 m/s within 30s)
+                    if (distanceMeters < 3f && location.speed < 0.8f && elapsedSeconds < 30f) {
+                        return@launch
+                    }
+                    if (distanceMeters / elapsedSeconds > MAX_PLAUSIBLE_SPEED_METERS_PER_SECOND) return@launch
                 }
             }
             val point = LocationPoint(
