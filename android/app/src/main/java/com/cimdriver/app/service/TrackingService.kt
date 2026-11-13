@@ -360,6 +360,27 @@ class TrackingService : Service(), LocationListener {
                 )
             }
         }
+
+        // If the last GPS fix occurred before entering a garage at arrival, append a location point at the destination
+        var distanceToLastGpsPoint = 0f
+        if (trueEndLat != null && trueEndLon != null && points.isNotEmpty()) {
+            val distResults = FloatArray(1)
+            android.location.Location.distanceBetween(points.last().latitude, points.last().longitude, trueEndLat, trueEndLon, distResults)
+            distanceToLastGpsPoint = distResults[0]
+            if (distanceToLastGpsPoint > 100f) {
+                database.locationPointDao().insertPoint(
+                    com.cimdriver.app.data.local.entity.LocationPoint(
+                        tripId = tripId,
+                        latitude = trueEndLat,
+                        longitude = trueEndLon,
+                        altitude = points.last().altitude,
+                        speed = 0f,
+                        accuracy = 10f,
+                        timestamp = System.currentTimeMillis() - gracePeriodMs
+                    )
+                )
+            }
+        }
         
         var isCommute = false
         var arrivedAtWork = false
@@ -467,18 +488,40 @@ class TrackingService : Service(), LocationListener {
             }
         }
 
-        // Check if GPS was missing/delayed at departure (e.g. parking garage) and recorded distance is less than route query
+        // Calculate missing segments for parking garage exit/entry
+        var missingStartDistanceM = 0
+        if (trueStartLat != null && trueStartLon != null && points.isNotEmpty() && distanceToFirstGpsPoint > 100f) {
+            val startSegment = geocoderService.getOsrmDistance(
+                trueStartLat, trueStartLon,
+                points.first().latitude, points.first().longitude
+            )
+            missingStartDistanceM = startSegment?.first?.toInt() ?: distanceToFirstGpsPoint.toInt()
+        }
+
+        var missingEndDistanceM = 0
+        if (trueEndLat != null && trueEndLon != null && points.isNotEmpty() && distanceToLastGpsPoint > 100f) {
+            val endSegment = geocoderService.getOsrmDistance(
+                points.last().latitude, points.last().longitude,
+                trueEndLat, trueEndLon
+            )
+            missingEndDistanceM = endSegment?.first?.toInt() ?: distanceToLastGpsPoint.toInt()
+        }
+
+        // Check if GPS was missing/delayed at departure (e.g. parking garage)
         val isDelayedGpsFix = points.isEmpty() ||
                 (distanceToFirstGpsPoint > 100f) ||
                 (startMatch != null && startMatch.reason == com.cimdriver.app.util.AddressMatching.MatchReason.COORDINATE && startMatch.distanceMeters > 100f)
 
+        // Adjust distance: adds missing garage segments directly to the actual driven route!
         val finalDistanceM = TripDistance.adjustForParkingGarageOrDelayedGps(
             recordedDistanceMeters = recordedDistance,
-            expectedDistanceMeters = expectedDistance,
+            expectedDirectDistanceMeters = expectedDistance,
+            missingStartDistanceMeters = missingStartDistanceM,
+            missingEndDistanceMeters = missingEndDistanceM,
             isDelayedGpsFix = isDelayedGpsFix
         )
         if (finalDistanceM != recordedDistance) {
-            Log.i("TrackingService", "Parkeergarage / vertraagde GPS-fix: ritafstand bijgesteld van $recordedDistance m naar verwachte routeafstand $finalDistanceM m ($finalStartAddress -> $finalEndAddress)")
+            Log.i("TrackingService", "Parkeergarage / vertraagde GPS-fix: ritafstand bijgesteld van $recordedDistance m naar $finalDistanceM m (inclusief werkelijk afgelegde route: +$missingStartDistanceM m start, +$missingEndDistanceM m eind, route direct: $expectedDistance m)")
         }
 
         val odoEnd = TripDistance.updatedOdometer(currentTrip.odometerStart, finalDistanceM)

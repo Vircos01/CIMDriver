@@ -10,22 +10,36 @@ object TripDistance {
         currentKilometers + metersToOdometerKilometers(distanceMeters)
 
     /**
-     * Checks if the recorded GPS distance is smaller than the calculated route distance
-     * due to exiting a parking garage or delayed GPS acquisition, and adjusts the distance accordingly.
+     * Checks if the recorded GPS distance missed parts of the route due to exiting or entering
+     * a parking garage (or delayed GPS acquisition), and adjusts the distance accordingly while
+     * fully respecting any detours or alternative routes driven.
      */
     fun adjustForParkingGarageOrDelayedGps(
         recordedDistanceMeters: Int,
-        expectedDistanceMeters: Int?,
-        isDelayedGpsFix: Boolean,
+        expectedDirectDistanceMeters: Int?,
+        missingStartDistanceMeters: Int = 0,
+        missingEndDistanceMeters: Int = 0,
+        isDelayedGpsFix: Boolean = false,
         minDeviationThresholdMeters: Int = 300
     ): Int {
-        if (expectedDistanceMeters == null || expectedDistanceMeters <= 0) {
-            return recordedDistanceMeters
+        val actualRouteWithMissingSegments = recordedDistanceMeters + missingStartDistanceMeters + missingEndDistanceMeters
+        val directRoute = expectedDirectDistanceMeters ?: 0
+
+        // If specific garage exit/entry segments were missing, add them directly to the actual driven route!
+        if (missingStartDistanceMeters > 0 || missingEndDistanceMeters > 0) {
+            return maxOf(actualRouteWithMissingSegments, directRoute, recordedDistanceMeters)
         }
-        if (recordedDistanceMeters < expectedDistanceMeters &&
-            (isDelayedGpsFix || (expectedDistanceMeters - recordedDistanceMeters >= minDeviationThresholdMeters))) {
-            return expectedDistanceMeters
+
+        // If GPS was delayed at start and no specific segment could be determined:
+        if (isDelayedGpsFix && directRoute > recordedDistanceMeters) {
+            return directRoute
         }
-        return recordedDistanceMeters
+
+        // If recorded distance is substantially shorter than direct route (e.g. general GPS dropouts during trip):
+        if (directRoute > 0 && recordedDistanceMeters < directRoute && (directRoute - recordedDistanceMeters >= minDeviationThresholdMeters)) {
+            return directRoute
+        }
+
+        return maxOf(actualRouteWithMissingSegments, recordedDistanceMeters)
     }
 }
