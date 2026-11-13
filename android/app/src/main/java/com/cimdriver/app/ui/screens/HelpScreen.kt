@@ -19,6 +19,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.CallMerge
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
@@ -125,6 +129,30 @@ fun HelpScreen(onOpenDrawer: () -> Unit) {
                 icon = Icons.Filled.Flag,
                 title = stringResource(R.string.help_targets_title),
                 description = stringResource(R.string.help_targets_desc)
+            )
+
+            HelpSection(
+                icon = Icons.Filled.Info,
+                title = stringResource(R.string.help_inbox_title),
+                description = stringResource(R.string.help_inbox_desc)
+            )
+
+            HelpSection(
+                icon = Icons.Filled.CheckCircle,
+                title = stringResource(R.string.help_precheck_title),
+                description = stringResource(R.string.help_precheck_desc)
+            )
+
+            HelpSection(
+                icon = Icons.Filled.Warning,
+                title = stringResource(R.string.help_detour_title),
+                description = stringResource(R.string.help_detour_desc)
+            )
+
+            HelpSection(
+                icon = Icons.Filled.Build,
+                title = stringResource(R.string.help_diagnostics_title),
+                description = stringResource(R.string.help_diagnostics_desc)
             )
         }
     }
