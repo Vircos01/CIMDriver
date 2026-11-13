@@ -340,6 +340,46 @@ flowchart TD
 
 ---
 
+### 🟠 Fase 7: Slimme Werkuren-Begeleiding, Triage & Target-Coaching (Roadmap v1.7) (🚀 In uitvoering)
+
+> [!IMPORTANT]
+> Na de succesvolle transformatie van de rittenmodule in Fase 5 en 6 (Daily Inbox, Confidence Scoring, Fiscale Voorcontrole), brengt Fase 7 dezelfde mate van volwassenheid, rust en "slimme begeleiding" naar de **werkurenregistratie**.
+
+#### 7.1 Werkuren-Reviewlijst & Uitzonderingen ("Work Hours Triage") (Prioriteit 1)
+- **Concept:** In de Daily Inbox op het Dashboard en in het Werkurenscherm toont de app direct welke dagen actie vereisen:
+  - Dagen met ontbrekende eindtijd (`departureTime == null` terwijl de dag voorbij is).
+  - Dagen met status `TO_REVIEW`.
+  - Dagen met ontbrekende of ongebruikelijke pauze.
+  - Dagen geregistreerd in het weekend of buiten vaste werkdagen.
+
+#### 7.2 Slimme Voorstellen voor Pauze, Eindtijd & Projectcode (Prioriteit 2)
+- **Concept:** Wanneer een werkdag ter controle staat of een eindtijd mist:
+  - **Eindtijd-suggestie:** Berekend op basis van de laatste rit van die dag (vertrektijd van werk / aankomst thuis) of de reguliere werktijd (`settings.workEndTime`).
+  - **Pauze-suggestie:** Conform Arbowet (30 min bij > 5.5u, 45 min bij > 8u).
+  - **Projectcode-suggestie:** Automatisch overgenomen van ritten naar opgeslagen klantlocaties op dezelfde dag.
+  - **1-Tik Acceptatie:** Eén duidelijke knop om het plausibele voorstel direct over te nemen.
+
+#### 7.3 Werkdagstatus in Begrijpelijke Mensentaal (Prioriteit 3)
+- **Concept:** In plaats van puur technische statussen zoals `IN_PROGRESS` of `TO_REVIEW` toont elke werkdagkaart een heldere statusbadge:
+  - 🟢 *"Vrijwel zeker compleet (8.0 uur netto, 30m pauze)"* (≥ 85% confidence).
+  - 🟠 *"Eindtijd ontbreekt (gesuggereerd: 17:00 via laatste rit)"*.
+  - 🟠 *"Geen pauze geregistreerd bij lange werkdag (9.5 uur)"*.
+  - ⚪ *"Geregistreerd in het weekend / op een vrije dag"*.
+
+#### 7.4 Koppeling Ritten naar Werkdagafronding (Prioriteit 4)
+- **Concept:** Zodra een rit naar huis wordt afgerond, sluit CIMDriver hands-free de actieve werkdag af: de vertrektijd van kantoor wordt als eindtijd voorgesteld en de pauze wordt automatisch genormaliseerd.
+
+#### 7.5 Realistische Targetbegeleiding & Resterend Tempo (Prioriteit 5)
+- **Concept:** Het doelenoverzicht toont niet alleen het gerealiseerde percentage, maar ook wat realistisch nodig is:
+  - Aantal resterende werkdagen in de periode.
+  - Resterend tempo: *"Nog 14.5 uur nodig (ca. 7.2 uur per resterende werkdag)"*.
+  - Status: *"Op schema (+3.5 uur voorsprong)"* vs. *"Achterstand (tempo: 8.4 u/dag nodig)"*.
+
+#### 7.6 Herstelbare Werkdagcorrecties (Undo Snackbar / Banner) (Prioriteit 6)
+- **Concept:** Bij snelle 1-tik fiattering of batchgoedkeuring van werkdagen toont de app een `[Ongedaan maken]` actie via Snackbar (Android) of Banner (iOS).
+
+---
+
 ## 4. Prioriterings- en Impactmatrix
 
 | Taak / Verbetering | Fiscale Noodzaak | Gebruikersimpact | Complexiteit | Status / Sprint |
@@ -365,6 +405,12 @@ flowchart TD
 | **6.3 Projectcode-voorstellen & Terugkerende Regels** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.6.0) |
 | **6.4 Herstelbare Wijzigingen (Undo Snackbar)** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.6.0) |
 | **6.5 Back-up Herstel- en Integriteitscheck** | 🟡 Gemiddeld | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.6.0) |
+| **7.1 Werkuren-Reviewlijst & Uitzonderingen (Inbox)** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
+| **7.2 Slimme Voorstellen voor Pauze, Eindtijd & Projectcode** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
+| **7.3 Werkdagstatus in Begrijpelijke Mensentaal** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
+| **7.4 Koppeling Ritten naar Werkdagafronding** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
+| **7.5 Realistische Targetbegeleiding & Resterend Tempo** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
+| **7.6 Herstelbare Werkdagcorrecties (Undo Snackbar/Banner)** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
 
 ---
 

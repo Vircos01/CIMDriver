@@ -4,7 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.6.0 (Current Version)
+## Version 1.7.0 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 7: Smart Work Hours Guidance, Triage & Target Coaching"
+    * **Work Hours Review List & Daily Inbox Integration:** Unconfirmed workdays (missing end time, break discrepancies, or deviations from the work schedule) are consolidated into the Daily Inbox (`DailyInboxCard`) on the Dashboard and inside the Work Hours screen.
+    * **Gentle End Time & Break Suggestions:** Automatic departure time deduction via the recorded return trip home/office or from the day-specific work schedule (`workDays`). Automatic break suggestion compliant with Dutch Working Hours Act (Arbowet: min. 45m for $\ge$ 8h, 30m for $\ge$ 4.5h).
+    * **Workday Status in Plain Language:** Clear status badges per workday (e.g. *"Almost certainly complete (7.5h net, 30m break)"*, *"Missing end time (suggestion: 17:00)"*, *"Long workday (8.2h) without break"*, or *"Registered outside regular work days"*).
+    * **Target Coaching with Dynamic Daily Pace:** Target progress now dynamically computes remaining active work days in the current period based on your work schedule, with motivating pacing guidance (e.g. *"16.5h needed over 2 remaining work days (8.3h/day)"*).
+    * **Single-Tap Approval with Reversible Undo:** Individual days or all high-confidence workdays can be approved in one tap with an immediate Snackbar undo option.
+
+## Version 1.6.0
 *Release date: November 13, 2026*
 
 !!! success "Phase 6: Reliability, Audit & Flawless Export"

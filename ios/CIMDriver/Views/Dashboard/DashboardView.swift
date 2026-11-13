@@ -4,6 +4,7 @@ import Charts
 
 struct DashboardView: View {
     @Environment(TrackingManager.self) private var trackingManager
+    @Environment(\.modelContext) private var modelContext
     @Query private var trips: [Trip]
     @Query private var vehicles: [Vehicle]
     @Query private var addresses: [SavedAddress]
@@ -15,6 +16,13 @@ struct DashboardView: View {
     
     @State private var timeFilter: TimeFilter = .week
     @State private var selectedVehicleId: UUID?
+    @State private var lastApprovedWorkDay: WorkDay? = nil
+    @State private var undoDepTime: Date? = nil
+    @State private var undoRoundedDepTime: Date? = nil
+    @State private var undoBreakMins: Int = 0
+    @State private var undoProjectCode: String? = nil
+    @State private var undoStatus: String = "TO_REVIEW"
+    @State private var showUndoBanner: Bool = false
     
     @Binding var selectedTab: Int
     
@@ -47,6 +55,23 @@ struct DashboardView: View {
     
     private var workDaysToReviewCount: Int {
         workDays.filter { $0.status == "TO_REVIEW" }.count
+    }
+
+    private var workDayCandidates: [WorkDayReviewCandidate] {
+        let cal = Calendar.current
+        return workDays.compactMap { wd in
+            let dayTrips = trips.filter { cal.isDate($0.startTime, inSameDayAs: wd.date) }
+            let suggestion = WorkHoursTriage.evaluateWorkDay(
+                workDay: wd,
+                tripsOnDay: dayTrips,
+                settings: appSettings,
+                savedAddresses: addresses
+            )
+            if suggestion.requiresAttention || wd.status == "TO_REVIEW" {
+                return WorkDayReviewCandidate(workDay: wd, suggestion: suggestion)
+            }
+            return nil
+        }
     }
     
     private var appSettings: AppSettings? { settingsList.first }
@@ -462,8 +487,49 @@ struct DashboardView: View {
         .padding(.horizontal)
     }
     
+    private func quickApprove(candidate: WorkDayReviewCandidate) {
+        let wd = candidate.workDay
+        let sug = candidate.suggestion
+        lastApprovedWorkDay = wd
+        undoDepTime = wd.departureTime
+        undoRoundedDepTime = wd.roundedDepartureTime
+        undoBreakMins = wd.breakMinutes
+        undoProjectCode = wd.projectCode
+        undoStatus = wd.status
+
+        let effectiveDep = wd.departureTime ?? sug.suggestedDepartureTime
+        wd.departureTime = effectiveDep
+        wd.roundedDepartureTime = wd.roundedDepartureTime ?? effectiveDep
+        if wd.breakMinutes == 0 {
+            wd.breakMinutes = sug.suggestedBreakMinutes
+        }
+        if wd.projectCode == nil || wd.projectCode?.isEmpty == true {
+            wd.projectCode = sug.suggestedProjectCode
+        }
+        wd.status = "APPROVED"
+        try? modelContext.save()
+        withAnimation {
+            showUndoBanner = true
+        }
+    }
+
+    private func undoApproval() {
+        guard let wd = lastApprovedWorkDay else { return }
+        wd.departureTime = undoDepTime
+        wd.roundedDepartureTime = undoRoundedDepTime
+        wd.breakMinutes = undoBreakMins
+        wd.projectCode = undoProjectCode
+        wd.status = undoStatus
+        try? modelContext.save()
+        withAnimation {
+            showUndoBanner = false
+            lastApprovedWorkDay = nil
+        }
+    }
+
     private var dailyInboxCard: some View {
-        let totalItems = tripsToReviewCount + workDaysToReviewCount
+        let effectiveWorkDays = max(workDaysToReviewCount, workDayCandidates.count)
+        let totalItems = tripsToReviewCount + effectiveWorkDays
         return VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("Dagelijkse Inbox", systemImage: "tray.full.fill")
@@ -487,6 +553,24 @@ struct DashboardView: View {
                         .foregroundColor(Color.cimGreen)
                         .clipShape(Capsule())
                 }
+            }
+
+            if showUndoBanner {
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.cimGreen)
+                    Text("Werkdag goedgekeurd")
+                        .font(.subheadline)
+                    Spacer()
+                    Button("Ongedaan maken") {
+                        undoApproval()
+                    }
+                    .font(.subheadline.bold())
+                    .foregroundColor(.orange)
+                }
+                .padding(10)
+                .background(Color.orange.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             
             if totalItems == 0 {
@@ -517,8 +601,73 @@ struct DashboardView: View {
                         .controlSize(.small)
                     }
                 }
-                
-                if workDaysToReviewCount > 0 {
+
+                if !workDayCandidates.isEmpty {
+                    if tripsToReviewCount > 0 {
+                        Divider()
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Werkuren ter controle (\(workDayCandidates.count))")
+                            .font(.caption.bold())
+                            .foregroundColor(.orange)
+
+                        ForEach(workDayCandidates.prefix(3)) { candidate in
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text(candidate.workDay.date.formatted(date: .abbreviated, time: .omitted))
+                                        .font(.subheadline.bold())
+                                    Spacer()
+                                    let isHigh = candidate.suggestion.isHighConfidence
+                                    Text("\(candidate.suggestion.confidenceScore)% zeker")
+                                        .font(.caption2.bold())
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(isHigh ? Color.cimGreen.opacity(0.15) : Color.orange.opacity(0.15))
+                                        .foregroundColor(isHigh ? Color.cimGreen : Color.orange)
+                                        .clipShape(Capsule())
+                                }
+
+                                Text(candidate.suggestion.statusText)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(2)
+
+                                HStack {
+                                    Text("\(candidate.suggestion.suggestedBreakMinutes)m pauze\(candidate.suggestion.suggestedProjectCode.map { " • \($0)" } ?? "")")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                    Button(action: {
+                                        quickApprove(candidate: candidate)
+                                    }) {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "checkmark")
+                                            Text("Akkoord")
+                                        }
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 5)
+                                        .background(Color.cimNavy)
+                                        .foregroundColor(.white)
+                                        .clipShape(Capsule())
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                            .padding(10)
+                            .background(Color(.systemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+
+                        if workDayCandidates.count > 3 {
+                            Button("Bekijk alle \(workDayCandidates.count) werkdagen →") {
+                                selectedTab = 2
+                            }
+                            .font(.caption)
+                            .foregroundColor(.accentColor)
+                        }
+                    }
+                } else if workDaysToReviewCount > 0 {
                     if tripsToReviewCount > 0 {
                         Divider()
                     }

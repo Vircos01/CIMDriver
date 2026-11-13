@@ -6,7 +6,17 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.6.0 (Huidige Versie)
+## Versie 1.7.0 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 7: Slimme Werkuren-Begeleiding, Triage & Target-Coaching"
+    * **Werkuren-Reviewlijst & Dagelijkse Inbox-integratie:** Openstaande werkdagen (ontbrekende eindtijd, twijfel over pauzes of afwijkingen t.o.v. het basisrooster) worden nu gebundeld in de Dagelijkse Uitzonderingen-Inbox (`DailyInboxCard`) op het Dashboard en direct in het Werkurenscherm.
+    * **Zachte Voorstellen voor Eindtijd & Pauze:** Automatische afleiding van ontbrekende vertrektijden via de geregistreerde rit naar huis/kantoor of via het dagspecifieke basisrooster (`workDays`). Automatische pauzesuggestie conform de Nederlandse Arbeidstijdenwet (minimaal 45 min bij $\ge$ 8u en 30 min bij $\ge$ 4.5u).
+    * **Werkdagstatus in Begrijpelijke Mensentaal:** Duidelijke statusbadges per werkdag (bijv. *"Vrijwel zeker compleet (7.5 uur netto, 30m pauze)"*, *"Eindtijd ontbreekt (voorstel: 17:00)"*, *"Lange werkdag (8.2u) zonder pauze"* of *"Geregistreerd buiten reguliere werkdagen"*).
+    * **Target-Coaching met Dynamisch Dagtempo:** De urentargets berekenen nu dynamisch de resterende actieve werkdagen in de lopende periode op basis van het ingestelde basisrooster, met een motiverende coachingstekst (bijv. *"Nog 16.5 uur nodig over 2 resterende werkdagen (8.3 u/dag)"*).
+    * **1-Tik Goedkeuring met Ongedaan Maken (Undo Snackbar):** Individuele werkdagen en alle hoog-betrouwbare werkdagen kunnen in één tik worden goedgekeurd, met een directe Snackbar-optie om de actie zonder dataverlies terug te draaien.
+
+## Versie 1.6.0
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 6: Betrouwbaarheid, Audit & Foutloze Export"

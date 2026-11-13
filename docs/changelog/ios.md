@@ -4,7 +4,17 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
-## Versie 0.0.10 Alpha (Huidige Versie)
+## Versie 0.0.11 Alpha (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 7: Slimme Werkuren-Begeleiding, Triage & Target-Coaching (Android Feature Sync)"
+    * **Werkuren-Reviewlijst & Dashboard Daily Inbox:** Werkdagen die aandacht vragen (ontbrekende uitchecktijd, ontbrekende pauzes of parttime/weekend registraties) verschijnen geconsolideerd in de dagelijkse Inbox op het Dashboard en in het Werkuren-overzicht.
+    * **Slimme Voorstellen voor Vertrektijd & Pauze:** Automatische detectie van de retourrit naar huis voor de vertrektijd of toepassing van het dagspecifieke basisrooster (`workDays`). Arbowet-conforme pauzevoorstellen (minimaal 45 min bij $\ge$ 8u en 30 min bij $\ge$ 4.5u).
+    * **Werkdagstatus in Begrijpelijke Mensentaal:** Transparante badges zoals *"Vrijwel zeker compleet (7.5 uur netto, 30m pauze)"*, *"Eindtijd ontbreekt (voorstel: 17:00)"* en *"Geregistreerd buiten reguliere werkdagen"*.
+    * **Target-Coaching met Dynamisch Dagtempo:** Resterende actieve werkdagen worden berekend op basis van het ingestelde basisrooster, met motiverende begeleiding (bijv. *"Nog 16.5 uur nodig over 2 resterende werkdagen (8.3 u/dag)"*).
+    * **1-Tik Goedkeuring met Ongedaan Maken (Undo Banner):** Snelle fiattering van voorgestelde werkdagcorrecties met een geanimeerde Undo-banner om wijzigingen direct te herstellen.
+
+## Versie 0.0.10 Alpha
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 6: Betrouwbaarheid, Audit & Foutloze Export (Android Feature Sync)"

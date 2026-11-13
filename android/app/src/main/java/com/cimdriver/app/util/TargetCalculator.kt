@@ -118,6 +118,85 @@ fun calculateTargetProgress(
     val diffValue = accumulatedValue - expectedValue
     val isBehind = diffValue < 0 && elapsedRatio > 0 && elapsedRatio < 1
 
+    val currentYear = now.get(Calendar.YEAR)
+    var remainingWorkDays = 0
+    if (targetYear == currentYear) {
+        val workDaysConfig = WorkHoursUtil.parseWorkHoursString(
+            settings?.workDays ?: "1,2,3,4,5",
+            settings?.workStartTime ?: "08:00",
+            settings?.workEndTime ?: "18:00"
+        )
+        val activeDaysSet = workDaysConfig.filter { it.isEnabled }.map { it.dayOfWeek }.toSet().ifEmpty { setOf(1, 2, 3, 4, 5) }
+
+        val tempCal = Calendar.getInstance().apply {
+            timeInMillis = now.timeInMillis
+            add(Calendar.DAY_OF_YEAR, 1)
+        }
+        while (tempCal.get(Calendar.YEAR) == targetYear) {
+            val rawDay = tempCal.get(Calendar.DAY_OF_WEEK)
+            val dayOfWeek = if (rawDay == Calendar.SUNDAY) 7 else rawDay - 1
+            if (dayOfWeek in activeDaysSet) {
+                remainingWorkDays++
+            }
+            tempCal.add(Calendar.DAY_OF_YEAR, 1)
+        }
+    } else if (targetYear > currentYear) {
+        val workDaysConfig = WorkHoursUtil.parseWorkHoursString(
+            settings?.workDays ?: "1,2,3,4,5",
+            settings?.workStartTime ?: "08:00",
+            settings?.workEndTime ?: "18:00"
+        )
+        val activeDaysSet = workDaysConfig.filter { it.isEnabled }.map { it.dayOfWeek }.toSet().ifEmpty { setOf(1, 2, 3, 4, 5) }
+        val tempCal = Calendar.getInstance().apply {
+            set(Calendar.YEAR, targetYear)
+            set(Calendar.DAY_OF_YEAR, 1)
+        }
+        while (tempCal.get(Calendar.YEAR) == targetYear) {
+            val rawDay = tempCal.get(Calendar.DAY_OF_WEEK)
+            val dayOfWeek = if (rawDay == Calendar.SUNDAY) 7 else rawDay - 1
+            if (dayOfWeek in activeDaysSet) {
+                remainingWorkDays++
+            }
+            tempCal.add(Calendar.DAY_OF_YEAR, 1)
+        }
+    }
+
+    val remainingValue = (effectiveTargetValue - accumulatedValue).coerceAtLeast(0.0)
+    val requiredPacePerDay = if (remainingWorkDays > 0) remainingValue / remainingWorkDays else 0.0
+
+    val guidanceMessage = when {
+        effectiveTargetValue <= 0.0 -> ""
+        accumulatedValue >= effectiveTargetValue -> {
+            val surplus = accumulatedValue - effectiveTargetValue
+            if (isRevenue) {
+                String.format(java.util.Locale.getDefault(), "Doel behaald! (+€ %,.0f)", surplus)
+            } else {
+                String.format(java.util.Locale.getDefault(), "Doel behaald! (+%.1f uur)", surplus)
+            }
+        }
+        targetYear < currentYear -> {
+            if (isRevenue) {
+                String.format(java.util.Locale.getDefault(), "Jaar afgesloten: € %,.0f tekort", remainingValue)
+            } else {
+                String.format(java.util.Locale.getDefault(), "Jaar afgesloten: %.1f uur tekort", remainingValue)
+            }
+        }
+        remainingWorkDays > 0 -> {
+            if (isRevenue) {
+                String.format(java.util.Locale.getDefault(), "Nog € %,.0f nodig over %d werkdagen (€ %,.0f/dag)", remainingValue, remainingWorkDays, requiredPacePerDay)
+            } else {
+                String.format(java.util.Locale.getDefault(), "Nog %.1f uur nodig over %d werkdagen (tempo: %.1f u/dag)", remainingValue, remainingWorkDays, requiredPacePerDay)
+            }
+        }
+        else -> {
+            if (isRevenue) {
+                String.format(java.util.Locale.getDefault(), "Nog € %,.0f nodig", remainingValue)
+            } else {
+                String.format(java.util.Locale.getDefault(), "Nog %.1f uur nodig", remainingValue)
+            }
+        }
+    }
+
     return TargetProgress(
         targetDetails = targetDetails,
         accumulatedHours = accHours,
@@ -127,6 +206,9 @@ fun calculateTargetProgress(
         isBehind = isBehind,
         diffValue = diffValue,
         effectiveTargetValue = effectiveTargetValue,
-        proRataFactor = proRataFactor
+        proRataFactor = proRataFactor,
+        remainingWorkDays = remainingWorkDays,
+        requiredPacePerDay = requiredPacePerDay,
+        guidanceMessage = guidanceMessage
     )
 }

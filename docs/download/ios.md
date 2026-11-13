@@ -5,9 +5,14 @@ hide:
 
 # 📦 Installatie: iOS (iPhone)
 
-De huidige stabiele testversie is **Versie 0.0.10 Alpha** (Build 6).
+De huidige stabiele testversie is **Versie 0.0.11 Alpha** (Build 7).
 
-Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 6 (Betrouwbaarheid, Audit & Foutloze Export):
+Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 7 (Slimme Werkuren-Begeleiding, Triage & Target-Coaching):
+- Werkuren-reviewlijst met dagelijkse triage van openstaande werkdagen in de Daily Inbox
+- Automatische voorstellen voor ontbrekende vertrektijden (via basisrooster of retourrit) en Arbowet-conforme pauzes
+- Begrijpelijke werkdagstatus in gewone mensentaal
+- Target-coaching met dynamisch dagtempo op basis van het actieve basisrooster
+- 1-Tik goedkeuring met ongedaan maken (Undo banner)
 - Foutarme Export-voorcontrole (`ExportPreCheckSheet`) vóór PDF- en CSV-export
 - Uitlegbare ritvoorstellen & automatische projectcodes via opgeslagen klantadressen
 - Begrijpelijke tracking-betrouwbaarheid in Diagnostiek met directe 1-tik herstelacties

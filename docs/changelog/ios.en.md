@@ -4,7 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
-## Version 0.0.10 Alpha (Current Version)
+## Version 0.0.11 Alpha (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 7: Smart Work Hours Guidance, Triage & Target Coaching (Android Feature Sync)"
+    * **Work Hours Review List & Dashboard Daily Inbox:** Workdays requiring attention (missing checkout time, unrecorded breaks, or off-schedule days) appear consolidated in the Daily Inbox on the Dashboard and in the Work Hours screen.
+    * **Gentle Departure & Break Suggestions:** Automatic departure time deduction via the recorded return trip home/office or from the day-specific work schedule (`workDays`). Automatic break suggestion compliant with Dutch Working Hours Act (Arbowet: min. 45m for $\ge$ 8h, 30m for $\ge$ 4.5h).
+    * **Workday Status in Plain Language:** Transparent badges such as *"Almost certainly complete (7.5h net, 30m break)"*, *"Missing end time (suggestion: 17:00)"*, and *"Registered outside regular work days"*.
+    * **Target Coaching with Dynamic Daily Pace:** Target progress now dynamically computes remaining active work days in the current period based on your work schedule, with motivating pacing guidance (e.g. *"16.5h needed over 2 remaining work days (8.3h/day)"*).
+    * **Single-Tap Approval with Reversible Undo Banner:** Quick approval of suggested workday corrections with an animated Undo banner to immediately revert any mistakes.
+
+## Version 0.0.10 Alpha
 *Release date: November 13, 2026*
 
 !!! success "Phase 6: Reliability, Audit & Flawless Export (Android Feature Sync)"

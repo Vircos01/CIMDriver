@@ -166,6 +166,16 @@ fun HoursTargetsScreen(
                                 Text("Op schema", style = MaterialTheme.typography.bodySmall, color = com.cimdriver.app.ui.theme.CIMDriverGreen)
                             }
                         }
+
+                        if (progress.guidanceMessage.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = progress.guidanceMessage,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

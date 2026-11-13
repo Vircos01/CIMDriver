@@ -8,6 +8,33 @@ struct TargetProgressSnapshot {
     let percentage: Double
     let isBehind: Bool
     let proRataFactor: Double
+    let remainingWorkDays: Int
+    let requiredPacePerDay: Double
+    let guidanceMessage: String
+
+    init(
+        accumulatedHours: Double,
+        accumulatedRevenue: Double,
+        accumulatedValue: Double,
+        effectiveTarget: Double,
+        percentage: Double,
+        isBehind: Bool,
+        proRataFactor: Double,
+        remainingWorkDays: Int = 0,
+        requiredPacePerDay: Double = 0.0,
+        guidanceMessage: String = ""
+    ) {
+        self.accumulatedHours = accumulatedHours
+        self.accumulatedRevenue = accumulatedRevenue
+        self.accumulatedValue = accumulatedValue
+        self.effectiveTarget = effectiveTarget
+        self.percentage = percentage
+        self.isBehind = isBehind
+        self.proRataFactor = proRataFactor
+        self.remainingWorkDays = remainingWorkDays
+        self.requiredPacePerDay = requiredPacePerDay
+        self.guidanceMessage = guidanceMessage
+    }
 }
 
 enum TargetCalculator {
@@ -57,6 +84,69 @@ enum TargetCalculator {
         let elapsedRatio = elapsedRatio(for: target.year, startDate: employmentStartDate, now: now, calendar: calendar)
         let isBehind = elapsedRatio > 0 && elapsedRatio < 1 && accumulatedValue < effectiveTarget * elapsedRatio
 
+        let currentYear = calendar.component(.year, from: now)
+        var remainingWorkDays = 0
+        if target.year == currentYear {
+            var tempDate = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+            while calendar.component(.year, from: tempDate) == target.year {
+                let weekday = calendar.component(.weekday, from: tempDate)
+                if weekday >= 2 && weekday <= 6 { // Mon - Fri
+                    remainingWorkDays += 1
+                }
+                guard let next = calendar.date(byAdding: .day, value: 1, to: tempDate) else { break }
+                tempDate = next
+            }
+        } else if target.year > currentYear {
+            var comp = DateComponents()
+            comp.year = target.year
+            comp.month = 1
+            comp.day = 1
+            if var tempDate = calendar.date(from: comp) {
+                while calendar.component(.year, from: tempDate) == target.year {
+                    let weekday = calendar.component(.weekday, from: tempDate)
+                    if weekday >= 2 && weekday <= 6 {
+                        remainingWorkDays += 1
+                    }
+                    guard let next = calendar.date(byAdding: .day, value: 1, to: tempDate) else { break }
+                    tempDate = next
+                }
+            }
+        }
+
+        let isRevenue = target.targetType == "REVENUE"
+        let remainingValue = max(0, effectiveTarget - accumulatedValue)
+        let requiredPacePerDay = remainingWorkDays > 0 ? remainingValue / Double(remainingWorkDays) : 0.0
+
+        let guidanceMessage: String
+        if effectiveTarget <= 0 {
+            guidanceMessage = ""
+        } else if accumulatedValue >= effectiveTarget {
+            let surplus = accumulatedValue - effectiveTarget
+            if isRevenue {
+                guidanceMessage = String(format: "Doel behaald! (+€ %.0f)", surplus)
+            } else {
+                guidanceMessage = String(format: "Doel behaald! (+%.1f uur)", surplus)
+            }
+        } else if target.year < currentYear {
+            if isRevenue {
+                guidanceMessage = String(format: "Jaar afgesloten: € %.0f tekort", remainingValue)
+            } else {
+                guidanceMessage = String(format: "Jaar afgesloten: %.1f uur tekort", remainingValue)
+            }
+        } else if remainingWorkDays > 0 {
+            if isRevenue {
+                guidanceMessage = String(format: "Nog € %.0f nodig over %d werkdagen (€ %.0f/dag)", remainingValue, remainingWorkDays, requiredPacePerDay)
+            } else {
+                guidanceMessage = String(format: "Nog %.1f uur nodig over %d werkdagen (tempo: %.1f u/dag)", remainingValue, remainingWorkDays, requiredPacePerDay)
+            }
+        } else {
+            if isRevenue {
+                guidanceMessage = String(format: "Nog € %.0f nodig", remainingValue)
+            } else {
+                guidanceMessage = String(format: "Nog %.1f uur nodig", remainingValue)
+            }
+        }
+
         return TargetProgressSnapshot(
             accumulatedHours: accumulatedHours,
             accumulatedRevenue: accumulatedRevenue,
@@ -64,7 +154,10 @@ enum TargetCalculator {
             effectiveTarget: effectiveTarget,
             percentage: percentage,
             isBehind: isBehind,
-            proRataFactor: factor
+            proRataFactor: factor,
+            remainingWorkDays: remainingWorkDays,
+            requiredPacePerDay: requiredPacePerDay,
+            guidanceMessage: guidanceMessage
         )
     }
 

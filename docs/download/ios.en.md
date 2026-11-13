@@ -5,9 +5,14 @@ hide:
 
 # 📦 Installation: iOS (iPhone)
 
-The current stable preview is **Version 0.0.10 Alpha** (Build 6).
+The current stable preview is **Version 0.0.11 Alpha** (Build 7).
 
-This release brings the iOS app into full parity with Android Phase 6 (Reliability, Audit & Flawless Export):
+This release brings the iOS app into full parity with Android Phase 7 (Smart Work Hours Guidance, Triage & Target Coaching):
+- Work hours review list with daily triage of open workdays in the Daily Inbox
+- Automatic proposals for missing departure times (via work schedule or return trip) and Dutch Arbowet-compliant breaks
+- Human-readable workday status in plain language
+- Target coaching with dynamic daily pace based on the active work schedule
+- 1-Tap approval with reversible undo (Undo banner)
 - Pre-export completeness check (`ExportPreCheckSheet`) before PDF & CSV exports
 - Explainable trip proposals & automatic project codes from saved client addresses
 - Human-readable tracking reliability in Diagnostics with 1-tap repair shortcuts

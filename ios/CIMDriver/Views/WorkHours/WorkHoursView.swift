@@ -3,10 +3,20 @@ import SwiftData
 
 struct WorkHoursView: View {
     @Query(sort: \WorkDay.date, order: .reverse) private var workDays: [WorkDay]
+    @Query private var trips: [Trip]
+    @Query private var savedAddresses: [SavedAddress]
+    @Query private var settingsList: [AppSettings]
     @Environment(\.modelContext) private var modelContext
     @State private var showingAddWorkDay = false
     @State private var exportURL: URL?
     @State private var searchText = ""
+    @State private var lastApprovedWorkDay: WorkDay? = nil
+    @State private var undoDepTime: Date? = nil
+    @State private var undoRoundedDepTime: Date? = nil
+    @State private var undoBreakMins: Int = 0
+    @State private var undoProjectCode: String? = nil
+    @State private var undoStatus: String = "TO_REVIEW"
+    @State private var showUndoBanner = false
     
     private var groupedWorkDays: [(key: String, value: [WorkDay])] {
         let formatter = DateFormatter()
@@ -32,41 +42,56 @@ struct WorkHoursView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(groupedWorkDays, id: \.key) { group in
-                    Section {
-                        ForEach(group.value) { workDay in
-                            NavigationLink(value: workDay) {
-                                WorkDayRowView(workDay: workDay)
+            VStack(spacing: 0) {
+                if showUndoBanner {
+                    undoBanner
+                }
+
+                List {
+                    ForEach(groupedWorkDays, id: \.key) { group in
+                        Section {
+                            ForEach(group.value) { workDay in
+                                NavigationLink(value: workDay) {
+                                    let dayTrips = trips.filter { Calendar.current.isDate($0.startTime, inSameDayAs: workDay.date) }
+                                    WorkDayRowView(
+                                        workDay: workDay,
+                                        tripsOnDay: dayTrips,
+                                        settings: settingsList.first,
+                                        savedAddresses: savedAddresses,
+                                        onApprove: { suggestion in
+                                            quickApprove(workDay: workDay, suggestion: suggestion)
+                                        }
+                                    )
+                                }
                             }
-                        }
-                        .onDelete { offsets in
-                            deleteWorkDays(at: offsets, in: group.value)
-                        }
-                    } header: {
-                        HStack {
-                            let hours = totalHours(for: group.value)
-                            Text("\(group.key) • \(String(format: "%.1f", hours))u")
-                                .font(.headline)
-                            Spacer()
-                            Menu {
-                                Button {
-                                    exportWorkDaysPDF(workDays: group.value, title: group.key)
+                            .onDelete { offsets in
+                                deleteWorkDays(at: offsets, in: group.value)
+                            }
+                        } header: {
+                            HStack {
+                                let hours = totalHours(for: group.value)
+                                Text("\(group.key) • \(String(format: "%.1f", hours))u")
+                                    .font(.headline)
+                                Spacer()
+                                Menu {
+                                    Button {
+                                        exportWorkDaysPDF(workDays: group.value, title: group.key)
+                                    } label: {
+                                        Label("Exporteer PDF (\(group.key))", systemImage: "doc.richtext")
+                                    }
+                                    Button {
+                                        exportWorkDaysCSV(workDays: group.value, title: group.key)
+                                    } label: {
+                                        Label("Exporteer CSV (\(group.key))", systemImage: "tablecells")
+                                    }
                                 } label: {
-                                    Label("Exporteer PDF (\(group.key))", systemImage: "doc.richtext")
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "square.and.arrow.up")
+                                        Text("Deel")
+                                            .font(.caption)
+                                    }
+                                    .foregroundColor(.accentColor)
                                 }
-                                Button {
-                                    exportWorkDaysCSV(workDays: group.value, title: group.key)
-                                } label: {
-                                    Label("Exporteer CSV (\(group.key))", systemImage: "tablecells")
-                                }
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "square.and.arrow.up")
-                                    Text("Deel")
-                                        .font(.caption)
-                                }
-                                .foregroundColor(.accentColor)
                             }
                         }
                     }
@@ -122,6 +147,64 @@ struct WorkHoursView: View {
             }
         }
     }
+
+    private var undoBanner: some View {
+        HStack {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.cimGreen)
+            Text("Werkdag goedgekeurd")
+                .font(.subheadline)
+            Spacer()
+            Button("Ongedaan maken") {
+                undoApproval()
+            }
+            .font(.subheadline.bold())
+            .foregroundColor(.orange)
+        }
+        .padding(12)
+        .background(Color.orange.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding(.horizontal)
+        .padding(.top, 8)
+    }
+
+    private func quickApprove(workDay: WorkDay, suggestion: WorkDaySuggestion) {
+        lastApprovedWorkDay = workDay
+        undoDepTime = workDay.departureTime
+        undoRoundedDepTime = workDay.roundedDepartureTime
+        undoBreakMins = workDay.breakMinutes
+        undoProjectCode = workDay.projectCode
+        undoStatus = workDay.status
+
+        let effectiveDep = workDay.departureTime ?? suggestion.suggestedDepartureTime
+        workDay.departureTime = effectiveDep
+        workDay.roundedDepartureTime = workDay.roundedDepartureTime ?? effectiveDep
+        if workDay.breakMinutes == 0 {
+            workDay.breakMinutes = suggestion.suggestedBreakMinutes
+        }
+        if workDay.projectCode == nil || workDay.projectCode?.isEmpty == true {
+            workDay.projectCode = suggestion.suggestedProjectCode
+        }
+        workDay.status = "APPROVED"
+        try? modelContext.save()
+        withAnimation {
+            showUndoBanner = true
+        }
+    }
+
+    private func undoApproval() {
+        guard let wd = lastApprovedWorkDay else { return }
+        wd.departureTime = undoDepTime
+        wd.roundedDepartureTime = undoRoundedDepTime
+        wd.breakMinutes = undoBreakMins
+        wd.projectCode = undoProjectCode
+        wd.status = undoStatus
+        try? modelContext.save()
+        withAnimation {
+            showUndoBanner = false
+            lastApprovedWorkDay = nil
+        }
+    }
     
     private func deleteWorkDays(at offsets: IndexSet, in group: [WorkDay]) {
         for index in offsets {
@@ -156,22 +239,50 @@ struct WorkHoursView: View {
 
 struct WorkDayRowView: View {
     let workDay: WorkDay
-    
+    var tripsOnDay: [Trip] = []
+    var settings: AppSettings? = nil
+    var savedAddresses: [SavedAddress] = []
+    var onApprove: ((WorkDaySuggestion) -> Void)? = nil
+
+    private var suggestion: WorkDaySuggestion {
+        WorkHoursTriage.evaluateWorkDay(
+            workDay: workDay,
+            tripsOnDay: tripsOnDay,
+            settings: settings,
+            savedAddresses: savedAddresses
+        )
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(workDay.date.formatted(date: .abbreviated, time: .omitted))
                     .font(.subheadline.bold())
                 Spacer()
-                Text(workDay.status == "TO_REVIEW" ? "Nog beoordelen" : workDay.status)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.orange.opacity(0.2))
-                    .foregroundStyle(.orange)
+                let isHigh = suggestion.isHighConfidence
+                Text("\(suggestion.confidenceScore)% zeker")
+                    .font(.caption2.bold())
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(isHigh ? Color.cimGreen.opacity(0.15) : Color.orange.opacity(0.15))
+                    .foregroundColor(isHigh ? Color.cimGreen : Color.orange)
                     .clipShape(Capsule())
             }
-            
+
+            // Plain language status badge
+            HStack(spacing: 6) {
+                Image(systemName: suggestion.isHighConfidence ? "checkmark.circle.fill" : "info.circle.fill")
+                    .foregroundColor(suggestion.isHighConfidence ? .cimGreen : .orange)
+                    .font(.caption2)
+                Text(suggestion.statusText)
+                    .font(.caption)
+                    .foregroundColor(suggestion.isHighConfidence ? .cimGreen : .orange)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background((suggestion.isHighConfidence ? Color.cimGreen : Color.orange).opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Start: \(workDay.roundedArrivalTime?.formatted(date: .omitted, time: .shortened) ?? workDay.arrivalTime.formatted(date: .omitted, time: .shortened))")
@@ -183,9 +294,16 @@ struct WorkDayRowView: View {
                         Text("Einde: -")
                             .font(.subheadline)
                     }
+                    Text("Pauze: \(workDay.breakMinutes) min")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    if let code = workDay.projectCode, !code.isEmpty {
+                        Text("Project: \(code)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 Spacer()
-                // Bereken uren
                 if let depTime = workDay.roundedDepartureTime ?? workDay.departureTime {
                     let arrTime = workDay.roundedArrivalTime ?? workDay.arrivalTime
                     let totalSeconds = depTime.timeIntervalSince(arrTime)
@@ -199,6 +317,41 @@ struct WorkDayRowView: View {
                 }
             }
             .foregroundStyle(.secondary)
+
+            // Smart suggestion card if review required
+            if workDay.status == "TO_REVIEW" || suggestion.requiresAttention {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Slimme suggestie:")
+                        .font(.caption2.bold())
+                        .foregroundColor(.orange)
+                    let depStr = suggestion.suggestedDepartureTime?.formatted(date: .omitted, time: .shortened) ?? "17:00"
+                    Text("Vertrek: \(depStr) • Pauze: \(suggestion.suggestedBreakMinutes)m\(suggestion.suggestedProjectCode.map { " • Project: \($0)" } ?? "")")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            onApprove?(suggestion)
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark")
+                                Text("Akkoord met suggestie")
+                            }
+                            .font(.caption.bold())
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.cimNavy)
+                            .foregroundColor(.white)
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(8)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
         }
         .padding(.vertical, 4)
     }

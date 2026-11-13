@@ -16,6 +16,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import java.text.SimpleDateFormat
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -50,14 +55,18 @@ fun WorkHoursScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedPeriod by viewModel.selectedPeriod.collectAsState()
     val availablePeriods by viewModel.availablePeriods.collectAsState()
+    val workDaySuggestions by viewModel.workDaySuggestions.collectAsState()
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     var showExportMenu by remember { mutableStateOf(false) }
     var workDayToDelete by remember { mutableStateOf<WorkDay?>(null) }
 
     var isSearchVisible by remember { mutableStateOf(false) }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CimDriverTopAppBar(
                 onOpenDrawer = onOpenDrawer,
@@ -329,30 +338,84 @@ fun WorkHoursScreen(
                                 if (workDay.projectCode != null) {
                                     Text(stringResource(R.string.project_label, workDay.projectCode), style = MaterialTheme.typography.bodySmall)
                                 }
-                                
-                                if (isToReview) {
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                                        Button(onClick = {
-                                            viewModel.updateWorkDay(
-                                                id = workDay.id,
-                                                date = workDay.date,
-                                                firstDepartureTime = workDay.firstDepartureTime,
-                                                arrivalTime = workDay.arrivalTime,
-                                                departureTime = workDay.departureTime,
-                                                lastArrivalTime = workDay.lastArrivalTime,
-                                                roundedArrivalTime = workDay.roundedArrivalTime,
-                                                roundedDepartureTime = workDay.roundedDepartureTime,
-                                                breakMinutes = workDay.breakMinutes,
-                                                workLocationLabel = workDay.workLocationLabel,
-                                                projectCode = workDay.projectCode,
-                                                status = "APPROVED",
-                                                projectCodeId = workDay.projectCodeId
+
+                                val suggestion = workDaySuggestions[workDay.id]
+                                suggestion?.let { sug ->
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    val badgeColor = when {
+                                        isInProgress -> MaterialTheme.colorScheme.primary
+                                        sug.isHighConfidence -> Color(0xFF16A34A)
+                                        else -> Color(0xFFD97706)
+                                    }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(badgeColor.copy(alpha = 0.12f))
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = if (sug.isHighConfidence) Icons.Filled.CheckCircle else Icons.Filled.Info,
+                                            contentDescription = null,
+                                            tint = badgeColor,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = sug.statusText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                                            color = badgeColor
+                                        )
+                                    }
+                                }
+
+                                if (isToReview || suggestion?.requiresAttention == true) {
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    val sug = suggestion ?: com.cimdriver.app.util.WorkHoursTriage.evaluateWorkDay(workDay)
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Column(modifier = Modifier.padding(10.dp)) {
+                                            Text(
+                                                text = "Slimme suggestie:",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.tertiary
                                             )
-                                        }) {
-                                            Icon(Icons.Filled.Check, contentDescription = null)
-                                            Spacer(Modifier.width(4.dp))
-                                            Text(stringResource(R.string.approve))
+                                            val depTimeStr = sug.suggestedDepartureTime?.let { timeFormat.format(Date(it)) } ?: "17:00"
+                                            Text(
+                                                text = "Vertrek: $depTimeStr • Pauze: ${sug.suggestedBreakMinutes} min" +
+                                                        (sug.suggestedProjectCode?.let { " • Project: $it" } ?: ""),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                                                Button(
+                                                    onClick = {
+                                                        viewModel.quickApproveWorkDay(com.cimdriver.app.util.WorkDayReviewCandidate(workDay, sug))
+                                                        coroutineScope.launch {
+                                                            val res = snackbarHostState.showSnackbar(
+                                                                message = "Werkdag goedgekeurd",
+                                                                actionLabel = "Ongedaan maken",
+                                                                duration = SnackbarDuration.Short
+                                                            )
+                                                            if (res == SnackbarResult.ActionPerformed) {
+                                                                viewModel.undoLastApproval()
+                                                            }
+                                                        }
+                                                    },
+                                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                                    modifier = Modifier.height(32.dp)
+                                                ) {
+                                                    Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                    Spacer(Modifier.width(4.dp))
+                                                    Text("Akkoord met suggestie", style = MaterialTheme.typography.labelMedium)
+                                                }
+                                            }
                                         }
                                     }
                                 }

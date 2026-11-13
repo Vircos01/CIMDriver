@@ -35,10 +35,15 @@ fun DailyInboxCard(
     onNavigateToWorkHours: () -> Unit,
     onNavigateToGaps: () -> Unit,
     onNavigateToFuelDraft: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    workDayReviewCandidates: List<com.cimdriver.app.util.WorkDayReviewCandidate> = emptyList(),
+    onQuickApproveWorkDay: ((com.cimdriver.app.util.WorkDayReviewCandidate) -> Unit)? = null
 ) {
-    val totalCount = reviewCandidates.size + workDayReviewCount + openGapsCount + pendingFuelDrafts.size
+    val effectiveWorkDayCount = maxOf(workDayReviewCount, workDayReviewCandidates.size)
+    val totalCount = reviewCandidates.size + effectiveWorkDayCount + openGapsCount + pendingFuelDrafts.size
     val highConfidenceTrips = remember(reviewCandidates) { reviewCandidates.filter { it.assessment.isHighConfidence } }
+    val highConfidenceWorkDays = remember(workDayReviewCandidates) { workDayReviewCandidates.filter { it.suggestion.isHighConfidence } }
+    val totalHighConfidence = highConfidenceTrips.size + highConfidenceWorkDays.size
     var isExpanded by remember { mutableStateOf(true) }
 
     Card(
@@ -102,7 +107,7 @@ fun DailyInboxCard(
                 Spacer(modifier = Modifier.height(14.dp))
 
                 // Batch goedkeuren voor hoge betrouwbaarheid
-                if (highConfidenceTrips.size >= 2) {
+                if (totalHighConfidence >= 2) {
                     Button(
                         onClick = onApproveAllHighConfidence,
                         modifier = Modifier.fillMaxWidth(),
@@ -113,7 +118,7 @@ fun DailyInboxCard(
                     ) {
                         Icon(Icons.Filled.DoneAll, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Alles met hoge zekerheid goedkeuren (${highConfidenceTrips.size})")
+                        Text("Alles met hoge zekerheid goedkeuren ($totalHighConfidence)")
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -147,8 +152,35 @@ fun DailyInboxCard(
                     }
                 }
 
-                // 2. Openstaande werkdagen
-                if (workDayReviewCount > 0) {
+                // 2. Openstaande werkdagen (Triage & 1-tap suggesties)
+                if (workDayReviewCandidates.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Werkuren ter controle (${workDayReviewCandidates.size})",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    workDayReviewCandidates.take(3).forEach { candidate ->
+                        InboxWorkDayItem(
+                            candidate = candidate,
+                            onQuickApprove = { onQuickApproveWorkDay?.invoke(candidate) },
+                            onClick = onNavigateToWorkHours
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    if (workDayReviewCandidates.size > 3) {
+                        TextButton(
+                            onClick = onNavigateToWorkHours,
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text("Bekijk alle ${workDayReviewCandidates.size} werkdagen →")
+                        }
+                    }
+                } else if (workDayReviewCount > 0) {
                     Spacer(modifier = Modifier.height(8.dp))
                     InboxNoticeItem(
                         icon = Icons.Filled.Schedule,
@@ -254,6 +286,85 @@ private fun InboxTripItem(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
+                )
+                Button(
+                    onClick = onQuickApprove,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Akkoord", style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InboxWorkDayItem(
+    candidate: com.cimdriver.app.util.WorkDayReviewCandidate,
+    onQuickApprove: () -> Unit,
+    onClick: () -> Unit
+) {
+    val workDay = candidate.workDay
+    val suggestion = candidate.suggestion
+    val dateFormat = SimpleDateFormat("EEEE d MMM", Locale.forLanguageTag("nl-NL"))
+    val dateStr = dateFormat.format(Date(workDay.date))
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = dateStr,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                // Confidence badge
+                val badgeColor = if (suggestion.isHighConfidence) Color(0xFF16A34A) else Color(0xFFD97706)
+                Text(
+                    text = "${suggestion.confidenceScore}% zeker",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = badgeColor,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(badgeColor.copy(alpha = 0.12f))
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = suggestion.statusText,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val detailText = buildString {
+                    append("${suggestion.suggestedBreakMinutes}m pauze")
+                    suggestion.suggestedProjectCode?.let { append(" • $it") }
+                }
+                Text(
+                    text = detailText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Button(
                     onClick = onQuickApprove,

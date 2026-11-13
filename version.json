@@ -1,6 +1,6 @@
 {
-  "versionCode": 38,
-  "versionName": "1.6.0",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.6.0.apk",
-  "releaseNotes": "Versie 1.6.0: Fase 6 - Betrouwbaarheid, Audit & Foutloze Export: Exportcontrole met fiscale sluitendheidsvalidatie (ExportPreCheckDialog) conform eisen Belastingdienst, automatische projectcode-suggesties via opgeslagen klantadressen, begrijpelijke tracking-betrouwbaarheid in Diagnostiek met directe 1-tik herstelacties, herstelbare wijzigingen (Undo snackbar bij fiatteringen) en automatische back-up integriteitsvalidatie."
+  "versionCode": 39,
+  "versionName": "1.7.0",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.7.0.apk",
+  "releaseNotes": "Versie 1.7.0: Fase 7 - Slimme Werkuren-Begeleiding, Triage & Target-Coaching: Werkuren-reviewlijst met dagelijkse triage van openstaande werkdagen in de Daily Inbox, automatische voorstellen voor ontbrekende eindtijden (via basisrooster of retourrit) en Arbowet-conforme pauzes, begrijpelijke werkdagstatus in gewone mensentaal, target-coaching met dynamisch dagtempo op basis van het actieve basisrooster, en 1-tik goedkeuring met ongedaan maken (Undo Snackbar/Banner)."
 }

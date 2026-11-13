@@ -109,6 +109,12 @@ private struct TargetProgressCard: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            if !progress.guidanceMessage.isEmpty {
+                Text(progress.guidanceMessage)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(.vertical, 6)
         .contentShape(Rectangle())

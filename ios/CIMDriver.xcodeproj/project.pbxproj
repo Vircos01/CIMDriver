@@ -27,6 +27,8 @@
 		2A3B4C5D6E7F8A9B0C1D2E3F /* ExportPreCheckSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D5E6F7A8B9C0D1E2F /* ExportPreCheckSheet.swift */; };
 		2D3B4C34CA0EB10A7D03D99E /* BluetoothService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076D609D3F91A3AEA955B1E0 /* BluetoothService.swift */; };
 		2DBFCAFC4518AF0176F9F190 /* WorkHoursNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 593BD8FD220E74E8600D4E04 /* WorkHoursNormalizer.swift */; };
+		A1B2C3D4E5F6012345678901 /* WorkHoursTriage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678902 /* WorkHoursTriage.swift */; };
+		A1B2C3D4E5F6012345678903 /* WorkHoursTriageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678904 /* WorkHoursTriageTests.swift */; };
 		3124A9A3BF18DD59E69E01FC /* WidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130ADCAF6FDD59D315146325 /* WidgetManager.swift */; };
 		3400DD39A1EC487B6E0FB056 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9C9436354CC5107B4BC18CA /* Assets.xcassets */; };
 		360408C90855CFE2F4D436F2 /* ExportUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C9D9EA8AF0A98E7C7A609E2 /* ExportUtil.swift */; };
@@ -162,6 +164,8 @@
 		539237327ADD0DAB0288EC0C /* OdometerTextRecognizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerTextRecognizerTests.swift; sourceTree = "<group>"; };
 		591C5D6C84265B6C61B5021E /* GeocoderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeocoderService.swift; sourceTree = "<group>"; };
 		593BD8FD220E74E8600D4E04 /* WorkHoursNormalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkHoursNormalizer.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6012345678902 /* WorkHoursTriage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkHoursTriage.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6012345678904 /* WorkHoursTriageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkHoursTriageTests.swift; sourceTree = "<group>"; };
 		5C3EBA862BF6E73DBE7B9C23 /* DashboardStatsCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatsCalculator.swift; sourceTree = "<group>"; };
 		5E9E3893C011580CC1912EB0 /* AddressMatchingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressMatchingTests.swift; sourceTree = "<group>"; };
 		5ED214300125C599BE085C69 /* FuelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuelView.swift; sourceTree = "<group>"; };
@@ -230,6 +234,7 @@
 				4B773B4B97CB18A63CD3E6C1 /* TripClassification.swift */,
 				130ADCAF6FDD59D315146325 /* WidgetManager.swift */,
 				593BD8FD220E74E8600D4E04 /* WorkHoursNormalizer.swift */,
+				A1B2C3D4E5F6012345678902 /* WorkHoursTriage.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -360,6 +365,7 @@
 				CC7DCD42B3BA6B7602A2DA35 /* TargetCalculatorTests.swift */,
 				1F579E4C5A4669CA31969696 /* TripClassificationTests.swift */,
 				7BB4DB75F74E40A92DC2438C /* WorkHoursNormalizerTests.swift */,
+				A1B2C3D4E5F6012345678904 /* WorkHoursTriageTests.swift */,
 			);
 			path = CIMDriverTests;
 			sourceTree = "<group>";
@@ -656,6 +662,7 @@
 				3124A9A3BF18DD59E69E01FC /* WidgetManager.swift in Sources */,
 				FD2823B6EEC9F6D9BA57CE36 /* WorkDay.swift in Sources */,
 				2DBFCAFC4518AF0176F9F190 /* WorkHoursNormalizer.swift in Sources */,
+				A1B2C3D4E5F6012345678901 /* WorkHoursTriage.swift in Sources */,
 				B80D31FF07593491ADBCE63C /* WorkHoursView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -673,6 +680,7 @@
 				BD2B08203D224A84C00B23FD /* TargetCalculatorTests.swift in Sources */,
 				E7FC34E75E17E6422499F4D4 /* TripClassificationTests.swift in Sources */,
 				64721F651CC8045492543C5B /* WorkHoursNormalizerTests.swift in Sources */,
+				A1B2C3D4E5F6012345678903 /* WorkHoursTriageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -710,14 +718,14 @@
 				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GIT_COMMIT = unknown;
 				INFOPLIST_FILE = CIMDriver/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.10;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -793,14 +801,14 @@
 				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GIT_COMMIT = unknown;
 				INFOPLIST_FILE = CIMDriver/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.10;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -811,7 +819,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "";
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -819,7 +827,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.10;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
 				PRODUCT_NAME = CIMDriverWidget;
 				SDKROOT = iphoneos;
@@ -905,7 +913,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "";
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -913,7 +921,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.10;
+				MARKETING_VERSION = 0.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
 				PRODUCT_NAME = CIMDriverWidget;
 				SDKROOT = iphoneos;

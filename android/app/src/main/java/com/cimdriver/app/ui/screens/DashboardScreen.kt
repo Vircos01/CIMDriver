@@ -296,10 +296,12 @@ fun DashboardScreen(
 
                 // Dagelijkse Uitzonderingen Inbox (Triage met 1-tap acceptatie & confidence)
                 val reviewCandidates by viewModel.tripsToReviewCandidates.collectAsState()
+                val workDayReviewCandidates by workHoursViewModel.workDayReviewCandidates.collectAsState()
                 Spacer(modifier = Modifier.height(16.dp))
                 com.cimdriver.app.ui.components.DailyInboxCard(
                     reviewCandidates = reviewCandidates,
                     workDayReviewCount = workDayReviewCount,
+                    workDayReviewCandidates = workDayReviewCandidates,
                     openGapsCount = openGapsCount,
                     pendingFuelDrafts = pendingFuelDrafts,
                     vehicles = vehicles,
@@ -316,16 +318,34 @@ fun DashboardScreen(
                             }
                         }
                     },
-                    onApproveAllHighConfidence = {
-                        viewModel.approveAllHighConfidenceTrips(reviewCandidates)
+                    onQuickApproveWorkDay = { candidate ->
+                        workHoursViewModel.quickApproveWorkDay(candidate)
                         coroutineScope.launch {
                             val res = snackbarHostState.showSnackbar(
-                                message = "${reviewCandidates.count { it.assessment.isHighConfidence }} ritten goedgekeurd",
+                                message = "Werkdag goedgekeurd",
+                                actionLabel = "Ongedaan maken",
+                                duration = SnackbarDuration.Short
+                            )
+                            if (res == SnackbarResult.ActionPerformed) {
+                                workHoursViewModel.undoLastApproval()
+                            }
+                        }
+                    },
+                    onApproveAllHighConfidence = {
+                        val highConfTripsCount = reviewCandidates.count { it.assessment.isHighConfidence }
+                        val highConfWorkDaysCount = workDayReviewCandidates.count { it.suggestion.isHighConfidence }
+                        viewModel.approveAllHighConfidenceTrips(reviewCandidates)
+                        workHoursViewModel.approveAllHighConfidenceWorkDays(workDayReviewCandidates)
+                        coroutineScope.launch {
+                            val totalApproved = highConfTripsCount + highConfWorkDaysCount
+                            val res = snackbarHostState.showSnackbar(
+                                message = "$totalApproved items goedgekeurd",
                                 actionLabel = "Ongedaan maken",
                                 duration = SnackbarDuration.Short
                             )
                             if (res == SnackbarResult.ActionPerformed) {
                                 viewModel.undoLastApproval()
+                                workHoursViewModel.undoLastApproval()
                             }
                         }
                     },

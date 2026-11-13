@@ -5,6 +5,13 @@ import javax.inject.Inject
 import androidx.lifecycle.ViewModel
 import com.cimdriver.app.data.local.dao.WorkDayDao
 import com.cimdriver.app.data.local.dao.SettingsDao
+import com.cimdriver.app.data.local.dao.TripDao
+import com.cimdriver.app.data.local.dao.SavedAddressDao
+import com.cimdriver.app.util.WorkHoursTriage
+import com.cimdriver.app.util.WorkDayReviewCandidate
+import com.cimdriver.app.util.WorkDaySuggestion
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,8 +37,17 @@ data class WorkHoursChartItem(
 @HiltViewModel
 class WorkHoursViewModel @Inject constructor(
     private val workDayDao: WorkDayDao,
-    private val settingsDao: SettingsDao
+    private val settingsDao: SettingsDao,
+    private val tripDao: TripDao? = null,
+    private val savedAddressDao: SavedAddressDao? = null
 ) : ViewModel() {
+
+    private val tripsFlow = tripDao?.getAllTrips() ?: kotlinx.coroutines.flow.flowOf(emptyList())
+    private val addressesFlow = savedAddressDao?.getAllAddresses() ?: kotlinx.coroutines.flow.flowOf(emptyList())
+
+    private val _lastModifiedWorkDays = MutableStateFlow<List<WorkDay>>(emptyList())
+    val canUndoApproval: StateFlow<Boolean> = _lastModifiedWorkDays.map { it.isNotEmpty() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val workDays: StateFlow<List<WorkDay>> = workDayDao.getAllWorkDays()
         .stateIn(
@@ -49,6 +65,56 @@ class WorkHoursViewModel @Inject constructor(
 
     private val settings = settingsDao.getSettings()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val workDaySuggestions: StateFlow<Map<Long, WorkDaySuggestion>> = combine(
+        workDays,
+        tripsFlow,
+        settings,
+        addressesFlow
+    ) { days, trips, currentSettings, addresses ->
+        days.associate { day ->
+            val calDay = Calendar.getInstance().apply { timeInMillis = day.date }
+            val tripsOnDay = trips.filter { trip ->
+                val calTrip = Calendar.getInstance().apply { timeInMillis = trip.startTime }
+                calTrip.get(Calendar.YEAR) == calDay.get(Calendar.YEAR) &&
+                calTrip.get(Calendar.DAY_OF_YEAR) == calDay.get(Calendar.DAY_OF_YEAR)
+            }
+            val suggestion = WorkHoursTriage.evaluateWorkDay(
+                workDay = day,
+                tripsOnDay = tripsOnDay,
+                settings = currentSettings,
+                savedAddresses = addresses
+            )
+            day.id to suggestion
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+
+    val workDayReviewCandidates: StateFlow<List<WorkDayReviewCandidate>> = combine(
+        workDays,
+        tripsFlow,
+        settings,
+        addressesFlow
+    ) { days, trips, currentSettings, addresses ->
+        days.mapNotNull { day ->
+            val calDay = Calendar.getInstance().apply { timeInMillis = day.date }
+            val tripsOnDay = trips.filter { trip ->
+                val calTrip = Calendar.getInstance().apply { timeInMillis = trip.startTime }
+                calTrip.get(Calendar.YEAR) == calDay.get(Calendar.YEAR) &&
+                calTrip.get(Calendar.DAY_OF_YEAR) == calDay.get(Calendar.DAY_OF_YEAR)
+            }
+            val suggestion = WorkHoursTriage.evaluateWorkDay(
+                workDay = day,
+                tripsOnDay = tripsOnDay,
+                settings = currentSettings,
+                savedAddresses = addresses
+            )
+            if (suggestion.requiresAttention || day.status == "TO_REVIEW") {
+                WorkDayReviewCandidate(day, suggestion)
+            } else {
+                null
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun effectiveBreakMinutes(workDay: WorkDay): Int {
         val start = workDay.roundedArrivalTime ?: workDay.arrivalTime
@@ -400,6 +466,72 @@ class WorkHoursViewModel @Inject constructor(
     fun deleteWorkDay(workDay: WorkDay) {
         viewModelScope.launch {
             workDayDao.deleteWorkDay(workDay)
+        }
+    }
+
+    fun quickApproveWorkDay(candidate: WorkDayReviewCandidate) {
+        viewModelScope.launch {
+            _lastModifiedWorkDays.value = listOf(candidate.workDay)
+            val day = candidate.workDay
+            val sug = candidate.suggestion
+            val effectiveDeparture = day.departureTime ?: sug.suggestedDepartureTime
+            val roundedDep = if (day.roundedDepartureTime != null) {
+                day.roundedDepartureTime
+            } else {
+                com.cimdriver.app.util.TimeUtil.roundToNearestQuarterHour(effectiveDeparture ?: day.arrivalTime)
+            }
+            val effectiveBreak = if (day.breakMinutes > 0) day.breakMinutes else sug.suggestedBreakMinutes
+            val effectiveProject = if (!day.projectCode.isNullOrBlank()) day.projectCode else sug.suggestedProjectCode
+
+            val updated = day.copy(
+                departureTime = effectiveDeparture,
+                roundedDepartureTime = roundedDep,
+                breakMinutes = effectiveBreak,
+                projectCode = effectiveProject,
+                status = "APPROVED"
+            )
+            workDayDao.updateWorkDay(updated)
+        }
+    }
+
+    fun approveAllHighConfidenceWorkDays(candidates: List<WorkDayReviewCandidate> = workDayReviewCandidates.value) {
+        viewModelScope.launch {
+            val highConf = candidates.filter { it.suggestion.isHighConfidence }
+            if (highConf.isNotEmpty()) {
+                _lastModifiedWorkDays.value = highConf.map { it.workDay }
+                highConf.forEach { candidate ->
+                    val day = candidate.workDay
+                    val sug = candidate.suggestion
+                    val effectiveDeparture = day.departureTime ?: sug.suggestedDepartureTime
+                    val roundedDep = if (day.roundedDepartureTime != null) {
+                        day.roundedDepartureTime
+                    } else {
+                        com.cimdriver.app.util.TimeUtil.roundToNearestQuarterHour(effectiveDeparture ?: day.arrivalTime)
+                    }
+                    val effectiveBreak = if (day.breakMinutes > 0) day.breakMinutes else sug.suggestedBreakMinutes
+                    val effectiveProject = if (!day.projectCode.isNullOrBlank()) day.projectCode else sug.suggestedProjectCode
+
+                    val updated = day.copy(
+                        departureTime = effectiveDeparture,
+                        roundedDepartureTime = roundedDep,
+                        breakMinutes = effectiveBreak,
+                        projectCode = effectiveProject,
+                        status = "APPROVED"
+                    )
+                    workDayDao.updateWorkDay(updated)
+                }
+            }
+        }
+    }
+
+    fun undoLastApproval() {
+        val previous = _lastModifiedWorkDays.value
+        if (previous.isEmpty()) return
+        viewModelScope.launch {
+            previous.forEach { day ->
+                workDayDao.updateWorkDay(day)
+            }
+            _lastModifiedWorkDays.value = emptyList()
         }
     }
 }

@@ -26,7 +26,10 @@ data class TargetProgress(
     val isBehind: Boolean,
     val diffValue: Double,
     val effectiveTargetValue: Double, // Pro-rata adjusted target
-    val proRataFactor: Double // 1.0 = full year, 0.5 = half year, etc.
+    val proRataFactor: Double, // 1.0 = full year, 0.5 = half year, etc.
+    val remainingWorkDays: Int = 0,
+    val requiredPacePerDay: Double = 0.0,
+    val guidanceMessage: String = ""
 )
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
