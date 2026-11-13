@@ -201,6 +201,9 @@ interface WorkDayDao {
     @Query("SELECT COUNT(*) FROM work_days WHERE status = 'TO_REVIEW'")
     fun getToReviewCount(): Flow<Int>
 
+    @Query("SELECT MAX(date) FROM work_days WHERE projectCodeId = :projectCodeId OR projectCode = :code")
+    suspend fun getLastWorkDayTimeForProjectSync(projectCodeId: Long, code: String): Long?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkDay(workDay: WorkDay): Long
 

@@ -95,7 +95,8 @@ class WorkHoursViewModel @Inject constructor(
         settings,
         addressesFlow
     ) { days, trips, currentSettings, addresses ->
-        days.mapNotNull { day ->
+        val calNow = Calendar.getInstance()
+        days.filter { it.status == "TO_REVIEW" }.mapNotNull { day ->
             val calDay = Calendar.getInstance().apply { timeInMillis = day.date }
             val tripsOnDay = trips.filter { trip ->
                 val calTrip = Calendar.getInstance().apply { timeInMillis = trip.startTime }
@@ -108,7 +109,10 @@ class WorkHoursViewModel @Inject constructor(
                 settings = currentSettings,
                 savedAddresses = addresses
             )
-            if (suggestion.requiresAttention || day.status == "TO_REVIEW") {
+            val isToday = calDay.get(Calendar.YEAR) == calNow.get(Calendar.YEAR) &&
+                    calDay.get(Calendar.DAY_OF_YEAR) == calNow.get(Calendar.DAY_OF_YEAR)
+            val isInProgressToday = isToday && (day.departureTime == null && day.lastArrivalTime == null)
+            if (!isInProgressToday) {
                 WorkDayReviewCandidate(day, suggestion)
             } else {
                 null
@@ -475,6 +479,7 @@ class WorkHoursViewModel @Inject constructor(
             val day = candidate.workDay
             val sug = candidate.suggestion
             val effectiveDeparture = day.departureTime ?: sug.suggestedDepartureTime
+            val roundedArr = day.roundedArrivalTime ?: com.cimdriver.app.util.TimeUtil.roundToNearestQuarterHour(day.arrivalTime)
             val roundedDep = if (day.roundedDepartureTime != null) {
                 day.roundedDepartureTime
             } else {
@@ -485,6 +490,7 @@ class WorkHoursViewModel @Inject constructor(
 
             val updated = day.copy(
                 departureTime = effectiveDeparture,
+                roundedArrivalTime = roundedArr,
                 roundedDepartureTime = roundedDep,
                 breakMinutes = effectiveBreak,
                 projectCode = effectiveProject,
@@ -503,6 +509,7 @@ class WorkHoursViewModel @Inject constructor(
                     val day = candidate.workDay
                     val sug = candidate.suggestion
                     val effectiveDeparture = day.departureTime ?: sug.suggestedDepartureTime
+                    val roundedArr = day.roundedArrivalTime ?: com.cimdriver.app.util.TimeUtil.roundToNearestQuarterHour(day.arrivalTime)
                     val roundedDep = if (day.roundedDepartureTime != null) {
                         day.roundedDepartureTime
                     } else {
@@ -513,6 +520,7 @@ class WorkHoursViewModel @Inject constructor(
 
                     val updated = day.copy(
                         departureTime = effectiveDeparture,
+                        roundedArrivalTime = roundedArr,
                         roundedDepartureTime = roundedDep,
                         breakMinutes = effectiveBreak,
                         projectCode = effectiveProject,

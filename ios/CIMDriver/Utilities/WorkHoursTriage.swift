@@ -117,6 +117,24 @@ enum WorkHoursTriage {
 
         let suggestedProject = existingProject ?? tripWithProject?.projectCode ?? customerAddress?.projectCode
 
+        if workDay.status == "APPROVED" {
+            let actualDep = workDay.roundedDepartureTime ?? workDay.departureTime ?? workDay.lastArrivalTime ?? suggestedDeparture
+            let actualArr = workDay.roundedArrivalTime ?? workDay.arrivalTime
+            let grossSec = max(0, actualDep.timeIntervalSince(actualArr))
+            let effectiveBreak = workDay.breakMinutes > 0 ? workDay.breakMinutes : suggestedBreak
+            let netDuration = max(0, grossSec - Double(effectiveBreak) * 60)
+            let netHours = netDuration / 3600.0
+            return WorkDaySuggestion(
+                suggestedDepartureTime: actualDep,
+                suggestedBreakMinutes: effectiveBreak,
+                suggestedProjectCode: suggestedProject,
+                confidenceScore: 100,
+                statusText: String(format: "Goedgekeurd (%.1f uur netto)", netHours),
+                isHighConfidence: true,
+                requiresAttention: false
+            )
+        }
+
         var score = 95
         var statusText: String
         var requiresAttention = false

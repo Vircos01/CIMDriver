@@ -59,7 +59,7 @@ struct DashboardView: View {
 
     private var workDayCandidates: [WorkDayReviewCandidate] {
         let cal = Calendar.current
-        return workDays.compactMap { wd in
+        return workDays.filter { $0.status == "TO_REVIEW" }.compactMap { wd in
             let dayTrips = trips.filter { cal.isDate($0.startTime, inSameDayAs: wd.date) }
             let suggestion = WorkHoursTriage.evaluateWorkDay(
                 workDay: wd,
@@ -67,10 +67,12 @@ struct DashboardView: View {
                 settings: appSettings,
                 savedAddresses: addresses
             )
-            if suggestion.requiresAttention || wd.status == "TO_REVIEW" {
-                return WorkDayReviewCandidate(workDay: wd, suggestion: suggestion)
+            let isToday = cal.isDateInToday(wd.date)
+            let isActivelyRunning = isToday && (wd.departureTime == nil && wd.lastArrivalTime == nil)
+            if isActivelyRunning {
+                return nil
             }
-            return nil
+            return WorkDayReviewCandidate(workDay: wd, suggestion: suggestion)
         }
     }
     

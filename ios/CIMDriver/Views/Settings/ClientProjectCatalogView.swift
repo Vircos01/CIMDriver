@@ -81,6 +81,9 @@ struct ClientProjectCatalogView: View {
                     .swipeActions {
                         Button(project.isActive ? "Archiveer" : "Herstel", systemImage: project.isActive ? "archivebox" : "arrow.uturn.backward") {
                             project.isActive.toggle()
+                            if project.isActive {
+                                project.createdAt = Date()
+                            }
                             try? modelContext.save()
                         }
                         .tint(project.isActive ? .orange : .green)

@@ -111,6 +111,24 @@ object WorkHoursTriage {
         val isOffDay = TripClassification.isOutsideWorkHours(workDay.date, workDaysStr, "00:00", "23:59")
 
         // 5. Scoring & Plain Language Status
+        val isApproved = workDay.status == "APPROVED"
+        if (isApproved) {
+            val netHours = String.format(
+                Locale.getDefault(),
+                "%.1f",
+                (grossDurationMs - suggestedBreak * 60_000L).coerceAtLeast(0L) / 3600_000.0
+            )
+            return WorkDaySuggestion(
+                suggestedDepartureTime = suggestedDeparture,
+                suggestedBreakMinutes = suggestedBreak,
+                suggestedProjectCode = suggestedProject,
+                confidenceScore = 100,
+                statusText = "Goedgekeurd ($netHours uur netto)",
+                isHighConfidence = true,
+                requiresAttention = false
+            )
+        }
+
         var score = 95
         var statusText: String
         var requiresAttention = false

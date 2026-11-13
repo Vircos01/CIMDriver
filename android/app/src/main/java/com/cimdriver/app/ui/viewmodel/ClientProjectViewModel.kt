@@ -78,7 +78,12 @@ class ClientProjectViewModel @Inject constructor(
 
     fun updateProjectCode(projectCode: ProjectCode) {
         viewModelScope.launch {
-            projectCodeDao.updateProjectCode(projectCode)
+            val updated = if (projectCode.isActive) {
+                projectCode.copy(createdAt = System.currentTimeMillis())
+            } else {
+                projectCode
+            }
+            projectCodeDao.updateProjectCode(updated)
         }
     }
 
@@ -86,8 +91,9 @@ class ClientProjectViewModel @Inject constructor(
         viewModelScope.launch {
             val hasTrip = database.tripDao().getTripForProjectSync(projectCode.id) != null
             val hasTarget = database.hoursTargetDao().getHoursTargetForProjectSync(projectCode.id) != null
+            val hasWorkDay = (database.workDayDao().getLastWorkDayTimeForProjectSync(projectCode.id, projectCode.code) ?: 0L) > 0L
             
-            if (hasTrip || hasTarget) {
+            if (hasTrip || hasTarget || hasWorkDay) {
                 // In use -> we can only archive it (soft delete)
                 projectCodeDao.updateProjectCode(projectCode.copy(isActive = false))
                 onResult(true, "Projectcode in gebruik, is in plaats daarvan gearchiveerd.")
@@ -101,7 +107,12 @@ class ClientProjectViewModel @Inject constructor(
     
     fun restoreProjectCode(projectCode: ProjectCode) {
         viewModelScope.launch {
-            projectCodeDao.updateProjectCode(projectCode.copy(isActive = true))
+            projectCodeDao.updateProjectCode(
+                projectCode.copy(
+                    isActive = true,
+                    createdAt = System.currentTimeMillis()
+                )
+            )
         }
     }
     
@@ -121,7 +132,8 @@ class ClientProjectViewModel @Inject constructor(
         
         for (pc in allActive) {
             val lastTripTime = database.tripDao().getLastTripTimeForProjectSync(pc.id) ?: 0L
-            val compareTime = maxOf(lastTripTime, pc.createdAt)
+            val lastWorkDayTime = database.workDayDao().getLastWorkDayTimeForProjectSync(pc.id, pc.code) ?: 0L
+            val compareTime = maxOf(lastTripTime, lastWorkDayTime, pc.createdAt)
             if (compareTime > 0 && compareTime < thresholdTime) {
                 // Older than threshold, archive it
                 database.projectCodeDao().updateProjectCode(pc.copy(isActive = false))

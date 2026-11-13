@@ -270,17 +270,19 @@ struct WorkDayRowView: View {
             }
 
             // Plain language status badge
+            let isApproved = workDay.status == "APPROVED" || workDay.status == "DONE"
+            let isHighConf = isApproved || suggestion.isHighConfidence
             HStack(spacing: 6) {
-                Image(systemName: suggestion.isHighConfidence ? "checkmark.circle.fill" : "info.circle.fill")
-                    .foregroundColor(suggestion.isHighConfidence ? .cimGreen : .orange)
+                Image(systemName: isHighConf ? "checkmark.circle.fill" : "info.circle.fill")
+                    .foregroundColor(isHighConf ? .cimGreen : .orange)
                     .font(.caption2)
                 Text(suggestion.statusText)
                     .font(.caption)
-                    .foregroundColor(suggestion.isHighConfidence ? .cimGreen : .orange)
+                    .foregroundColor(isHighConf ? .cimGreen : .orange)
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background((suggestion.isHighConfidence ? Color.cimGreen : Color.orange).opacity(0.1))
+            .background((isHighConf ? Color.cimGreen : Color.orange).opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 6))
 
             HStack {
@@ -319,7 +321,8 @@ struct WorkDayRowView: View {
             .foregroundStyle(.secondary)
 
             // Smart suggestion card if review required
-            if workDay.status == "TO_REVIEW" || suggestion.requiresAttention {
+            let isActivelyRunningToday = Calendar.current.isDateInToday(workDay.date) && workDay.departureTime == nil && workDay.lastArrivalTime == nil
+            if workDay.status == "TO_REVIEW" && !isActivelyRunningToday {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Slimme suggestie:")
                         .font(.caption2.bold())

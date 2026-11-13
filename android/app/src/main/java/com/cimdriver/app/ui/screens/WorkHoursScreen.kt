@@ -263,6 +263,7 @@ fun WorkHoursScreen(
                         }
                         items(days, key = { it.id }) { workDay ->
                         val isToReview = workDay.status == "TO_REVIEW"
+                        val isApproved = workDay.status == "APPROVED" || workDay.status == "DONE"
                         val isInProgress = workDay.status == "IN_PROGRESS"
                         val effectiveStart = workDay.roundedArrivalTime ?: workDay.arrivalTime
                         val effectiveEnd = workDay.roundedDepartureTime ?: workDay.departureTime ?: workDay.lastArrivalTime ?: workDay.arrivalTime
@@ -280,7 +281,7 @@ fun WorkHoursScreen(
                                     onEditWorkDay(workDay.id)
                                 },
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isToReview) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                                    containerColor = if (isToReview) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surfaceVariant
                                 )
                         ) {
                             Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
@@ -297,6 +298,14 @@ fun WorkHoursScreen(
                                                 contentDescription = stringResource(R.string.to_be_rated),
                                                 tint = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.size(20.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                        } else if (isApproved) {
+                                            Icon(
+                                                imageVector = Icons.Filled.CheckCircle,
+                                                contentDescription = "Goedgekeurd",
+                                                tint = Color(0xFF16A34A),
+                                                modifier = Modifier.size(18.dp)
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
                                         }
@@ -343,6 +352,7 @@ fun WorkHoursScreen(
                                 suggestion?.let { sug ->
                                     Spacer(modifier = Modifier.height(6.dp))
                                     val badgeColor = when {
+                                        isApproved -> Color(0xFF16A34A)
                                         isInProgress -> MaterialTheme.colorScheme.primary
                                         sug.isHighConfidence -> Color(0xFF16A34A)
                                         else -> Color(0xFFD97706)
@@ -355,7 +365,7 @@ fun WorkHoursScreen(
                                             .padding(horizontal = 8.dp, vertical = 4.dp)
                                     ) {
                                         Icon(
-                                            imageVector = if (sug.isHighConfidence) Icons.Filled.CheckCircle else Icons.Filled.Info,
+                                            imageVector = if (isApproved || sug.isHighConfidence) Icons.Filled.CheckCircle else Icons.Filled.Info,
                                             contentDescription = null,
                                             tint = badgeColor,
                                             modifier = Modifier.size(14.dp)
@@ -370,7 +380,7 @@ fun WorkHoursScreen(
                                     }
                                 }
 
-                                if (isToReview || suggestion?.requiresAttention == true) {
+                                if (isToReview && !isInProgress) {
                                     Spacer(modifier = Modifier.height(10.dp))
                                     val sug = suggestion ?: com.cimdriver.app.util.WorkHoursTriage.evaluateWorkDay(workDay)
                                     Card(
