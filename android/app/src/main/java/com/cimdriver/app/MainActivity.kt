@@ -105,5 +105,13 @@ class MainActivity : ComponentActivity() {
             }
             intent.removeExtra("EXTRA_VEHICLE_ID")
         }
+
+        if (intent?.hasExtra("EXTRA_FILL_UP_ID") == true) {
+            val fillUpId = intent.getLongExtra("EXTRA_FILL_UP_ID", -1L)
+            if (fillUpId != -1L) {
+                com.cimdriver.app.service.FuelPromptStore.request(fillUpId)
+            }
+            intent.removeExtra("EXTRA_FILL_UP_ID")
+        }
     }
 }

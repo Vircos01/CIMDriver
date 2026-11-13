@@ -4,7 +4,18 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.6 (Current Version)
+## Version 1.3.7 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "New Features & Improvements"
+    * **Reliable Gas Station & EV Charger Detection:** Search radius doubled to 150m with native Android Geocoder fallback supporting all major brands (Shell, BP, Total, Esso, Texaco, TinQ, Tango, AVIA, Fastned, etc.).
+    * **Mid-trip Refueling Detection:** When ignition/Bluetooth disconnects briefly at a station along your route, refueling is captured immediately even if the trip continues afterwards.
+    * **Heads-up Notification:** Fuel alerts now use a dedicated high-priority channel (`FuelAlertChannel`). Tapping the alert directly opens registration with pre-filled station and odometer readings.
+    * **Dashboard Action Card:** Pending fuel entries are prominently surfaced on the dashboard with quick "Enter Details" and "Dismiss" buttons.
+    * **Auto Cost Calculation:** Automatically computes total cost or price per liter when entering amounts.
+    * **Vehicle Filter for Fuel & Charging:** Multi-vehicle support with top-bar vehicle filtering on the fuel screen.
+
+## Version 1.3.6
 *Release date: November 13, 2026*
 
 !!! success "New Features & Improvements"

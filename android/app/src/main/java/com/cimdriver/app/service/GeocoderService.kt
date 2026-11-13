@@ -209,49 +209,117 @@ class GeocoderService(private val context: Context) {
 
     suspend fun checkGasStationNearby(latitude: Double, longitude: Double, engineType: String = "ICE"): String? {
         return withContext(Dispatchers.IO) {
-            try {
-                val amenities = mutableListOf("\"amenity\"=\"fuel\"")
-                if (engineType == "EV" || engineType == "PHEV") {
-                    amenities.add("\"amenity\"=\"charging_station\"")
-                }
-                
-                val nodeQueries = amenities.joinToString(";") { "node(around:75,$latitude,$longitude)[$it]" }
-                val wayQueries = amenities.joinToString(";") { "way(around:75,$latitude,$longitude)[$it]" }
-                
-                val query = "[out:json];($nodeQueries;$wayQueries;);out center;"
-                
-                val url = URL("https://overpass-api.de/api/interpreter")
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "POST"
-                connection.setRequestProperty("User-Agent", "CIMDriver/1.0")
-                connection.doOutput = true
-                connection.outputStream.write(query.toByteArray())
+            // 1. Try Overpass API with 150m radius and 5s timeout
+            val overpassResult = tryOverpassGasStation(latitude, longitude, engineType)
+            if (!overpassResult.isNullOrBlank()) {
+                Log.d("GeocoderService", "Gas station found via Overpass: $overpassResult")
+                return@withContext overpassResult
+            }
 
-                if (connection.responseCode == 200) {
-                    val response = connection.inputStream.bufferedReader().readText()
-                    val json = JSONObject(response)
-                    val elements = json.optJSONArray("elements")
-                    if (elements != null && elements.length() > 0) {
-                        for (i in 0 until elements.length()) {
-                            val element = elements.getJSONObject(i)
-                            val tags = element.optJSONObject("tags")
-                            if (tags != null) {
-                                val name = tags.optString("name")
-                                val brand = tags.optString("brand")
-                                val operator = tags.optString("operator")
-                                if (name.isNotEmpty()) return@withContext name
-                                if (brand.isNotEmpty()) return@withContext brand
-                                if (operator.isNotEmpty()) return@withContext operator
-                            }
+            // 2. Fallback to Android native Geocoder looking for gas station/charging POIs and brands
+            val fallbackResult = checkGasStationNearbyFallback(latitude, longitude, engineType)
+            if (!fallbackResult.isNullOrBlank()) {
+                Log.d("GeocoderService", "Gas station found via Geocoder fallback: $fallbackResult")
+                return@withContext fallbackResult
+            }
+
+            null
+        }
+    }
+
+    private fun tryOverpassGasStation(latitude: Double, longitude: Double, engineType: String): String? {
+        return try {
+            val amenities = mutableListOf("\"amenity\"=\"fuel\"")
+            if (engineType == "EV" || engineType == "PHEV") {
+                amenities.add("\"amenity\"=\"charging_station\"")
+            }
+            
+            val nodeQueries = amenities.joinToString(";") { "node(around:150,$latitude,$longitude)[$it]" }
+            val wayQueries = amenities.joinToString(";") { "way(around:150,$latitude,$longitude)[$it]" }
+            
+            val query = "[out:json][timeout:5];($nodeQueries;$wayQueries;);out center;"
+            
+            val url = URL("https://overpass-api.de/api/interpreter")
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            connection.setRequestProperty("User-Agent", "CIMDriver/1.0 (Android)")
+            connection.connectTimeout = 5000
+            connection.readTimeout = 5000
+            connection.doOutput = true
+            connection.outputStream.use { os ->
+                os.write(query.toByteArray())
+            }
+
+            if (connection.responseCode == 200) {
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+                val json = JSONObject(response)
+                val elements = json.optJSONArray("elements")
+                if (elements != null && elements.length() > 0) {
+                    for (i in 0 until elements.length()) {
+                        val element = elements.getJSONObject(i)
+                        val tags = element.optJSONObject("tags")
+                        if (tags != null) {
+                            val name = tags.optString("name")
+                            val brand = tags.optString("brand")
+                            val operator = tags.optString("operator")
+                            if (name.isNotEmpty()) return name
+                            if (brand.isNotEmpty()) return brand
+                            if (operator.isNotEmpty()) return operator
                         }
-                        return@withContext if (engineType == "EV") "Laadpaal" else "Tankstation"
+                    }
+                    return if (engineType == "EV") "Laadpaal" else "Tankstation"
+                }
+            }
+            null
+        } catch (e: Exception) {
+            Log.w("GeocoderService", "Overpass gas station check failed: ${e.message}")
+            null
+        }
+    }
+
+    private suspend fun checkGasStationNearbyFallback(latitude: Double, longitude: Double, engineType: String): String? {
+        return try {
+            val addresses: List<Address> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                kotlinx.coroutines.withTimeoutOrNull(2500) {
+                    kotlinx.coroutines.suspendCancellableCoroutine { continuation ->
+                        geocoder.getFromLocation(latitude, longitude, 5, object : android.location.Geocoder.GeocodeListener {
+                            override fun onGeocode(addresses: List<Address>) {
+                                if (continuation.isActive) continuation.resume(addresses)
+                            }
+                            override fun onError(errorMessage: String?) {
+                                if (continuation.isActive) continuation.resume(emptyList())
+                            }
+                        })
+                    }
+                } ?: emptyList()
+            } else {
+                @Suppress("DEPRECATION")
+                geocoder.getFromLocation(latitude, longitude, 5) ?: emptyList()
+            }
+
+            val fuelBrands = listOf(
+                "shell", "bp", "esso", "total", "texaco", "tinq", "tango", "avia", "q8",
+                "aral", "lukoil", "firezone", "tamoil", "gulf", "argos", "amigo", "dco",
+                "sakko", "tankstation", "brandstof", "benzinepomp", "fastned", "ionity",
+                "supercharger", "allego", "laadpaal", "laadstation"
+            )
+
+            for (addr in addresses) {
+                val feature = addr.featureName?.lowercase(Locale.ROOT) ?: ""
+                val thoroughfare = addr.thoroughfare?.lowercase(Locale.ROOT) ?: ""
+                val line0 = (addr.getAddressLine(0) ?: "").lowercase(Locale.ROOT)
+
+                for (brand in fuelBrands) {
+                    if (feature.contains(brand) || thoroughfare.contains(brand) || line0.contains(brand)) {
+                        return addr.featureName?.takeIf { it.isNotBlank() }
+                            ?: brand.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
                     }
                 }
-                null
-            } catch (e: Exception) {
-                Log.e("GeocoderService", "Failed to check gas station", e)
-                null
             }
+            null
+        } catch (e: Exception) {
+            Log.w("GeocoderService", "Fallback gas station check failed: ${e.message}")
+            null
         }
     }
 

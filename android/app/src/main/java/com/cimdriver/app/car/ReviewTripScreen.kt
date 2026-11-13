@@ -71,7 +71,7 @@ class ReviewTripScreen(carContext: CarContext, private val tripId: Long) : Scree
             db.tripDao().updateTrip(
                 currentTrip.copy(
                     tripType = type,
-                    status = "APPROVED"
+                    status = "DONE"
                 )
             )
             screenManager.pop()

@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 class TrackingService : Service(), LocationListener {
     
     private val CHANNEL_ID = "TrackingServiceChannel"
+    private val FUEL_CHANNEL_ID = "FuelAlertChannel"
     private val NOTIFICATION_ID = 1
 
     private val serviceJob = SupervisorJob()
@@ -201,6 +202,42 @@ class TrackingService : Service(), LocationListener {
         notificationManager.notify(NOTIFICATION_ID, createNotification(getString(R.string.tracking_disconnect_warning)))
         TrackingStatusStore.warning("Bluetoothverbinding verbroken; rit blijft tijdelijk actief")
         
+        // Immediate check: did the driver stop at a gas station / charging point during this pause?
+        activeTripId?.let { tripId ->
+            serviceScope.launch {
+                try {
+                    val lastPoint = database.locationPointDao().getLastPointForTrip(tripId)
+                    if (lastPoint != null) {
+                        val currentTrip = database.tripDao().getTripById(tripId)
+                        val vehicle = database.vehicleDao().getVehicleById(vehicleId)
+                        val points = database.locationPointDao().getPointsForTrip(tripId).firstOrNull() ?: emptyList()
+                        var recordedDistance = 0f
+                        for (i in 0 until points.size - 1) {
+                            val results = FloatArray(1)
+                            Location.distanceBetween(
+                                points[i].latitude, points[i].longitude,
+                                points[i+1].latitude, points[i+1].longitude,
+                                results
+                            )
+                            recordedDistance += results[0]
+                        }
+                        val tripKm = kotlin.math.round(recordedDistance / 1000.0).toInt()
+                        val estimatedOdo = (currentTrip?.odometerStart ?: vehicle?.odometerCurrent ?: 0) + tripKm
+
+                        checkAndCreateFuelDraft(
+                            vehicleId = vehicleId,
+                            lat = lastPoint.latitude,
+                            lon = lastPoint.longitude,
+                            estimatedOdometer = estimatedOdo,
+                            fallbackAddress = null
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("TrackingService", "Failed to check fuel draft on disconnect", e)
+                }
+            }
+        }
+
         disconnectJob = serviceScope.launch {
             val settings = database.settingsDao().getSettings().firstOrNull()
             val gracePeriodMs = (settings?.gracePeriodSec ?: 180) * 1000L
@@ -672,67 +709,104 @@ class TrackingService : Service(), LocationListener {
         sendCompletionNotification(tripId, vehicleId)
 
         if (endLat != null && endLon != null) {
-            val savedFillUps = database.fuelFillUpDao().getAllFillUpsSync()
-            var closestFillUp: com.cimdriver.app.data.local.entity.FuelFillUp? = null
-            var minDistance = Float.MAX_VALUE
-
-            for (fillUp in savedFillUps) {
-                if (fillUp.latitude != null && fillUp.longitude != null && !fillUp.stationName.isNullOrBlank()) {
-                    val results = FloatArray(1)
-                    android.location.Location.distanceBetween(endLat, endLon, fillUp.latitude, fillUp.longitude, results)
-                    if (results[0] < minDistance && results[0] <= 100f) {
-                        minDistance = results[0]
-                        closestFillUp = fillUp
-                    }
-                }
-            }
-
-            val stationName = closestFillUp?.stationName ?: run {
-                val engineType = vehicle?.engineType ?: "ICE"
-                geocoderService.checkGasStationNearby(endLat, endLon, engineType)
-            }
-            
-            if (stationName != null) {
-                val stationAddress = closestFillUp?.address ?: finalEndAddress
-                val stationLat = closestFillUp?.latitude ?: endLat
-                val stationLon = closestFillUp?.longitude ?: endLon
-
-                val fuelFillUp = com.cimdriver.app.data.local.entity.FuelFillUp(
-                    vehicleId = vehicleId,
-                    dateTimestamp = System.currentTimeMillis(),
-                    liters = 0.0,
-                    pricePerLiter = 0.0,
-                    totalCost = 0.0,
-                    odometer = odoEnd,
-                    stationName = stationName,
-                    address = stationAddress,
-                    latitude = stationLat,
-                    longitude = stationLon,
-                    status = "DRAFT"
-                )
-                database.fuelFillUpDao().insertFillUp(fuelFillUp)
-                sendFuelDraftNotification()
-            }
+            checkAndCreateFuelDraft(
+                vehicleId = vehicleId,
+                lat = endLat,
+                lon = endLon,
+                estimatedOdometer = odoEnd,
+                fallbackAddress = finalEndAddress
+            )
         }
     }
 
-    private fun sendFuelDraftNotification() {
+    private suspend fun checkAndCreateFuelDraft(
+        vehicleId: Long,
+        lat: Double,
+        lon: Double,
+        estimatedOdometer: Int,
+        fallbackAddress: String?
+    ) {
+        val vehicle = database.vehicleDao().getVehicleById(vehicleId)
+        val engineType = vehicle?.engineType ?: "ICE"
+
+        // 1. Avoid duplicate drafts: check if there is an uncompleted draft in the last 2 hours
+        val savedFillUps = database.fuelFillUpDao().getAllFillUpsSync()
+        val twoHoursAgo = System.currentTimeMillis() - 2 * 60 * 60 * 1000L
+        val hasRecentDraft = savedFillUps.any { fillUp ->
+            fillUp.vehicleId == vehicleId &&
+            fillUp.status == "DRAFT" &&
+            fillUp.dateTimestamp >= twoHoursAgo
+        }
+        if (hasRecentDraft) {
+            Log.d("TrackingService", "Skipping fuel draft check: draft already exists from last 2 hours")
+            return
+        }
+
+        // 2. Check saved fill-ups within 150m
+        var closestFillUp: com.cimdriver.app.data.local.entity.FuelFillUp? = null
+        var minDistance = Float.MAX_VALUE
+
+        for (fillUp in savedFillUps) {
+            if (fillUp.latitude != null && fillUp.longitude != null && !fillUp.stationName.isNullOrBlank()) {
+                val results = FloatArray(1)
+                android.location.Location.distanceBetween(lat, lon, fillUp.latitude, fillUp.longitude, results)
+                if (results[0] < minDistance && results[0] <= 150f) {
+                    minDistance = results[0]
+                    closestFillUp = fillUp
+                }
+            }
+        }
+
+        val stationName = closestFillUp?.stationName ?: run {
+            geocoderService.checkGasStationNearby(lat, lon, engineType)
+        }
+
+        if (stationName != null) {
+            val stationAddress = closestFillUp?.address ?: fallbackAddress ?: geocoderService.getAddressFromLocation(lat, lon)
+            val stationLat = closestFillUp?.latitude ?: lat
+            val stationLon = closestFillUp?.longitude ?: lon
+
+            val fuelFillUp = com.cimdriver.app.data.local.entity.FuelFillUp(
+                vehicleId = vehicleId,
+                dateTimestamp = System.currentTimeMillis(),
+                liters = 0.0,
+                pricePerLiter = 0.0,
+                totalCost = 0.0,
+                odometer = estimatedOdometer,
+                stationName = stationName,
+                address = stationAddress,
+                latitude = stationLat,
+                longitude = stationLon,
+                status = "DRAFT"
+            )
+            val newFillUpId = database.fuelFillUpDao().insertFillUp(fuelFillUp)
+            Log.i("TrackingService", "Created draft fuel fill-up $newFillUpId at $stationName")
+            sendFuelDraftNotification(newFillUpId, stationName, engineType)
+        }
+    }
+
+    private fun sendFuelDraftNotification(fillUpId: Long, stationName: String, engineType: String) {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            // Optional: putExtra to navigate to Fuel Draft screen
+            putExtra("EXTRA_FILL_UP_ID", fillUpId)
         }
         val pendingIntent = PendingIntent.getActivity(
-            this, 203, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            this, (20000 + fillUpId).toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val notification = androidx.core.app.NotificationCompat.Builder(this, "tracking_channel")
-            .setContentTitle("Ben je aan het tanken/laden?")
-            .setContentText("Je lijkt bij een tankstation of laadpaal te staan. Tik om op te slaan.")
-            .setSmallIcon(R.drawable.ic_car_location)
+        val isEV = engineType == "EV"
+        val title = if (isEV) "Laden bij $stationName?" else "Tanken bij $stationName?"
+        val content = if (isEV) "Tik om kWh en laadkosten op te slaan." else "Tik om liters en bedrag in te vullen."
+
+        val notification = androidx.core.app.NotificationCompat.Builder(this, FUEL_CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        notificationManager.notify(4, notification)
+        notificationManager.notify((50000 + fillUpId).toInt(), notification)
     }
 
     private fun sendWorkDayCompletionNotification(workDayId: Long) {
@@ -905,12 +979,21 @@ class TrackingService : Service(), LocationListener {
     }
 
     private fun createNotificationChannel() {
+        val manager = getSystemService(NotificationManager::class.java) ?: return
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
             "CIMDriver Tracking Service Channel",
             NotificationManager.IMPORTANCE_LOW
         )
-        val manager = getSystemService(NotificationManager::class.java)
+        val fuelChannel = NotificationChannel(
+            FUEL_CHANNEL_ID,
+            "CIMDriver Brandstof & Laden",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Meldingen bij aankomst of tussenstop bij een tankstation of laadpaal"
+            enableVibration(true)
+        }
         manager.createNotificationChannel(serviceChannel)
+        manager.createNotificationChannel(fuelChannel)
     }
 }

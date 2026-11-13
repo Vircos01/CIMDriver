@@ -10,6 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -32,12 +35,30 @@ fun FuelScreen(
 ) {
     val fillUps by viewModel.fillUps.collectAsState()
     val vehicles by viewModel.vehicles.collectAsState()
+    var selectedVehicleId by remember(vehicles) { mutableStateOf<Long?>(null) }
+    val activeVehicleId = selectedVehicleId ?: (vehicles.find { it.isDefault } ?: vehicles.firstOrNull())?.id
+    val selectedVehicle = vehicles.find { it.id == activeVehicleId }
+
+    val displayedFillUps = if (activeVehicleId != null && vehicles.size > 1) {
+        fillUps.filter { it.vehicleId == activeVehicleId }
+    } else {
+        fillUps
+    }
 
     Scaffold(
         topBar = { 
             CimDriverTopAppBar(
                 onOpenDrawer = onOpenDrawer,
-                title = { Text(stringResource(R.string.fuel), color = com.cimdriver.app.ui.theme.CIMDriverWhite) }
+                title = { Text(stringResource(R.string.fuel), color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
+                actions = {
+                    if (vehicles.size > 1) {
+                        VehicleSelectorTopBarAction(
+                            vehicles = vehicles,
+                            activeVehicleId = activeVehicleId,
+                            onVehicleSelected = { selectedVehicleId = it }
+                        )
+                    }
+                }
             ) 
         },
         floatingActionButton = {
@@ -47,10 +68,8 @@ fun FuelScreen(
         }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-            if (vehicles.isNotEmpty() && fillUps.isNotEmpty()) {
-                // Show stats for the first vehicle for now, or total
-                val selectedVehicle = vehicles.first()
-                val stats = viewModel.getStatsForVehicle(selectedVehicle.id, fillUps)
+            if (selectedVehicle != null && displayedFillUps.isNotEmpty()) {
+                val stats = viewModel.getStatsForVehicle(selectedVehicle.id, displayedFillUps)
                 
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -74,7 +93,7 @@ fun FuelScreen(
                 }
             }
 
-            if (fillUps.isEmpty()) {
+            if (displayedFillUps.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
@@ -92,8 +111,8 @@ fun FuelScreen(
                     }
                 }
             } else {
-                val drafts = fillUps.filter { it.status == "DRAFT" }
-                val history = fillUps.filter { it.status != "DRAFT" }.sortedByDescending { it.dateTimestamp }
+                val drafts = displayedFillUps.filter { it.status == "DRAFT" }
+                val history = displayedFillUps.filter { it.status != "DRAFT" }.sortedByDescending { it.dateTimestamp }
 
                 LazyColumn {
                     if (drafts.isNotEmpty()) {

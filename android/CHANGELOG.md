@@ -2,6 +2,17 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.3.7] - 2026-11-13
+
+### Toegevoegd & Verbeterd
+- **Betrouwbare automatische tankstation- en laadpaaldetectie:** De detectie van tankstations en laadpalen is grondig vernieuwd met een vergrote zoekstraal (150m) en een native Android Geocoder fallback die bekende merken (Shell, BP, Total, Esso, Texaco, TinQ, Tango, AVIA, Fastned, etc.) direct herkent.
+- **Herkenning bij tussenstops (mid-trip):** Wanneer het contact/Bluetooth tijdens een rit tijdelijk wordt verbroken bij een pomp of laadpaal, wordt direct gedetecteerd dat er getankt wordt, zelfs als de rit na de pauze gewoon weer verdergaat.
+- **Directe pop-up notificatie:** Meldingen over tank- en laadsessies gebruiken nu een eigen notificatiekanaal met hoge prioriteit (`FuelAlertChannel`). Tikken op de melding opent direct het registratiescherm met de juiste pomp, datum en tellerstand alvast ingevuld.
+- **Dashboard herinneringskaart:** Openstaande concept-tankbeurten worden nu direct en prominent als actiekaart op het dashboard getoond met snelle knoppen voor "Gegevens invoeren" en "Negeren".
+- **Slim rekenhulpje bij invoer:** Bij het invullen van liters en prijs per liter wordt het totaalbedrag automatisch berekend (en vice versa bij invullen van liters en totaalbedrag).
+- **Voertuigfilter in brandstofoverzicht:** Gebruikers met meerdere voertuigen kunnen nu in het brandstofoverzicht direct schakelen tussen auto's.
+- **Statuscorrectie in Android Auto:** Beoordeelde ritten via Android Auto worden nu correct met status `DONE` geregistreerd.
+
 ## [1.3.6] - 2026-11-13
 
 ### Toegevoegd & Verbeterd

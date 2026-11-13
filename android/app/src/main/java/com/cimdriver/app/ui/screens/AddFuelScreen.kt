@@ -42,6 +42,12 @@ fun AddFuelScreen(
     var existingFillUp by remember { mutableStateOf<FuelFillUp?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(vehicles) {
+        if (selectedVehicleId == 0L && vehicles.isNotEmpty()) {
+            selectedVehicleId = (vehicles.find { it.isDefault } ?: vehicles.first()).id
+        }
+    }
+
     LaunchedEffect(fillUpId) {
         if (fillUpId != null) {
             val fillUp = viewModel.getFillUpById(fillUpId)
@@ -51,7 +57,7 @@ fun AddFuelScreen(
                 if (fillUp.liters > 0) litersStr = fillUp.liters.toString()
                 if (fillUp.pricePerLiter > 0) pricePerLiterStr = fillUp.pricePerLiter.toString()
                 if (fillUp.totalCost > 0) totalCostStr = fillUp.totalCost.toString()
-                odometerStr = fillUp.odometer.toString()
+                odometerStr = if (fillUp.odometer > 0) fillUp.odometer.toString() else (selectedVehicle?.odometerCurrent?.toString() ?: "")
                 stationName = fillUp.stationName ?: fillUp.address ?: ""
                 notes = fillUp.notes ?: ""
                 latitude = fillUp.latitude
@@ -63,7 +69,14 @@ fun AddFuelScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (fillUpId == null) "Tankbeurt Toevoegen" else "Tankbeurt Bewerken", color = com.cimdriver.app.ui.theme.CIMDriverWhite) },
+                title = { 
+                    val titleText = when {
+                        existingFillUp?.status == "DRAFT" -> if (isEV) "Laadsessie Voltooien" else "Tankbeurt Voltooien"
+                        fillUpId == null -> if (isEV) "Laadsessie Toevoegen" else "Tankbeurt Toevoegen"
+                        else -> if (isEV) "Laadsessie Bewerken" else "Tankbeurt Bewerken"
+                    }
+                    Text(titleText, color = com.cimdriver.app.ui.theme.CIMDriverWhite) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Terug", tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
@@ -139,15 +152,29 @@ fun AddFuelScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
                         value = litersStr,
-                        onValueChange = { litersStr = it },
-                        label = { Text(if (isEV) "kWh" else "Liters") },
+                        onValueChange = { 
+                            litersStr = it
+                            val l = it.replace(',', '.').toDoubleOrNull()
+                            val p = pricePerLiterStr.replace(',', '.').toDoubleOrNull()
+                            if (l != null && p != null && l > 0 && p > 0) {
+                                totalCostStr = String.format(java.util.Locale.US, "%.2f", l * p)
+                            }
+                        },
+                        label = { Text(if (isEV) "Hoeveelheid (kWh)" else "Hoeveelheid (Liters)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
                         value = pricePerLiterStr,
-                        onValueChange = { pricePerLiterStr = it },
+                        onValueChange = { 
+                            pricePerLiterStr = it
+                            val p = it.replace(',', '.').toDoubleOrNull()
+                            val l = litersStr.replace(',', '.').toDoubleOrNull()
+                            if (l != null && p != null && l > 0 && p > 0) {
+                                totalCostStr = String.format(java.util.Locale.US, "%.2f", l * p)
+                            }
+                        },
                         label = { Text(if (isEV) "Prijs per kWh (€)" else "Prijs per liter (€)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth()
@@ -155,7 +182,14 @@ fun AddFuelScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
                         value = totalCostStr,
-                        onValueChange = { totalCostStr = it },
+                        onValueChange = { 
+                            totalCostStr = it
+                            val t = it.replace(',', '.').toDoubleOrNull()
+                            val l = litersStr.replace(',', '.').toDoubleOrNull()
+                            if (t != null && l != null && l > 0 && t > 0) {
+                                pricePerLiterStr = String.format(java.util.Locale.US, "%.3f", t / l)
+                            }
+                        },
                         label = { Text("Totale kosten (€)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth()

@@ -6,7 +6,18 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.6 (Huidige Versie)
+## Versie 1.3.7 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Nieuwe Functies & Verbeteringen"
+    * **Betrouwbare tankstation- & laadpaaldetectie:** De zoekstraal is verdubbeld naar 150m en voorzien van een slimme fallback via de Android Geocoder voor betrouwbare herkenning van alle bekende merken (Shell, BP, Total, Esso, Texaco, TinQ, Tango, AVIA, Fastned, etc.).
+    * **Herkenning bij tussenstops:** Bij een tankstop onderweg (contact uit) wordt direct geregistreerd dat er getankt wordt, ook wanneer de rit na de tankbeurt als één geheel doorloopt.
+    * **Heads-up notificatie:** Meldingen over tank- en laadsessies poppen direct op (`FuelAlertChannel`). Eén tik opent het invoerscherm met station en tellerstand vooraf ingevuld.
+    * **Dashboard actiekaart:** Openstaande tankbeurten zijn direct zichtbaar op het dashboard met actieknoppen voor snelle invoer of negeren.
+    * **Automatisch rekenen:** Automatische berekening van het totaalbedrag of de literprijs bij invoer.
+    * **Voertuigfilter:** Direct filteren op auto in het brandstof- en laadoverzicht.
+
+## Versie 1.3.6
 *Releasedatum: 13 november 2026*
 
 !!! success "Nieuwe Functies & Verbeteringen"

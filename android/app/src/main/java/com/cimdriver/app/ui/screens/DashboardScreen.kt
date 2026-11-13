@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Commute
+import androidx.compose.material.icons.filled.LocalGasStation
 import com.cimdriver.app.ui.components.DistanceStackedChart
 import com.cimdriver.app.ui.components.WorkHoursBarChart
 import androidx.compose.material3.*
@@ -89,10 +90,12 @@ fun DashboardScreen(
     updateViewModel: com.cimdriver.app.ui.viewmodel.UpdateViewModel = hiltViewModel(),
     hoursTargetViewModel: com.cimdriver.app.ui.viewmodel.HoursTargetViewModel = hiltViewModel(),
     vehiclesViewModel: com.cimdriver.app.ui.viewmodel.VehiclesViewModel = hiltViewModel(),
+    fuelViewModel: com.cimdriver.app.ui.viewmodel.FuelViewModel = hiltViewModel(),
     onNavigateToTrips: () -> Unit = {},
     onNavigateToWorkHours: () -> Unit = {},
     onNavigateToDiagnostics: () -> Unit = {},
-    onNavigateToGaps: (Long) -> Unit = {}
+    onNavigateToGaps: (Long) -> Unit = {},
+    onNavigateToFuelDraft: (Long) -> Unit = {}
 ) {
     val locale = currentAppLocale()
     val context = LocalContext.current
@@ -159,6 +162,8 @@ fun DashboardScreen(
 
     val updateInfo by updateViewModel.updateInfo.collectAsState()
     val targetProgresses by hoursTargetViewModel.targetProgresses.collectAsState()
+    val allFillUps by fuelViewModel.fillUps.collectAsState()
+    val pendingFuelDrafts = remember(allFillUps) { allFillUps.filter { it.status == "DRAFT" } }
 
     LaunchedEffect(Unit) {
         updateViewModel.checkForUpdates()
@@ -280,6 +285,72 @@ fun DashboardScreen(
             }
 
             if (allGranted) {
+                if (pendingFuelDrafts.isNotEmpty()) {
+                    pendingFuelDrafts.forEach { draft ->
+                        val draftVehicle = vehicles.find { it.id == draft.vehicleId }
+                        val isEV = draftVehicle?.engineType == "EV"
+                        val title = if (isEV) "Laadsessie registreren" else "Tankbeurt registreren"
+                        val station = draft.stationName ?: if (isEV) "Laadpaal" else "Tankstation"
+                        val odoText = if (draft.odometer > 0) " (${String.format(locale, "%,d", draft.odometer).replace(',', '.')} km)" else ""
+                        val promptText = if (isEV) {
+                            "Je stond bij $station$odoText. Voer kWh en laadkosten in om je administratie compleet te maken."
+                        } else {
+                            "Je stond bij $station$odoText. Voer liters en bedrag in om je administratie compleet te maken."
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2FE))
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Filled.LocalGasStation,
+                                        contentDescription = null,
+                                        tint = Color(0xFF0369A1),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = title,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color(0xFF0369A1),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = promptText,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color(0xFF0C4A6E)
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    OutlinedButton(
+                                        onClick = { fuelViewModel.deleteFillUp(draft) }
+                                    ) {
+                                        Text("Negeren", color = Color(0xFF0369A1))
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Button(
+                                        onClick = { onNavigateToFuelDraft(draft.id) },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF0284C7),
+                                            contentColor = Color.White
+                                        )
+                                    ) {
+                                        Text("Gegevens invoeren")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (reviewCount > 0) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Card(

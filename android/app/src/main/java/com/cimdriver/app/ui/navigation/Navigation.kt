@@ -254,6 +254,16 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
             }
         }
     ) { innerPadding ->
+        // Fuel draft notification click handler
+        val pendingFillUpId by com.cimdriver.app.service.FuelPromptStore.pendingFillUpId.collectAsState()
+        androidx.compose.runtime.LaunchedEffect(pendingFillUpId) {
+            val fillUpId = pendingFillUpId
+            if (fillUpId != null) {
+                com.cimdriver.app.service.FuelPromptStore.consume()
+                navController.navigate(AddFuelRoute(fillUpId = fillUpId))
+            }
+        }
+
         // Monthly odometer verification dialog
         val odometerCheckRequest by com.cimdriver.app.service.OdometerCheckStore.request.collectAsState()
         val vehicles by vehiclesViewModel.vehicles.collectAsState(initial = emptyList())
@@ -413,6 +423,9 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     },
                     onNavigateToGaps = { vehicleId ->
                         navController.navigate(OdometerGapReviewRoute(vehicleId = vehicleId))
+                    },
+                    onNavigateToFuelDraft = { fillUpId ->
+                        navController.navigate(AddFuelRoute(fillUpId = fillUpId))
                     }
                 ) 
             }
