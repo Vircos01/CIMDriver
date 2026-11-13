@@ -118,6 +118,12 @@ struct TripDetailView: View {
                 Text("Km-stand: \(odometerStartText) km → \(odometerEndText) km")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                
+                if trip.privateDetourMeters > 0 {
+                    Text("Privé-omrijden: \(String(format: "%.1f km", Double(trip.privateDetourMeters) / 1000.0))")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
             }
             .padding()
             .background(Color(.systemBackground).opacity(0.95))
@@ -276,6 +282,7 @@ struct EditTripView: View {
     @State private var startAddress: String
     @State private var endAddress: String
     @State private var distanceString: String
+    @State private var privateDetourKm: String
     @State private var notes: String
     @State private var projectCode: String
     @State private var startTime: Date
@@ -298,6 +305,7 @@ struct EditTripView: View {
         _startAddress = State(initialValue: trip.startAddress ?? "")
         _endAddress = State(initialValue: trip.endAddress ?? "")
         _distanceString = State(initialValue: String(format: "%.1f", Double(trip.distanceMeters) / 1000.0))
+        _privateDetourKm = State(initialValue: trip.privateDetourMeters > 0 ? String(format: "%.1f", Double(trip.privateDetourMeters) / 1000.0) : "")
         _notes = State(initialValue: trip.note ?? "")
         _projectCode = State(initialValue: trip.projectCode ?? "")
         _startTime = State(initialValue: trip.startTime)
@@ -335,6 +343,11 @@ struct EditTripView: View {
                     
                     TextField("Afstand (km)", text: $distanceString)
                         .keyboardType(.decimalPad)
+                    
+                    if tripType != "PRIVATE" {
+                        TextField("Privé-omrijden (km)", text: $privateDetourKm)
+                            .keyboardType(.decimalPad)
+                    }
                     
                     TextField("Optionele notitie", text: $notes, axis: .vertical)
                         .lineLimit(3...6)
@@ -431,6 +444,9 @@ struct EditTripView: View {
             }
         }
         trip.distanceMeters = parsedDistanceMeters
+        
+        let detourKmVal = Double(privateDetourKm.replacingOccurrences(of: ",", with: ".")) ?? 0.0
+        trip.privateDetourMeters = max(0, Int(detourKmVal * 1000.0))
         
         if let odoStart = Int(odometerStartString) {
             trip.odometerStart = odoStart

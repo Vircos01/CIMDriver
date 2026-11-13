@@ -70,4 +70,34 @@ final class DashboardStatsCalculatorTests: XCTestCase {
         // Assert YTD Private
         XCTAssertEqual(stats.ytdPriveKm, 10.0, "Year-to-date private should be 10km")
     }
+
+    func testPrivateDetourAllocation() {
+        let vehicle = Vehicle(name: "TestCar", licensePlate: "AB-123-C", make: "BMW", model: "i4", odometerStart: 0, odometerCurrent: 500)
+        let now = Date()
+
+        // Zakelijke rit van 50 km waarvan 5 km privé-omrijden
+        let tripBusinessWithDetour = Trip(
+            vehicle: vehicle,
+            startTime: now,
+            endTime: now.addingTimeInterval(3600),
+            distanceMeters: 50000,
+            tripType: "BUSINESS",
+            status: "DONE",
+            odometerStart: 0,
+            privateDetourMeters: 5000
+        )
+
+        let stats = DashboardStatsCalculator.calculateDashboardStats(
+            tripList: [tripBusinessWithDetour],
+            timeFilter: .week,
+            selectedVehicleId: vehicle.id,
+            vehicleList: [vehicle],
+            rules: [],
+            addresses: []
+        )
+
+        XCTAssertEqual(stats.zakelijkKm, 45.0, "Business distance should deduct private detour")
+        XCTAssertEqual(stats.priveKm, 5.0, "Private distance should receive private detour")
+        XCTAssertEqual(stats.ytdPriveKm, 5.0, "YTD private distance should include private detour")
+    }
 }

@@ -4,6 +4,19 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
+## Version 0.0.8 Alpha
+*Release date: November 13, 2026*
+
+!!! success "New features & Improvements (Android Feature Sync)"
+    * **Fiscal Compliance & Private Detour Kilometers:** Full support for private detour kilometers within business and commute trips in accordance with Dutch Tax Authority (Belastingdienst) requirements. Private detours automatically count towards the 500 km yearly threshold and are deducted from business totals.
+    * **Landscape A4 PDF Reports:** Overhauled PDF export in Landscape A4 format featuring vehicle metadata headers, full fiscal columns (start/end odometer, detour km, trip purpose, addresses), and a clear totals summary block.
+    * **RDW License Plate Lookup:** One-tap RDW integration in vehicle management to auto-fetch make, commercial model, and powertrain type (ICE, PHEV, EV) via the official Dutch open data API.
+    * **Live Trip Classification Toggle:** Switch between Business and Private on the fly directly from the dashboard status card during active tracking.
+    * **Calendar Day Tap Inspection:** Tap any date in the trips calendar to instantly inspect all trips for that day and drill down into the trip details view.
+    * **Periodic Work Hours Export & Share Button:** Direct monthly work hours export (PDF & CSV) via section share buttons, complete with total worked hours calculation.
+    * **Quick Target Management Navigation:** Jump directly to hours and revenue target management from the dashboard via the new "Beheren" action or by tapping any target card.
+    * **EV & Charging Presets:** Electric vehicle support in fuel tracking with automatic kWh units, charging type badges, and quick presets for Home (€0.28), Public (€0.45), and Fast charging (€0.69 / kWh).
+
 ## Version 0.0.7 Alpha
 *Release date: October 30, 2026*
 

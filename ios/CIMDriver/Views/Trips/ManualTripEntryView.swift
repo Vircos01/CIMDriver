@@ -24,6 +24,7 @@ struct ManualTripEntryView: View {
     @State private var endAddress: String = ""
     
     @State private var distanceKm: String = ""
+    @State private var privateDetourKm: String = ""
     @State private var tripType: String = TripCategory.business.rawValue
     @State private var projectCode: String = ""
     
@@ -138,6 +139,11 @@ struct ManualTripEntryView: View {
                             }
                         }
                     }
+                    
+                    if tripType != TripCategory.privateTrip.rawValue {
+                        TextField("Privé-omrijden (km)", text: $privateDetourKm)
+                            .keyboardType(.decimalPad)
+                    }
                 }
                 
                 Section(header: Text("Notities")) {
@@ -246,6 +252,7 @@ struct ManualTripEntryView: View {
         let vehicle = vehicles.first { $0.id == selectedVehicleId }
         
         let distanceMeters = (Double(distanceKm.replacingOccurrences(of: ",", with: ".")) ?? 0) * 1000
+        let detourMeters = (Double(privateDetourKm.replacingOccurrences(of: ",", with: ".")) ?? 0) * 1000
         
         let newTrip = Trip(
             vehicle: vehicle,
@@ -260,7 +267,8 @@ struct ManualTripEntryView: View {
             isManual: true,
             odometerStart: vehicle?.odometerCurrent ?? 0,
             odometerEnd: (vehicle?.odometerCurrent ?? 0) + Int(distanceMeters),
-            projectCode: projectCode.isEmpty ? nil : projectCode
+            projectCode: projectCode.isEmpty ? nil : projectCode,
+            privateDetourMeters: Int(detourMeters)
         )
         
         if let route = calculatedRoute {

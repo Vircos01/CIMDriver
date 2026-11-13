@@ -19,10 +19,11 @@ final class Trip {
     var expectedDistanceMeters: Int?
     var projectCode: String?
     var recoveryState: String?
+    var privateDetourMeters: Int = 0
     @Relationship(deleteRule: .cascade, inverse: \LocationPoint.trip)
     var locationPoints: [LocationPoint] = []
 
-    init(id: UUID = UUID(), vehicle: Vehicle? = nil, startTime: Date = Date(), endTime: Date? = nil, startAddress: String? = nil, endAddress: String? = nil, distanceMeters: Int = 0, tripType: String = "PRIVATE", note: String? = nil, status: String = "ACTIVE", isManual: Bool = false, odometerStart: Int, odometerEnd: Int? = nil, expectedDistanceMeters: Int? = nil, projectCode: String? = nil, recoveryState: String? = nil) {
+    init(id: UUID = UUID(), vehicle: Vehicle? = nil, startTime: Date = Date(), endTime: Date? = nil, startAddress: String? = nil, endAddress: String? = nil, distanceMeters: Int = 0, tripType: String = "PRIVATE", note: String? = nil, status: String = "ACTIVE", isManual: Bool = false, odometerStart: Int, odometerEnd: Int? = nil, expectedDistanceMeters: Int? = nil, projectCode: String? = nil, recoveryState: String? = nil, privateDetourMeters: Int = 0) {
         self.id = id
         self.vehicle = vehicle
         self.startTime = startTime
@@ -39,5 +40,6 @@ final class Trip {
         self.expectedDistanceMeters = expectedDistanceMeters
         self.projectCode = projectCode
         self.recoveryState = recoveryState
+        self.privateDetourMeters = privateDetourMeters
     }
 }

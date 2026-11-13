@@ -377,8 +377,15 @@ struct TripRowView: View {
                         .font(.subheadline)
                 }
                 Spacer()
-                Text(String(format: "%.1f km", Double(trip.distanceMeters) / 1000.0))
-                    .font(.headline)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(String(format: "%.1f km", Double(trip.distanceMeters) / 1000.0))
+                        .font(.headline)
+                    if trip.privateDetourMeters > 0 {
+                        Text("• waarvan \(String(format: "%.1f", Double(trip.privateDetourMeters) / 1000.0)) km privé")
+                            .font(.caption2)
+                            .foregroundStyle(.orange)
+                    }
+                }
             }
             .foregroundStyle(.secondary)
         }

@@ -127,19 +127,27 @@ struct DashboardStatsCalculator {
                     let durationMs = endTime.timeIntervalSince(trip.startTime) * 1000 // In milliseconds
                     let category = classifyTrip(trip: trip, addresses: addresses, rules: rules)
                     let meters = trip.distanceMeters
-                    
-                    if tripYear == currentYear && category == .privateTrip {
+                    let detourMeters = min(max(0, trip.privateDetourMeters), meters)
+                    let netBusinessMeters = meters - detourMeters
+
+                    if tripYear == currentYear {
                         if trip.startTime >= inServiceDate {
-                            ytdPriveMeters += meters
+                            if category == .privateTrip {
+                                ytdPriveMeters += meters
+                            } else if detourMeters > 0 {
+                                ytdPriveMeters += detourMeters
+                            }
                         }
                     }
                     
                     if isMatch {
                         if category == .business {
-                            totalZakelijkMeters += meters
+                            totalZakelijkMeters += netBusinessMeters
+                            totalPriveMeters += detourMeters
                             totalZakelijkMs += durationMs
                         } else if category == .commute {
-                            totalWoonWerkMeters += meters
+                            totalWoonWerkMeters += netBusinessMeters
+                            totalPriveMeters += detourMeters
                             totalWoonWerkMs += durationMs
                         } else if category == .privateTrip {
                             totalPriveMeters += meters
@@ -149,9 +157,11 @@ struct DashboardStatsCalculator {
                     
                     if isPrevMatch {
                         if category == .business {
-                            prevZakelijkMeters += meters
+                            prevZakelijkMeters += netBusinessMeters
+                            prevPriveMeters += detourMeters
                         } else if category == .commute {
-                            prevWoonWerkMeters += meters
+                            prevWoonWerkMeters += netBusinessMeters
+                            prevPriveMeters += detourMeters
                         } else if category == .privateTrip {
                             prevPriveMeters += meters
                         }
@@ -213,10 +223,18 @@ struct DashboardStatsCalculator {
                             cal.component(.weekday, from: tripDate) == i {
                             
                             let km = Double(trip.distanceMeters) / 1000.0
+                            let detourKm = Double(min(max(0, trip.privateDetourMeters), trip.distanceMeters)) / 1000.0
+                            let netKm = km - detourKm
                             let category = classifyTrip(trip: trip, addresses: addresses, rules: rules)
                             
-                            if category == .business { zKm += km }
-                            if category == .commute { wKm += km }
+                            if category == .business {
+                                zKm += netKm
+                                pKm += detourKm
+                            }
+                            if category == .commute {
+                                wKm += netKm
+                                pKm += detourKm
+                            }
                             if category == .privateTrip { pKm += km }
                         }
                     }
@@ -247,10 +265,18 @@ struct DashboardStatsCalculator {
                             cal.component(.day, from: tripDate) == i {
                             
                             let km = Double(trip.distanceMeters) / 1000.0
+                            let detourKm = Double(min(max(0, trip.privateDetourMeters), trip.distanceMeters)) / 1000.0
+                            let netKm = km - detourKm
                             let category = classifyTrip(trip: trip, addresses: addresses, rules: rules)
                             
-                            if category == .business { zKm += km }
-                            if category == .commute { wKm += km }
+                            if category == .business {
+                                zKm += netKm
+                                pKm += detourKm
+                            }
+                            if category == .commute {
+                                wKm += netKm
+                                pKm += detourKm
+                            }
                             if category == .privateTrip { pKm += km }
                         }
                     }
@@ -276,10 +302,18 @@ struct DashboardStatsCalculator {
                             cal.component(.weekOfYear, from: tripDate) == i {
                             
                             let km = Double(trip.distanceMeters) / 1000.0
+                            let detourKm = Double(min(max(0, trip.privateDetourMeters), trip.distanceMeters)) / 1000.0
+                            let netKm = km - detourKm
                             let category = classifyTrip(trip: trip, addresses: addresses, rules: rules)
                             
-                            if category == .business { zKm += km }
-                            if category == .commute { wKm += km }
+                            if category == .business {
+                                zKm += netKm
+                                pKm += detourKm
+                            }
+                            if category == .commute {
+                                wKm += netKm
+                                pKm += detourKm
+                            }
                             if category == .privateTrip { pKm += km }
                         }
                     }

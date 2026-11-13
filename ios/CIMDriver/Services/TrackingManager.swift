@@ -581,6 +581,18 @@ class TrackingManager: NSObject, BluetoothServiceDelegate, LocationServiceDelega
         locationService.startTracking()
     }
     
+    // MARK: - Live Trip Controls
+    
+    func toggleActiveTripType() {
+        guard let trip = activeTrip else { return }
+        if trip.tripType == "PRIVATE" {
+            trip.tripType = "BUSINESS"
+        } else {
+            trip.tripType = "PRIVATE"
+        }
+        try? modelContext?.save()
+    }
+    
     // MARK: - Live Activity
     
     #if canImport(ActivityKit)

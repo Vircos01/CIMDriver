@@ -206,43 +206,56 @@ struct DashboardView: View {
 
                     if !currentTargetProgress.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Uren- & omzetdoelen")
-                                .font(.title2.bold())
-                                .padding(.horizontal)
+                            HStack {
+                                Text("Uren- & omzetdoelen")
+                                    .font(.title2.bold())
+                                Spacer()
+                                NavigationLink(destination: HoursTargetsView()) {
+                                    Text("Beheren")
+                                        .font(.subheadline.bold())
+                                        .foregroundColor(.accentColor)
+                                }
+                            }
+                            .padding(.horizontal)
 
                             ForEach(currentTargetProgress, id: \.target.id) { item in
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack {
-                                        Text(item.target.name).font(.headline)
-                                        Spacer()
-                                        Text(item.progress.percentage, format: .percent.precision(.fractionLength(0)))
-                                            .font(.headline)
-                                    }
-                                    ProgressView(value: min(max(item.progress.percentage, 0), 1))
-                                        .tint(item.progress.isBehind ? .orange : .cimGreen)
-                                    HStack {
-                                        if item.target.targetType == "REVENUE" {
-                                            Text(item.progress.accumulatedRevenue, format: .currency(code: Locale.current.currency?.identifier ?? "EUR"))
+                                NavigationLink(destination: HoursTargetsView()) {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack {
+                                            Text(item.target.name).font(.headline)
+                                                .foregroundColor(.primary)
                                             Spacer()
-                                            Text("Doel: \(item.progress.effectiveTarget, format: .currency(code: Locale.current.currency?.identifier ?? "EUR"))")
-                                        } else {
-                                            Text("\(item.progress.accumulatedHours, format: .number.precision(.fractionLength(1))) uur")
-                                            Spacer()
-                                            Text("Doel: \(item.progress.effectiveTarget, format: .number.precision(.fractionLength(1))) uur")
+                                            Text(item.progress.percentage, format: .percent.precision(.fractionLength(0)))
+                                                .font(.headline)
+                                                .foregroundColor(.primary)
+                                        }
+                                        ProgressView(value: min(max(item.progress.percentage, 0), 1))
+                                            .tint(item.progress.isBehind ? .orange : .cimGreen)
+                                        HStack {
+                                            if item.target.targetType == "REVENUE" {
+                                                Text(item.progress.accumulatedRevenue, format: .currency(code: Locale.current.currency?.identifier ?? "EUR"))
+                                                Spacer()
+                                                Text("Doel: \(item.progress.effectiveTarget, format: .currency(code: Locale.current.currency?.identifier ?? "EUR"))")
+                                            } else {
+                                                Text("\(item.progress.accumulatedHours, format: .number.precision(.fractionLength(1))) uur")
+                                                Spacer()
+                                                Text("Doel: \(item.progress.effectiveTarget, format: .number.precision(.fractionLength(1))) uur")
+                                            }
+                                        }
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                        if item.progress.proRataFactor < 1 {
+                                            Text("Pro-rata: \(item.progress.proRataFactor, format: .percent.precision(.fractionLength(0))) van jaar")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
                                         }
                                     }
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    if item.progress.proRataFactor < 1 {
-                                        Text("Pro-rata: \(item.progress.proRataFactor, format: .percent.precision(.fractionLength(0))) van jaar")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
+                                    .padding()
+                                    .background(Color(.secondarySystemGroupedBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .padding(.horizontal)
                                 }
-                                .padding()
-                                .background(Color(.secondarySystemGroupedBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .padding(.horizontal)
+                                .buttonStyle(.plain)
                             }
                         }
                     }
@@ -321,6 +334,34 @@ struct DashboardView: View {
             Text(LocalizedStringKey(statusText))
                 .font(.headline)
                 .foregroundStyle(statusColor)
+            
+            if trackingManager.state == .active, let activeTrip = trackingManager.activeTrip {
+                let isPrivate = activeTrip.tripType == "PRIVATE"
+                let currentTypeLabel = isPrivate ? "Privé" : (activeTrip.tripType == "COMMUTE" ? "Woon-werk" : "Zakelijk")
+                
+                VStack(spacing: 8) {
+                    Text("Huidige rit: \(currentTypeLabel)")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(isPrivate ? Color.orange : Color.cimNavy)
+                    
+                    Button(action: {
+                        trackingManager.toggleActiveTripType()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: isPrivate ? "briefcase.fill" : "person.fill")
+                            Text(isPrivate ? "Wissel naar Zakelijk" : "Wissel naar Privé")
+                        }
+                        .font(.caption.bold())
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(isPrivate ? Color.cimNavy : Color.orange)
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.top, 4)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 30)

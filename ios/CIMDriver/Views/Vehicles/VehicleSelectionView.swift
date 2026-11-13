@@ -27,9 +27,28 @@ struct VehicleSelectionView: View {
                                 Text("\(vehicle.make) \(vehicle.model) - \(vehicle.licensePlate)")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
-                                Text("Tellerstand: \(vehicle.odometerCurrent) km")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                HStack(spacing: 6) {
+                                    Text("Tellerstand: \(vehicle.odometerCurrent) km")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    if vehicle.engineType == "EV" {
+                                        Text("⚡ EV")
+                                            .font(.caption2.bold())
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.green.opacity(0.2))
+                                            .foregroundColor(.green)
+                                            .clipShape(Capsule())
+                                    } else if vehicle.engineType == "PHEV" {
+                                        Text("🔌 PHEV")
+                                            .font(.caption2.bold())
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.blue.opacity(0.2))
+                                            .foregroundColor(.blue)
+                                            .clipShape(Capsule())
+                                    }
+                                }
                             }
                             Spacer()
                             if vehicle.isDefault {
@@ -111,6 +130,9 @@ struct VehicleEditView: View {
     @State private var licensePlate: String = ""
     @State private var make: String = ""
     @State private var model: String = ""
+    @State private var engineType: String = "ICE"
+    @State private var isLookingUpRdw: Bool = false
+    @State private var rdwLookupMessage: String? = nil
     @State private var privateKmYearlyLimit: String = "500"
     @State private var odometerStart: String = "0"
     @State private var usageType: String = "MIXED"
@@ -125,9 +147,34 @@ struct VehicleEditView: View {
         Form {
             Section(header: Text("Voertuig details")) {
                 TextField("Bijnaam (bijv. Auto van de zaak)", text: $name)
-                TextField("Kenteken", text: $licensePlate)
+                HStack {
+                    TextField("Kenteken", text: $licensePlate)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                    Button(action: performRdwLookup) {
+                        if isLookingUpRdw {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Text("RDW Ophalen")
+                                .font(.caption.bold())
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(licensePlate.trimmingCharacters(in: .whitespaces).isEmpty || isLookingUpRdw)
+                }
+                if let msg = rdwLookupMessage {
+                    Text(msg)
+                        .font(.caption)
+                        .foregroundColor(msg.contains("gevonden") ? .green : .orange)
+                }
                 TextField("Merk", text: $make)
                 TextField("Model", text: $model)
+                Picker("Aandrijving / Brandstof", selection: $engineType) {
+                    Text("Brandstof (Benzine/Diesel)").tag("ICE")
+                    Text("Plug-in Hybride (PHEV)").tag("PHEV")
+                    Text("Volledig Elektrisch (EV)").tag("EV")
+                }
             }
             
             Section(
@@ -212,6 +259,7 @@ struct VehicleEditView: View {
                 licensePlate = v.licensePlate
                 make = v.make
                 model = v.model
+                engineType = v.engineType
                 privateKmYearlyLimit = String(v.privateKmYearlyLimit)
                 odometerStart = String(v.odometerStart)
                 usageType = v.usageType
@@ -241,12 +289,40 @@ struct VehicleEditView: View {
         }
     }
     
+    private func performRdwLookup() {
+        let clean = RdwVehicleLookup.cleanPlate(licensePlate)
+        guard !clean.isEmpty else { return }
+        isLookingUpRdw = true
+        rdwLookupMessage = nil
+        Task {
+            do {
+                let result = try await RdwVehicleLookup.lookup(licensePlate: clean)
+                await MainActor.run {
+                    make = result.make
+                    model = result.model
+                    engineType = result.engineType
+                    if name.isEmpty {
+                        name = "\(result.make) \(result.model)".trimmingCharacters(in: .whitespaces)
+                    }
+                    rdwLookupMessage = "Voertuig gevonden: \(result.make) \(result.model) (\(result.engineType))"
+                    isLookingUpRdw = false
+                }
+            } catch {
+                await MainActor.run {
+                    rdwLookupMessage = "Geen RDW gegevens gevonden voor dit kenteken."
+                    isLookingUpRdw = false
+                }
+            }
+        }
+    }
+    
     private func saveVehicle() {
         if let v = existingVehicle {
             v.name = name
             v.licensePlate = licensePlate
             v.make = make
             v.model = model
+            v.engineType = engineType
             v.privateKmYearlyLimit = Int(privateKmYearlyLimit) ?? 500
             v.usageType = usageType
             v.odometerCorrectionStrategy = odometerCorrectionStrategy
@@ -264,7 +340,8 @@ struct VehicleEditView: View {
                 usageType: usageType,
                 odometerCorrectionStrategy: odometerCorrectionStrategy,
                 inServiceDate: hasInServiceDate ? inServiceDate : nil,
-                endServiceDate: hasEndServiceDate ? endServiceDate : nil
+                endServiceDate: hasEndServiceDate ? endServiceDate : nil,
+                engineType: engineType
             )
             modelContext.insert(vehicle)
         }

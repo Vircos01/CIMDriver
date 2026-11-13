@@ -1,10 +1,17 @@
 import SwiftUI
 import SwiftData
 
+struct DayTripsItem: Identifiable {
+    let id = UUID()
+    let date: Date
+    let trips: [Trip]
+}
+
 struct TripsCalendarView: View {
     var trips: [Trip]
     
     @State private var selectedMonth: Date = Date()
+    @State private var selectedDayItem: DayTripsItem?
     
     private let calendar = Calendar.current
     
@@ -75,13 +82,39 @@ struct TripsCalendarView: View {
                 }
                 
                 ForEach(daysInMonth, id: \.self) { date in
-                    CalendarDayView(date: date, trips: tripsFor(date: date))
+                    let dayTrips = tripsFor(date: date)
+                    CalendarDayView(date: date, trips: dayTrips) {
+                        if !dayTrips.isEmpty {
+                            selectedDayItem = DayTripsItem(date: date, trips: dayTrips)
+                        }
+                    }
                 }
             }
             
             Spacer()
         }
         .padding()
+        .sheet(item: $selectedDayItem) { item in
+            NavigationStack {
+                List {
+                    let totalKm = String(format: "%.1f", Double(item.trips.reduce(0) { $0 + $1.distanceMeters }) / 1000.0)
+                    Section(header: Text("\(item.trips.count) ritten • \(totalKm) km")) {
+                        ForEach(item.trips.sorted(by: { $0.startTime > $1.startTime })) { trip in
+                            NavigationLink(destination: TripDetailView(trip: trip)) {
+                                TripRowView(trip: trip)
+                            }
+                        }
+                    }
+                }
+                .navigationTitle(item.date.formatted(date: .abbreviated, time: .omitted))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Sluiten") { selectedDayItem = nil }
+                    }
+                }
+            }
+        }
     }
     
     private func monthYearString(from date: Date) -> String {
@@ -95,6 +128,7 @@ struct TripsCalendarView: View {
 struct CalendarDayView: View {
     let date: Date
     let trips: [Trip]
+    var onSelect: (() -> Void)? = nil
     
     var body: some View {
         let hasBusiness = trips.contains { $0.tripType == "BUSINESS" || $0.tripType == "Customer Visit" }
@@ -109,27 +143,29 @@ struct CalendarDayView: View {
             return Color.clear
         }()
         
-        VStack(spacing: 2) {
-            Text("\(Calendar.current.component(.day, from: date))")
-                .font(.body)
-                .foregroundColor(trips.isEmpty ? .primary : .primary)
-            
-            if !trips.isEmpty {
-                HStack(spacing: 2) {
-                    ForEach(0..<min(3, trips.count), id: \.self) { _ in
-                        Circle()
-                            .fill(Color.primary.opacity(0.5))
-                            .frame(width: 4, height: 4)
+        Button(action: {
+            onSelect?()
+        }) {
+            VStack(spacing: 2) {
+                Text("\(Calendar.current.component(.day, from: date))")
+                    .font(.body)
+                    .foregroundColor(trips.isEmpty ? .primary : .primary)
+                
+                if !trips.isEmpty {
+                    HStack(spacing: 2) {
+                        ForEach(0..<min(3, trips.count), id: \.self) { _ in
+                            Circle()
+                                .fill(Color.primary.opacity(0.5))
+                                .frame(width: 4, height: 4)
+                        }
                     }
                 }
             }
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            .background(bgColor)
+            .clipShape(Circle())
         }
-        .frame(maxWidth: .infinity)
-        .aspectRatio(1, contentMode: .fit)
-        .background(bgColor)
-        .clipShape(Circle())
-        .onTapGesture {
-            // Optional: Handle day tap
-        }
+        .buttonStyle(.plain)
     }
 }

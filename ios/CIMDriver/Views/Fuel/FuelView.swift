@@ -109,20 +109,44 @@ struct FuelRowView: View {
         vehicles.first(where: { $0.id == fillUp.vehicle?.id })?.name ?? "Onbekend voertuig"
     }
     
+    var isEV: Bool {
+        fillUp.chargingType != nil || fillUp.vehicle?.engineType == "EV" || fillUp.vehicle?.engineType == "PHEV"
+    }
+    
+    var chargingBadge: String? {
+        switch fillUp.chargingType {
+        case "HOME": return "🏠 Thuis"
+        case "PUBLIC": return "🔌 Publiek"
+        case "FAST": return "⚡ Snellader"
+        default: return nil
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(fillUp.date, format: .dateTime.day().month().year().hour().minute())
                     .font(.headline)
                 Spacer()
-                Text(vehicleName)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 4) {
+                    if let badge = chargingBadge {
+                        Text(badge)
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.green.opacity(0.15))
+                            .foregroundStyle(.green)
+                            .clipShape(Capsule())
+                    }
+                    Text(vehicleName)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
             
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Liters: \(fillUp.liters, specifier: "%.2f") L")
+                    Text("\(isEV ? "Stroom" : "Liters"): \(fillUp.liters, specifier: "%.2f") \(isEV ? "kWh" : "L")")
                     Text("Totaal: €\(fillUp.totalCost, specifier: "%.2f")")
                 }
                 .font(.subheadline)
@@ -130,7 +154,7 @@ struct FuelRowView: View {
                 Spacer()
                 
                 VStack(alignment: .trailing) {
-                    Text("Prijs/L: €\(fillUp.pricePerLiter, specifier: "%.2f")")
+                    Text("\(isEV ? "Prijs/kWh" : "Prijs/L"): €\(fillUp.pricePerLiter, specifier: "%.2f")")
                     Text("Km-stand: \(fillUp.odometer) km")
                 }
                 .font(.subheadline)

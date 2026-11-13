@@ -4,6 +4,19 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
+## Versie 0.0.8 Alpha
+*Releasedatum: 13 november 2026*
+
+!!! success "Nieuwe functies & Verbeteringen (Android Feature Sync)"
+    * **Fiscale compliance & Privé-omrijkilometers:** Volledige ondersteuning voor privé-omrijden binnen zakelijke en woon-werkritten conform de richtlijnen van de Belastingdienst. Privé-omrijkilometers tellen automatisch mee voor de 500 km grens en worden in mindering gebracht op zakelijke totalen.
+    * **Liggend A4 PDF-rapport:** Vernieuwde PDF-export in liggend A4 formaat met sluitende ritdetails (start- en eindstand, omrijkilometers, categorie, adressen, ritdoel) en een overzichtelijk totalenblok.
+    * **RDW Kentekencheck:** Eénknops RDW-koppeling bij voertuigbeheer; haalt direct merk, handelsbenaming en aandrijvingstype (ICE, PHEV, EV) op via de open data API van de RDW.
+    * **Live Ritclassificatie-toggle:** Schakel tijdens een actieve rit direct tussen Zakelijk en Privé vanaf de statuskaart op het dashboard.
+    * **Kalender dagtik-inspectie:** Tik op een datum in de rittenkalender om direct alle ritten van die dag te bekijken en te openen in het detailscherm.
+    * **Periodieke Werkuren-export & Deelknop:** Direct werkuren per maand exporteren (PDF & CSV) via een handige deelknop per sectie, inclusief berekende totaalsom van gewerkte uren.
+    * **Direct doelen beheren:** Navigeer direct naar het doelenbeheerscherm via de nieuwe "Beheren" knop of door op een doelkaart te tikken.
+    * **EV & Laadpresets:** Ondersteuning voor elektrische voertuigen in brandstofbeheer met automatische kWh-weergave, laadtarief-badges en snelle presets voor Thuis (€0,28), Publiek (€0,45) en Snellader (€0,69).
+
 ## Versie 0.0.7 Alpha
 *Releasedatum: 30 oktober 2026*
 

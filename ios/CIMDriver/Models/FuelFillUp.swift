@@ -12,8 +12,9 @@ final class FuelFillUp {
     var odometer: Int
     var stationName: String?
     var notes: String?
+    var chargingType: String?
     
-    init(id: UUID = UUID(), vehicle: Vehicle? = nil, date: Date = Date(), liters: Double = 0, pricePerLiter: Double = 0, totalCost: Double = 0, odometer: Int = 0, stationName: String? = nil, notes: String? = nil) {
+    init(id: UUID = UUID(), vehicle: Vehicle? = nil, date: Date = Date(), liters: Double = 0, pricePerLiter: Double = 0, totalCost: Double = 0, odometer: Int = 0, stationName: String? = nil, notes: String? = nil, chargingType: String? = nil) {
         self.id = id
         self.vehicle = vehicle
         self.date = date
@@ -23,5 +24,6 @@ final class FuelFillUp {
         self.odometer = odometer
         self.stationName = stationName
         self.notes = notes
+        self.chargingType = chargingType
     }
 }

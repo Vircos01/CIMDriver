@@ -15,6 +15,11 @@ struct AddFuelView: View {
     @State private var odometerString: String = ""
     @State private var stationName: String = ""
     @State private var notes: String = ""
+    @State private var chargingType: String? = nil
+    
+    private var isEV: Bool {
+        selectedVehicle?.engineType == "EV" || selectedVehicle?.engineType == "PHEV"
+    }
     
     var body: some View {
         NavigationStack {
@@ -34,12 +39,25 @@ struct AddFuelView: View {
                     DatePicker("Datum", selection: $date)
                 }
                 
-                Section("Tankbeurt details") {
-                    TextField("Liters", text: $litersString)
+                if isEV {
+                    Section("Standaard Laadtarieven") {
+                        HStack(spacing: 8) {
+                            presetButton(title: "🏠 Thuis", rate: 0.28, type: "HOME")
+                            presetButton(title: "🔌 Publiek", rate: 0.45, type: "PUBLIC")
+                            presetButton(title: "⚡ Snel", rate: 0.69, type: "FAST")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+                
+                Section(isEV ? "Laadsessie details" : "Tankbeurt details") {
+                    TextField(isEV ? "Stroom (kWh)" : "Liters", text: $litersString)
                         .keyboardType(.decimalPad)
+                        .onChange(of: litersString) { _, _ in recalculateTotal() }
                     
-                    TextField("Prijs per liter (€)", text: $pricePerLiterString)
+                    TextField(isEV ? "Prijs per kWh (€)" : "Prijs per liter (€)", text: $pricePerLiterString)
                         .keyboardType(.decimalPad)
+                        .onChange(of: pricePerLiterString) { _, _ in recalculateTotal() }
                         
                     TextField("Totale kosten (€)", text: $totalCostString)
                         .keyboardType(.decimalPad)
@@ -49,11 +67,11 @@ struct AddFuelView: View {
                 }
                 
                 Section("Optioneel") {
-                    TextField("Tankstation", text: $stationName)
+                    TextField(isEV ? "Laadpaal / Aanbieder" : "Tankstation", text: $stationName)
                     TextField("Notities", text: $notes)
                 }
             }
-            .navigationTitle("Tankbeurt toevoegen")
+            .navigationTitle(isEV ? "Laadsessie toevoegen" : "Tankbeurt toevoegen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -76,6 +94,32 @@ struct AddFuelView: View {
         }
     }
     
+    private func presetButton(title: String, rate: Double, type: String) -> some View {
+        Button(action: {
+            chargingType = type
+            pricePerLiterString = String(format: "%.2f", rate)
+            recalculateTotal()
+        }) {
+            VStack(spacing: 2) {
+                Text(title)
+                    .font(.caption.bold())
+                Text("€\(String(format: "%.2f", rate))/kWh")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .tint(chargingType == type ? .accentColor : .secondary)
+    }
+    
+    private func recalculateTotal() {
+        let amount = Double(litersString.replacingOccurrences(of: ",", with: ".")) ?? 0
+        let unitPrice = Double(pricePerLiterString.replacingOccurrences(of: ",", with: ".")) ?? 0
+        if amount > 0 && unitPrice > 0 {
+            totalCostString = String(format: "%.2f", amount * unitPrice)
+        }
+    }
+    
     private func saveFillUp() {
         guard let vehicle = selectedVehicle else { return }
         
@@ -92,7 +136,8 @@ struct AddFuelView: View {
             totalCost: totalCost,
             odometer: odometer,
             stationName: stationName,
-            notes: notes
+            notes: notes,
+            chargingType: isEV ? chargingType : nil
         )
         
         modelContext.insert(fillUp)

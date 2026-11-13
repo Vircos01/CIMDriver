@@ -34,7 +34,7 @@ struct WorkHoursView: View {
         NavigationStack {
             List {
                 ForEach(groupedWorkDays, id: \.key) { group in
-                    Section(header: Text(group.key).font(.headline)) {
+                    Section {
                         ForEach(group.value) { workDay in
                             NavigationLink(value: workDay) {
                                 WorkDayRowView(workDay: workDay)
@@ -42,6 +42,32 @@ struct WorkHoursView: View {
                         }
                         .onDelete { offsets in
                             deleteWorkDays(at: offsets, in: group.value)
+                        }
+                    } header: {
+                        HStack {
+                            let hours = totalHours(for: group.value)
+                            Text("\(group.key) • \(String(format: "%.1f", hours))u")
+                                .font(.headline)
+                            Spacer()
+                            Menu {
+                                Button {
+                                    exportWorkDaysPDF(workDays: group.value, title: group.key)
+                                } label: {
+                                    Label("Exporteer PDF (\(group.key))", systemImage: "doc.richtext")
+                                }
+                                Button {
+                                    exportWorkDaysCSV(workDays: group.value, title: group.key)
+                                } label: {
+                                    Label("Exporteer CSV (\(group.key))", systemImage: "tablecells")
+                                }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "square.and.arrow.up")
+                                    Text("Deel")
+                                        .font(.caption)
+                                }
+                                .foregroundColor(.accentColor)
+                            }
                         }
                     }
                 }
@@ -105,12 +131,26 @@ struct WorkHoursView: View {
         try? modelContext.save()
     }
     
-    private func exportWorkDaysCSV() {
-        exportURL = ExportUtil.generateWorkDaysCSV(workDays: workDays)
+    private func totalHours(for days: [WorkDay]) -> Double {
+        days.reduce(0.0) { sum, wd in
+            if let dep = wd.roundedDepartureTime ?? wd.departureTime {
+                let arr = wd.roundedArrivalTime ?? wd.arrivalTime
+                let sec = max(0, dep.timeIntervalSince(arr))
+                let min = max(0, (sec / 60.0) - Double(wd.breakMinutes))
+                return sum + (min / 60.0)
+            }
+            return sum
+        }
     }
     
-    private func exportWorkDaysPDF() {
-        exportURL = ExportUtil.generateWorkDaysPDF(workDays: workDays)
+    private func exportWorkDaysCSV(workDays: [WorkDay]? = nil, title: String? = nil) {
+        let daysToExport = workDays ?? self.workDays
+        exportURL = ExportUtil.generateWorkDaysCSV(workDays: daysToExport, periodTitle: title)
+    }
+    
+    private func exportWorkDaysPDF(workDays: [WorkDay]? = nil, title: String? = nil) {
+        let daysToExport = workDays ?? self.workDays
+        exportURL = ExportUtil.generateWorkDaysPDF(workDays: daysToExport, periodTitle: title)
     }
 }
 
