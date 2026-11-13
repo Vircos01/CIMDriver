@@ -44,6 +44,9 @@ class MainCarScreen(carContext: CarContext) : Screen(carContext) {
         val currentActiveTrip = activeTrip
         
         if (currentActiveTrip != null) {
+            val isPrivate = currentActiveTrip.tripType.equals("PRIVATE", ignoreCase = true) || currentActiveTrip.tripType.equals("PERSONAL", ignoreCase = true)
+            val typeDisplay = if (isPrivate) "Privé" else "Zakelijk"
+
             val paneBuilder = Pane.Builder()
                 .setImage(CarIcon.Builder(androidx.core.graphics.drawable.IconCompat.createWithResource(carContext, com.cimdriver.app.R.drawable.ic_car_location)).setTint(CarColor.GREEN).build())
                 .addRow(Row.Builder()
@@ -52,8 +55,23 @@ class MainCarScreen(carContext: CarContext) : Screen(carContext) {
                     .build()
                 )
                 .addRow(Row.Builder()
+                    .setTitle("Type rit")
+                    .addText(typeDisplay)
+                    .build()
+                )
+                .addRow(Row.Builder()
                     .setTitle(carContext.getString(R.string.start_time))
                     .addText(java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(currentActiveTrip.startTime)))
+                    .build()
+                )
+                .addAction(Action.Builder()
+                    .setTitle(if (isPrivate) "Naar Zakelijk" else "Naar Privé")
+                    .setOnClickListener {
+                        val intent = android.content.Intent(carContext, com.cimdriver.app.service.TrackingService::class.java).apply {
+                            action = com.cimdriver.app.service.TrackingService.ACTION_TOGGLE_TRIP_TYPE
+                        }
+                        androidx.core.content.ContextCompat.startForegroundService(carContext, intent)
+                    }
                     .build()
                 )
                 .addAction(Action.Builder()

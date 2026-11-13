@@ -22,6 +22,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.flow.firstOrNull
 import com.cimdriver.app.MainActivity
 import android.app.PendingIntent
@@ -37,6 +39,12 @@ class TrackingService : Service(), LocationListener {
     private val FUEL_CHANNEL_ID = "FuelAlertChannel"
     private val NOTIFICATION_ID = 1
 
+    companion object {
+        const val ACTION_TOGGLE_TRIP_TYPE = "ACTION_TOGGLE_TRIP_TYPE"
+        const val MAX_LOCATION_ACCURACY_METERS = 50f
+        const val MAX_PLAUSIBLE_SPEED_METERS_PER_SECOND = 70f
+    }
+
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     
@@ -45,6 +53,7 @@ class TrackingService : Service(), LocationListener {
     private lateinit var geocoderService: GeocoderService
     
     private var activeTripId: Long? = null
+    private var currentTripType: String = "BUSINESS"
     private var disconnectJob: Job? = null
 
     override fun onCreate() {
@@ -120,6 +129,21 @@ class TrackingService : Service(), LocationListener {
                         startForeground(NOTIFICATION_ID, createNotification(getString(R.string.tracking_recording_trip)))
                         startLocationUpdates()
                         TrackingStatusStore.started(activeTripId!!)
+                        serviceScope.launch(Dispatchers.IO) {
+                            val trip = database.tripDao().getTripById(activeTripId!!)
+                            if (trip != null) {
+                                currentTripType = trip.tripType
+                                withContext(Dispatchers.Main) {
+                                    val notificationManager = getSystemService(NotificationManager::class.java)
+                                    notificationManager?.notify(NOTIFICATION_ID, createNotification(getString(R.string.tracking_recording_trip)))
+                                }
+                            }
+                            try {
+                                com.cimdriver.app.ui.widget.CIMDriverWidget().updateAll(applicationContext)
+                            } catch (e: Exception) {
+                                Log.w("TrackingService", "Widget update failed", e)
+                            }
+                        }
                     } catch (e: Exception) {
                         Log.e("TrackingService", "Failed to start tracking", e)
                         TrackingStatusStore.failed("Fout bij opstarten: ${e.message}")
@@ -150,6 +174,21 @@ class TrackingService : Service(), LocationListener {
                         startForeground(NOTIFICATION_ID, createNotification("Rit wordt hersteld..."))
                         startLocationUpdates()
                         TrackingStatusStore.started(activeTripId!!)
+                        serviceScope.launch(Dispatchers.IO) {
+                            val trip = database.tripDao().getTripById(activeTripId!!)
+                            if (trip != null) {
+                                currentTripType = trip.tripType
+                                withContext(Dispatchers.Main) {
+                                    val notificationManager = getSystemService(NotificationManager::class.java)
+                                    notificationManager?.notify(NOTIFICATION_ID, createNotification("Rit wordt hersteld..."))
+                                }
+                            }
+                            try {
+                                com.cimdriver.app.ui.widget.CIMDriverWidget().updateAll(applicationContext)
+                            } catch (e: Exception) {
+                                Log.w("TrackingService", "Widget update failed", e)
+                            }
+                        }
                     } catch (e: Exception) {
                         Log.e("TrackingService", "Failed to recover tracking", e)
                         TrackingStatusStore.failed("Fout bij herstel: ${e.message}")
@@ -170,6 +209,9 @@ class TrackingService : Service(), LocationListener {
                 }
                 TrackingStatusStore.stopping("Rit wordt afgerond")
                 finalizeTripAndStop()
+            }
+            ACTION_TOGGLE_TRIP_TYPE -> {
+                toggleActiveTripType()
             }
             "CLASSIFY_TRIP" -> {
                 val tripId = intent.getLongExtra("TRIP_ID", -1L)
@@ -193,6 +235,36 @@ class TrackingService : Service(), LocationListener {
     private fun cancelDisconnectJob() {
         disconnectJob?.cancel()
         disconnectJob = null
+    }
+
+    private fun toggleActiveTripType() {
+        val tripId = activeTripId ?: return
+        serviceScope.launch(Dispatchers.IO) {
+            val trip = database.tripDao().getTripById(tripId) ?: return@launch
+            val isCurrentlyPrivate = isPrivateTrip(trip.tripType)
+            val newType = if (isCurrentlyPrivate) "Business Meeting" else "PRIVATE"
+            val updated = trip.copy(tripType = newType)
+            database.tripDao().updateTrip(updated)
+            currentTripType = newType
+
+            withContext(Dispatchers.Main) {
+                val typeLabel = if (isPrivateTrip(newType)) "Privé" else "Zakelijk"
+                val message = "Rit gewijzigd naar $typeLabel"
+                TrackingStatusStore.updateMessage(message)
+                val notificationManager = getSystemService(NotificationManager::class.java)
+                notificationManager?.notify(NOTIFICATION_ID, createNotification(message))
+                try {
+                    com.cimdriver.app.ui.widget.CIMDriverWidget().updateAll(applicationContext)
+                } catch (e: Exception) {
+                    Log.w("TrackingService", "Widget update failed", e)
+                }
+            }
+        }
+    }
+
+    private fun isPrivateTrip(type: String?): Boolean {
+        if (type == null) return false
+        return type.equals("PRIVATE", ignoreCase = true) || type.equals("PERSONAL", ignoreCase = true)
     }
 
     private fun startDisconnectCountdown(vehicleId: Long) {
@@ -282,6 +354,11 @@ class TrackingService : Service(), LocationListener {
                     Log.e("TrackingService", "Error finalizing trip", e)
                     TrackingStatusStore.failed("Fout bij afronden rit")
                 } finally {
+                    try {
+                        com.cimdriver.app.ui.widget.CIMDriverWidget().updateAll(applicationContext)
+                    } catch (e: Exception) {
+                        Log.w("TrackingService", "Widget update failed", e)
+                    }
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 }
@@ -289,6 +366,13 @@ class TrackingService : Service(), LocationListener {
         } ?: run {
             TrackingStatusStore.stopped("Tracking gestopt")
             ZeppCompanionServer.stopIfNeeded()
+            serviceScope.launch {
+                try {
+                    com.cimdriver.app.ui.widget.CIMDriverWidget().updateAll(applicationContext)
+                } catch (e: Exception) {
+                    Log.w("TrackingService", "Widget update failed", e)
+                }
+            }
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
@@ -941,11 +1025,6 @@ class TrackingService : Service(), LocationListener {
         }
     }
 
-    private companion object {
-        const val MAX_LOCATION_ACCURACY_METERS = 50f
-        const val MAX_PLAUSIBLE_SPEED_METERS_PER_SECOND = 70f
-    }
-
     override fun onBind(intent: Intent?): IBinder? {
         return null // We don't use binding for this service
     }
@@ -969,11 +1048,26 @@ class TrackingService : Service(), LocationListener {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val toggleIntent = Intent(this, TrackingService::class.java).apply {
+            action = ACTION_TOGGLE_TRIP_TYPE
+        }
+        val togglePendingIntent = PendingIntent.getService(
+            this,
+            101,
+            toggleIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val isPrivate = isPrivateTrip(currentTripType)
+        val toggleLabel = if (isPrivate) "➡️ Naar Zakelijk" else "🔒 Naar Privé"
+        val title = if (isPrivate) "CIMDriver Actief (Privé)" else "CIMDriver Actief (Zakelijk)"
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.cimdriver_active))
+            .setContentTitle(title)
             .setContentText(contentText)
             .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .addAction(0, toggleLabel, togglePendingIntent)
             .addAction(0, getString(R.string.stop_trip), stopPendingIntent)
             .build()
     }

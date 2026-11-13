@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cimdriver.app.ui.viewmodel.VehiclesViewModel
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import com.cimdriver.app.R
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -55,6 +56,9 @@ fun AddVehicleScreen(
 
     var showInServiceDatePicker by remember { mutableStateOf(false) }
     var showEndServiceDatePicker by remember { mutableStateOf(false) }
+    var isRdwLoading by remember { mutableStateOf(false) }
+    var rdwMessage by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     val allBluetoothDevices by viewModel.bluetoothDevices.collectAsState(initial = emptyList())
     val linkedDevices = existingVehicle?.let { vehicle ->
@@ -144,13 +148,58 @@ fun AddVehicleScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     
-                    OutlinedTextField(
-                        value = plate, 
-                        onValueChange = { plate = it }, 
-                        label = { Text(stringResource(R.string.license_plate)) }, 
-                        singleLine = true,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
-                    )
+                    ) {
+                        OutlinedTextField(
+                            value = plate, 
+                            onValueChange = { 
+                                plate = it.uppercase()
+                                rdwMessage = null
+                            }, 
+                            label = { Text(stringResource(R.string.license_plate)) }, 
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    isRdwLoading = true
+                                    rdwMessage = null
+                                    val result = com.cimdriver.app.util.RdwVehicleLookup.lookup(plate)
+                                    result.onSuccess { data ->
+                                        make = data.make
+                                        model = data.model
+                                        engineType = data.engineType
+                                        if (name.isBlank()) {
+                                            name = "${data.make} ${data.model}".trim()
+                                        }
+                                        rdwMessage = "Gegevens opgehaald via RDW (${data.make} ${data.model})"
+                                    }.onFailure { err ->
+                                        rdwMessage = err.message ?: "Voertuig niet gevonden bij RDW"
+                                    }
+                                    isRdwLoading = false
+                                }
+                            },
+                            enabled = plate.isNotBlank() && !isRdwLoading,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            if (isRdwLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                            } else {
+                                Text("RDW Ophalen", style = MaterialTheme.typography.labelMedium)
+                            }
+                        }
+                    }
+                    if (!rdwMessage.isNullOrBlank()) {
+                        Text(
+                            text = rdwMessage!!,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (rdwMessage!!.startsWith("Gegevens")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                        )
+                    }
                     
                     OutlinedTextField(
                         value = make, 

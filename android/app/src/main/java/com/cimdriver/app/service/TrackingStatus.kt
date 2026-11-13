@@ -54,6 +54,10 @@ object TrackingStatusStore {
         _status.value = _status.value.copy(message = message)
     }
 
+    fun updateMessage(message: String) {
+        _status.value = _status.value.copy(message = message)
+    }
+
     fun locationReceived(accuracyMeters: Float, timestamp: Long) {
         _status.value = _status.value.copy(
             state = ServiceState.RUNNING,

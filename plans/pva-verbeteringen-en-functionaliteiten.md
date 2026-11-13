@@ -92,39 +92,36 @@ flowchart TD
 
 ---
 
-### 🔵 Fase 2: Gebruikersgemak & Slimme Automatisering (Prio 2)
+### 🔵 Fase 2: Gebruikersgemak & Slimme Automatisering (✅ Gerealiseerd)
 
-#### 2.1 RDW Open Data Kentekencheck
+#### 2.1 RDW Open Data Kentekencheck (✅ Gerealiseerd)
 - **Doel:** Nooit meer handmatig merk, model, bouwjaar en brandstoftype intypen bij het toevoegen van een auto.
-- **Uitwerking:**
-  - Koppeling met de gratis en openbare RDW API:  
-    `https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken={KENTEKEN}`
-  - Bij het invoeren van het kenteken in `AddVehicleScreen` automatisch ophalen van:
-    - Merk (`merk`, bijv. "VOLKSWAGEN", "TESLA")
-    - Handelsbenaming / Model (`handelsbenaming`, bijv. "GOLF", "MODEL 3")
-    - Brandstof/Aandrijving (`brandstof_omschrijving` via gekoppelde dataset of trefwoorden -> `ICE`, `EV`, `PHEV`)
-    - Bouwjaar / eerste toelatingsdatum.
+- **Uitwerking & Implementatie:**
+  - `RdwVehicleLookup.kt`: Koppeling met de gratis en openbare RDW API (`m9d7-ebf2.json`) en brandstofdataset (`8ys7-d773.json`).
+  - Automatische detectie van `merk`, `handelsbenaming`, `datum_eerste_toelating` en aandrijving (`EV`, `PHEV` of `ICE`).
+  - In `AddVehicleScreen.kt` voorzien van een *"RDW Ophalen"*-actie met laadindicator, foutafhandeling en automatische naamvoorstelling.
 - **Betrokken bestanden:**
-  - `android/app/src/main/java/com/cimdriver/app/util/RdwVehicleLookup.kt` (nieuw)
+  - `android/app/src/main/java/com/cimdriver/app/util/RdwVehicleLookup.kt`
   - `android/app/src/main/java/com/cimdriver/app/ui/screens/AddVehicleScreen.kt`
+  - `android/app/src/test/java/com/cimdriver/app/util/RdwVehicleLookupTest.kt`
 
-#### 2.2 Live Rit-Toggle tijdens het rijden (Notificatie & Android Auto)
+#### 2.2 Live Rit-Toggle tijdens het rijden (Notificatie & Android Auto) (✅ Gerealiseerd)
 - **Doel:** Tijdens een rit kunnen wisselen tussen "Zakelijk" en "Privé" zonder de rit te hoeven stoppen en een nieuwe rit te starten.
-- **Uitwerking:**
-  - Voeg in de actieve foreground-notificatie (`TrackingServiceChannel`) een actieknop toe: *"Wissel naar Privé"* (als rit zakelijk is) of *"Wissel naar Zakelijk"* (als rit privé is).
-  - Voeg dezelfde schakelaar toe op het `MainCarScreen` in Android Auto.
+- **Uitwerking & Implementatie:**
+  - `TrackingService.kt`: Ondersteunt `ACTION_TOGGLE_TRIP_TYPE`. In de actieve foreground-notificatie is een directe actieknop toegevoegd: *"🔒 Naar Privé"* (als rit zakelijk/woon-werk is) of *"➡️ Naar Zakelijk"* (als rit privé is). De statusmelding en notificatietitel updaten direct realtime.
+  - `MainCarScreen.kt`: Op het Android Auto dashboard toont het actieve ritpaneel nu het huidige type rit met een wisselknop *"Naar Privé"* / *"Naar Zakelijk"*.
 - **Betrokken bestanden:**
   - `android/app/src/main/java/com/cimdriver/app/service/TrackingService.kt`
   - `android/app/src/main/java/com/cimdriver/app/car/MainCarScreen.kt`
+  - `android/app/src/main/java/com/cimdriver/app/service/TrackingStatus.kt`
 
-#### 2.3 Interactieve Home Screen Widget (Quick Actions)
-- **Doel:** Direct vanaf het Android-startscherm ritten kunnen starten en stoppen.
-- **Uitwerking:**
-  - De huidige Glance AppWidget toont alleen statische totalen van de maand.
-  - Uitbreiden met compacte actieknoppen:
-    - 🔵 *"Start Zakelijk"*
-    - 🟢 *"Start Privé"*
-    - 🔴 *"Stop Rit"* (wanneer actief).
+#### 2.3 Interactieve Home Screen Widget (Quick Actions) (✅ Gerealiseerd)
+- **Doel:** Direct vanaf het Android-startscherm de actieve ritstatus zien en ritten starten of stoppen.
+- **Uitwerking & Implementatie:**
+  - `CIMDriverWidget.kt`: Volledig interactieve Glance AppWidget:
+    - **Tijdens rit:** Toont actieve ritstatus (type rit, kilometers, starttijd, vertreklocatie) met actieknoppen *"Naar Zakelijk/Privé"* en *"Stop Rit"*.
+    - **In rust:** Toont de maandtotalen per categorie én directe startknoppen *"▶️ Zakelijk"* en *"▶️ Privé"*.
+    - Gesynchroniseerd met `TrackingService` via `updateAll()`.
 - **Betrokken bestanden:**
   - `android/app/src/main/java/com/cimdriver/app/ui/widget/CIMDriverWidget.kt`
 
