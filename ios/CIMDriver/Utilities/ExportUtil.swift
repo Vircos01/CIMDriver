@@ -107,7 +107,7 @@ struct ExportUtil {
     
     // MARK: - PDF Export
     
-    static func generateTripsPDF(trips: [Trip], periodTitle: String? = nil) -> URL? {
+    static func generateTripsPDF(trips: [Trip], periodTitle: String? = nil, odometerChecks: [OdometerCheck] = []) -> URL? {
         let suffix = periodTitle?.replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: "/", with: "-")
             ?? Date().formatted(date: .numeric, time: .omitted).replacingOccurrences(of: "/", with: "-")
         let fileName = "CIMDriver_Ritten_\(suffix).pdf"
@@ -252,6 +252,72 @@ struct ExportUtil {
             
             let summaryStr = "TOTALEN: Totaal: \(totalKm) km   |   Zakelijk: \(zakKm) km   |   Woon-werk: \(wwKm) km   |   Privé: \(priKm) km   |   Privé-omrijden: \(detKm) km"
             summaryStr.draw(at: CGPoint(x: 35, y: currentY), withAttributes: headerAttributes)
+
+            // Appendix: Fiscale Verificatie Kilometerstanden
+            if !odometerChecks.isEmpty {
+                context.beginPage()
+                let appendixTitleAttributes: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.boldSystemFont(ofSize: 16)
+                ]
+                "Bijlage: Fiscale Verificatie Kilometerstanden (Audit Trail)"
+                    .draw(at: CGPoint(x: 35, y: 25), withAttributes: appendixTitleAttributes)
+                
+                "Fotobewijs en fysieke meteropnames conform Belastingdienst-controleerbaarheid"
+                    .draw(at: CGPoint(x: 35, y: 46), withAttributes: subAttributes)
+                
+                cgContext.move(to: CGPoint(x: 35, y: 64))
+                cgContext.addLine(to: CGPoint(x: 807, y: 64))
+                cgContext.strokePath()
+                
+                let checkCols = ["Datum & Tijd", "Kenteken", "Geregistreerd", "Geverifieerd", "Verschil", "Toelichting", "Fotobewijs"]
+                let checkXPositions: [CGFloat] = [35, 140, 230, 310, 390, 460, 630]
+                
+                for (i, col) in checkCols.enumerated() {
+                    col.draw(at: CGPoint(x: checkXPositions[i], y: 70), withAttributes: headerAttributes)
+                }
+                
+                cgContext.move(to: CGPoint(x: 35, y: 84))
+                cgContext.addLine(to: CGPoint(x: 807, y: 84))
+                cgContext.strokePath()
+                
+                var checkY: CGFloat = 94
+                for check in odometerChecks.sorted(by: { $0.timestamp < $1.timestamp }) {
+                    if checkY > pageHeight - 65 {
+                        context.beginPage()
+                        checkY = 35
+                    }
+                    
+                    let dateStr = df.string(from: check.timestamp)
+                    let checkVehicle = trips.first(where: { $0.vehicle?.id == check.vehicleId })?.vehicle
+                    let plate = checkVehicle?.licensePlate ?? "-"
+                    let regStr = "\(check.registeredOdometer) km"
+                    let corrStr = "\(check.correctedOdometer) km"
+                    let diff = check.correctedOdometer - check.registeredOdometer
+                    let diffStr = "\(diff > 0 ? "+\(diff)" : "\(diff)") km"
+                    let note = "Periodieke opname"
+                    
+                    let rowTexts = [dateStr, plate, regStr, corrStr, diffStr, note]
+                    for (i, txt) in rowTexts.enumerated() {
+                        txt.draw(at: CGPoint(x: checkXPositions[i], y: checkY + 12), withAttributes: rowAttributes)
+                    }
+                    
+                    var photoRendered = false
+                    if let photoData = check.photoData, let image = UIImage(data: photoData) {
+                        let imgRect = CGRect(x: 630, y: checkY, width: 50, height: 38)
+                        image.draw(in: imgRect)
+                        photoRendered = true
+                    }
+                    if !photoRendered {
+                        (check.photoData != nil ? "Foto opgeslagen" : "Geen foto")
+                            .draw(at: CGPoint(x: 630, y: checkY + 12), withAttributes: rowAttributes)
+                    }
+                    
+                    checkY += 45
+                    cgContext.move(to: CGPoint(x: 35, y: checkY - 4))
+                    cgContext.addLine(to: CGPoint(x: 807, y: checkY - 4))
+                    cgContext.strokePath()
+                }
+            }
         }
         
         do {

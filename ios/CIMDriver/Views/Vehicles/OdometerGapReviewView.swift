@@ -17,6 +17,7 @@ struct OdometerGapReviewView: View {
     @State private var showingPreviewSheet = false
     @State private var bannerMessage: String?
     @State private var showingBanner = false
+    @State private var selectedPhotoData: Data?
     
     private var vehicleTrips: [Trip] {
         allTrips.filter { $0.vehicle?.id == vehicle.id }
@@ -105,6 +106,30 @@ struct OdometerGapReviewView: View {
                 NavigationStack {
                     RecalculateConfirmationSheet(preview: preview) {
                         applyRecalculation(preview: preview)
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: Binding(
+            get: { selectedPhotoData != nil },
+            set: { if !$0 { selectedPhotoData = nil } }
+        )) {
+            if let data = selectedPhotoData, let uiImage = UIImage(data: data) {
+                NavigationStack {
+                    VStack {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
+                    }
+                    .background(Color.black)
+                    .navigationTitle("Fotobewijs Tellerstand")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Sluiten") { selectedPhotoData = nil }
+                                .foregroundColor(.white)
+                        }
                     }
                 }
             }
@@ -263,6 +288,48 @@ struct OdometerGapReviewView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                }
+            }
+            
+            if !vehicleChecks.isEmpty {
+                Section("Fysieke Km-Controles & Fotobewijs") {
+                    ForEach(vehicleChecks.sorted(by: { $0.timestamp > $1.timestamp })) { check in
+                        HStack(spacing: 12) {
+                            if let data = check.photoData, let uiImage = UIImage(data: data) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 52, height: 52)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                                    )
+                                    .onTapGesture {
+                                        selectedPhotoData = data
+                                    }
+                            } else {
+                                Image(systemName: "speedometer")
+                                    .font(.title2)
+                                    .foregroundColor(.secondary)
+                                    .frame(width: 52, height: 52)
+                                    .background(Color(.secondarySystemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("\(check.correctedOdometer) km")
+                                    .font(.headline)
+                                Text("Geregistreerd: \(check.registeredOdometer) km (verschil: \(check.correctedOdometer - check.registeredOdometer) km)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text(check.timestamp.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
                 }
             }
         }

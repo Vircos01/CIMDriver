@@ -36,6 +36,9 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
     val settings: StateFlow<com.cimdriver.app.data.local.entity.Settings?> = database.settingsDao().getSettings()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    val favoriteRoutes: StateFlow<List<com.cimdriver.app.data.local.entity.FavoriteRoute>> = database.favoriteRouteDao().getAllFavoriteRoutes()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _trip = MutableStateFlow<Trip?>(null)
     val trip: StateFlow<Trip?> = _trip.asStateFlow()
 

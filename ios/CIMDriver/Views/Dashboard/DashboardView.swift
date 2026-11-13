@@ -13,6 +13,13 @@ struct DashboardView: View {
     @Query private var targets: [HoursTarget]
     @Query private var projectCodes: [ProjectCode]
     @Query private var settingsList: [AppSettings]
+    @Query private var allChecks: [OdometerCheck]
+    
+    @AppStorage("monthly_closing_banner_dismissed_month") private var dismissedClosingMonth: String = ""
+    @State private var showingMonthlyClosingSheet = false
+    @State private var monthlyClosingTrips: [Trip] = []
+    @State private var monthlyClosingTitle: String = ""
+    @State private var exportURL: URL? = nil
     
     @State private var timeFilter: TimeFilter = .week
     @State private var selectedVehicleId: UUID?
@@ -145,6 +152,17 @@ struct DashboardView: View {
                     // 1. Tracking Status (Bestaand)
                     statusCard
                     
+                    // 1.25 Fiscale Maandafsluiting Banner
+                    MonthlyClosingBannerView(
+                        dismissedMonth: $dismissedClosingMonth,
+                        trips: trips,
+                        onOpenClosing: { selectedTrips, title in
+                            monthlyClosingTrips = selectedTrips
+                            monthlyClosingTitle = title
+                            showingMonthlyClosingSheet = true
+                        }
+                    )
+                    
                     // 1.5 Dagelijkse Inbox (Uitzonderingen & Triage)
                     dailyInboxCard
                     
@@ -269,16 +287,21 @@ struct DashboardView: View {
                     
                     // 7. Voertuig Odometer Overzicht
                     if !vehicles.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Kilometerstanden")
-                                .font(.title2.bold())
-                                .padding(.horizontal)
-                            
-                            ForEach(vehicles) { vehicle in
-                                vehicleRow(vehicle: vehicle)
+                        if vehicles.count >= 2 {
+                            multiVehicleFleetCard
+                                .padding(.top, 10)
+                        } else {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Kilometerstanden")
+                                    .font(.title2.bold())
+                                    .padding(.horizontal)
+                                
+                                ForEach(vehicles) { vehicle in
+                                    vehicleRow(vehicle: vehicle)
+                                }
                             }
+                            .padding(.top, 10)
                         }
-                        .padding(.top, 10)
                     }
                 }
                 .padding(.vertical)
@@ -320,6 +343,24 @@ struct DashboardView: View {
                 
                 // Request permissions when the user lands on the dashboard
                 trackingManager.requestPermissions()
+            }
+            .sheet(isPresented: $showingMonthlyClosingSheet) {
+                ExportPreCheckSheet(
+                    trips: monthlyClosingTrips,
+                    periodTitle: monthlyClosingTitle,
+                    isPDF: true,
+                    onConfirm: {
+                        let minTime = monthlyClosingTrips.map(\.startTime).min() ?? Date.distantPast
+                        let maxTime = monthlyClosingTrips.compactMap(\.endTime).max() ?? (monthlyClosingTrips.map(\.startTime).max() ?? Date.distantFuture)
+                        let relevantChecks = allChecks.filter { $0.timestamp >= minTime.addingTimeInterval(-86400) && $0.timestamp <= maxTime.addingTimeInterval(86400) }
+                        exportURL = ExportUtil.generateTripsPDF(trips: monthlyClosingTrips, periodTitle: monthlyClosingTitle, odometerChecks: relevantChecks)
+                    }
+                )
+            }
+            .sheet(isPresented: Binding(get: { exportURL != nil }, set: { if !$0 { exportURL = nil } })) {
+                if let url = exportURL {
+                    ShareSheet(activityItems: [url])
+                }
             }
         }
     }
@@ -459,6 +500,121 @@ struct DashboardView: View {
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
+    }
+    
+    private var multiVehicleFleetCard: some View {
+        let calendar = Calendar.current
+        let now = Date()
+        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) ?? now
+        let startOfYear = calendar.date(from: calendar.dateComponents([.year], from: now)) ?? now
+        
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("Wagenpark Overzicht", systemImage: "car.2.fill")
+                    .font(.title3.bold())
+                    .foregroundStyle(Color.cimNavy)
+                Spacer()
+                Text("\(vehicles.count) voertuigen")
+                    .font(.caption.bold())
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.cimNavy.opacity(0.1))
+                    .foregroundStyle(Color.cimNavy)
+                    .clipShape(Capsule())
+            }
+            .padding(.horizontal)
+            
+            VStack(spacing: 12) {
+                ForEach(Array(vehicles.enumerated()), id: \.element.id) { index, vehicle in
+                    if index > 0 {
+                        Divider()
+                    }
+                    
+                    let vehicleTrips = trips.filter { $0.vehicle?.id == vehicle.id }
+                    let monthTrips = vehicleTrips.filter { $0.startTime >= startOfMonth }
+                    let monthKm = monthTrips.reduce(0.0) { $0 + Double($1.distanceMeters) / 1000.0 }
+                    
+                    let yearPrivateTrips = vehicleTrips.filter {
+                        $0.startTime >= startOfYear &&
+                        ($0.tripType == "PRIVATE" || $0.tripType == TripClassification.dynamicsPersonal)
+                    }
+                    let yearPrivateKm = yearPrivateTrips.reduce(0.0) {
+                        $0 + (Double($1.distanceMeters + $1.privateDetourMeters) / 1000.0)
+                    }
+                    
+                    let privateProgress = min(1.0, max(0.0, yearPrivateKm / 500.0))
+                    let statusColor: Color = {
+                        if yearPrivateKm > 500 { return .red }
+                        if yearPrivateKm >= 400 { return .orange }
+                        return .cimGreen
+                    }()
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("\(vehicle.make) \(vehicle.model)")
+                                    .font(.headline)
+                                HStack(spacing: 6) {
+                                    Text(vehicle.licensePlate)
+                                        .font(.caption2.bold())
+                                        .padding(.horizontal, 5)
+                                        .padding(.vertical, 2)
+                                        .background(Color(red: 1.0, green: 0.85, blue: 0.3))
+                                        .foregroundColor(.black)
+                                        .clipShape(RoundedRectangle(cornerRadius: 3))
+                                    if vehicle.isDefault {
+                                        Text("Standaard")
+                                            .font(.caption2)
+                                            .foregroundStyle(Color.cimNavy)
+                                    }
+                                }
+                            }
+                            Spacer()
+                            VStack(alignment: .trailing, spacing: 2) {
+                                Text("\(vehicle.odometerCurrent) km")
+                                    .font(.headline.bold())
+                                    .foregroundStyle(Color.cimNavy)
+                                Text("\(monthTrips.count) ritten (\(Int(monthKm)) km) deze mnd")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        
+                        // 500 km Privé Progress Bar
+                        VStack(spacing: 3) {
+                            HStack {
+                                Text("Privé dit jaar:")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Text(String(format: "%.1f / 500 km", yearPrivateKm))
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(statusColor)
+                            }
+                            
+                            ProgressView(value: privateProgress)
+                                .tint(statusColor)
+                            
+                            HStack {
+                                let hint: String = {
+                                    if yearPrivateKm > 500 { return "Fiscaal bijtellingsrisico (overschreden)" }
+                                    if yearPrivateKm >= 400 { return "Nog \(Int(500 - yearPrivateKm)) km tot bijtellingsgrens" }
+                                    return "Veilig binnen 500 km privé-norm"
+                                }()
+                                Text(hint)
+                                    .font(.caption2)
+                                    .foregroundStyle(statusColor)
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal)
+        }
     }
     
     private func vehicleRow(vehicle: Vehicle) -> some View {
@@ -793,5 +949,97 @@ struct AutoPreviewProviderDashboardView1: PreviewProvider {
             DashboardView(selectedTab: .constant(0))
                 .modelContainer(PreviewContainer.shared.container)
                 .environment(TrackingManager.shared)
+    }
+}
+
+// MARK: - MonthlyClosingBannerView
+
+struct MonthlyClosingBannerView: View {
+    @Binding var dismissedMonth: String
+    let trips: [Trip]
+    let onOpenClosing: ([Trip], String) -> Void
+    
+    private var isVisible: Bool {
+        let calendar = Calendar.current
+        let now = Date()
+        let dayOfMonth = calendar.component(.day, from: now)
+        let dfKey = DateFormatter()
+        dfKey.dateFormat = "yyyy-MM"
+        let currentMonthKey = dfKey.string(from: now)
+        return dayOfMonth <= 7 && dismissedMonth != currentMonthKey
+    }
+    
+    private var prevMonthName: String {
+        let calendar = Calendar.current
+        let now = Date()
+        let prevMonthDate = calendar.date(byAdding: .month, value: -1, to: now) ?? now
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "nl_NL")
+        df.dateFormat = "MMMM yyyy"
+        return df.string(from: prevMonthDate).capitalized
+    }
+    
+    private var currentMonthKey: String {
+        let dfKey = DateFormatter()
+        dfKey.dateFormat = "yyyy-MM"
+        return dfKey.string(from: Date())
+    }
+    
+    var body: some View {
+        if isVisible {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    HStack(spacing: 8) {
+                        Image(systemName: "calendar.badge.checkmark")
+                            .font(.title3)
+                            .foregroundColor(.cimGreen)
+                        Text("Fiscale Maandafsluiting gereed")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                    }
+                    Spacer()
+                    Button(action: {
+                        dismissedMonth = currentMonthKey
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Text("De rittenadministratie van \(prevMonthName) staat klaar voor controle en export naar je boekhouder of administratie.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                Button(action: {
+                    let calendar = Calendar.current
+                    let now = Date()
+                    let prevMonthDate = calendar.date(byAdding: .month, value: -1, to: now) ?? now
+                    let startOfPrev = calendar.date(from: calendar.dateComponents([.year, .month], from: prevMonthDate)) ?? prevMonthDate
+                    let startOfThis = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) ?? now
+                    let pTrips = trips.filter { $0.startTime >= startOfPrev && $0.startTime < startOfThis }
+                    let selectedTrips = pTrips.isEmpty ? trips : pTrips
+                    onOpenClosing(selectedTrips, prevMonthName)
+                }) {
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                        Text("Controleren & Delen (\(prevMonthName))")
+                            .bold()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.cimNavy)
+            }
+            .padding()
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.cimGreen.opacity(0.3), lineWidth: 1.5)
+            )
+            .padding(.horizontal)
+        }
     }
 }

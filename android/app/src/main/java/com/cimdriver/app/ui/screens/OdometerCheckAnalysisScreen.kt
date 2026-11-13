@@ -20,6 +20,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -89,6 +92,7 @@ fun OdometerCheckAnalysisScreen(
     }
 
     var isSaving by remember { mutableStateOf(false) }
+    var showFullPhotoDialog by remember { mutableStateOf(false) }
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()) }
 
     Scaffold(
@@ -230,9 +234,11 @@ fun OdometerCheckAnalysisScreen(
                                         .crossfade(true)
                                         .build(),
                                     contentDescription = "Foto tellerstand",
+                                    contentScale = ContentScale.Crop,
                                     modifier = Modifier
                                         .size(56.dp)
                                         .clip(RoundedCornerShape(8.dp))
+                                        .clickable { showFullPhotoDialog = true }
                                 )
                             }
                         }
@@ -591,6 +597,44 @@ fun OdometerCheckAnalysisScreen(
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    if (showFullPhotoDialog && photoPath != null) {
+        Dialog(
+            onDismissRequest = { showFullPhotoDialog = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.92f)),
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(File(photoPath))
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Foto tellerstand groot",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+                IconButton(
+                    onClick = { showFullPhotoDialog = false },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Close,
+                        contentDescription = "Sluiten",
+                        tint = Color.White
+                    )
                 }
             }
         }

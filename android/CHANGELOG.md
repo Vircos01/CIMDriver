@@ -2,6 +2,15 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.8.0] - 2026-11-13
+
+### Toegevoegd & Verbeterd
+- **Fase 8: Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs:**
+  - **Fiscale Maandafsluiting & Lokale Deel-notificatie (Privacy-First):** Op de 1e van elke kalendermaand ontvangt de gebruiker een lokale Android-notificatie om de rittenadministratie van de zojuist afgesloten maand fiscaal te verifiëren en direct met de boekhouder te delen via het native deelsheet (PDF/CSV). In de eerste 7 dagen van de maand toont het Dashboard tevens een discrete tegel *"Maandafsluiting gereed"*.
+  - **Favoriete Routes als 1-Tik Presets & Triage-Match:** Bij handmatige invoer van ritten (`AddTripScreen`) verschijnen opgeslagen favoriete routes direct als tikbare chips die vertrek- en aankomstadres, categorie en eventuele projectcode automatisch invullen. Bij de automatische rittriage krijgen ritten die matchen met een favoriete route automatisch 95% betrouwbaarheid en de juiste fiscale categorie toegewezen.
+  - **Odometer Fotobewijs in Historie & PDF-Bijlage:** Dashboardfoto's gemaakt tijdens tellerstand-verificaties (ML Kit OCR) zijn nu direct als tikbare miniatuur te bekijken in de km-controle analyse (`OdometerCheckAnalysisScreen`) met een schermvullende preview. Daarnaast worden tellerstandcontroles met bijbehorende dashboardsfoto's optioneel opgenomen als audit-appendix achterin het officiële Belastingdienst PDF-rapport.
+  - **Multi-Voertuig Wagenpark-kaart:** Voor gebruikers met 2 of meer actieve voertuigen toont het Dashboard een geconsolideerde wagenparkkaart met per voertuig de actuele tellerstand, ritten en kilometers deze maand, en een visuele voortgangsindicator van de 500 km privégrens.
+
 ## [1.7.0] - 2026-11-13
 
 ### Toegevoegd & Verbeterd

@@ -182,4 +182,43 @@ final class TripClassificationTests: XCTestCase {
         XCTAssertEqual(customerAssessment.category, .business)
         XCTAssertTrue(customerAssessment.isHighConfidence)
     }
+
+    func testAssessConfidenceWithFavoriteRoute() {
+        let route = FavoriteRoute(
+            name: "Klant Amsterdam",
+            startAddress: "Dorpsstraat 1, Utrecht",
+            endAddress: "Keizersgracht 100, Amsterdam",
+            tripType: "BUSINESS",
+            projectCode: "AMS-001"
+        )
+        let assessment = TripClassification.assessConfidence(
+            tripType: nil,
+            startAddress: "Dorpsstraat 1, Utrecht",
+            endAddress: "Keizersgracht 100, Amsterdam",
+            favoriteRoutes: [route]
+        )
+        XCTAssertEqual(assessment.category, .business)
+        XCTAssertEqual(assessment.confidenceScore, 95)
+        XCTAssertTrue(assessment.isHighConfidence)
+        XCTAssertTrue(assessment.reasoning.contains("Klant Amsterdam"))
+        XCTAssertEqual(assessment.suggestedProjectCode, "AMS-001")
+    }
+
+    func testAssessConfidenceWithFavoriteRouteReverse() {
+        let route = FavoriteRoute(
+            name: "Vaste Woon-Werk",
+            startAddress: "Home, Rotterdam",
+            endAddress: "HQ, Utrecht",
+            tripType: "COMMUTE"
+        )
+        let assessment = TripClassification.assessConfidence(
+            tripType: nil,
+            startAddress: "HQ, Utrecht",
+            endAddress: "Home, Rotterdam",
+            favoriteRoutes: [route]
+        )
+        XCTAssertEqual(assessment.category, .commute)
+        XCTAssertEqual(assessment.confidenceScore, 95)
+        XCTAssertTrue(assessment.reasoning.contains("Vaste Woon-Werk"))
+    }
 }

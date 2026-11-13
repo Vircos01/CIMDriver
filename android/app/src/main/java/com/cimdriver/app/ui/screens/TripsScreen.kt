@@ -127,6 +127,54 @@ fun TripsScreen(
         trips.groupBy { fmt.format(java.util.Date(it.startTime)) }
     }
     
+    val odometerChecks by viewModel.odometerChecks.collectAsState()
+    val monthlyClosingRequest by com.cimdriver.app.service.MonthlyClosingStore.request.collectAsState()
+
+    LaunchedEffect(monthlyClosingRequest, trips) {
+        if (monthlyClosingRequest.openExport && trips.isNotEmpty()) {
+            val title = monthlyClosingRequest.title.ifBlank {
+                val cal = java.util.Calendar.getInstance()
+                cal.add(java.util.Calendar.MONTH, -1)
+                java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.forLanguageTag("nl-NL")).format(cal.time)
+            }
+            val capitalizedMonth = title.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
+            val slug = capitalizedMonth.replace(" ", "_")
+            
+            val prevCal = java.util.Calendar.getInstance()
+            prevCal.add(java.util.Calendar.MONTH, -1)
+            prevCal.set(java.util.Calendar.DAY_OF_MONTH, 1)
+            prevCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            prevCal.set(java.util.Calendar.MINUTE, 0)
+            prevCal.set(java.util.Calendar.SECOND, 0)
+            val startMs = prevCal.timeInMillis
+            val nextCal = java.util.Calendar.getInstance()
+            nextCal.set(java.util.Calendar.DAY_OF_MONTH, 1)
+            nextCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            nextCal.set(java.util.Calendar.MINUTE, 0)
+            nextCal.set(java.util.Calendar.SECOND, 0)
+            val endMs = nextCal.timeInMillis
+            
+            val mTrips = trips.filter { it.startTime in startMs until endMs }
+            val targetTrips = if (mTrips.isNotEmpty()) mTrips else trips
+            
+            pendingExportTitle = capitalizedMonth
+            pendingExportTrips = targetTrips
+            pendingExportAction = {
+                val mChecks = odometerChecks.filter { it.timestamp in (startMs - 86400000L)..(endMs + 86400000L) }
+                com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                    context, "cimdriver_maandafsluiting_${slug}.pdf", "application/pdf"
+                ) { uri ->
+                    com.cimdriver.app.util.ExportUtil.exportToPdf(
+                        context, uri, targetTrips, savedAddresses, classificationRules,
+                        title = capitalizedMonth, vehicles = vehicles, settings = classificationSettings,
+                        odometerChecks = mChecks
+                    )
+                }
+            }
+            com.cimdriver.app.service.MonthlyClosingStore.dismiss()
+        }
+    }
+
     val suggestRuleState by viewModel.suggestRuleState.collectAsState()
 
     if (suggestRuleState != null) {
@@ -275,12 +323,16 @@ fun TripsScreen(
                                             pendingExportTitle = capitalizedMonth
                                             pendingExportTrips = mTrips
                                             pendingExportAction = {
+                                                val minTime = mTrips.minOfOrNull { it.startTime } ?: 0L
+                                                val maxTime = mTrips.maxOfOrNull { it.endTime ?: it.startTime } ?: Long.MAX_VALUE
+                                                val mChecks = odometerChecks.filter { it.timestamp in (minTime - 86400000L)..(maxTime + 86400000L) }
                                                 com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                                     context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
                                                 ) { uri ->
                                                     com.cimdriver.app.util.ExportUtil.exportToPdf(
                                                         context, uri, mTrips, savedAddresses, classificationRules,
-                                                        title = capitalizedMonth, vehicles = vehicles, settings = classificationSettings
+                                                        title = capitalizedMonth, vehicles = vehicles, settings = classificationSettings,
+                                                        odometerChecks = mChecks
                                                     )
                                                 }
                                             }
@@ -318,7 +370,8 @@ fun TripsScreen(
                                         ) { uri ->
                                             com.cimdriver.app.util.ExportUtil.exportToPdf(
                                                 context, uri, trips, savedAddresses, classificationRules,
-                                                vehicles = vehicles, settings = classificationSettings
+                                                vehicles = vehicles, settings = classificationSettings,
+                                                odometerChecks = odometerChecks
                                             )
                                         }
                                     }
@@ -581,6 +634,7 @@ fun TripsScreen(
                                     classificationRules = classificationRules,
                                     vehicles = vehicles,
                                     settings = classificationSettings,
+                                    odometerChecks = odometerChecks,
                                     onExportRequested = { title, exportTrips, action ->
                                         pendingExportTitle = title
                                         pendingExportTrips = exportTrips
@@ -899,6 +953,7 @@ private fun MonthHeaderItem(
     classificationRules: List<com.cimdriver.app.data.local.entity.ClassificationRule>,
     vehicles: List<com.cimdriver.app.data.local.entity.Vehicle> = emptyList(),
     settings: com.cimdriver.app.data.local.entity.Settings? = null,
+    odometerChecks: List<com.cimdriver.app.data.local.entity.OdometerCheck> = emptyList(),
     onExportRequested: (title: String, trips: List<Trip>, action: () -> Unit) -> Unit
 ) {
     val capitalizedMonth = monthName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
@@ -949,12 +1004,16 @@ private fun MonthHeaderItem(
                     onClick = {
                         showMenu = false
                         onExportRequested(capitalizedMonth, trips) {
+                            val minTime = trips.minOfOrNull { it.startTime } ?: 0L
+                            val maxTime = trips.maxOfOrNull { it.endTime ?: it.startTime } ?: Long.MAX_VALUE
+                            val mChecks = odometerChecks.filter { it.timestamp in (minTime - 86400000L)..(maxTime + 86400000L) }
                             com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                 context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
                             ) { uri ->
                                 com.cimdriver.app.util.ExportUtil.exportToPdf(
                                     context, uri, trips, savedAddresses, classificationRules,
-                                    title = capitalizedMonth, vehicles = vehicles, settings = settings
+                                    title = capitalizedMonth, vehicles = vehicles, settings = settings,
+                                    odometerChecks = mChecks
                                 )
                             }
                         }

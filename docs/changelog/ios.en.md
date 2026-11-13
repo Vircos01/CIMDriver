@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
-## Version 0.0.11 Alpha (Current Version)
+## Version 0.0.12 Alpha (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 8: Tax Month-End Closing, Route Presets & Odometer Audit Evidence (Android Feature Sync)"
+    * **Tax Month-End Closing & Local Share Notification (Privacy-First):** Monthly local notification on the 1st of each month and a discrete dashboard tile during days 1-7 to share the closed month directly with your accountant via the native iOS ShareSheet (PDF/CSV).
+    * **Favorite Routes as 1-Tap Presets & Triage Match:** 1-tap presets in `ManualTripEntryView` auto-filling all trip details, plus 95% confidence triage matching in `TripClassification`.
+    * **Odometer Photo Evidence & PDF Audit Appendix:** Captured dashboard photos are stored locally, viewable in the odometer check history of `OdometerGapReviewView` (with full-screen zoom), and appended as an audit evidence sheet with photos in the PDF export.
+    * **Multi-Vehicle Fleet Card:** Consolidated fleet card on the Dashboard for fleets with $\ge$ 2 active vehicles with a 500 km private limit indicator.
+
+## Version 0.0.11 Alpha
 *Release date: November 13, 2026*
 
 !!! success "Phase 7: Smart Work Hours Guidance, Triage & Target Coaching (Android Feature Sync)"

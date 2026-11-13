@@ -5,9 +5,13 @@ hide:
 
 # 📦 Installatie: iOS (iPhone)
 
-De huidige stabiele testversie is **Versie 0.0.11 Alpha** (Build 7).
+De huidige stabiele testversie is **Versie 0.0.12 Alpha** (Build 8).
 
-Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 7 (Slimme Werkuren-Begeleiding, Triage & Target-Coaching):
+Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 8 (Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs):
+- Lokale fiscale maandafsluiting & deel-notificatie op de 1e van de maand (100% privacy-first)
+- Favoriete routes als 1-tik presets bij handmatige ritinvoer en 95% confidence matching bij ritclassificatie
+- Odometer fotobewijs met thumbnail-preview in historie en visuele audit-bijlagepagina in PDF-rapportage
+- Geconsolideerde multi-voertuig wagenpark-kaart op het Dashboard (bij ≥ 2 actieve voertuigen)
 - Werkuren-reviewlijst met dagelijkse triage van openstaande werkdagen in de Daily Inbox
 - Automatische voorstellen voor ontbrekende vertrektijden (via basisrooster of retourrit) en Arbowet-conforme pauzes
 - Begrijpelijke werkdagstatus in gewone mensentaal

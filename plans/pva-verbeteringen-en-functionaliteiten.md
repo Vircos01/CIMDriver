@@ -380,6 +380,29 @@ flowchart TD
 
 ---
 
+### Fase 8: Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs (v1.8.0 / iOS v0.0.12)
+
+#### 8.1 Fiscale Maandafsluiting & Lokale Deel-notificatie (Privacy-First)
+- **Concept:** Op de eerste dag van elke nieuwe kalendermaand stuurt CIMDriver een lokale Android- en iOS-notificatie:
+  > *"Fiscale Maandafsluiting: [Vorige Maand, bijv. Oktober 2026] staat klaar voor export. Tik om te controleren en te delen."*
+- **Interactie:** Eén tik op de melding opent direct de `ExportPreCheckDialog` / `ExportPreCheckSheet` voor de zojuist afgesloten maand. Na verificatie kan het rapport met 1 tik worden geëxporteerd (PDF / CSV) en gedeeld met de boekhouder of salarisadministratie via het native deelsheet.
+- **Dashboard Actie:** In de eerste 7 dagen van de maand toont het Dashboard tevens een discrete tegel *"Maandafsluiting gereed"* zolang het maandrapport nog niet is geëxporteerd.
+
+#### 8.2 Favoriete Routes als 1-Tik Presets & Slimme Herkenning
+- **Concept:** Favoriete routes worden actief ingezet voor snelle invoer en triage:
+  1. **1-Tik Preset bij Handmatige Invoer:** In `AddTripScreen` / `ManualTripEntryView` verschijnt een knop *"Kies favoriete route"* (bijv. "Woon-Werk", "Klant Amsterdam"). Met één tik worden vertreklocatie, bestemming, afstand, ritcategorie en eventuele projectcode automatisch ingevuld.
+  2. **Triage-Matching:** Ritten waarvan het vertrek- en aankomstadres overeenkomen met een opgeslagen `FavoriteRoute` krijgen automatisch 95% confidence en worden geclassificeerd conform de favoriete route.
+
+#### 8.3 Odometer Fotobewijs in Historie & PDF-Bijlage
+- **Concept:** De foto van het dashboard die tijdens de km-stand verificatie (met ML Kit OCR) wordt gemaakt, wordt duurzaam bewaard in lokale app storage en:
+  1. Zichtbaar gemaakt als tikbare miniatuur in de km-controle historie (`OdometerCheckAnalysisScreen` & `OdometerGapReviewView`).
+  2. Optioneel als fotobewijsblad / audit-appendix opgenomen achterin het officiële Belastingdienst PDF-rapport.
+
+#### 8.4 Multi-Voertuig Wagenpark-kaart
+- **Concept:** Voor gebruikers met 2 of meer actieve voertuigen toont het Dashboard een compacte wagenparkkaart met per voertuig de actuele tellerstand, ritten deze maand en de status van de 500 km privégrens.
+
+---
+
 ## 4. Prioriterings- en Impactmatrix
 
 | Taak / Verbetering | Fiscale Noodzaak | Gebruikersimpact | Complexiteit | Status / Sprint |
@@ -411,6 +434,10 @@ flowchart TD
 | **7.4 Koppeling Ritten naar Werkdagafronding** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
 | **7.5 Realistische Targetbegeleiding & Resterend Tempo** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
 | **7.6 Herstelbare Werkdagcorrecties (Undo Snackbar/Banner)** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.7.0 / iOS v0.0.11) |
+| **8.1 Fiscale Maandafsluiting & Lokale Deel-notificatie** | 🔴 Hoog | 🟢 Zeer hoog | ⚡ Laag | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
+| **8.2 Favoriete Routes als 1-Tik Presets & Triage-Match** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
+| **8.3 Odometer Fotobewijs in Historie & PDF-Bijlage** | 🔴 Zeer hoog | 🟢 Hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
+| **8.4 Multi-Voertuig Wagenpark-kaart op Dashboard** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
 
 ---
 

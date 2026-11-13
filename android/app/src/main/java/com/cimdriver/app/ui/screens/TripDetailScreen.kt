@@ -118,9 +118,10 @@ fun TripDetailScreen(
     val savedAddresses by viewModel.savedAddresses.collectAsState()
     val classificationRules by viewModel.classificationRules.collectAsState()
     val settings by viewModel.settings.collectAsState()
+    val favoriteRoutes by viewModel.favoriteRoutes.collectAsState()
     val suggestRuleState by viewModel.suggestRuleState.collectAsState()
 
-    val assessment = remember(trip, classificationRules, savedAddresses, settings) {
+    val assessment = remember(trip, classificationRules, savedAddresses, settings, favoriteRoutes) {
         val t = trip ?: return@remember null
         val startSaved = AddressMatching.findSavedAddress(t.startAddress, savedAddresses)
         val endSaved = AddressMatching.findSavedAddress(t.endAddress, savedAddresses)
@@ -147,7 +148,8 @@ fun TripDetailScreen(
             workStartTime = settings?.workStartTime,
             workEndTime = settings?.workEndTime,
             isBluetoothTriggered = t.vehicleId != null,
-            suggestedProjectCode = suggestedProj
+            suggestedProjectCode = suggestedProj,
+            favoriteRoutes = favoriteRoutes
         )
     }
 

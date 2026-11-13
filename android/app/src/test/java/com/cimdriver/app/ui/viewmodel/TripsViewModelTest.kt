@@ -1,6 +1,7 @@
 package com.cimdriver.app.ui.viewmodel
 
 import com.cimdriver.app.data.local.AppDatabase
+import com.cimdriver.app.data.local.dao.OdometerCheckDao
 import com.cimdriver.app.data.local.dao.SettingsDao
 import com.cimdriver.app.data.repository.TripRepository
 import com.cimdriver.app.data.local.entity.Trip
@@ -31,8 +32,11 @@ class TripsViewModelTest {
         tripRepository = mock(TripRepository::class.java)
         database = mock(AppDatabase::class.java)
         val settingsDao = mock(SettingsDao::class.java)
+        val odometerCheckDao = mock(OdometerCheckDao::class.java)
         
         `when`(database.settingsDao()).thenReturn(settingsDao)
+        `when`(database.odometerCheckDao()).thenReturn(odometerCheckDao)
+        `when`(odometerCheckDao.getAllChecks()).thenReturn(flowOf(emptyList()))
         `when`(settingsDao.getSettings()).thenReturn(flowOf(null))
         `when`(tripRepository.getAllTrips()).thenReturn(flowOf(emptyList()))
         `when`(tripRepository.getAllFavoriteRoutes()).thenReturn(flowOf(emptyList()))

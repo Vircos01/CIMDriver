@@ -31,6 +31,7 @@ enum TripClassification {
         homeWorkAsCommute: Bool = true,
         customerAsBusiness: Bool = true,
         rules: [ClassificationRule] = [],
+        favoriteRoutes: [FavoriteRoute] = [],
         timestamp: Date? = nil,
         appSettings: AppSettings? = nil
     ) -> TripCategory {
@@ -53,6 +54,17 @@ enum TripClassification {
             case "COMMUTE": return .commute
             case "PRIVATE": return .privateTrip
             default: return defaultCategory
+            }
+        }
+
+        if let favorite = matchingFavoriteRoute(startAddress: startAddress, endAddress: endAddress, favoriteRoutes: favoriteRoutes) {
+            switch favorite.tripType.uppercased() {
+            case "BUSINESS": return .business
+            case "COMMUTE": return .commute
+            case "PRIVATE": return .privateTrip
+            default:
+                if businessTripTypes.contains(favorite.tripType) { return .business }
+                return defaultCategory
             }
         }
 
@@ -134,6 +146,23 @@ enum TripClassification {
         }
     }
 
+    static func matchingFavoriteRoute(
+        startAddress: String?,
+        endAddress: String?,
+        favoriteRoutes: [FavoriteRoute]
+    ) -> FavoriteRoute? {
+        guard let start = startAddress?.trimmingCharacters(in: .whitespacesAndNewlines), !start.isEmpty,
+              let end = endAddress?.trimmingCharacters(in: .whitespacesAndNewlines), !end.isEmpty else {
+            return nil
+        }
+        return favoriteRoutes.first { route in
+            let s = route.startAddress.trimmingCharacters(in: .whitespacesAndNewlines)
+            let e = route.endAddress.trimmingCharacters(in: .whitespacesAndNewlines)
+            return (s.caseInsensitiveCompare(start) == .orderedSame && e.caseInsensitiveCompare(end) == .orderedSame) ||
+                   (s.caseInsensitiveCompare(end) == .orderedSame && e.caseInsensitiveCompare(start) == .orderedSame)
+        }
+    }
+
     static func isOutsideWorkHours(timestamp: Date, appSettings: AppSettings?) -> Bool {
         guard let settings = appSettings else { return false }
         
@@ -201,7 +230,8 @@ enum TripClassification {
         appSettings: AppSettings? = nil,
         isBluetoothTriggered: Bool = false,
         defaultCategory: TripCategory = .privateTrip,
-        suggestedProjectCode: String? = nil
+        suggestedProjectCode: String? = nil,
+        favoriteRoutes: [FavoriteRoute] = []
     ) -> ConfidenceAssessment {
         let matchedRule = matchingRule(
             tripType: tripType,
@@ -211,6 +241,11 @@ enum TripClassification {
             endAddress: endAddress,
             rules: rules
         )
+        let matchedFavorite = matchingFavoriteRoute(
+            startAddress: startAddress,
+            endAddress: endAddress,
+            favoriteRoutes: favoriteRoutes
+        )
         let isCommutePair = (startAddressType == "THUIS" && endAddressType == "WERK") ||
             (startAddressType == "WERK" && endAddressType == "THUIS")
         let isCustomer = startAddressType == "KLANT" || endAddressType == "KLANT"
@@ -219,6 +254,7 @@ enum TripClassification {
         var score = 50
         let category: TripCategory
         let reasoning: String
+        var effectiveProjectCode = suggestedProjectCode
 
         if let rule = matchedRule {
             switch rule.category {
@@ -230,6 +266,19 @@ enum TripClassification {
             let isExact = !(rule.startAddress?.isEmpty ?? true) && !(rule.endAddress?.isEmpty ?? true)
             score = isExact ? 96 : 88
             reasoning = isExact ? "Vaste route-regel matched exact" : "Classificatieregel matched adrestypes"
+        } else if let favorite = matchedFavorite {
+            switch favorite.tripType.uppercased() {
+            case "BUSINESS": category = .business
+            case "COMMUTE": category = .commute
+            case "PRIVATE": category = .privateTrip
+            default:
+                category = businessTripTypes.contains(favorite.tripType) ? .business : defaultCategory
+            }
+            score = 95
+            reasoning = "Komt exact overeen met favoriete route '\(favorite.name)'"
+            if let pc = favorite.projectCode, !pc.isEmpty {
+                effectiveProjectCode = pc
+            }
         } else if isCommutePair || tripType == "COMMUTE" || tripType == dynamicsHomeToWork {
             category = .commute
             score = isBluetoothTriggered ? 92 : 88
@@ -256,7 +305,7 @@ enum TripClassification {
             category: category,
             confidenceScore: min(100, max(0, score)),
             reasoning: reasoning,
-            suggestedProjectCode: suggestedProjectCode
+            suggestedProjectCode: effectiveProjectCode
         )
     }
 }

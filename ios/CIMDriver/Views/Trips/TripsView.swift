@@ -3,6 +3,7 @@ import SwiftData
 
 struct TripsView: View {
     @Query(sort: \Trip.startTime, order: .reverse) private var allTrips: [Trip]
+    @Query private var allChecks: [OdometerCheck]
     @Environment(\.modelContext) private var modelContext
     @State private var showingAddTrip = false
     @State private var exportURL: URL?
@@ -357,7 +358,10 @@ struct TripsView: View {
     
     private func exportTripsPDF(trips: [Trip]? = nil, title: String? = nil) {
         let targetTrips = trips ?? filteredTrips
-        exportURL = ExportUtil.generateTripsPDF(trips: targetTrips, periodTitle: title)
+        let minTime = targetTrips.map(\.startTime).min() ?? Date.distantPast
+        let maxTime = targetTrips.compactMap(\.endTime).max() ?? (targetTrips.map(\.startTime).max() ?? Date.distantFuture)
+        let relevantChecks = allChecks.filter { $0.timestamp >= minTime.addingTimeInterval(-86400) && $0.timestamp <= maxTime.addingTimeInterval(86400) }
+        exportURL = ExportUtil.generateTripsPDF(trips: targetTrips, periodTitle: title, odometerChecks: relevantChecks)
     }
     
     @ViewBuilder

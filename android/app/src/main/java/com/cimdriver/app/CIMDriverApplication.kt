@@ -6,6 +6,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.cimdriver.app.worker.BackupWorker
 import com.cimdriver.app.worker.DataLifecycleWorker
+import com.cimdriver.app.worker.MonthlyClosingWorker
 import org.maplibre.android.MapLibre
 import java.util.concurrent.TimeUnit
 
@@ -34,6 +35,15 @@ class CIMDriverApplication : Application() {
             "DataLifecycleWorker",
             ExistingPeriodicWorkPolicy.KEEP,
             lifecycleWorkRequest
+        )
+
+        // Enqueue daily monthly closing worker
+        val closingWorkRequest = PeriodicWorkRequestBuilder<MonthlyClosingWorker>(1, TimeUnit.DAYS)
+            .build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "MonthlyClosingWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            closingWorkRequest
         )
     }
 }

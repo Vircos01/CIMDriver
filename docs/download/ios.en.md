@@ -5,9 +5,13 @@ hide:
 
 # 📦 Installation: iOS (iPhone)
 
-The current stable preview is **Version 0.0.11 Alpha** (Build 7).
+The current stable preview is **Version 0.0.12 Alpha** (Build 8).
 
-This release brings the iOS app into full parity with Android Phase 7 (Smart Work Hours Guidance, Triage & Target Coaching):
+This release brings the iOS app into full parity with Android Phase 8 (Fiscal Monthly Closing, Route Presets & Odometer Audit Evidence):
+- Local fiscal monthly closing & share notification on the 1st of the month (100% privacy-first)
+- Favorite routes as 1-tap presets in manual trip entry and 95% confidence matching during classification
+- Odometer photo proof with thumbnail preview in history and visual audit appendix page in PDF export
+- Consolidated multi-vehicle fleet card on the Dashboard (for ≥ 2 active vehicles)
 - Work hours review list with daily triage of open workdays in the Daily Inbox
 - Automatic proposals for missing departure times (via work schedule or return trip) and Dutch Arbowet-compliant breaks
 - Human-readable workday status in plain language

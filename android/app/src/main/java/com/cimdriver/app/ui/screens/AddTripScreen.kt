@@ -314,8 +314,18 @@ fun AddTripScreen(
                                     startAddress = route.startAddress
                                     endAddress = route.endAddress
                                     tripType = route.tripType
+                                    if (!route.projectCode.isNullOrBlank()) {
+                                        projectCode = route.projectCode
+                                    }
                                 },
-                                label = { Text(route.name) },
+                                label = {
+                                    val typeLabel = when (route.tripType.uppercase()) {
+                                        "BUSINESS" -> "Zakelijk"
+                                        "COMMUTE" -> "Woon-werk"
+                                        else -> "Privé"
+                                    }
+                                    Text("${route.name} ($typeLabel)")
+                                },
                                 leadingIcon = { Icon(Icons.Filled.Star, contentDescription = null, modifier = Modifier.size(16.dp)) }
                             )
                         }

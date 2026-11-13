@@ -8,6 +8,7 @@ struct TripDetailView: View {
     @Query private var rules: [ClassificationRule]
     @Query private var addresses: [SavedAddress]
     @Query private var settingsList: [AppSettings]
+    @Query private var favoriteRoutes: [FavoriteRoute]
     @State private var showingEditSheet = false
     @Environment(\.dismiss) private var dismiss
     
@@ -33,7 +34,8 @@ struct TripDetailView: View {
             timestamp: trip.startTime,
             appSettings: settingsList.first,
             isBluetoothTriggered: trip.vehicle != nil,
-            suggestedProjectCode: suggestedProj
+            suggestedProjectCode: suggestedProj,
+            favoriteRoutes: favoriteRoutes
         )
     }
 

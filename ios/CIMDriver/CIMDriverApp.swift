@@ -23,6 +23,7 @@ struct CIMDriverApp: App {
         TrackingManager.shared.modelContext = sharedModelContainer.mainContext
         TrackingManager.shared.setup(modelContext: sharedModelContainer.mainContext)
         registerBackgroundTasks()
+        MonthlyClosingNotificationManager.scheduleMonthlyClosingReminder()
         
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, error in
             if let error = error {

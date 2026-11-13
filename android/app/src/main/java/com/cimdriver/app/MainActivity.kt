@@ -88,6 +88,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntents(intent: Intent?) {
+        if (intent?.getBooleanExtra("OPEN_MONTHLY_CLOSING", false) == true) {
+            val title = intent.getStringExtra("MONTHLY_CLOSING_TITLE") ?: ""
+            com.cimdriver.app.service.MonthlyClosingStore.requestClosing(title)
+            intent.removeExtra("OPEN_MONTHLY_CLOSING")
+            intent.removeExtra("MONTHLY_CLOSING_TITLE")
+        }
+
         if (intent?.getBooleanExtra("SHOW_ODOMETER_CHECK", false) == true) {
             val vehicleId = intent.getLongExtra("ODOMETER_CHECK_VEHICLE_ID", -1L)
             if (vehicleId != -1L) {

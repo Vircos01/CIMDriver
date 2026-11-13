@@ -99,9 +99,16 @@ class TripsViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    val odometerChecks: StateFlow<List<com.cimdriver.app.data.local.entity.OdometerCheck>> = database.odometerCheckDao().getAllChecks()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     val tripsToReviewCandidates: StateFlow<List<TripReviewCandidate>> = kotlinx.coroutines.flow.combine(
-        trips, classificationRules, savedAddresses, database.settingsDao().getSettings()
-    ) { allTrips, rules, addresses, settings ->
+        trips, classificationRules, savedAddresses, database.settingsDao().getSettings(), favoriteRoutes
+    ) { allTrips, rules, addresses, settings, favRoutes ->
         val toReview = allTrips.filter { it.status == TripStatus.TO_REVIEW.value }
         toReview.map { trip ->
             val startSaved = AddressMatching.findSavedAddress(trip.startAddress, addresses)
@@ -130,7 +137,8 @@ class TripsViewModel @Inject constructor(
                 workStartTime = settings?.workStartTime,
                 workEndTime = settings?.workEndTime,
                 isBluetoothTriggered = trip.vehicleId != null,
-                suggestedProjectCode = suggestedProjectCode
+                suggestedProjectCode = suggestedProjectCode,
+                favoriteRoutes = favRoutes
             )
 
             val catName = when (assessment.category) {

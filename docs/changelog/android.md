@@ -6,7 +6,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.7.0 (Huidige Versie)
+## Versie 1.8.0 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 8: Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs"
+    * **Fiscale Maandafsluiting & Lokale Deel-notificatie (Privacy-First):** Op de 1e van elke nieuwe maand stuurt CIMDriver een lokale notificatie om de rittenadministratie van de afgelopen maand fiscaal te controleren en direct te delen via het native deelsheet (PDF/CSV). In de eerste 7 dagen van de maand toont het Dashboard tevens een discrete tegel *"Maandafsluiting gereed"*.
+    * **Favoriete Routes als 1-Tik Presets & Triage-Match:** Bij handmatige invoer van ritten (`AddTripScreen`) verschijnen opgeslagen favoriete routes als directe presets die vertrek, bestemming, categorie en projectcode met één tik invullen. Bij triage krijgen ritten die matchen met een favoriete route automatisch 95% betrouwbaarheid.
+    * **Odometer Fotobewijs in Historie & PDF-Bijlage:** Dashboardfoto's van kilometerstandmetingen zijn direct als tikbare miniatuur te bekijken in de km-controle historie (`OdometerCheckAnalysisScreen`) met schermvullende weergave. Daarnaast worden tellerstandcontroles en dashboardsfoto's als audit-appendix opgenomen in het officiële Belastingdienst PDF-rapport.
+    * **Multi-Voertuig Wagenpark-kaart:** Voor gebruikers met 2 of meer actieve voertuigen toont het Dashboard een geconsolideerde wagenparkkaart met actuele tellerstanden, ritten deze maand en de status van de 500 km privégrens.
+
+## Versie 1.7.0
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 7: Slimme Werkuren-Begeleiding, Triage & Target-Coaching"

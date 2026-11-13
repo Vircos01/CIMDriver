@@ -8,6 +8,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Share
+import com.cimdriver.app.ui.theme.CIMDriverGreen
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -162,6 +166,7 @@ fun DashboardScreen(
     var showTrackingStatusDialog by remember { mutableStateOf(false) }
 
     val updateInfo by updateViewModel.updateInfo.collectAsState()
+    val allTrips by viewModel.trips.collectAsState()
     val targetProgresses by hoursTargetViewModel.targetProgresses.collectAsState()
     val allFillUps by fuelViewModel.fillUps.collectAsState()
     val pendingFuelDrafts = remember(allFillUps) { allFillUps.filter { it.status == "DRAFT" } }
@@ -297,6 +302,92 @@ fun DashboardScreen(
                 // Dagelijkse Uitzonderingen Inbox (Triage met 1-tap acceptatie & confidence)
                 val reviewCandidates by viewModel.tripsToReviewCandidates.collectAsState()
                 val workDayReviewCandidates by workHoursViewModel.workDayReviewCandidates.collectAsState()
+                
+                val calendar = remember { java.util.Calendar.getInstance() }
+                val dayOfMonth = remember { calendar.get(java.util.Calendar.DAY_OF_MONTH) }
+                val currentMonthKey = remember { java.text.SimpleDateFormat("yyyy-MM", java.util.Locale.US).format(calendar.time) }
+                val closingPrefs = remember { context.getSharedPreferences("monthly_closing_prefs", Context.MODE_PRIVATE) }
+                var isClosingBannerDismissed by remember {
+                    mutableStateOf(closingPrefs.getString("banner_dismissed_month", null) == currentMonthKey)
+                }
+
+                if (dayOfMonth <= 7 && !isClosingBannerDismissed) {
+                    val prevCal = remember {
+                        java.util.Calendar.getInstance().apply { add(java.util.Calendar.MONTH, -1) }
+                    }
+                    val prevMonthName = remember {
+                        java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.forLanguageTag("nl-NL")).format(prevCal.time)
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.forLanguageTag("nl-NL")) else it.toString() }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Filled.DateRange,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Fiscale Maandafsluiting gereed",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        closingPrefs.edit().putString("banner_dismissed_month", currentMonthKey).apply()
+                                        isClosingBannerDismissed = true
+                                    },
+                                    modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Close,
+                                        contentDescription = "Sluiten",
+                                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "De rittenadministratie van $prevMonthName staat klaar voor controle en export naar je boekhouder of salarisadministratie.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(
+                                onClick = {
+                                    com.cimdriver.app.service.MonthlyClosingStore.requestClosing(prevMonthName)
+                                    onNavigateToTrips()
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Share,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Controleren & Delen ($prevMonthName)", fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
                 com.cimdriver.app.ui.components.DailyInboxCard(
                     reviewCandidates = reviewCandidates,
@@ -711,12 +802,20 @@ fun DashboardScreen(
                     }
                 }
                 
-                if (vehicles.isNotEmpty()) {
+                val activeVehicles = remember(vehicles) { vehicles.filter { it.isActive } }
+                if (activeVehicles.size >= 2) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    MultiVehicleFleetCard(
+                        vehicles = activeVehicles,
+                        allTrips = allTrips,
+                        locale = locale
+                    )
+                } else if (activeVehicles.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(text = stringResource(R.string.odometer_title), style = MaterialTheme.typography.titleLarge)
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    vehicles.filter { it.isActive }.forEach { vehicle ->
+                    activeVehicles.forEach { vehicle ->
                         Card(
                             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -800,4 +899,190 @@ fun DashboardScreen(
         )
     }
 
+}
+
+@Composable
+private fun MultiVehicleFleetCard(
+    vehicles: List<com.cimdriver.app.data.local.entity.Vehicle>,
+    allTrips: List<com.cimdriver.app.data.local.entity.Trip>,
+    locale: java.util.Locale
+) {
+    val calendar = java.util.Calendar.getInstance()
+    calendar.set(java.util.Calendar.DAY_OF_MONTH, 1)
+    calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+    calendar.set(java.util.Calendar.MINUTE, 0)
+    calendar.set(java.util.Calendar.SECOND, 0)
+    val startOfMonth = calendar.timeInMillis
+
+    calendar.set(java.util.Calendar.DAY_OF_YEAR, 1)
+    val startOfYear = calendar.timeInMillis
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.DirectionsCar,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Wagenpark Overzicht",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                ) {
+                    Text(
+                        text = "${vehicles.size} voertuigen",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            vehicles.forEachIndexed { index, vehicle ->
+                if (index > 0) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+                    )
+                }
+
+                val monthTrips = remember(allTrips, vehicle.id, startOfMonth) {
+                    allTrips.filter { it.vehicleId == vehicle.id && it.startTime >= startOfMonth }
+                }
+                val monthKm = remember(monthTrips) {
+                    monthTrips.sumOf { it.distanceMeters } / 1000.0
+                }
+                val yearPrivateTrips = remember(allTrips, vehicle.id, startOfYear) {
+                    allTrips.filter {
+                        it.vehicleId == vehicle.id && it.startTime >= startOfYear &&
+                            (it.tripType == "PRIVATE" || it.tripType == com.cimdriver.app.util.TripClassification.DYNAMICS_PERSONAL)
+                    }
+                }
+                val yearPrivateKm = remember(yearPrivateTrips) {
+                    yearPrivateTrips.sumOf { it.distanceMeters + it.privateDetourMeters } / 1000.0
+                }
+                val privateProgress = (yearPrivateKm / 500.0).toFloat().coerceIn(0f, 1f)
+                val statusColor = when {
+                    yearPrivateKm > 500 -> Color(0xFFE53935)
+                    yearPrivateKm >= 400 -> Color(0xFFFFB300)
+                    else -> CIMDriverGreen
+                }
+
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column {
+                            Text(
+                                text = "${vehicle.make} ${vehicle.model}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = Color(0xFFFFD54F),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.Black)
+                                ) {
+                                    Text(
+                                        text = vehicle.licensePlate,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.Black,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                                if (vehicle.isDefault) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Standaard",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = String.format(locale, "%,d km", vehicle.odometerCurrent).replace(',', '.'),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "${monthTrips.size} ritten (${String.format(locale, "%.0f", monthKm)} km) deze mnd",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // 500 km Privé Grens Progress Bar
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Privé dit jaar:",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${String.format(locale, "%.1f", yearPrivateKm)} / 500 km",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = statusColor
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { privateProgress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = statusColor,
+                        trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    val statusHint = when {
+                        yearPrivateKm > 500 -> "Fiscaal bijtellingsrisico (overschreden)"
+                        yearPrivateKm >= 400 -> "Nog ${(500 - yearPrivateKm).toInt()} km tot fiscale bijtellingsgrens"
+                        else -> "Veilig binnen 500 km privé-norm"
+                    }
+                    Text(
+                        text = statusHint,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = statusColor.copy(alpha = 0.9f)
+                    )
+                }
+            }
+        }
+    }
 }

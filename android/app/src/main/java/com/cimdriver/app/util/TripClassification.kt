@@ -37,7 +37,8 @@ object TripClassification {
         timestamp: Long? = null,
         workDaysStr: String? = null,
         workStartTime: String? = null,
-        workEndTime: String? = null
+        workEndTime: String? = null,
+        favoriteRoutes: List<com.cimdriver.app.data.local.entity.FavoriteRoute> = emptyList()
     ): TripCategory? {
         val isCommuteAddressPair = (startAddressType == "THUIS" && endAddressType == "WERK") ||
             (startAddressType == "WERK" && endAddressType == "THUIS")
@@ -53,6 +54,16 @@ object TripClassification {
                 "COMMUTE" -> TripCategory.COMMUTE
                 "PRIVATE" -> TripCategory.PRIVATE
                 else -> defaultCategory
+            }
+        }
+
+        val matchingFavorite = findMatchingFavoriteRoute(startAddress, endAddress, favoriteRoutes)
+        if (matchingFavorite != null) {
+            return when (matchingFavorite.tripType.uppercase()) {
+                "BUSINESS" -> TripCategory.BUSINESS
+                "COMMUTE" -> TripCategory.COMMUTE
+                "PRIVATE" -> TripCategory.PRIVATE
+                else -> if (matchingFavorite.tripType in businessTripTypes) TripCategory.BUSINESS else defaultCategory
             }
         }
         // If rules exist but none matched, fall through to built-in classification logic
@@ -111,6 +122,22 @@ object TripClassification {
         listOf(rule.startAddressType, rule.endAddressType, rule.tripType, rule.startAddress, rule.endAddress).count { !it.isNullOrBlank() }
     }
 
+    fun findMatchingFavoriteRoute(
+        startAddress: String?,
+        endAddress: String?,
+        favoriteRoutes: List<com.cimdriver.app.data.local.entity.FavoriteRoute>
+    ): com.cimdriver.app.data.local.entity.FavoriteRoute? {
+        if (startAddress.isNullOrBlank() || endAddress.isNullOrBlank()) return null
+        val cleanStart = startAddress.trim()
+        val cleanEnd = endAddress.trim()
+        return favoriteRoutes.firstOrNull { route ->
+            val s = route.startAddress.trim()
+            val e = route.endAddress.trim()
+            (s.equals(cleanStart, ignoreCase = true) && e.equals(cleanEnd, ignoreCase = true)) ||
+            (s.equals(cleanEnd, ignoreCase = true) && e.equals(cleanStart, ignoreCase = true))
+        }
+    }
+
     data class ConfidenceAssessment(
         val category: TripCategory,
         val confidenceScore: Int, // 0 - 100
@@ -133,9 +160,11 @@ object TripClassification {
         workEndTime: String? = null,
         isBluetoothTriggered: Boolean = false,
         defaultCategory: TripCategory = TripCategory.PRIVATE,
-        suggestedProjectCode: String? = null
+        suggestedProjectCode: String? = null,
+        favoriteRoutes: List<com.cimdriver.app.data.local.entity.FavoriteRoute> = emptyList()
     ): ConfidenceAssessment {
         val matchingRule = findMatchingRule(tripType, startAddressType, endAddressType, startAddress, endAddress, rules)
+        val matchingFavorite = findMatchingFavoriteRoute(startAddress, endAddress, favoriteRoutes)
         val isCommutePair = (startAddressType == "THUIS" && endAddressType == "WERK") ||
             (startAddressType == "WERK" && endAddressType == "THUIS")
         val isCustomer = startAddressType == "KLANT" || endAddressType == "KLANT"
@@ -146,6 +175,7 @@ object TripClassification {
         var score = 50
         val category: TripCategory
         val reasoning: String
+        var effectiveProjectCode = suggestedProjectCode
 
         if (matchingRule != null) {
             val ruleCat = when (matchingRule.category) {
@@ -158,6 +188,18 @@ object TripClassification {
             val isExact = !matchingRule.startAddress.isNullOrBlank() && !matchingRule.endAddress.isNullOrBlank()
             score = if (isExact) 96 else 88
             reasoning = if (isExact) "Vaste route-regel matched exact" else "Classificatieregel matched adrestypes"
+        } else if (matchingFavorite != null) {
+            category = when (matchingFavorite.tripType.uppercase()) {
+                "BUSINESS" -> TripCategory.BUSINESS
+                "COMMUTE" -> TripCategory.COMMUTE
+                "PRIVATE" -> TripCategory.PRIVATE
+                else -> if (matchingFavorite.tripType in businessTripTypes) TripCategory.BUSINESS else defaultCategory
+            }
+            score = 95
+            reasoning = "Komt exact overeen met favoriete route '${matchingFavorite.name}'"
+            if (!matchingFavorite.projectCode.isNullOrBlank()) {
+                effectiveProjectCode = matchingFavorite.projectCode
+            }
         } else if (isCommutePair || tripType == "COMMUTE" || tripType == DYNAMICS_HOME_TO_WORK) {
             category = TripCategory.COMMUTE
             score = 92
@@ -192,7 +234,7 @@ object TripClassification {
             category = category,
             confidenceScore = score,
             reasoning = reasoning,
-            suggestedProjectCode = suggestedProjectCode
+            suggestedProjectCode = effectiveProjectCode
         )
     }
 

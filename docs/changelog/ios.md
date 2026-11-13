@@ -4,7 +4,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
-## Versie 0.0.11 Alpha (Huidige Versie)
+## Versie 0.0.12 Alpha (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 8: Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs (Android Feature Sync)"
+    * **Fiscale Maandafsluiting & Lokale Deel-notificatie (Privacy-First):** Maandelijkse lokale herinnering op de 1e van de maand en een discrete dashboardtegel in de eerste 7 dagen om de afgesloten maand direct via het native iOS ShareSheet (PDF/CSV) te delen met je accountant.
+    * **Favoriete Routes als 1-Tik Presets & Triage-Match:** 1-tik presets in `ManualTripEntryView` die direct alle ritdetails invullen, en automatische matching in `TripClassification` met 95% betrouwbaarheid.
+    * **Odometer Fotobewijs & PDF Audit-Appendix:** Fysieke foto's van tellerstanden worden bewaard, zijn te bekijken in de km-controle historie van `OdometerGapReviewView` (inclusief schermvullende weergave) en worden optioneel als audit-appendix met foto's toegevoegd aan de PDF-export.
+    * **Multi-Voertuig Wagenpark-kaart:** Consolidated fleet card op het Dashboard voor wagenparken met $\ge$ 2 actieve voertuigen met 500 km privégrens indicator.
+
+## Versie 0.0.11 Alpha
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 7: Slimme Werkuren-Begeleiding, Triage & Target-Coaching (Android Feature Sync)"

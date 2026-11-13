@@ -1,6 +1,6 @@
 {
-  "versionCode": 39,
-  "versionName": "1.7.0",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.7.0.apk",
-  "releaseNotes": "Versie 1.7.0: Fase 7 - Slimme Werkuren-Begeleiding, Triage & Target-Coaching: Werkuren-reviewlijst met dagelijkse triage van openstaande werkdagen in de Daily Inbox, automatische voorstellen voor ontbrekende eindtijden (via basisrooster of retourrit) en Arbowet-conforme pauzes, begrijpelijke werkdagstatus in gewone mensentaal, target-coaching met dynamisch dagtempo op basis van het actieve basisrooster, en 1-tik goedkeuring met ongedaan maken (Undo Snackbar/Banner)."
+  "versionCode": 40,
+  "versionName": "1.8.0",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.0.apk",
+  "releaseNotes": "Versie 1.8.0: Fase 8 - Fiscale Maandafsluiting, Route-Presets & Odometer Audit-Bewijs: Lokale maandelijkse notificatie voor fiscale maandafsluiting en direct exporteren/delen via native share sheet (PDF/CSV), discrete maandafsluitingstegel op het Dashboard (eerste 7 dagen), 1-tik presets voor favoriete routes bij handmatige invoer met 95% triage-confidence matching, odometer fotobewijs in km-controle historie en als audit-appendix met dashboardsfoto's in de Belastingdienst PDF-export, en een compacte Multi-Voertuig Wagenpark-kaart met 500 km privégrens indicator."
 }

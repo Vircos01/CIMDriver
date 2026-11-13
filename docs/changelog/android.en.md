@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.7.0 (Current Version)
+## Version 1.8.0 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 8: Tax Month-End Closing, Route Presets & Odometer Audit Evidence"
+    * **Tax Month-End Closing & Local Share Notification (Privacy-First):** On the 1st of every month, CIMDriver sends a local notification to verify the previous month's trip log and share it directly with your accountant via the native share sheet (PDF/CSV). During the first 7 days of the month, the Dashboard also displays a discrete *"Month-end closing ready"* banner.
+    * **Favorite Routes as 1-Tap Presets & Triage Match:** Manual trip entry (`AddTripScreen`) offers 1-tap preset chips for saved favorite routes, auto-filling departure, destination, category, and project code. Automatic triage matching assigns 95% confidence to trips matching a saved favorite route.
+    * **Odometer Photo Evidence in History & PDF Appendix:** Dashboard photos taken during odometer readings (ML Kit OCR) are viewable as tap-to-zoom thumbnails in the check history (`OdometerCheckAnalysisScreen`). Odometer checks and dashboard photos are also included as an audit evidence appendix in the Belastingdienst PDF export.
+    * **Multi-Vehicle Fleet Card:** For users with 2 or more active vehicles, the Dashboard features a consolidated fleet card showing current odometers, monthly trip stats, and 500 km private limit progress.
+
+## Version 1.7.0
 *Release date: November 13, 2026*
 
 !!! success "Phase 7: Smart Work Hours Guidance, Triage & Target Coaching"

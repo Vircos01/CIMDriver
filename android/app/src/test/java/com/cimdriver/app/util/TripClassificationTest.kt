@@ -1,7 +1,9 @@
 package com.cimdriver.app.util
 
 import com.cimdriver.app.data.local.entity.ClassificationRule
+import com.cimdriver.app.data.local.entity.FavoriteRoute
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TripClassificationTest {
@@ -71,5 +73,47 @@ class TripClassificationTest {
         )
         assertEquals(TripCategory.BUSINESS, assessment.category)
         assert(assessment.confidenceScore >= 95)
+    }
+
+    @Test
+    fun confidenceAssessmentForFavoriteRouteMatch() {
+        val favorite = FavoriteRoute(
+            id = 1L,
+            name = "Klant Vestiging Noord",
+            startAddress = "Hoofdstraat 10, Utrecht",
+            endAddress = "Industrieweg 4, Amsterdam",
+            tripType = "BUSINESS",
+            projectCode = "PRJ-999"
+        )
+        val assessment = TripClassification.assessConfidence(
+            tripType = null,
+            startAddress = "Hoofdstraat 10, Utrecht",
+            endAddress = "Industrieweg 4, Amsterdam",
+            favoriteRoutes = listOf(favorite)
+        )
+        assertEquals(TripCategory.BUSINESS, assessment.category)
+        assertEquals(95, assessment.confidenceScore)
+        assertTrue(assessment.reasoning.contains("Klant Vestiging Noord"))
+        assertEquals("PRJ-999", assessment.suggestedProjectCode)
+    }
+
+    @Test
+    fun favoriteRouteReverseMatchWorks() {
+        val favorite = FavoriteRoute(
+            id = 2L,
+            name = "Woon-Werk Route",
+            startAddress = "Thuisadres 1, Almere",
+            endAddress = "Kantoor CIM, Vianen",
+            tripType = "COMMUTE"
+        )
+        val assessment = TripClassification.assessConfidence(
+            tripType = null,
+            startAddress = "Kantoor CIM, Vianen",
+            endAddress = "Thuisadres 1, Almere",
+            favoriteRoutes = listOf(favorite)
+        )
+        assertEquals(TripCategory.COMMUTE, assessment.category)
+        assertEquals(95, assessment.confidenceScore)
+        assertTrue(assessment.reasoning.contains("Woon-Werk Route"))
     }
 }

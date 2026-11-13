@@ -1,6 +1,8 @@
 package com.cimdriver.app.util
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -13,6 +15,7 @@ import com.cimdriver.app.data.local.entity.Vehicle
 import com.cimdriver.app.data.local.entity.OdometerCheck
 import com.cimdriver.app.data.local.entity.OdometerGapResolution
 import com.cimdriver.app.ui.viewmodel.DashboardStats
+import java.io.File
 import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -161,7 +164,8 @@ object ExportUtil {
         rules: List<ClassificationRule> = emptyList(),
         settings: com.cimdriver.app.data.local.entity.Settings? = null,
         title: String? = null,
-        vehicles: List<Vehicle> = emptyList()
+        vehicles: List<Vehicle> = emptyList(),
+        odometerChecks: List<OdometerCheck> = emptyList()
     ) {
         val outputStream = context.contentResolver.openOutputStream(uri) ?: return
         
@@ -315,6 +319,83 @@ object ExportUtil {
         canvas.drawText("TOTALEN: Totaal: $totaalKmStr km   |   Zakelijk: $zakelijkKmStr km   |   Woon-werk: $woonWerkKmStr km   |   Privé: $priveKmStr km   |   Privé-omrijden: $detourKmStr km", 35f, yPosition, headerPaint)
         
         pdfDocument.finishPage(page)
+
+        if (odometerChecks.isNotEmpty()) {
+            page = pdfDocument.startPage(pageInfo)
+            canvas = page.canvas
+            yPosition = 35f
+
+            canvas.drawText("Bijlage: Fiscale Verificatie Kilometerstanden (Audit Trail)", 35f, yPosition, titlePaint)
+            yPosition += 16f
+            canvas.drawText("Fotobewijs en fysieke meteropnames conform Belastingdienst-controleerbaarheid", 35f, yPosition, metaPaint)
+            yPosition += 18f
+            canvas.drawLine(35f, yPosition, 807f, yPosition, linePaint)
+            yPosition += 14f
+
+            // Table header
+            canvas.drawText("Datum & Tijd", 35f, yPosition, headerPaint)
+            canvas.drawText("Kenteken", 140f, yPosition, headerPaint)
+            canvas.drawText("Geregistreerd", 230f, yPosition, headerPaint)
+            canvas.drawText("Geverifieerd", 310f, yPosition, headerPaint)
+            canvas.drawText("Verschil", 390f, yPosition, headerPaint)
+            canvas.drawText("Toelichting / Strategie", 460f, yPosition, headerPaint)
+            canvas.drawText("Fotobewijs Dashboard", 630f, yPosition, headerPaint)
+            yPosition += 6f
+            canvas.drawLine(35f, yPosition, 807f, yPosition, linePaint)
+            yPosition += 16f
+
+            for (check in odometerChecks.sortedBy { it.timestamp }) {
+                if (yPosition > 510f) {
+                    pdfDocument.finishPage(page)
+                    page = pdfDocument.startPage(pageInfo)
+                    canvas = page.canvas
+                    yPosition = 35f
+                }
+
+                val checkVehicle = vehicles.find { it.id == check.vehicleId }
+                val checkDateStr = dateTimeFormat.format(Date(check.timestamp))
+                val plate = checkVehicle?.licensePlate ?: "-"
+                val regStr = "${check.registeredOdometer} km"
+                val corrStr = "${check.correctedOdometer} km"
+                val diffVal = check.correctedOdometer - check.registeredOdometer
+                val diffStr = "${if (diffVal > 0) "+$diffVal" else "$diffVal"} km"
+                val note = (check.correctionReason ?: check.correctionStrategy).take(24)
+
+                canvas.drawText(checkDateStr, 35f, yPosition + 15f, bodyPaint)
+                canvas.drawText(plate, 140f, yPosition + 15f, bodyPaint)
+                canvas.drawText(regStr, 230f, yPosition + 15f, bodyPaint)
+                canvas.drawText(corrStr, 310f, yPosition + 15f, bodyPaint)
+                canvas.drawText(diffStr, 390f, yPosition + 15f, bodyPaint)
+                canvas.drawText(note, 460f, yPosition + 15f, bodyPaint)
+
+                // Render photo thumbnail if available
+                var photoDrawn = false
+                if (!check.photoPath.isNullOrBlank()) {
+                    val photoFile = File(check.photoPath)
+                    if (photoFile.exists()) {
+                        try {
+                            val options = BitmapFactory.Options().apply { inSampleSize = 8 }
+                            val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath, options)
+                            if (bitmap != null) {
+                                val thumb = Bitmap.createScaledBitmap(bitmap, 50, 38, true)
+                                canvas.drawBitmap(thumb, 630f, yPosition - 4f, null)
+                                photoDrawn = true
+                            }
+                        } catch (e: Exception) {
+                            // ignore photo loading error in PDF
+                        }
+                    }
+                }
+                if (!photoDrawn) {
+                    canvas.drawText(if (check.photoPath != null) "Foto opgeslagen" else "Geen foto", 630f, yPosition + 15f, bodyPaint)
+                }
+
+                yPosition += 45f
+                canvas.drawLine(35f, yPosition - 4f, 807f, yPosition - 4f, linePaint)
+            }
+            pdfDocument.finishPage(page)
+        }
+        
         pdfDocument.writeTo(outputStream)
         pdfDocument.close()
         outputStream.close()
