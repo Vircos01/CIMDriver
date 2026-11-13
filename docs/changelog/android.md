@@ -6,7 +6,22 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.3.7 (Huidige Versie)
+## Versie 1.4.0 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Nieuwe Functies & Verbeteringen"
+    * **Fiscaal sluitende export (Belastingdienst):** Begin- en eindtellerstanden zijn nu standaard onderdeel van de CSV- en PDF-export. Het PDF-rapport is geoptimaliseerd naar liggend A4 (Landscape) met een professionele paginakop (voertuiggegevens, kenteken en periode) en een fiscaal totalenblok onderaan.
+    * **Privé-omrijkilometers:** Eenvoudig registreren van privé-omrijden tijdens zakelijke ritten. Deze kilometers worden automatisch van de zakelijke afstand afgetrokken en meegeteld voor de 500km-privégrens.
+    * **RDW Open Data Kentekencheck:** Automatisch ophalen van automerk, handelsbenaming, bouwjaar en brandstoftype/aandrijving (EV, PHEV of brandstof) bij het invoeren van een kenteken.
+    * **Live Rit-Toggle tijdens het rijden:** Schakel een lopende rit direct om tussen "Zakelijk" en "Privé" via de actieve notificatie of op het Android Auto scherm.
+    * **Interactieve Home Screen Widget:** Bedien je ritten direct vanaf je Android-startscherm (actuele ritstatus, rit-toggle en snelle startknoppen).
+    * **Werkuren delen per periode:** Exporteer werkuren direct gefilterd per week of maand naar PDF of CSV met berekende urentotalen.
+    * **Kalender dag-inspectie:** Tik op een dag in de rittenkalender om direct alle ritten van die dag in een overzichtelijke pop-up te bekijken en te openen.
+    * **Klikbare doelen:** Tik op doelkaarten op het dashboard om direct naar het doelenbeheer te navigeren.
+    * **Nederlandse Android Auto:** Volledige Nederlandse vertaling van categorieën op het autoscherm inclusief directe privé-rit optie.
+    * **EV Laadpresets:** Snelle keuzeknoppen voor laadtarieven bij elektrische voertuigen (Thuis € 0,28, Publiek € 0,45, Snellader € 0,69).
+
+## Versie 1.3.7
 *Releasedatum: 13 november 2026*
 
 !!! success "Nieuwe Functies & Verbeteringen"

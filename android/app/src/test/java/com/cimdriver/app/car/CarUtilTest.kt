@@ -26,3 +26,4 @@ class CarUtilTest {
         assertEquals("Project X", CarUtil.getLocalizedTripType("Project X"))
     }
 }
+

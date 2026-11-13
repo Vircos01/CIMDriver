@@ -4,7 +4,22 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.3.7 (Current Version)
+## Version 1.4.0 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "New Features & Improvements"
+    * **Tax-Compliant Exports (Dutch Belastingdienst):** Start and end odometer readings are now included across CSV and PDF exports. The PDF report has been converted to Landscape A4 format featuring a professional header with vehicle details and period totals summary.
+    * **Private Detour Distance Tracking:** Dedicated field for private detour kilometers on business trips. Detours are automatically deducted from business totals and counted towards the 500km private limit.
+    * **RDW Open Data Vehicle Lookup:** Automatically fetches vehicle make, model, year, and fuel/engine type (EV, PHEV, ICE) from the Dutch RDW database when adding a vehicle.
+    * **Live Trip Toggle while Driving:** Switch active trips seamlessly between Business and Private directly from the ongoing tracking notification or the Android Auto screen.
+    * **Interactive Home Screen Widget:** Manage trips directly from your Android home screen with active trip status display, trip toggle, and quick start buttons.
+    * **Work Hours Export by Period:** Export work hours filtered by individual week or month to PDF or CSV with automatic total hours summary.
+    * **Calendar Day Inspection:** Tap any day in the trips calendar to review all trips for that date in an interactive pop-up with direct drill-down to trip details.
+    * **Clickable Dashboard Targets:** Target progress cards on the dashboard are now clickable to directly manage work hours and revenue goals.
+    * **Dutch Android Auto Localization:** Android Auto car interface localized into clean Dutch with an added option to start Private trips directly.
+    * **EV Charging Presets:** Single-tap charging rate presets for electric vehicles (Home €0.28, Public €0.45, Fast charger €0.69) with automatic cost calculation.
+
+## Version 1.3.7
 *Release date: November 13, 2026*
 
 !!! success "New Features & Improvements"

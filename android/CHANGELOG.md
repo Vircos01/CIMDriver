@@ -2,6 +2,20 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.4.0] - 2026-11-13
+
+### Toegevoegd & Verbeterd
+- **Belastingdienst Fiscale Compliance (Begin- & Eindstand in Export):** Volledige implementatie van de eisen van de Belastingdienst (art. 3.17 Wet IB 2001). Zowel de CSV- als PDF-export bevatten nu per rit de begin- en eindtellerstand. De PDF-export is overgezet naar een strak liggend A4-formaat (Landscape 842x595) met een professionele kop (voertuiggegevens & fiscale periode) en een totalenblok onderaan (totaal gereden km, zakelijk, woon-werk, privé en privé-omrijden).
+- **Registratie van Privé-omrijkilometers:** Ondersteuning voor het apart opgeven van privé-omrijkilometers bij zakelijke en woon-werk ritten. Deze kilometers worden automatisch afgetrokken van het zakelijke kilometrage en meegeteld voor de fiscale 500km-privégrens.
+- **Automatische RDW Kentekencheck:** Bij het toevoegen van een voertuig worden merk, handelsbenaming, bouwjaar en aandrijving (EV, PHEV of ICE) nu met één tik direct en gratis opgehaald via de officiële RDW Open Data API.
+- **Live Rit-Toggle tijdens het rijden:** Wissel direct tussen Zakelijk en Privé tijdens een actieve rit zonder deze te hoeven beëindigen. Beschikbaar via de actieve notificatie en op het dashboard van Android Auto.
+- **Interactieve Home Screen Widget:** Vernieuwde Glance AppWidget voor het startscherm. Toont tijdens het rijden direct de actieve ritstatus met knoppen om te wisselen of te stoppen, en in rust de maandtotalen met snelle startknoppen voor Zakelijk en Privé.
+- **Werkuren delen per Week of Maand:** Exporteer en deel werkuren direct gefilterd per individuele week of maand naar PDF of CSV, compleet met een handige totaalregel met gewerkte uren.
+- **Kalenderweergave Dag-Inspectie:** Tik op een dag in de rittenkalender om alle ritten van die dag in een overzichtelijke pop-up te bekijken met directe doorklikmogelijkheid naar ritdetails.
+- **Doorklikbare Doelen:** Doelvoortgangskaarten op het dashboard zijn nu direct klikbaar om uren- en omzetdoelen te beheren.
+- **Nederlandse Lokalisatie Android Auto:** Vaste Engelse rittypen in het car-interface zijn vervangen door nette Nederlandse labels (*Woon-werk*, *Zakelijk overleg*, *Klantbezoek*, *Klant declarabel*, etc.) en uitgebreid met een directe optie voor *Privé*.
+- **EV Laadsessies & Tariefdifferentiatie:** Handige presets voor het registreren van laadsessies bij elektrische auto's (Thuis € 0,28/kWh, Publiek € 0,45/kWh, Snellader € 0,69/kWh) met automatische kostenberekening.
+
 ## [1.3.7] - 2026-11-13
 
 ### Toegevoegd & Verbeterd
