@@ -7,6 +7,16 @@ struct TripsView: View {
     @State private var showingAddTrip = false
     @State private var exportURL: URL?
     
+    struct PendingExport: Identifiable {
+        let id = UUID()
+        let trips: [Trip]
+        let title: String
+        let isPDF: Bool
+    }
+    @State private var pendingExport: PendingExport?
+    @State private var undoTrips: [(trip: Trip, oldType: String, oldStatus: String)] = []
+    @State private var showUndoBanner = false
+    
     enum TripFilter: String, CaseIterable, Identifiable {
         case all = "Alles"
         case toReview = "Nog beoordelen"
@@ -106,6 +116,27 @@ struct TripsView: View {
                     }
                     .background(Color(.systemBackground))
                 }
+                
+                if showUndoBanner {
+                    HStack {
+                        Text("\(undoTrips.count) ritten bijgewerkt")
+                            .font(.caption)
+                            .foregroundColor(.white)
+                        Spacer()
+                        Button("Ongedaan maken") {
+                            performUndo()
+                        }
+                        .font(.caption.bold())
+                        .foregroundColor(.yellow)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Color.cimNavy)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
             .navigationTitle("Ritten")
             .navigationDestination(for: Trip.self) { trip in
@@ -127,12 +158,12 @@ struct TripsView: View {
                                     ForEach(groupedTrips, id: \.key) { group in
                                         Menu(group.key) {
                                             Button {
-                                                exportTripsPDF(trips: group.value, title: group.key)
+                                                requestExport(trips: group.value, title: group.key, isPDF: true)
                                             } label: {
                                                 Label("PDF (\(group.key))", systemImage: "doc.richtext")
                                             }
                                             Button {
-                                                exportTripsCSV(trips: group.value, title: group.key)
+                                                requestExport(trips: group.value, title: group.key, isPDF: false)
                                             } label: {
                                                 Label("CSV (\(group.key))", systemImage: "tablecells")
                                             }
@@ -143,12 +174,12 @@ struct TripsView: View {
                             
                             Section("Alles") {
                                 Button {
-                                    exportTripsPDF(trips: filteredTrips, title: "Alles")
+                                    requestExport(trips: filteredTrips, title: "Alles", isPDF: true)
                                 } label: {
                                     Label("Exporteer alles (PDF)", systemImage: "doc.richtext")
                                 }
                                 Button {
-                                    exportTripsCSV(trips: filteredTrips, title: "Alles")
+                                    requestExport(trips: filteredTrips, title: "Alles", isPDF: false)
                                 } label: {
                                     Label("Exporteer alles (CSV)", systemImage: "tablecells")
                                 }
@@ -165,6 +196,20 @@ struct TripsView: View {
             }
             .sheet(isPresented: $showingAddTrip) {
                 ManualTripEntryView()
+            }
+            .sheet(item: $pendingExport) { export in
+                ExportPreCheckSheet(
+                    trips: export.trips,
+                    periodTitle: export.title,
+                    isPDF: export.isPDF,
+                    onConfirm: {
+                        if export.isPDF {
+                            exportTripsPDF(trips: export.trips, title: export.title)
+                        } else {
+                            exportTripsCSV(trips: export.trips, title: export.title)
+                        }
+                    }
+                )
             }
             .sheet(isPresented: Binding(
                 get: { exportURL != nil },
@@ -204,6 +249,7 @@ struct TripsView: View {
     }
     
     private func batchUpdate(type: String) {
+        undoTrips = selection.map { ($0, $0.tripType, $0.status) }
         for trip in selection {
             trip.tripType = type
             trip.status = TripStatus.done.rawValue
@@ -211,6 +257,25 @@ struct TripsView: View {
         try? modelContext.save()
         isEditing = false
         selection.removeAll()
+        withAnimation {
+            showUndoBanner = true
+        }
+    }
+    
+    private func performUndo() {
+        for (trip, oldType, oldStatus) in undoTrips {
+            trip.tripType = oldType
+            trip.status = oldStatus
+        }
+        try? modelContext.save()
+        undoTrips.removeAll()
+        withAnimation {
+            showUndoBanner = false
+        }
+    }
+    
+    private func requestExport(trips: [Trip], title: String, isPDF: Bool) {
+        pendingExport = PendingExport(trips: trips, title: title, isPDF: isPDF)
     }
     
     private func mergeSelectedTrips() {
@@ -315,12 +380,12 @@ struct TripsView: View {
                     Spacer()
                     Menu {
                         Button {
-                            exportTripsPDF(trips: group.value, title: group.key)
+                            requestExport(trips: group.value, title: group.key, isPDF: true)
                         } label: {
                             Label("Exporteer PDF (\(group.key))", systemImage: "doc.richtext")
                         }
                         Button {
-                            exportTripsCSV(trips: group.value, title: group.key)
+                            requestExport(trips: group.value, title: group.key, isPDF: false)
                         } label: {
                             Label("Exporteer CSV (\(group.key))", systemImage: "tablecells")
                         }

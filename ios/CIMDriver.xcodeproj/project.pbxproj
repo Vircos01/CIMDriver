@@ -24,6 +24,7 @@
 		24DB4F8833385A61E767B584 /* LocationPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */; };
 		258FC2D1EFEEF1EE9C5E55A2 /* DashboardStatsCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3EBA862BF6E73DBE7B9C23 /* DashboardStatsCalculator.swift */; };
 		2772A3015F076FCA9779502E /* TripsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246321B84451354E540BC461 /* TripsView.swift */; };
+		2A3B4C5D6E7F8A9B0C1D2E3F /* ExportPreCheckSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2B3C4D5E6F7A8B9C0D1E2F /* ExportPreCheckSheet.swift */; };
 		2D3B4C34CA0EB10A7D03D99E /* BluetoothService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076D609D3F91A3AEA955B1E0 /* BluetoothService.swift */; };
 		2DBFCAFC4518AF0176F9F190 /* WorkHoursNormalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 593BD8FD220E74E8600D4E04 /* WorkHoursNormalizer.swift */; };
 		3124A9A3BF18DD59E69E01FC /* WidgetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130ADCAF6FDD59D315146325 /* WidgetManager.swift */; };
@@ -142,6 +143,7 @@
 		1F9585770616888E9E1ECB75 /* EditClassificationRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditClassificationRuleView.swift; sourceTree = "<group>"; };
 		1FE4CA0DC08EDA2DC9D44E99 /* ExportUtilTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportUtilTests.swift; sourceTree = "<group>"; };
 		246321B84451354E540BC461 /* TripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripsView.swift; sourceTree = "<group>"; };
+		1A2B3C4D5E6F7A8B9C0D1E2F /* ExportPreCheckSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPreCheckSheet.swift; sourceTree = "<group>"; };
 		2A07621028FC2304C57F43C4 /* SavedAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAddress.swift; sourceTree = "<group>"; };
 		2ED0F8B499FA03E495D6E128 /* LocationPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPoint.swift; sourceTree = "<group>"; };
 		31079D71E0F81FBBD170E7D3 /* Color+CIMDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+CIMDriver.swift"; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 				0E43D8518F2C320B8C88C017 /* TripDetailView.swift */,
 				7F58942C3DC121371AA9B23F /* TripsCalendarView.swift */,
 				246321B84451354E540BC461 /* TripsView.swift */,
+				1A2B3C4D5E6F7A8B9C0D1E2F /* ExportPreCheckSheet.swift */,
 			);
 			path = Trips;
 			sourceTree = "<group>";
@@ -646,6 +649,7 @@
 				C1C2FDD82E7A28AF52083590 /* TripDetailView.swift in Sources */,
 				10ADF9BF830D269A206F761E /* TripsCalendarView.swift in Sources */,
 				2772A3015F076FCA9779502E /* TripsView.swift in Sources */,
+				2A3B4C5D6E7F8A9B0C1D2E3F /* ExportPreCheckSheet.swift in Sources */,
 				050C9F23A3FA0536939582DE /* Vehicle.swift in Sources */,
 				FCA90E12EA0EE7A980446800 /* VehicleBluetoothView.swift in Sources */,
 				A954146D6ABEF5AC7D19C10B /* VehicleSelectionView.swift in Sources */,
@@ -706,14 +710,14 @@
 				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GIT_COMMIT = unknown;
 				INFOPLIST_FILE = CIMDriver/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.9;
+				MARKETING_VERSION = 0.0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -789,14 +793,14 @@
 				APP_DISPLAY_VERSION = "$(MARKETING_VERSION)-$(GIT_COMMIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GIT_COMMIT = unknown;
 				INFOPLIST_FILE = CIMDriver/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.9;
+				MARKETING_VERSION = 0.0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -807,7 +811,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -815,7 +819,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.9;
+				MARKETING_VERSION = 0.0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
 				PRODUCT_NAME = CIMDriverWidget;
 				SDKROOT = iphoneos;
@@ -901,7 +905,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = CIMDriverWidget/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -909,7 +913,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.0.9;
+				MARKETING_VERSION = 0.0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cimsolutions.CIMDriver.widget;
 				PRODUCT_NAME = CIMDriverWidget;
 				SDKROOT = iphoneos;

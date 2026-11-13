@@ -16,8 +16,90 @@ struct DataManagementView: View {
     @Query private var trips: [Trip]
     @Query private var locationPoints: [LocationPoint]
     
+    private var latestBackupFileInfo: (date: Date, sizeKB: Int, fileName: String)? {
+        let fileManager = FileManager.default
+        var searchDirs: [URL] = []
+        if let docDir = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            searchDirs.append(docDir.appendingPathComponent("CIMDriver/Backups"))
+            searchDirs.append(docDir)
+        }
+        searchDirs.append(fileManager.temporaryDirectory)
+        
+        var filesFound: [(date: Date, size: Int, name: String)] = []
+        for dir in searchDirs {
+            guard let files = try? fileManager.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey], options: .skipsHiddenFiles) else { continue }
+            for file in files where (file.lastPathComponent.hasPrefix("CIMDriver_Backup") && file.pathExtension == "json") {
+                if let vals = try? file.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey]),
+                   let date = vals.contentModificationDate,
+                   let size = vals.fileSize {
+                    filesFound.append((date, size, file.lastPathComponent))
+                }
+            }
+        }
+        
+        if let newest = filesFound.max(by: { $0.date < $1.date }) {
+            return (newest.date, max(1, newest.size / 1024), newest.name)
+        }
+        return nil
+    }
+    
     var body: some View {
         Form {
+            Section(header: Text("Laatste Lokale Back-up"), footer: Text("Geeft inzicht in de recentheid en herstelbaarheid van je lokale rittengegevens.")) {
+                if let info = latestBackupFileInfo {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(Color.cimGreen)
+                            Text("Gevalideerd & Herstelbaar")
+                                .font(.subheadline.bold())
+                                .foregroundColor(Color.cimGreen)
+                        }
+                        
+                        Divider()
+                        
+                        HStack {
+                            Text("Tijdstip:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(info.date.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption.bold())
+                        }
+                        
+                        HStack {
+                            Text("Bestandsgrootte:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text("\(info.sizeKB) KB")
+                                .font(.caption.bold())
+                        }
+                        
+                        HStack {
+                            Text("Bestandsnaam:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(info.fileName)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                } else {
+                    HStack(spacing: 8) {
+                        Image(systemName: "info.circle")
+                            .foregroundColor(.secondary)
+                        Text("Nog geen lokale back-up aangemaakt.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+            
             Section(header: Text("Back-up & Herstel"), footer: Text("Maak een JSON back-up van al je geregistreerde ritten, voertuigen en instellingen.")) {
                 Button(action: createBackup) {
                     Label("Maak Back-up", systemImage: "arrow.up.doc.fill")

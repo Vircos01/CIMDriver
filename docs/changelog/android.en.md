@@ -4,7 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.5.0 (Current Version)
+## Version 1.6.0 (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 6: Reliability, Audit & Flawless Export"
+    * **Pre-Export Completeness Check (ExportPreCheckDialog):** Before generating PDF or CSV exports, CIMDriver validates the period for unreviewed trips, odometer continuity gaps, and route deviations without explanatory notes. Features a 1-tap bulk approval action and displays the official Belastingdienst tax compliance seal when fully consistent.
+    * **Explainable Trip Proposals & Smart Project Codes:** For trips departing from or arriving at saved client addresses, the associated project code is automatically suggested and prefilled, accompanied by transparent reasoning.
+    * **Human-Readable Tracking Reliability in Diagnostics:** The diagnostics screen now features a prominent status card ("Optimal" vs. "Attention Required") explaining background location, battery optimization, and notification states in plain language with 1-tap repair buttons.
+    * **Reversible Changes (Undo Snackbar):** Quick approvals on the Dashboard or Trips list trigger an `[Undo]` snackbar, allowing accidental actions to be immediately reverted without data loss.
+    * **Backup Integrity & Restorability Check:** Data Management screen displays the timestamp, file size, and validated restorability status of the latest automated local backup.
+
+## Version 1.5.0
 *Release date: November 13, 2026*
 
 !!! success "Phase 5: Assisted Decision-Making & Calm Autonomy"

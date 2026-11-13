@@ -5,9 +5,14 @@ hide:
 
 # 📦 Installatie: iOS (iPhone)
 
-De huidige stabiele testversie is **Versie 0.0.9 Alpha** (Build 5).
+De huidige stabiele testversie is **Versie 0.0.10 Alpha** (Build 6).
 
-Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 5 (Assisted Decision-Making):
+Deze release brengt de iOS-versie volledig in sync met alle functies van Android Fase 6 (Betrouwbaarheid, Audit & Foutloze Export):
+- Foutarme Export-voorcontrole (`ExportPreCheckSheet`) vóór PDF- en CSV-export
+- Uitlegbare ritvoorstellen & automatische projectcodes via opgeslagen klantadressen
+- Begrijpelijke tracking-betrouwbaarheid in Diagnostiek met directe 1-tik herstelacties
+- Herstelbare wijzigingen (Undo banner) bij batchclassificatie en goedkeuringen
+- Lokale back-up integriteits- en herstelvalidatie in Gegevensbeheer
 - Dagelijkse Uitzonderingen-Inbox ("Daily Triage") op het Dashboard
 - Confidence scoring (0–100%) & zachte 1-tik reviewvoorstellen
 - Ritaudit & contextuele gegevens in ritdetails

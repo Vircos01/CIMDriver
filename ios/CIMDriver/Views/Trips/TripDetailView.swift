@@ -18,8 +18,11 @@ struct TripDetailView: View {
     @State private var favoriteRouteName = ""
     
     private var assessment: TripClassification.ConfidenceAssessment {
-        let startAddrType = addresses.first(where: { $0.address.lowercased() == (trip.startAddress ?? "").lowercased() })?.addressType
-        let endAddrType = addresses.first(where: { $0.address.lowercased() == (trip.endAddress ?? "").lowercased() })?.addressType
+        let startSaved = addresses.first(where: { $0.address.lowercased() == (trip.startAddress ?? "").lowercased() })
+        let endSaved = addresses.first(where: { $0.address.lowercased() == (trip.endAddress ?? "").lowercased() })
+        let startAddrType = startSaved?.addressType
+        let endAddrType = endSaved?.addressType
+        let suggestedProj = startSaved?.projectCode ?? endSaved?.projectCode
         return TripClassification.assessConfidence(
             tripType: trip.tripType,
             startAddressType: startAddrType,
@@ -29,7 +32,8 @@ struct TripDetailView: View {
             rules: rules,
             timestamp: trip.startTime,
             appSettings: settingsList.first,
-            isBluetoothTriggered: trip.vehicle != nil
+            isBluetoothTriggered: trip.vehicle != nil,
+            suggestedProjectCode: suggestedProj
         )
     }
 
@@ -107,6 +111,12 @@ struct TripDetailView: View {
                 Text("Voorstel: \(catTitle) — \(assessment.reasoning)")
                     .font(.caption)
                     .foregroundColor(.secondary)
+                
+                if let proj = assessment.suggestedProjectCode, (trip.projectCode == nil || trip.projectCode?.isEmpty == true) {
+                    Text("💡 Voorgestelde projectcode: \(proj)")
+                        .font(.caption2)
+                        .foregroundColor(.cimNavy)
+                }
                 
                 Button(action: { quickClassify(suggestedTripTypeString) }) {
                     Text("✓ Accepteren (\(catTitle))")
@@ -294,7 +304,7 @@ struct TripDetailView: View {
             }
         }
         .sheet(isPresented: $showingEditSheet) {
-            EditTripView(trip: trip)
+            EditTripView(trip: trip, suggestedProjectCode: assessment.suggestedProjectCode)
         }
         .alert("Regel Voorstel", isPresented: $showingSuggestionAlert, presenting: suggestedRule) { rule in
             Button("Opslaan") {
@@ -334,6 +344,9 @@ struct TripDetailView: View {
     private func quickClassify(_ type: String) {
         trip.tripType = type
         trip.status = TripStatus.done.rawValue
+        if (trip.projectCode == nil || trip.projectCode?.isEmpty == true), let suggestedProj = assessment.suggestedProjectCode {
+            trip.projectCode = suggestedProj
+        }
         try? modelContext.save()
         
         let allTrips = (try? modelContext.fetch(FetchDescriptor<Trip>())) ?? []
@@ -396,7 +409,7 @@ struct EditTripView: View {
         Array(Set(trips.compactMap { $0.projectCode }).filter { !$0.isEmpty }).sorted()
     }
     
-    init(trip: Trip) {
+    init(trip: Trip, suggestedProjectCode: String? = nil) {
         self.trip = trip
         _tripType = State(initialValue: trip.tripType)
         _startAddress = State(initialValue: trip.startAddress ?? "")
@@ -404,7 +417,8 @@ struct EditTripView: View {
         _distanceString = State(initialValue: String(format: "%.1f", Double(trip.distanceMeters) / 1000.0))
         _privateDetourKm = State(initialValue: trip.privateDetourMeters > 0 ? String(format: "%.1f", Double(trip.privateDetourMeters) / 1000.0) : "")
         _notes = State(initialValue: trip.note ?? "")
-        _projectCode = State(initialValue: trip.projectCode ?? "")
+        let initialProj = !(trip.projectCode?.isEmpty ?? true) ? (trip.projectCode ?? "") : (suggestedProjectCode ?? "")
+        _projectCode = State(initialValue: initialProj)
         _startTime = State(initialValue: trip.startTime)
         _endTime = State(initialValue: trip.endTime ?? trip.startTime.addingTimeInterval(Double(max(60, trip.distanceMeters / 15))))
         _odometerStartString = State(initialValue: String(trip.odometerStart))

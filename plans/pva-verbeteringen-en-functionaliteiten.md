@@ -66,7 +66,14 @@ flowchart TD
         E4 --> E5[Netwerk- & Securityhygiëne / Cleartext Opschoning]
     end
 
-    Fase 1 --> Fase 2 --> Fase 3 --> Fase 4 --> Fase 5
+    subgraph Fase 6: Betrouwbaarheid, Audit & Foutloze Export (🚀 In uitvoering)
+        F1[Foutarme Export-voorcontrole] --> F2[Begrijpelijke Diagnostiekstatus]
+        F2 --> F3[Projectcode Suggesties & Terugkerende Regels]
+        F3 --> F4[Undo / Herstelbare Wijzigingen]
+        F4 --> F5[Back-up Herstel- & Integriteitscheck]
+    end
+
+    Fase 1 --> Fase 2 --> Fase 3 --> Fase 4 --> Fase 5 --> Fase 6
 ```
 
 ---
@@ -294,6 +301,45 @@ flowchart TD
 
 ---
 
+### 🟣 Fase 6: Betrouwbaarheid, Audit & Foutloze Export (Roadmap v1.6) (✅ Gerealiseerd)
+
+> [!IMPORTANT]
+> Deze fase tilt de registratie van "bruikbaar" naar "professioneel en onfeilbaar". In plaats van weer nieuwe grote modules bouwt Fase 6 voort op de bestaande kern van export, diagnostiek, backup en ritbeheer om fouten vóór te zijn en de app rustiger en vergevingsgezinder te maken.
+
+#### 6.1 Foutarme Export-voorcontrole & Registratie-compleetheid per Periode (Prioriteit 1 & 4)
+- **Concept:** Wanneer de gebruiker op "Exporteer PDF" of "Exporteer CSV" tikt, toont de app vóór het genereren van het document een transparante validatiedialoog (`ExportPreCheckDialog` / `ExportPreCheckSheet`).
+- **Inhoudelijke checks:**
+  1. *Tellerstanden-sluitendheid:* Controle via `OdometerGapAnalyzer` of alle kilometerstanden binnen de gekozen periode naadloos op elkaar aansluiten.
+  2. *Rittenclassificatie:* Controle of er ritten met status `TO_REVIEW` in de exportperiode vallen. Biedt direct een 1-tik *"Keur alle hoge betrouwbaarheid goed"* knop binnen de dialoog!
+  3. *Afwijkende routes:* Controle of er ritten zijn met afwijkende afstanden zonder notitie voor de fiscus.
+  4. *Fiscale validatiestempel:* Groene badge *"100% fiscaal sluitend conform Belastingdienst"* als alles compleet is; duidelijke waarschuwingsbanner met keuze `[Eerst oplossen]` of `[Toch exporteren]`.
+
+#### 6.2 Begrijpelijke Tracking-betrouwbaarheid in Diagnostiek (Prioriteit 3)
+- **Concept:** In `DiagnosticsScreen.kt` en `DiagnosticsView.swift` wordt de technische logging aangevuld met een duidelijke, menselijke statuskaart bovenaan.
+- **Status niveaus:**
+  - 🟢 **Optimaal:** Alle rechten, Doze mode uitschakeling, notificaties, precieze locatie en carkitverbinding actief.
+  - 🟠 **Beperkt:** Eén of meer instellingen (zoals batterij-optimalisatie of notificatietoestemming) verminderen de betrouwbaarheid.
+  - 🔴 **Geblokkeerd:** Locatie uitgeschakeld of permissies geweigerd.
+- **Actiegerichte checklist:** Elk punt bevat directe knoppen naar de juiste Android/iOS systeeminstelling.
+
+#### 6.3 Projectcode-voorstellen & Regels voor Terugkerende Ritten (Prioriteit 2 & 6)
+- **Concept:** Uitbreiding van het ritbeoordelings- en classificatiemodel:
+  - Bij ritten naar bekende klantadressen of op specifieke dagen/tijden wordt niet alleen het rittype, maar ook direct de meest waarschijnlijke projectcode voorgesteld.
+  - Bij het opslaan van een favoriete route krijgt de gebruiker een optie: *"Maak tevens automatische classificatieregel voor deze route"*.
+
+#### 6.4 Herstelbare Wijzigingen / Undo Snackbar (Prioriteit 5)
+- **Concept:** Bij snelle handelingen (zoals het 1-tik goedkeuren van een rit in de inbox, het herberekenen van tellers of handmatig corrigeren van een rit) toont de app een Snackbar met `[Ongedaan maken]`.
+- **Werking:** Tikken op `Ongedaan maken` draait de update direct terug naar de vorige toestand zonder dataverlies.
+
+#### 6.5 Back-up Herstel- en Integriteitscheck (Prioriteit 8)
+- **Concept:** In `DataManagementScreen.kt` en `DataManagementView.swift` ziet de gebruiker in één oogopslag de status van automatische back-ups:
+  - Tijdstip laatste back-up (bijv. *"Vandaag om 03:00"*).
+  - Bestandsgrootte en inhoud (aantal ritten en instellingen).
+  - Integriteitsindicator: *"Herstelbaar: Ja (Gevalideerd)"*.
+  - Knop om een handmatige verificatietest uit te voeren.
+
+---
+
 ## 4. Prioriterings- en Impactmatrix
 
 | Taak / Verbetering | Fiscale Noodzaak | Gebruikersimpact | Complexiteit | Status / Sprint |
@@ -308,12 +354,17 @@ flowchart TD
 | **3.2 Kalenderweergave filter per dag** | ⚪ Laag | 🟡 Gemiddeld | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.0) |
 | **2.3 Interactieve Home Screen Widget (Start/Stop)** | ⚪ Laag | 🟢 Hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.0) |
 | **4.2 EV Tariefdifferentiatie & Laadpresets** | ⚪ Laag | 🟡 Gemiddeld | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.4.1) |
-| **5.5 Netwerk- & Securityhygiëne (Network Security Config)** | ⚪ Laag | 🟢 Hoog (Beveiliging) | ⚡ Laag (1-2 uur) | **Sprint 5.1 (Direct)** |
-| **5.4 Permission & Battery Health Monitor** | 🟡 Gemiddeld | 🟢 Zeer hoog | ⚡ Laag (2-3 uur) | **Sprint 5.1 (Direct)** |
-| **5.1 Dagelijkse Uitzonderingen-Inbox ("Daily Triage")** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld (4-5 uur) | **Sprint 5.2** |
-| **5.2 Confidence Score & Zachte 1-Tap Reviews** | ⚪ Laag | 🟢 Hoog | 🔶 Gemiddeld (3-4 uur) | **Sprint 5.2** |
-| **5.3 Contextuele Smart Defaults & Ritaudit** | ⚪ Laag | 🟡 Gemiddeld | ⚡ Laag (2-3 uur) | **Sprint 5.3** |
-| **5.6 Adaptieve Tracking & Fiscale Jaarprognose** | 🔴 Hoog | 🟢 Hoog | 🔶 Gemiddeld (4-5 uur) | **Sprint 5.3** |
+| **5.5 Netwerk- & Securityhygiëne (Network Security Config)** | ⚪ Laag | 🟢 Hoog (Beveiliging) | ⚡ Laag | ✅ Gerealiseerd (v1.5.0) |
+| **5.4 Permission & Battery Health Monitor** | 🟡 Gemiddeld | 🟢 Zeer hoog | ⚡ Laag | ✅ Gerealiseerd (v1.5.0) |
+| **5.1 Dagelijkse Uitzonderingen-Inbox ("Daily Triage")** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.5.0) |
+| **5.2 Confidence Score & Zachte 1-Tap Reviews** | ⚪ Laag | 🟢 Hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.5.0) |
+| **5.3 Contextuele Smart Defaults & Ritaudit** | ⚪ Laag | 🟡 Gemiddeld | ⚡ Laag | ✅ Gerealiseerd (v1.5.0) |
+| **5.6 Adaptieve Tracking & Fiscale Jaarprognose** | 🔴 Hoog | 🟢 Hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.5.0) |
+| **6.1 Foutarme Export-voorcontrole & Periode-compleetheid** | 🔴 Zeer hoog | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.6.0) |
+| **6.2 Begrijpelijke Tracking-betrouwbaarheid in Diagnostiek** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.6.0) |
+| **6.3 Projectcode-voorstellen & Terugkerende Regels** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.6.0) |
+| **6.4 Herstelbare Wijzigingen (Undo Snackbar)** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.6.0) |
+| **6.5 Back-up Herstel- en Integriteitscheck** | 🟡 Gemiddeld | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.6.0) |
 
 ---
 

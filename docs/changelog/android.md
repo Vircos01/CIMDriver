@@ -6,7 +6,17 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.5.0 (Huidige Versie)
+## Versie 1.6.0 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 6: Betrouwbaarheid, Audit & Foutloze Export"
+    * **Foutarme Export-voorcontrole (ExportPreCheckDialog):** Voordat een PDF- of CSV-export wordt gegenereerd, controleert CIMDriver de gekozen periode op openstaande beoordelingen, kilometerstand-onderbrekingen en routeafwijkingen zonder toelichting. Bevat een 1-tik bulk-goedkeurknop en toont bij volledige sluitendheid het officiële Belastingdienst-conformiteitsstempel.
+    * **Uitlegbare Ritvoorstellen & Slimme Projectcodes:** Bij ritten van en naar bekende klantlocaties wordt nu automatisch de bijbehorende projectcode voorgesteld en vooringevuld, compleet met een transparante redenatie.
+    * **Begrijpelijke Tracking-betrouwbaarheid in Diagnostiek:** Het diagnostiekscherm toont nu bovenaan een intuïtieve statuskaart ("Optimaal" vs. "Aandacht vereist") met uitleg in begrijpelijke mensentaal over achtergrondlocatie, batterijoptimalisatie en notificaties, inclusief directe actieknoppen voor herstel.
+    * **Herstelbare Wijzigingen (Undo Snackbar):** Bij het snel fiatteren van ritten op het Dashboard of in de rittenlijst verschijnt een `[Ongedaan maken]` actie via Snackbar, zodat vergissingen direct zonder dataverlies kunnen worden hersteld.
+    * **Back-up Integriteits- & Herstelcheck:** In Gegevensbeheer toont een nieuwe statuskaart direct het tijdstip, de bestandsgrootte en de gevalideerde herstelbaarheidsstatus van de laatste automatische back-up.
+
+## Versie 1.5.0
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 5: Assisted Decision-Making & Slimme Rust"

@@ -1,5 +1,6 @@
 package com.cimdriver.app.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -121,6 +122,10 @@ fun TripDetailScreen(
 
     val assessment = remember(trip, classificationRules, savedAddresses, settings) {
         val t = trip ?: return@remember null
+        val startSaved = AddressMatching.findSavedAddress(t.startAddress, savedAddresses)
+        val endSaved = AddressMatching.findSavedAddress(t.endAddress, savedAddresses)
+        val suggestedProj = startSaved?.projectCode ?: endSaved?.projectCode
+
         fun addressType(address: String?): String? {
             val saved = AddressMatching.findSavedAddress(address, savedAddresses) ?: return null
             return saved.addressType ?: when {
@@ -141,7 +146,8 @@ fun TripDetailScreen(
             workDaysStr = settings?.workDays,
             workStartTime = settings?.workStartTime,
             workEndTime = settings?.workEndTime,
-            isBluetoothTriggered = t.vehicleId != null
+            isBluetoothTriggered = t.vehicleId != null,
+            suggestedProjectCode = suggestedProj
         )
     }
 
@@ -470,7 +476,12 @@ fun TripDetailScreen(
                 var typeExpanded by remember { mutableStateOf(false) }
                 var showNoteRequiredDialog by remember { mutableStateOf(false) }
                 var reviewNoteText by remember { mutableStateOf(trip!!.note ?: "") }
-                var reviewProjectCode by remember { mutableStateOf(trip!!.projectCode ?: "") }
+                var reviewProjectCode by remember {
+                    mutableStateOf(
+                        if (!trip!!.projectCode.isNullOrBlank()) trip!!.projectCode!!
+                        else assessment?.suggestedProjectCode ?: ""
+                    )
+                }
                 var reviewPrivateDetourKm by remember(trip!!.privateDetourMeters) {
                     mutableStateOf(if (trip!!.privateDetourMeters > 0) String.format(locale, "%.1f", trip!!.privateDetourMeters / 1000.0) else "")
                 }
@@ -643,6 +654,18 @@ fun TripDetailScreen(
                                     }
                                 }
                             }
+                        }
+
+                        if (!assessment?.suggestedProjectCode.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "💡 Voorgesteld via klantadres: ${assessment.suggestedProjectCode}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.clickable {
+                                    reviewProjectCode = assessment.suggestedProjectCode
+                                }
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))

@@ -208,6 +208,8 @@ fun DashboardScreen(
     }
 
     val allGranted = hasFineLocation && hasBackgroundLocation && hasNotificationPermission && isIgnoringBattery && hasBluetoothPermission
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
     val trackingIconColor = when {
         trackingStatus.isActive -> androidx.compose.ui.graphics.Color(0xFF2E7D32)
         allGranted -> androidx.compose.ui.graphics.Color(0xFF1976D2)
@@ -215,6 +217,7 @@ fun DashboardScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { 
             CimDriverTopAppBar(
                 onOpenDrawer = onOpenDrawer,
@@ -300,8 +303,32 @@ fun DashboardScreen(
                     openGapsCount = openGapsCount,
                     pendingFuelDrafts = pendingFuelDrafts,
                     vehicles = vehicles,
-                    onQuickApproveTrip = { candidate -> viewModel.quickApproveTrip(candidate) },
-                    onApproveAllHighConfidence = { viewModel.approveAllHighConfidenceTrips(reviewCandidates) },
+                    onQuickApproveTrip = { candidate ->
+                        viewModel.quickApproveTrip(candidate)
+                        coroutineScope.launch {
+                            val res = snackbarHostState.showSnackbar(
+                                message = "Rit goedgekeurd",
+                                actionLabel = "Ongedaan maken",
+                                duration = SnackbarDuration.Short
+                            )
+                            if (res == SnackbarResult.ActionPerformed) {
+                                viewModel.undoLastApproval()
+                            }
+                        }
+                    },
+                    onApproveAllHighConfidence = {
+                        viewModel.approveAllHighConfidenceTrips(reviewCandidates)
+                        coroutineScope.launch {
+                            val res = snackbarHostState.showSnackbar(
+                                message = "${reviewCandidates.count { it.assessment.isHighConfidence }} ritten goedgekeurd",
+                                actionLabel = "Ongedaan maken",
+                                duration = SnackbarDuration.Short
+                            )
+                            if (res == SnackbarResult.ActionPerformed) {
+                                viewModel.undoLastApproval()
+                            }
+                        }
+                    },
                     onNavigateToTrips = onNavigateToTrips,
                     onNavigateToWorkHours = onNavigateToWorkHours,
                     onNavigateToGaps = { defaultVehicle?.let { onNavigateToGaps(it.id) } },

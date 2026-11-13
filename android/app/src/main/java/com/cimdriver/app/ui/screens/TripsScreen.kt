@@ -25,6 +25,7 @@ import com.cimdriver.app.ui.components.DistanceStackedChart
 import com.cimdriver.app.ui.components.WorkHoursBarChart
 import com.cimdriver.app.ui.components.TripItem
 import com.cimdriver.app.ui.components.TripsCalendarView
+import com.cimdriver.app.ui.components.ExportPreCheckDialog
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.rememberCoroutineScope
@@ -115,6 +116,11 @@ fun TripsScreen(
     var isSearchVisible by remember { mutableStateOf(false) }
     var viewMode by remember { mutableStateOf("LIST") } // "LIST" or "CALENDAR"
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var pendingExportAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var pendingExportTitle by remember { mutableStateOf("") }
+    var pendingExportTrips by remember { mutableStateOf<List<Trip>>(emptyList()) }
     
     val monthGroups = remember(trips) {
         val fmt = java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
@@ -166,7 +172,35 @@ fun TripsScreen(
         )
     }
 
+    if (pendingExportAction != null) {
+        ExportPreCheckDialog(
+            title = pendingExportTitle,
+            trips = pendingExportTrips,
+            vehicles = vehicles,
+            onConfirmExport = {
+                val action = pendingExportAction
+                pendingExportAction = null
+                action?.invoke()
+            },
+            onDismiss = { pendingExportAction = null },
+            onQuickApproveAll = {
+                viewModel.approveAllHighConfidenceTrips()
+                coroutineScope.launch {
+                    val res = snackbarHostState.showSnackbar(
+                        message = "Ritten met hoge betrouwbaarheid goedgekeurd",
+                        actionLabel = "Ongedaan maken",
+                        duration = SnackbarDuration.Short
+                    )
+                    if (res == SnackbarResult.ActionPerformed) {
+                        viewModel.undoLastApproval()
+                    }
+                }
+            }
+        )
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CimDriverTopAppBar(
                 onOpenDrawer = onOpenDrawer,
@@ -238,13 +272,17 @@ fun TripsScreen(
                                         text = { Text("  $capitalizedMonth (PDF)") },
                                         onClick = {
                                             showExportMenu = false
-                                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                                                context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
-                                            ) { uri ->
-                                                com.cimdriver.app.util.ExportUtil.exportToPdf(
-                                                    context, uri, mTrips, savedAddresses, classificationRules,
-                                                    title = capitalizedMonth, vehicles = vehicles, settings = classificationSettings
-                                                )
+                                            pendingExportTitle = capitalizedMonth
+                                            pendingExportTrips = mTrips
+                                            pendingExportAction = {
+                                                com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                                    context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
+                                                ) { uri ->
+                                                    com.cimdriver.app.util.ExportUtil.exportToPdf(
+                                                        context, uri, mTrips, savedAddresses, classificationRules,
+                                                        title = capitalizedMonth, vehicles = vehicles, settings = classificationSettings
+                                                    )
+                                                }
                                             }
                                         }
                                     )
@@ -252,12 +290,16 @@ fun TripsScreen(
                                         text = { Text("  $capitalizedMonth (CSV)") },
                                         onClick = {
                                             showExportMenu = false
-                                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                                                context, "cimdriver_ritten_${slug}.csv", "text/csv"
-                                            ) { uri ->
-                                                com.cimdriver.app.util.ExportUtil.exportToCsv(
-                                                    context, uri, mTrips, savedAddresses, classificationRules, vehicles = vehicles
-                                                )
+                                            pendingExportTitle = capitalizedMonth
+                                            pendingExportTrips = mTrips
+                                            pendingExportAction = {
+                                                com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                                    context, "cimdriver_ritten_${slug}.csv", "text/csv"
+                                                ) { uri ->
+                                                    com.cimdriver.app.util.ExportUtil.exportToCsv(
+                                                        context, uri, mTrips, savedAddresses, classificationRules, vehicles = vehicles
+                                                    )
+                                                }
                                             }
                                         }
                                     )
@@ -268,13 +310,17 @@ fun TripsScreen(
                                 text = { Text(if (monthGroups.isNotEmpty()) "Alle ritten (PDF)" else "Deel (PDF)") },
                                 onClick = {
                                     showExportMenu = false
-                                    com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                                        context, "cimdriver_export.pdf", "application/pdf"
-                                    ) { uri ->
-                                        com.cimdriver.app.util.ExportUtil.exportToPdf(
-                                            context, uri, trips, savedAddresses, classificationRules,
-                                            vehicles = vehicles, settings = classificationSettings
-                                        )
+                                    pendingExportTitle = "Alle ritten"
+                                    pendingExportTrips = trips
+                                    pendingExportAction = {
+                                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                            context, "cimdriver_export.pdf", "application/pdf"
+                                        ) { uri ->
+                                            com.cimdriver.app.util.ExportUtil.exportToPdf(
+                                                context, uri, trips, savedAddresses, classificationRules,
+                                                vehicles = vehicles, settings = classificationSettings
+                                            )
+                                        }
                                     }
                                 }
                             )
@@ -282,12 +328,16 @@ fun TripsScreen(
                                 text = { Text(if (monthGroups.isNotEmpty()) "Alle ritten (CSV)" else "Deel (CSV)") },
                                 onClick = {
                                     showExportMenu = false
-                                    com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                                        context, "cimdriver_export.csv", "text/csv"
-                                    ) { uri ->
-                                        com.cimdriver.app.util.ExportUtil.exportToCsv(
-                                            context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
-                                        )
+                                    pendingExportTitle = "Alle ritten"
+                                    pendingExportTrips = trips
+                                    pendingExportAction = {
+                                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                            context, "cimdriver_export.csv", "text/csv"
+                                        ) { uri ->
+                                            com.cimdriver.app.util.ExportUtil.exportToCsv(
+                                                context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
+                                            )
+                                        }
                                     }
                                 }
                             )
@@ -530,7 +580,12 @@ fun TripsScreen(
                                     savedAddresses = savedAddresses,
                                     classificationRules = classificationRules,
                                     vehicles = vehicles,
-                                    settings = classificationSettings
+                                    settings = classificationSettings,
+                                    onExportRequested = { title, exportTrips, action ->
+                                        pendingExportTitle = title
+                                        pendingExportTrips = exportTrips
+                                        pendingExportAction = action
+                                    }
                                 )
                             }
                             items(monthTrips, key = { it.id }) { trip ->
@@ -843,7 +898,8 @@ private fun MonthHeaderItem(
     savedAddresses: List<com.cimdriver.app.data.local.entity.SavedAddress>,
     classificationRules: List<com.cimdriver.app.data.local.entity.ClassificationRule>,
     vehicles: List<com.cimdriver.app.data.local.entity.Vehicle> = emptyList(),
-    settings: com.cimdriver.app.data.local.entity.Settings? = null
+    settings: com.cimdriver.app.data.local.entity.Settings? = null,
+    onExportRequested: (title: String, trips: List<Trip>, action: () -> Unit) -> Unit
 ) {
     val capitalizedMonth = monthName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
     val totalKm = trips.sumOf { it.distanceMeters } / 1000.0
@@ -892,13 +948,15 @@ private fun MonthHeaderItem(
                     text = { Text("Exporteer PDF ($capitalizedMonth)") },
                     onClick = {
                         showMenu = false
-                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                            context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
-                        ) { uri ->
-                            com.cimdriver.app.util.ExportUtil.exportToPdf(
-                                context, uri, trips, savedAddresses, classificationRules,
-                                title = capitalizedMonth, vehicles = vehicles, settings = settings
-                            )
+                        onExportRequested(capitalizedMonth, trips) {
+                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                context, "cimdriver_ritten_${slug}.pdf", "application/pdf"
+                            ) { uri ->
+                                com.cimdriver.app.util.ExportUtil.exportToPdf(
+                                    context, uri, trips, savedAddresses, classificationRules,
+                                    title = capitalizedMonth, vehicles = vehicles, settings = settings
+                                )
+                            }
                         }
                     }
                 )
@@ -906,12 +964,14 @@ private fun MonthHeaderItem(
                     text = { Text("Exporteer CSV ($capitalizedMonth)") },
                     onClick = {
                         showMenu = false
-                        com.cimdriver.app.util.ExportUtil.shareExportedFile(
-                            context, "cimdriver_ritten_${slug}.csv", "text/csv"
-                        ) { uri ->
-                            com.cimdriver.app.util.ExportUtil.exportToCsv(
-                                context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
-                            )
+                        onExportRequested(capitalizedMonth, trips) {
+                            com.cimdriver.app.util.ExportUtil.shareExportedFile(
+                                context, "cimdriver_ritten_${slug}.csv", "text/csv"
+                            ) { uri ->
+                                com.cimdriver.app.util.ExportUtil.exportToCsv(
+                                    context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
+                                )
+                            }
                         }
                     }
                 )

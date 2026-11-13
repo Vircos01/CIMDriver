@@ -124,10 +124,18 @@ class BackupManager {
         
         do {
             let data = try encoder.encode(backup)
-            let tempDir = FileManager.default.temporaryDirectory
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyyMMdd_HHmmss"
             let fileName = "CIMDriver_Backup_\(formatter.string(from: Date())).json"
+            
+            if let docDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                let backupDir = docDir.appendingPathComponent("CIMDriver/Backups")
+                try? FileManager.default.createDirectory(at: backupDir, withIntermediateDirectories: true)
+                let persistentURL = backupDir.appendingPathComponent(fileName)
+                try? data.write(to: persistentURL)
+            }
+            
+            let tempDir = FileManager.default.temporaryDirectory
             let fileURL = tempDir.appendingPathComponent(fileName)
             
             try data.write(to: fileURL)

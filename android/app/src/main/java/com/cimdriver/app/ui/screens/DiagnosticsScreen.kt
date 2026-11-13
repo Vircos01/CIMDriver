@@ -21,6 +21,10 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import com.cimdriver.app.util.HealthMonitorHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,12 +32,15 @@ fun DiagnosticsScreen(
     onBack: () -> Unit,
     viewModel: DiagnosticsViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val trackingStatus by viewModel.trackingStatus.collectAsState()
     val systemState by viewModel.systemState.collectAsState()
+    var healthIssues by remember { mutableStateOf(HealthMonitorHelper.checkHealth(context)) }
 
     // Reload system state when screen is shown
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.loadSystemDiagnostics()
+        healthIssues = HealthMonitorHelper.checkHealth(context)
     }
 
     Scaffold(
@@ -56,6 +63,78 @@ fun DiagnosticsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Menselijke Betrouwbaarheidsstatus
+            val isOptimal = healthIssues.isEmpty()
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isOptimal) Color(0xFFE8F5E9) else Color(0xFFFFF3E0)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (isOptimal) Icons.Default.CheckCircle else Icons.Default.Warning,
+                            contentDescription = null,
+                            tint = if (isOptimal) Color(0xFF2E7D32) else Color(0xFFE65100),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isOptimal) "Tracking Betrouwbaarheid: Optimaal"
+                            else "Tracking Betrouwbaarheid: Aandacht Vereist (${healthIssues.size})",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isOptimal) Color(0xFF1B5E20) else Color(0xFFBF360C)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = if (isOptimal) "Alle benodigde achtergrondsysteemdiensten, Doze-mode uitzonderingen, GPS- en Bluetooth-permissies functioneren perfect. Ritten worden betrouwbaar geregistreerd."
+                        else "Eén of meer systeeminstellingen kunnen automatische registratie beperken of ritten voortijdig stoppen:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF333333)
+                    )
+                    if (healthIssues.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        healthIssues.forEach { issue ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(issue.title, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color(0xFFB71C1C))
+                                        Text(issue.description, style = MaterialTheme.typography.bodySmall, color = Color(0xFF555555))
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Button(
+                                        onClick = {
+                                            try {
+                                                context.startActivity(issue.createIntent(context))
+                                            } catch (e: Exception) {
+                                                android.util.Log.e("DiagnosticsScreen", "Error launching health intent", e)
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE65100)),
+                                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text(issue.actionLabel, style = MaterialTheme.typography.labelSmall)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Systeem & App Info
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {

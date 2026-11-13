@@ -71,8 +71,54 @@ struct DiagnosticsView: View {
         return workDays.first(where: { calendar.isDateInToday($0.date) && $0.departureTime == nil })
     }
     
+    private var isTrackingOptimal: Bool {
+        locationAuthStatus == .authorizedAlways && notificationGranted
+    }
+    
+    private var trackingSummaryMessage: String {
+        if locationAuthStatus != .authorizedAlways && !notificationGranted {
+            return "Locatiepermissie staat niet op 'Altijd' en notificaties zijn uitgeschakeld. Automatische ritregistratie kan worden onderbroken."
+        } else if locationAuthStatus != .authorizedAlways {
+            return "Locatiepermissie staat op '\(locationPermissionStatusText)'. Zet dit op 'Altijd' voor stabiele achtergrondtracking."
+        } else if !notificationGranted {
+            return "Notificaties staan uit. Schakel in voor ritstatus en herinneringen."
+        } else {
+            return "Alle systeemvereisten en permissies zijn optimaal geconfigureerd voor continue ritregistratie."
+        }
+    }
+    
     var body: some View {
         Form {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 12) {
+                        Image(systemName: isTrackingOptimal ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .font(.title2)
+                            .foregroundColor(isTrackingOptimal ? Color.cimGreen : .orange)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(isTrackingOptimal ? "Tracking Betrouwbaarheid: Optimaal" : "Tracking Betrouwbaarheid: Aandacht vereist")
+                                .font(.headline)
+                                .foregroundColor(isTrackingOptimal ? Color.cimGreen : .orange)
+                            Text(trackingSummaryMessage)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    if !isTrackingOptimal {
+                        Button("Instellingen controleren") {
+                            openAppSettings()
+                        }
+                        .font(.caption.bold())
+                        .buttonStyle(.borderedProminent)
+                        .tint(.orange)
+                        .padding(.top, 4)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            
             Section(header: Text("Live Status")) {
                 HStack {
                     Text("Tracking Status")

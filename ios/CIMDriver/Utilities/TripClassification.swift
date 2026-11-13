@@ -186,6 +186,7 @@ enum TripClassification {
         let category: TripCategory
         let confidenceScore: Int // 0 - 100
         let reasoning: String
+        var suggestedProjectCode: String? = nil
         var isHighConfidence: Bool { confidenceScore >= 85 }
     }
 
@@ -199,7 +200,8 @@ enum TripClassification {
         timestamp: Date? = nil,
         appSettings: AppSettings? = nil,
         isBluetoothTriggered: Bool = false,
-        defaultCategory: TripCategory = .privateTrip
+        defaultCategory: TripCategory = .privateTrip,
+        suggestedProjectCode: String? = nil
     ) -> ConfidenceAssessment {
         let matchedRule = matchingRule(
             tripType: tripType,
@@ -253,7 +255,8 @@ enum TripClassification {
         return ConfidenceAssessment(
             category: category,
             confidenceScore: min(100, max(0, score)),
-            reasoning: reasoning
+            reasoning: reasoning,
+            suggestedProjectCode: suggestedProjectCode
         )
     }
 }

@@ -114,7 +114,8 @@ object TripClassification {
     data class ConfidenceAssessment(
         val category: TripCategory,
         val confidenceScore: Int, // 0 - 100
-        val reasoning: String
+        val reasoning: String,
+        val suggestedProjectCode: String? = null
     ) {
         val isHighConfidence: Boolean get() = confidenceScore >= 85
     }
@@ -131,7 +132,8 @@ object TripClassification {
         workStartTime: String? = null,
         workEndTime: String? = null,
         isBluetoothTriggered: Boolean = false,
-        defaultCategory: TripCategory = TripCategory.PRIVATE
+        defaultCategory: TripCategory = TripCategory.PRIVATE,
+        suggestedProjectCode: String? = null
     ): ConfidenceAssessment {
         val matchingRule = findMatchingRule(tripType, startAddressType, endAddressType, startAddress, endAddress, rules)
         val isCommutePair = (startAddressType == "THUIS" && endAddressType == "WERK") ||
@@ -186,7 +188,12 @@ object TripClassification {
             score = minOf(98, score + 6)
         }
 
-        return ConfidenceAssessment(category = category, confidenceScore = score, reasoning = reasoning)
+        return ConfidenceAssessment(
+            category = category,
+            confidenceScore = score,
+            reasoning = reasoning,
+            suggestedProjectCode = suggestedProjectCode
+        )
     }
 
     fun isOutsideWorkHours(timestamp: Long, workDaysStr: String, workStartTime: String, workEndTime: String): Boolean {

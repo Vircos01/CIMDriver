@@ -2,6 +2,16 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.6.0] - 2026-11-13
+
+### Toegevoegd & Verbeterd
+- **Fase 6: Betrouwbaarheid, Audit & Foutloze Export:**
+  - **Foutarme Export-voorcontrole & Registratie-compleetheid (ExportPreCheckDialog):** Vóór het genereren van een PDF- of CSV-export valideert de app de gekozen periode op openstaande beoordelingen, kilometerstand-onderbrekingen en routeafwijkingen. Biedt een directe 1-tik goedkeuringsactie en toont bij volledige sluitendheid het officiële Belastingdienst-conformiteitsstempel.
+  - **Uitlegbare Ritvoorstellen & Automatische Projectcodes:** Bij ritten van en naar bekende klantlocaties wordt nu automatisch de bijbehorende projectcode voorgesteld en vooringevuld, inclusief een heldere toelichting over de herkomst van de suggestie.
+  - **Begrijpelijke Tracking-betrouwbaarheid in Diagnostiek:** Het diagnostiekscherm bevat nu bovenaan een intuïtieve statuskaart ("Optimaal" vs. "Aandacht vereist") die in duidelijke mensentaal uitlegt welke achtergrondpermissies (batterij-optimalisatie, achtergrondlocatie, notificaties) actief zijn, met directe 1-tik herstelknoppen.
+  - **Herstelbare Wijzigingen (Undo Snackbar):** Bij het snel goedkeuren van ritten op het Dashboard of in de rittenlijst verschijnt een `[Ongedaan maken]` actie via Snackbar, zodat vergissingen direct zonder dataverlies kunnen worden teruggedraaid.
+  - **Back-up Integriteits- & Herstelcheck:** In Gegevensbeheer (`DataManagementScreen`) toont een nieuwe statuskaart direct het tijdstip, de bestandsgrootte en een gevalideerde herstelbaarheidsstatus van de meest recente automatische back-up.
+
 ## [1.5.0] - 2026-11-13
 
 ### Toegevoegd & Verbeterd

@@ -104,6 +104,10 @@ class TripsViewModel @Inject constructor(
     ) { allTrips, rules, addresses, settings ->
         val toReview = allTrips.filter { it.status == TripStatus.TO_REVIEW.value }
         toReview.map { trip ->
+            val startSaved = AddressMatching.findSavedAddress(trip.startAddress, addresses)
+            val endSaved = AddressMatching.findSavedAddress(trip.endAddress, addresses)
+            val suggestedProjectCode = startSaved?.projectCode ?: endSaved?.projectCode
+
             fun addressType(address: String?): String? {
                 val saved = AddressMatching.findSavedAddress(address, addresses) ?: return null
                 return saved.addressType ?: when {
@@ -125,7 +129,8 @@ class TripsViewModel @Inject constructor(
                 workDaysStr = settings?.workDays,
                 workStartTime = settings?.workStartTime,
                 workEndTime = settings?.workEndTime,
-                isBluetoothTriggered = trip.vehicleId != null
+                isBluetoothTriggered = trip.vehicleId != null,
+                suggestedProjectCode = suggestedProjectCode
             )
 
             val catName = when (assessment.category) {
@@ -138,25 +143,56 @@ class TripsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private val _lastModifiedTrips = MutableStateFlow<List<Trip>>(emptyList())
+    val lastModifiedTrips: StateFlow<List<Trip>> = _lastModifiedTrips.asStateFlow()
+
     fun quickApproveTrip(candidate: TripReviewCandidate) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            _lastModifiedTrips.value = listOf(candidate.trip)
+            val projectCodeToSet = if (candidate.trip.projectCode.isNullOrBlank()) {
+                candidate.assessment.suggestedProjectCode
+            } else {
+                candidate.trip.projectCode
+            }
             val updated = candidate.trip.copy(
                 status = "DONE",
-                tripType = candidate.assessment.category.name
+                tripType = candidate.assessment.category.name,
+                projectCode = projectCodeToSet
             )
             tripRepository.updateTrip(updated)
         }
     }
 
-    fun approveAllHighConfidenceTrips(candidates: List<TripReviewCandidate>) {
+    fun approveAllHighConfidenceTrips(candidates: List<TripReviewCandidate> = tripsToReviewCandidates.value) {
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-            candidates.filter { it.assessment.isHighConfidence }.forEach { candidate ->
-                val updated = candidate.trip.copy(
-                    status = "DONE",
-                    tripType = candidate.assessment.category.name
-                )
-                tripRepository.updateTrip(updated)
+            val highConf = candidates.filter { it.assessment.isHighConfidence }
+            if (highConf.isNotEmpty()) {
+                _lastModifiedTrips.value = highConf.map { it.trip }
+                highConf.forEach { candidate ->
+                    val projectCodeToSet = if (candidate.trip.projectCode.isNullOrBlank()) {
+                        candidate.assessment.suggestedProjectCode
+                    } else {
+                        candidate.trip.projectCode
+                    }
+                    val updated = candidate.trip.copy(
+                        status = "DONE",
+                        tripType = candidate.assessment.category.name,
+                        projectCode = projectCodeToSet
+                    )
+                    tripRepository.updateTrip(updated)
+                }
             }
+        }
+    }
+
+    fun undoLastApproval() {
+        val previous = _lastModifiedTrips.value
+        if (previous.isEmpty()) return
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            previous.forEach { trip ->
+                tripRepository.updateTrip(trip)
+            }
+            _lastModifiedTrips.value = emptyList()
         }
     }
 

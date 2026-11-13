@@ -4,7 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
-## Version 0.0.9 Alpha (Current Version)
+## Version 0.0.10 Alpha (Current Version)
+*Release date: November 13, 2026*
+
+!!! success "Phase 6: Reliability, Audit & Flawless Export (Android Feature Sync)"
+    * **Pre-Export Completeness Check (ExportPreCheckSheet):** Before sharing PDF or CSV reports, CIMDriver runs an interactive completeness audit verifying unreviewed trips, odometer gaps, and route deviations without notes, complete with 1-tap bulk approval and tax compliance badge.
+    * **Explainable Trip Proposals & Automatic Project Codes:** Project codes are now automatically derived from saved client addresses and suggested in the review overlay and trip edit sheets.
+    * **Human-Readable Tracking Reliability in Diagnostics:** Diagnostics now features a status overview explaining iOS location services and notification permissions in plain language with direct navigation shortcuts.
+    * **Reversible Changes (Undo Banner):** Batch classifications and quick approvals in the trips list show an animated `[Undo]` banner for immediate error reversal.
+    * **Backup Integrity & Restorability Check:** Data Management now verifies the timestamp, file size, and validated restoration status of the latest local JSON backup stored in `Documents/CIMDriver/Backups`.
+
+## Version 0.0.9 Alpha
 *Release date: November 13, 2026*
 
 !!! success "Phase 5: Assisted Decision-Making & Dashboard Calmness (Android Feature Sync)"

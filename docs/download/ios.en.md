@@ -5,9 +5,14 @@ hide:
 
 # 📦 Installation: iOS (iPhone)
 
-The current stable preview is **Version 0.0.9 Alpha** (Build 5).
+The current stable preview is **Version 0.0.10 Alpha** (Build 6).
 
-This release brings the iOS app into full parity with Android Phase 5 (Assisted Decision-Making):
+This release brings the iOS app into full parity with Android Phase 6 (Reliability, Audit & Flawless Export):
+- Pre-export completeness check (`ExportPreCheckSheet`) before PDF & CSV exports
+- Explainable trip proposals & automatic project codes from saved client addresses
+- Human-readable tracking reliability in Diagnostics with 1-tap repair shortcuts
+- Reversible changes (Undo banner) for batch classifications and approvals
+- Local backup integrity and restorability verification in Data Management
 - Daily Exceptions Inbox ("Daily Triage") on the Dashboard
 - Confidence scoring (0–100%) & gentle single-tap review suggestions
 - Trip audit & contextual details in Trip Details

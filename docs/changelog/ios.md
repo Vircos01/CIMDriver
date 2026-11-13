@@ -4,7 +4,17 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
-## Versie 0.0.9 Alpha (Huidige Versie)
+## Versie 0.0.10 Alpha (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! success "Fase 6: Betrouwbaarheid, Audit & Foutloze Export (Android Feature Sync)"
+    * **Foutarme Export-voorcontrole (ExportPreCheckSheet):** Vóór het delen van PDF- of CSV-rapporten toont CIMDriver een interactieve sluitendheidscontrole op ongeclassificeerde ritten, kilometerstand-gaten en routeafwijkingen, compleet met directe 1-tik bulk-goedkeuring en fiscus-zegel.
+    * **Uitlegbare Ritvoorstellen & Automatische Projectcodes:** Projectcodes worden nu automatisch afgeleid van gekoppelde klantadressen en voorgesteld in de reviewoverlay en het ritspecificatiescherm.
+    * **Begrijpelijke Tracking-betrouwbaarheid in Diagnostiek:** Diagnostiek toont nu bovenaan een statusoverzicht met menselijke uitleg ("Optimaal" vs. "Aandacht vereist") en directe knoppen om iOS-locatievoorzieningen of notificaties te configureren.
+    * **Herstelbare Wijzigingen (Undo Banner):** Batchclassificaties en snelle goedkeuringen in de rittenlijst tonen een snelle `[Ongedaan maken]` actie via een geanimeerde banner.
+    * **Back-up Integriteits- & Herstelcheck:** Gegevensbeheer toont nu de recentheid, bestandsgrootte en gevalideerde herstelstatus van de laatste lokale JSON-back-up in `Documents/CIMDriver/Backups`.
+
+## Versie 0.0.9 Alpha
 *Releasedatum: 13 november 2026*
 
 !!! success "Fase 5: Assisted Decision-Making & Dashboard Rust (Android Feature Sync)"

@@ -1,6 +1,6 @@
 {
-  "versionCode": 37,
-  "versionName": "1.5.0",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.5.0.apk",
-  "releaseNotes": "Versie 1.5.0: Fase 5 - Assisted Decision-Making & Slimme Rust: Dagelijkse Uitzonderingen-Inbox, Confidence Scoring & 1-tap review suggesties, Ritaudit Context, Permission & Battery Health Monitor, adaptieve GPS-jitter filtering, netwerk security config en fiscale jaareindprognose voor privékilometers."
+  "versionCode": 38,
+  "versionName": "1.6.0",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.6.0.apk",
+  "releaseNotes": "Versie 1.6.0: Fase 6 - Betrouwbaarheid, Audit & Foutloze Export: Exportcontrole met fiscale sluitendheidsvalidatie (ExportPreCheckDialog) conform eisen Belastingdienst, automatische projectcode-suggesties via opgeslagen klantadressen, begrijpelijke tracking-betrouwbaarheid in Diagnostiek met directe 1-tik herstelacties, herstelbare wijzigingen (Undo snackbar bij fiatteringen) en automatische back-up integriteitsvalidatie."
 }
