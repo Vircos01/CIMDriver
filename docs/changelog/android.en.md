@@ -4,7 +4,13 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.4.0 (Current Version)
+## Version 1.4.1 (Current Version)
+*Release date: November 13, 2026*
+
+!!! bug "Bug Fixes & Stability"
+    * **Startup Crash Hotfix:** Fixed an immediate crash on app startup caused by a table name mismatch in the Room database migration (`fuel_fillups`). Added direct migration paths and resilient fallback handling.
+
+## Version 1.4.0
 *Release date: November 13, 2026*
 
 !!! success "New Features & Improvements"

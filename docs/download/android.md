@@ -13,5 +13,5 @@ De app is momenteel nog niet beschikbaar via de Google Play Store. Je kunt de ni
 
 <div align="center" markdown="1">
 <br>
-[:material-android: Download APK v1.4.0 (53 MB)](../release/CIMDriver-v1.4.0.apk){ .md-button .md-button--primary }
+[:material-android: Download APK v1.4.1 (53 MB)](../release/CIMDriver-v1.4.1.apk){ .md-button .md-button--primary }
 </div>

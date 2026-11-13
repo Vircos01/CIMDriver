@@ -6,7 +6,13 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.4.0 (Huidige Versie)
+## Versie 1.4.1 (Huidige Versie)
+*Releasedatum: 13 november 2026*
+
+!!! bug "Bugfixes & Stabiliteit"
+    * **Hotfix opstartcrash:** Probleem verholpen waarbij de app direct bij het openen crashte door een verkeerde tabelnaam in de database-migratie (`fuel_fillups`). Directe migratiepaden en robuuste foutafhandeling toegevoegd.
+
+## Versie 1.4.0
 *Releasedatum: 13 november 2026*
 
 !!! success "Nieuwe Functies & Verbeteringen"

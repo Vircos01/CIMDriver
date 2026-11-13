@@ -2,6 +2,11 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.4.1] - 2026-11-13
+
+### Opgelost & Verbeterd
+- **Hotfix opstartcrash (Room database-migratie):** Crash opgelost die direct bij het openen van de app optrad doordat in Room-migratie 49->50 een typefout zat in de tabelnaam (`fuel_fill_ups` i.p.v. `fuel_fillups`). Tevens directe migratie 48->50 toegevoegd en migratiestatements voorzien van veilige foutafhandeling.
+
 ## [1.4.0] - 2026-11-13
 
 ### Toegevoegd & Verbeterd

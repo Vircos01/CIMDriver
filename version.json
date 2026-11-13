@@ -1,6 +1,6 @@
 {
-  "versionCode": 35,
-  "versionName": "1.4.0",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.4.0.apk",
-  "releaseNotes": "Versie 1.4.0: Belastingdienst-sluitende rittenexport (tellerstanden & privé-omrijkilometers), RDW kentekencheck, live rit-toggle tijdens het rijden, interactieve Glance widget, werkuren per periode delen, kalender dag-inspectie, doorklikbare doelen, Nederlandse Android Auto lokalisatie en EV laadtarieven."
+  "versionCode": 36,
+  "versionName": "1.4.1",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.4.1.apk",
+  "releaseNotes": "Versie 1.4.1: Hotfix voor crash direct bij het openen van de app (tabelnaam in database-migratie gecorrigeerd)."
 }
