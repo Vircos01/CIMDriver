@@ -1,6 +1,6 @@
 {
-  "versionCode": 44,
-  "versionName": "1.9.0",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.0.apk",
-  "releaseNotes": "Versie 1.9.0: Grote architectuur-, privacy- en navigatie-update. Bevat strikte release-signing validatie, privacy-first cloudback-up regels, modernisering naar uitsluitend Jetpack Glance widgets, eenduidige notificatie-ritclassificatie, TrackingService modularisatie en gecorrigeerde drawer back-stack navigatie."
+  "versionCode": 45,
+  "versionName": "1.9.1",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.1.apk",
+  "releaseNotes": "Versie 1.9.1: Patch-release voor veilige en betrouwbare data-exports en back-ups. Bevat automatische herstelbare SQLite-databaseback-ups (.zip), duidelijke scheiding tussen databaseback-up en rittenexport in Instellingen, volledige classificatie- en voertuigcontext bij periodieke exports en RFC 4180-conforme CSV-escaping van speciale tekens."
 }

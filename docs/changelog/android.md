@@ -6,7 +6,16 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.9.0 (Huidige Versie)
+## Versie 1.9.1 (Huidige Versie)
+*Releasedatum: 15 november 2026*
+
+!!! info "Patch: Herstelbare Databaseback-ups & RFC 4180 CSV-Escaping"
+    * **Herstelbare Databaseback-ups (`.zip`):** `BackupWorker` maakt nu periodiek een echte SQLite-databaseback-up (`.zip`) aan die daadwerkelijk gebruikt kan worden voor dataherstel bij een nieuw toestel of herinstallatie, inclusief automatische opschoning van oudere bestanden.
+    * **Duidelijke Scheiding in Databeheer:** Het scherm Databeheer toont herstelbare `.zip`-back-ups en `.csv`-rittenexports nu strikt gescheiden, inclusief heldere toelichting en statuslabels.
+    * **Volledige Context bij Rittenexports:** CSV-exports bevatten nu altijd alle opgeslagen adressen, classificatieregels, werkureninstellingen en gekoppelde voertuigen (inclusief kenteken en model).
+    * **RFC 4180 CSV-Escaping:** Speciale tekens zoals puntkomma's (`;`), dubbele aanhalingstekens (`"`) en regeleinden worden conform de internationale CSV-standaard geëscaped en gequote.
+
+## Versie 1.9.0
 *Releasedatum: 15 november 2026*
 
 !!! success "Fase 9: Tracking-Architectuur, Privacy-First Back-up & Hardening"

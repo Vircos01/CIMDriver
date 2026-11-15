@@ -4,7 +4,16 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.9.0 (Current Version)
+## Version 1.9.1 (Current Version)
+*Release date: November 15, 2026*
+
+!!! info "Patch: Restorable Database Backups & RFC 4180 CSV Escaping"
+    * **Restorable Database Backups (`.zip`):** `BackupWorker` now generates genuine SQLite database backups (`.zip`) that can be directly restored on new devices, with automatic retention cleanup.
+    * **Clear Separation in Data Management:** The Data Management screen strictly differentiates between restorable `.zip` database backups and read-only `.csv` periodic trip exports.
+    * **Full Classification Context for Exports:** CSV exports now always receive all saved addresses, classification rules, work hours settings, and linked vehicle profiles (plate and model).
+    * **RFC 4180 CSV Escaping:** Special characters including semicolons (`;`), quotation marks (`"`), and line breaks are fully escaped and quoted according to standard CSV specifications.
+
+## Version 1.9.0
 *Release date: November 15, 2026*
 
 !!! success "Phase 9: Tracking Architecture, Privacy-First Backup & Hardening"

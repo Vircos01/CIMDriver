@@ -2,6 +2,15 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.9.1] - 2026-11-15
+
+### Gecorrigeerd & Verbeterd
+- **Herstelbare Automatische Databaseback-ups (`.zip`):** `BackupWorker` genereert nu een echte herstelbare SQLite-databaseback-up (`cimdriver_backup_<timestamp>.zip`) in plaats van enkel een CSV-bestand. Daarnaast worden oudere automatische archieven automatisch opgeschoond (maximaal 5 bewaard) voor opslaghygiëne.
+- **Eenduidig Statusscherm Databeheer:** `DataManagementScreen` maakt nu een strikt visueel en functioneel onderscheid tussen daadwerkelijk herstelbare `.zip`-databaseback-ups (*“Gevalideerd & Herstelbaar”*) en alleen-lezen `.csv`-rittenexports (*“Periodieke Rittenexport”*), waarmee verwarring over herstelmogelijkheden wordt voorkomen.
+- **Volledige Classificatie- en Voertuigcontext:** Automatische en handmatige CSV-exports ontvangen nu altijd alle actieve adressen, regels, instellingen en voertuigprofielen, waardoor categorieën identiek zijn aan de weergave in de app en kentekens/autogegevens te allen tijde correct zijn ingevuld.
+- **RFC 4180-conforme CSV Escaping:** `ExportUtil` past nu robuuste CSV-standaard escaping toe. Velden met puntkomma's (`;`), dubbele aanhalingstekens (`"`) of regeleinden worden netjes tussen quotes geplaatst en interne quotes worden verdubbeld (`""`), waardoor kolommen in Excel of spreadsheet-applicaties nooit kunnen verschuiven.
+- **Cross-platform Pariteit:** De RFC 4180 CSV-escaping logica is tevens direct gesynchroniseerd met de iOS-exportlaag in `ExportUtil.swift`.
+
 ## [1.9.0] - 2026-11-15
 
 ### Toegevoegd & Verbeterd
