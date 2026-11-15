@@ -134,73 +134,67 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                val navBackStackEntryForDrawer by navController.currentBackStackEntryAsState()
+                val currentDestinationForDrawer = navBackStackEntryForDrawer?.destination
+
+                fun navigateFromDrawer(route: Any) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = false
+                        }
+                        launchSingleTop = true
+                        restoreState = false
+                    }
+                }
+
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.dashboard)) },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(DashboardRoute)
-                    },
+                    selected = currentDestinationForDrawer?.hasRoute(DashboardRoute::class) == true,
+                    onClick = { navigateFromDrawer(DashboardRoute) },
                     icon = { Icon(Screen.Dashboard.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
                     label = { Text("Auto's") },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(VehiclesRoute)
-                    },
+                    selected = currentDestinationForDrawer?.hasRoute(VehiclesRoute::class) == true,
+                    onClick = { navigateFromDrawer(VehiclesRoute) },
                     icon = { Icon(Screen.Vehicles.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.fuel)) },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(FuelRoute)
-                    },
+                    selected = currentDestinationForDrawer?.hasRoute(FuelRoute::class) == true,
+                    onClick = { navigateFromDrawer(FuelRoute) },
                     icon = { Icon(Screen.Fuel.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
                     label = { Text("Klanten & Projecten") },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(ClientsProjectCodesRoute)
-                    },
+                    selected = currentDestinationForDrawer?.hasRoute(ClientsProjectCodesRoute::class) == true,
+                    onClick = { navigateFromDrawer(ClientsProjectCodesRoute) },
                     icon = { Icon(Icons.Filled.Business, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.settings)) },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(SettingsRoute)
-                    },
+                    selected = currentDestinationForDrawer?.hasRoute(SettingsRoute::class) == true,
+                    onClick = { navigateFromDrawer(SettingsRoute) },
                     icon = { Icon(Screen.Settings.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.help)) },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(HelpRoute)
-                    },
+                    selected = currentDestinationForDrawer?.hasRoute(HelpRoute::class) == true,
+                    onClick = { navigateFromDrawer(HelpRoute) },
                     icon = { Icon(Screen.Help.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.about)) },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(AboutRoute)
-                    },
+                    selected = currentDestinationForDrawer?.hasRoute(AboutRoute::class) == true,
+                    onClick = { navigateFromDrawer(AboutRoute) },
                     icon = { Icon(Screen.About.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
