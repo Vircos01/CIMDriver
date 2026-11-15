@@ -4,7 +4,14 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.8.2 (Current Version)
+## Version 1.8.3 (Current Version)
+*Release date: November 15, 2026*
+
+!!! info "Patch: Hamburger Menu Back-Stack & Selection Indicator"
+    * **Hamburger Menu / Drawer Back-Stack Fix:** Screens opened via the navigation drawer (Vehicles, Fuel, Clients & Project Codes, Settings, Help, and About) now properly clean up the navigation stack back to the start destination (`popUpTo(startDestination)`). The back button now consistently navigates back to the Dashboard rather than returning to previous intermediate screens or tabs.
+    * **Active Menu Item Indicator:** Navigation drawer items now show an active visual `selected` state corresponding to the active destination.
+
+## Version 1.8.2
 *Release date: November 13, 2026*
 
 !!! success "UI Consistency & Design System Harmonization"

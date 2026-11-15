@@ -1,6 +1,6 @@
 {
-  "versionCode": 42,
-  "versionName": "1.8.2",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.2.apk",
-  "releaseNotes": "Versie 1.8.2: Volledige UI-consistentie en Design System Harmonisatie in Jetpack Compose (gestandaardiseerde TopBar, lege statussen, uniforme paddings en kaarten) & Dagelijkse Inbox uitbreiding."
+  "versionCode": 43,
+  "versionName": "1.8.3",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.3.apk",
+  "releaseNotes": "Versie 1.8.3: Patch - Herstel van de back-stack navigatie voor het hamburgermenu (terugknop navigeert nu consequent naar het Dashboard) en visuele selectiestatus voor actieve menu-items."
 }
