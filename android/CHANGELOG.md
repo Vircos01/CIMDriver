@@ -8,6 +8,11 @@ Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bi
 - **Hamburgermenu / Drawer Back-Stack Herstel:** Schermen geopend via de navigatielade (Auto's, Brandstof, Klanten & Projecten, Instellingen, Help en Over) poppen de navigatiestack nu correct af tot de startbestemming (`popUpTo(startDestination)`). Terugnavigatie (zowel via de topbar-terugknop als de Android-terugtoets) leidt hierdoor consequent en voorspelbaar terug naar het Dashboard in plaats van te blijven hangen in eerdere tussenliggende schermen.
 - **Klanten & Projectcodes Menuknop:** Het scherm 'Klanten & Projectcodes' toont nu conform de overige menuschermen een hamburgermenuknop om de navigatielade direct te openen in plaats van een terugknop.
 - **Actieve Menu-item Indicator:** Menu-items in de navigatielade tonen nu direct een visuele `selected`-indicator passend bij het geopende scherm.
+- **Strikte Release Signing Validatie:** De fallback naar debug-signing is verwijderd uit `build.gradle.kts`. Een release-build faalt nu direct en expliciet als de benodigde productiekeystore ontbreekt, wat per ongeluk ondertekenen met een debug-sleutel uitsluit.
+- **Privacy-First Back-up & Data-extractieregels:** `data_extraction_rules.xml` en `backup_rules.xml` sluiten de lokale Room-database (`cimdriver_database`) en tellerstand-fotobewijzen expliciet uit van automatische Google Cloud-back-ups. Lokale apparaat-naar-apparaat overdracht (bijv. via kabel bij toestelwissel) blijft volledig ondersteund.
+- **Verwijdering Verouderde Widget:** De oude XML/RemoteViews widgetprovider (`CIMDriverWidgetProvider`) is opgeruimd. Alleen de moderne, interactieve Glance-widget (`CIMDriverWidgetReceiver`) is nu geregistreerd.
+- **Eenduidige Ritclassificatie-route:** Twee concurrerende classificatieroutes zijn samengevoegd: alle notificatie-snelle acties lopen nu zuiver via `NotificationActionReceiver` met consistente categorieën (`Business Meeting`, `Home To Work`, `PRIVATE`), zonder overbodig starten van de trackingservice.
+- **TrackingService Modularisatie:** Notificatiebeheer en kanaalconfiguratie zijn ontkoppeld en ondergebracht in een zelfstandige `TrackingNotificationHelper`.
 
 ## [1.8.2] - 2026-11-13
 

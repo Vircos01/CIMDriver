@@ -9,10 +9,14 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 ## Versie 1.8.3 (Huidige Versie)
 *Releasedatum: 15 november 2026*
 
-!!! info "Patch: Hamburgermenu Back-Stack & Selectie-indicator"
+!!! info "Patch: Hamburgermenu Back-Stack, Privacy Back-up & Code Kwaliteit"
     * **Hamburgermenu / Drawer Back-Stack Herstel:** Schermen geopend via het hamburgermenu (Auto's, Brandstof, Klanten & Projecten, Instellingen, Help en Over) schonen de navigatiestack nu correct op tot de hoofdstartpagina (`popUpTo(startDestination)`). Hierdoor brengt de terugknop je altijd direct en voorspelbaar terug naar het Dashboard in plaats van te blijven rondhangen in eerdere tussenliggende tabs/schermen.
     * **Klanten & Projectcodes Menuknop:** Het scherm 'Klanten & Projectcodes' toont nu conform de overige menuschermen een hamburgermenuknop om de navigatielade direct te openen in plaats van een terugknop.
     * **Actieve Menu-item Indicator:** De menu-items in de navigatielade tonen nu direct een visuele `selected`-indicator die past bij het geopende scherm.
+    * **Strikte Release Signing Validatie:** Release builds kunnen niet langer stilzwijgend terugvallen op debug-ondertekening; bij ontbrekende release-credentials faalt de build nu expliciet.
+    * **Privacy-First Back-up Regels:** Lokale Room-databases en tellers-fotobewijzen worden expliciet uitgesloten van Google Drive cloud-back-ups, terwijl lokale apparaat-naar-apparaat overdracht bij toestelwissel behouden blijft.
+    * **Opschonen Oude Widget:** De verouderde XML-widgetprovider is verwijderd ten gunste van de actuele Jetpack Glance widget.
+    * **Eenduidige Ritclassificatie & TrackingService Modularisatie:** Notificatie-snelle acties lopen nu via één robuuste `NotificationActionReceiver` en alle notificatielogica is ondergebracht in een zelfstandige `TrackingNotificationHelper`.
 
 ## Versie 1.8.2
 *Releasedatum: 13 november 2026*

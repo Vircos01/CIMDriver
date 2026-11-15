@@ -51,6 +51,7 @@ class TrackingService : Service(), LocationListener {
     private lateinit var database: AppDatabase
     private lateinit var locationManager: LocationManager
     private lateinit var geocoderService: GeocoderService
+    private val notificationHelper by lazy { TrackingNotificationHelper(this) }
     
     private var activeTripId: Long? = null
     private var currentTripType: String = "BUSINESS"
@@ -71,35 +72,6 @@ class TrackingService : Service(), LocationListener {
                 }
             }
         }
-    }
-
-    private fun showClassificationNotification(tripId: Long) {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        
-        val createIntent = { type: String ->
-            Intent(this, TrackingService::class.java).apply {
-                action = "CLASSIFY_TRIP"
-                putExtra("TRIP_ID", tripId)
-                putExtra("TRIP_TYPE", type)
-            }
-        }
-        
-        val businessPending = PendingIntent.getService(this, 1, createIntent("BUSINESS"), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val privatePending = PendingIntent.getService(this, 2, createIntent("PRIVATE"), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val commutePending = PendingIntent.getService(this, 3, createIntent("COMMUTE"), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Rit afgerond")
-            .setContentText("Hoe wil je deze rit classificeren?")
-            .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .addAction(0, "Zakelijk", businessPending)
-            .addAction(0, "Privé", privatePending)
-            .addAction(0, "Woon-Werk", commutePending)
-            .build()
-            
-        notificationManager.notify(tripId.toInt(), notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -212,21 +184,6 @@ class TrackingService : Service(), LocationListener {
             }
             ACTION_TOGGLE_TRIP_TYPE -> {
                 toggleActiveTripType()
-            }
-            "CLASSIFY_TRIP" -> {
-                val tripId = intent.getLongExtra("TRIP_ID", -1L)
-                val tripType = intent.getStringExtra("TRIP_TYPE")
-                if (tripId != -1L && tripType != null) {
-                    serviceScope.launch {
-                        val tripDao = database.tripDao()
-                        val trip = tripDao.getTripById(tripId)
-                        if (trip != null && trip.status == "TO_REVIEW") {
-                            tripDao.updateTrip(trip.copy(tripType = tripType, status = "DONE"))
-                        }
-                        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                        notificationManager.cancel(tripId.toInt())
-                    }
-                }
             }
         }
         return START_STICKY
@@ -345,11 +302,6 @@ class TrackingService : Service(), LocationListener {
                     recoveryManager.clearRecoveryAttempts(tripId)
                     TrackingStatusStore.stopped("Rit succesvol afgerond")
                     ZeppCompanionServer.stopIfNeeded()
-                    // Fetch the updated trip to see if it still needs review
-                    val updatedTrip = tripDao.getTripById(tripId)
-                    if (updatedTrip?.status == "TO_REVIEW") {
-                        showClassificationNotification(tripId)
-                    }
                 } catch (e: Exception) {
                     Log.e("TrackingService", "Error finalizing trip", e)
                     TrackingStatusStore.failed("Fout bij afronden rit")
@@ -870,104 +822,19 @@ class TrackingService : Service(), LocationListener {
     }
 
     private fun sendFuelDraftNotification(fillUpId: Long, stationName: String, engineType: String) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("EXTRA_FILL_UP_ID", fillUpId)
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, (20000 + fillUpId).toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val isEV = engineType == "EV"
-        val title = if (isEV) "Laden bij $stationName?" else "Tanken bij $stationName?"
-        val content = if (isEV) "Tik om kWh en laadkosten op te slaan." else "Tik om liters en bedrag in te vullen."
-
-        val notification = androidx.core.app.NotificationCompat.Builder(this, FUEL_CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(content)
-            .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
-            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .build()
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        notificationManager.notify((50000 + fillUpId).toInt(), notification)
+        notificationHelper.sendFuelDraftNotification(fillUpId, stationName, engineType)
     }
 
     private fun sendWorkDayCompletionNotification(workDayId: Long) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            // We could add an extra to navigate straight to work hours
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 1, intent, PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification = androidx.core.app.NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.work_day_registered))
-            .setContentText(getString(R.string.tap_to_rate_work_hours))
-            .setSmallIcon(com.cimdriver.app.R.mipmap.ic_cimdriver_launcher)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        notificationManager.notify(workDayId.toInt() + 10000, notification) // Offset ID
+        notificationHelper.sendWorkDayCompletionNotification(workDayId)
     }
 
     private fun sendWorkDayStartedNotification() {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 2, intent, PendingIntent.FLAG_IMMUTABLE
-        )
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.work_day_started))
-            .setContentText(getString(R.string.work_day_started_msg))
-            .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID + 10001, notification)
+        notificationHelper.sendWorkDayStartedNotification()
     }
 
     private fun sendCompletionNotification(tripId: Long, vehicleId: Long) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("EXTRA_VEHICLE_ID", vehicleId)
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // Quick-action intents for classifying directly from the notification
-        fun classifyIntent(tripType: String): PendingIntent {
-            val classifyIntent = Intent(this, NotificationActionReceiver::class.java).apply {
-                action = NotificationActionReceiver.ACTION_CLASSIFY_TRIP
-                putExtra(NotificationActionReceiver.EXTRA_TRIP_ID, tripId)
-                putExtra(NotificationActionReceiver.EXTRA_TRIP_TYPE, tripType)
-            }
-            return PendingIntent.getBroadcast(
-                this,
-                kotlin.math.abs((tripId * 10 + tripType.hashCode()).toInt()),
-                classifyIntent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        }
-
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.trip_completed))
-            .setContentText(getString(R.string.trip_registered_msg))
-            .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .addAction(0, "✅ Zakelijk", classifyIntent("Business Meeting"))
-            .addAction(0, "🏠 Woon-werk", classifyIntent("Home To Work"))
-            .addAction(0, "🔒 Privé", classifyIntent("PRIVATE"))
-            .build()
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(tripId.toInt(), notification)
+        notificationHelper.sendCompletionNotification(tripId, vehicleId)
     }
 
     private fun startLocationUpdates() {
@@ -1043,56 +910,10 @@ class TrackingService : Service(), LocationListener {
     }
 
     private fun createNotification(contentText: String): Notification {
-        val stopIntent = Intent(this, TrackingService::class.java).apply {
-            action = "STOP_TRACKING"
-        }
-        val stopPendingIntent = PendingIntent.getService(
-            this,
-            0,
-            stopIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val toggleIntent = Intent(this, TrackingService::class.java).apply {
-            action = ACTION_TOGGLE_TRIP_TYPE
-        }
-        val togglePendingIntent = PendingIntent.getService(
-            this,
-            101,
-            toggleIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val isPrivate = isPrivateTrip(currentTripType)
-        val toggleLabel = if (isPrivate) "➡️ Naar Zakelijk" else "🔒 Naar Privé"
-        val title = if (isPrivate) "CIMDriver Actief (Privé)" else "CIMDriver Actief (Zakelijk)"
-
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(contentText)
-            .setSmallIcon(R.mipmap.ic_cimdriver_launcher)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .addAction(0, toggleLabel, togglePendingIntent)
-            .addAction(0, getString(R.string.stop_trip), stopPendingIntent)
-            .build()
+        return notificationHelper.createTrackingNotification(contentText, currentTripType)
     }
 
     private fun createNotificationChannel() {
-        val manager = getSystemService(NotificationManager::class.java) ?: return
-        val serviceChannel = NotificationChannel(
-            CHANNEL_ID,
-            "CIMDriver Tracking Service Channel",
-            NotificationManager.IMPORTANCE_LOW
-        )
-        val fuelChannel = NotificationChannel(
-            FUEL_CHANNEL_ID,
-            "CIMDriver Brandstof & Laden",
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Meldingen bij aankomst of tussenstop bij een tankstation of laadpaal"
-            enableVibration(true)
-        }
-        manager.createNotificationChannel(serviceChannel)
-        manager.createNotificationChannel(fuelChannel)
+        notificationHelper.createNotificationChannels()
     }
 }
