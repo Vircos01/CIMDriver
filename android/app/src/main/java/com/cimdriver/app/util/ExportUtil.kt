@@ -25,6 +25,16 @@ import com.cimdriver.app.R
 
 object ExportUtil {
 
+    fun escapeCsvField(value: String?): String {
+        if (value.isNullOrEmpty()) return ""
+        val needsQuotes = value.contains(';') || value.contains('"') || value.contains('\n') || value.contains('\r')
+        return if (needsQuotes) {
+            "\"" + value.replace("\"", "\"\"") + "\""
+        } else {
+            value
+        }
+    }
+
     fun exportSummaryCsv(
         context: Context,
         uri: Uri,
@@ -36,7 +46,7 @@ object ExportUtil {
         OutputStreamWriter(outputStream).use { writer ->
             writer.append("periode;zakelijk_km;woon_werk_km;prive_km;zakelijk_min;woon_werk_min;prive_min;werkuren\n")
             writer.append(
-                "$period;${formatDecimal(stats.zakelijkKm)};${formatDecimal(stats.woonWerkKm)};" +
+                "${escapeCsvField(period)};${formatDecimal(stats.zakelijkKm)};${formatDecimal(stats.woonWerkKm)};" +
                     "${formatDecimal(stats.priveKm)};${stats.zakelijkMin};${stats.woonWerkMin};" +
                     "${stats.priveMin};${formatDecimal(workHours)}\n"
             )
@@ -144,12 +154,29 @@ object ExportUtil {
                 null -> trip.tripType
             }
             
-            val startAddr = trip.startAddress?.replace(";", ",")?.replace("\n", " ") ?: ""
-            val endAddr = trip.endAddress?.replace(";", ",")?.replace("\n", " ") ?: ""
-            val purpose = trip.projectCode?.replace(";", ",") ?: trip.tripType.replace(";", ",")
-            val deviatingExplanation = trip.note?.replace(";", ",")?.replace("\n", " ") ?: ""
+            val startAddr = trip.startAddress?.replace("\r\n", " ")?.replace("\n", " ")?.trim() ?: ""
+            val endAddr = trip.endAddress?.replace("\r\n", " ")?.replace("\n", " ")?.trim() ?: ""
+            val purpose = trip.projectCode?.ifBlank { null } ?: trip.tripType
+            val deviatingExplanation = trip.note ?: ""
             
-            writer.append("$dateStr;$startTimeStr;$endTimeStr;$plate;$vehicleName;$odoStart;$odoEnd;$distanceKm;$detourKm;$typeStr;$startAddr;$endAddr;$purpose;$deviatingExplanation\n")
+            val row = listOf(
+                escapeCsvField(dateStr),
+                escapeCsvField(startTimeStr),
+                escapeCsvField(endTimeStr),
+                escapeCsvField(plate),
+                escapeCsvField(vehicleName),
+                escapeCsvField(odoStart.toString()),
+                escapeCsvField(odoEnd.toString()),
+                escapeCsvField(distanceKm),
+                escapeCsvField(detourKm),
+                escapeCsvField(typeStr),
+                escapeCsvField(startAddr),
+                escapeCsvField(endAddr),
+                escapeCsvField(purpose),
+                escapeCsvField(deviatingExplanation)
+            ).joinToString(";")
+            
+            writer.append(row).append("\n")
         }
         
         writer.flush()

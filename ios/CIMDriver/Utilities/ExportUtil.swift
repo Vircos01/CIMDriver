@@ -6,6 +6,15 @@ struct ExportUtil {
     
     // MARK: - CSV Export
     
+    static func escapeCsvField(_ value: String, delimiter: Character = ",") -> String {
+        let needsQuotes = value.contains(delimiter) || value.contains("\"") || value.contains("\n") || value.contains("\r")
+        if needsQuotes {
+            let escaped = value.replacingOccurrences(of: "\"", with: "\"\"")
+            return "\"\(escaped)\""
+        }
+        return value
+    }
+    
     static func generateTripsCSV(trips: [Trip], periodTitle: String? = nil) -> URL? {
         let suffix = periodTitle?.replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: "/", with: "-")
             ?? Date().formatted(date: .numeric, time: .omitted).replacingOccurrences(of: "/", with: "-")
@@ -35,11 +44,15 @@ struct ExportUtil {
             let detour = String(format: "%.1f", Double(trip.privateDetourMeters) / 1000.0)
             let type = trip.tripType
             let status = trip.status
-            let startAddress = (trip.startAddress ?? "").replacingOccurrences(of: ",", with: ";")
-            let endAddress = (trip.endAddress ?? "").replacingOccurrences(of: ",", with: ";")
-            let notes = (trip.note ?? trip.projectCode ?? "").replacingOccurrences(of: ",", with: ";")
+            let startAddress = escapeCsvField((trip.startAddress ?? "").replacingOccurrences(of: "\r\n", with: " ").replacingOccurrences(of: "\n", with: " ").trimmingCharacters(in: .whitespaces))
+            let endAddress = escapeCsvField((trip.endAddress ?? "").replacingOccurrences(of: "\r\n", with: " ").replacingOccurrences(of: "\n", with: " ").trimmingCharacters(in: .whitespaces))
+            let notes = escapeCsvField(trip.note ?? trip.projectCode ?? "")
+            let plateField = escapeCsvField(plate)
+            let vehicleField = escapeCsvField(vehicleName)
+            let typeField = escapeCsvField(type)
+            let statusField = escapeCsvField(status)
             
-            let row = "\(dateStr),\(startStr),\(endStr),\(plate),\(vehicleName),\(odoStart),\(odoEnd),\(distance),\(detour),\(type),\(status),\(startAddress),\(endAddress),\(notes)\n"
+            let row = "\(dateStr),\(startStr),\(endStr),\(plateField),\(vehicleField),\(odoStart),\(odoEnd),\(distance),\(detour),\(typeField),\(statusField),\(startAddress),\(endAddress),\(notes)\n"
             csvString.append(row)
         }
         
@@ -85,9 +98,9 @@ struct ExportUtil {
             sumHours += totalHours
             
             let totalStr = String(format: "%.1f", totalHours)
-            let project = (wd.projectCode ?? "").replacingOccurrences(of: ",", with: ";")
-            let location = (wd.workLocationLabel ?? "").replacingOccurrences(of: ",", with: ";")
-            let note = (wd.note ?? "").replacingOccurrences(of: ",", with: ";")
+            let project = escapeCsvField(wd.projectCode ?? "")
+            let location = escapeCsvField(wd.workLocationLabel ?? "")
+            let note = escapeCsvField(wd.note ?? "")
             
             let row = "\(dateStr),\(firstDep),\(arr),\(dep),\(lastArr),\(wd.breakMinutes),\(totalStr),\(project),\(location),\(note)\n"
             csvString.append(row)

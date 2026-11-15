@@ -211,6 +211,15 @@ Stel je datum in dienst in bij Instellingen → Werkuren. Het jaardoel wordt dan
     <string name="appearance">Weergave</string>
     <string name="appearance_desc">Kies het thema van de app.</string>
     <string name="data_management">Databeheer &amp; Back-ups</string>
+    <string name="status_backup_and_exports">Status Automatische Back-up &amp; Export</string>
+    <string name="latest_db_backup">Laatste Databaseback-up (.zip)</string>
+    <string name="backup_validated_restorable">Gevalideerd &amp; Herstelbaar</string>
+    <string name="backup_db_hint">Volledige database met ritten, voertuigen, adressen en instellingen. Geschikt voor herstel.</string>
+    <string name="no_db_backup_found">Nog geen automatische databaseback-up (.zip) aangetroffen. Maak hieronder een back-up aan.</string>
+    <string name="latest_csv_export">Laatste Periodieke Rittenexport (.csv)</string>
+    <string name="csv_export_readonly_badge">Periodieke Rittenexport</string>
+    <string name="csv_export_readonly_hint">Alleen-lezen export van ritten (geen databaseback-up voor herstel).</string>
+    <string name="no_csv_export_found">Nog geen automatische CSV-rittenexport aangetroffen.</string>
     <string name="backup_desc">Maak veilig een back-up van je ritten en kilometerstanden. Je kunt er zelf voor kiezen om dit bestand (een .zip) op te slaan in je Google Drive of lokaal op je telefoon.</string>
     <string name="restore_desc">Heb je een nieuwe telefoon of wil je data herstellen? Kies dan een eerder gemaakte back-up om te herstellen. Let op: dit overschrijft je huidige gegevens in de app!</string>
     <string name="clear_location_history_title">Locatiehistorie wissen?</string>

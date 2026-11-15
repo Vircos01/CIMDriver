@@ -350,7 +350,7 @@ fun TripsScreen(
                                                     context, "cimdriver_ritten_${slug}.csv", "text/csv"
                                                 ) { uri ->
                                                     com.cimdriver.app.util.ExportUtil.exportToCsv(
-                                                        context, uri, mTrips, savedAddresses, classificationRules, vehicles = vehicles
+                                                        context, uri, mTrips, savedAddresses, classificationRules, settings = classificationSettings, vehicles = vehicles
                                                     )
                                                 }
                                             }
@@ -389,7 +389,7 @@ fun TripsScreen(
                                             context, "cimdriver_export.csv", "text/csv"
                                         ) { uri ->
                                             com.cimdriver.app.util.ExportUtil.exportToCsv(
-                                                context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
+                                                context, uri, trips, savedAddresses, classificationRules, settings = classificationSettings, vehicles = vehicles
                                             )
                                         }
                                     }
@@ -1043,7 +1043,7 @@ private fun MonthHeaderItem(
                                 context, "cimdriver_ritten_${slug}.csv", "text/csv"
                             ) { uri ->
                                 com.cimdriver.app.util.ExportUtil.exportToCsv(
-                                    context, uri, trips, savedAddresses, classificationRules, vehicles = vehicles
+                                    context, uri, trips, savedAddresses, classificationRules, settings = settings, vehicles = vehicles
                                 )
                             }
                         }

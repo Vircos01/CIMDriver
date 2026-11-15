@@ -211,6 +211,15 @@ Set your employment start date under Settings → Work Hours. The annual target 
     <string name="appearance">Appearance</string>
     <string name="appearance_desc">Choose the app theme.</string>
     <string name="data_management">Data Management &amp; Backups</string>
+    <string name="status_backup_and_exports">Automated Backup &amp; Export Status</string>
+    <string name="latest_db_backup">Latest Database Backup (.zip)</string>
+    <string name="backup_validated_restorable">Validated &amp; Restorable</string>
+    <string name="backup_db_hint">Full database containing trips, vehicles, addresses and settings. Suitable for restore.</string>
+    <string name="no_db_backup_found">No automated database backup (.zip) found yet. You can create a backup below.</string>
+    <string name="latest_csv_export">Latest Periodic Trip Export (.csv)</string>
+    <string name="csv_export_readonly_badge">Periodic Trip Export</string>
+    <string name="csv_export_readonly_hint">Read-only trip export (not restorable as database).</string>
+    <string name="no_csv_export_found">No automated CSV trip export found yet.</string>
     <string name="backup_desc">Safely backup your trips and odometers. You can choose to save this file (.zip) in your Google Drive or locally on your phone.</string>
     <string name="restore_desc">Got a new phone or want to restore data? Choose a previously created backup to restore. Note: this overwrites your current data in the app!</string>
     <string name="clear_location_history_title">Clear location history?</string>

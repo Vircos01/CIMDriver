@@ -6,6 +6,8 @@ import com.cimdriver.app.data.local.AppDatabase
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.OutputStream
+import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -15,7 +17,7 @@ object BackupUtil {
     private const val DB_NAME = AppDatabase.DATABASE_NAME
     private val allowedBackupFiles = setOf(DB_NAME, "$DB_NAME-wal", "$DB_NAME-shm")
     
-    fun createBackup(context: Context, uri: Uri): Boolean {
+    fun createBackup(context: Context, outputStream: OutputStream): Boolean {
         return try {
             AppDatabase.getDatabase(context).openHelper.writableDatabase.query("PRAGMA wal_checkpoint(FULL)").close()
             val dbFile = context.getDatabasePath(DB_NAME)
@@ -25,7 +27,6 @@ object BackupUtil {
             val filesToBackup = listOf(dbFile, walFile, shmFile).filter { it.exists() }
             if (filesToBackup.isEmpty()) return false
             
-            val outputStream = context.contentResolver.openOutputStream(uri) ?: return false
             val zos = ZipOutputStream(outputStream)
             
             for (file in filesToBackup) {
@@ -43,10 +44,30 @@ object BackupUtil {
             false
         }
     }
-    
-    fun restoreBackup(context: Context, uri: Uri): Boolean {
+
+    fun createBackup(context: Context, uri: Uri): Boolean {
         return try {
-            val inputStream = context.contentResolver.openInputStream(uri) ?: return false
+            val outputStream = context.contentResolver.openOutputStream(uri) ?: return false
+            createBackup(context, outputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    fun createBackupToFile(context: Context, targetFile: File): Boolean {
+        return try {
+            targetFile.parentFile?.mkdirs()
+            val fos = FileOutputStream(targetFile)
+            createBackup(context, fos)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+    
+    fun restoreBackup(context: Context, inputStream: InputStream): Boolean {
+        return try {
             val zis = ZipInputStream(inputStream)
             var restoredDatabase = false
             val restoredEntries = mutableSetOf<String>()
@@ -90,6 +111,26 @@ object BackupUtil {
                 context.getDatabasePath(DB_NAME + "-shm").delete()
             }
             true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    fun restoreBackup(context: Context, uri: Uri): Boolean {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return false
+            restoreBackup(context, inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    fun restoreBackupFromFile(context: Context, file: File): Boolean {
+        return try {
+            if (!file.exists()) return false
+            restoreBackup(context, FileInputStream(file))
         } catch (e: Exception) {
             e.printStackTrace()
             false

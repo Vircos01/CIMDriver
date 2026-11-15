@@ -37,13 +37,15 @@ fun DataManagementScreen(
     var showClearLocationDialog by remember { mutableStateOf(false) }
     var showResetAllDataDialog by remember { mutableStateOf(false) }
 
-    val latestBackupInfo = remember {
+    val (latestDbBackup, latestCsvExport) = remember {
         val documentsDir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS)
         val backupDir = java.io.File(documentsDir, "CIMDriver/Backups")
         if (backupDir.exists()) {
-            val files = backupDir.listFiles { f -> f.extension == "csv" || f.extension == "zip" }
-            files?.maxByOrNull { it.lastModified() }
-        } else null
+            val files = backupDir.listFiles()
+            val latestZip = files?.filter { it.extension.equals("zip", ignoreCase = true) }?.maxByOrNull { it.lastModified() }
+            val latestCsv = files?.filter { it.extension.equals("csv", ignoreCase = true) }?.maxByOrNull { it.lastModified() }
+            Pair(latestZip, latestCsv)
+        } else Pair(null, null)
     }
 
     val backupLauncher = rememberLauncherForActivityResult(
@@ -81,17 +83,29 @@ fun DataManagementScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // Status laatste automatische back-up
+            // Status automatische back-up & export
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "Laatste Automatische Back-up", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(6.dp))
-                    if (latestBackupInfo != null) {
+                    Text(
+                        text = stringResource(R.string.status_backup_and_exports),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    
+                    // Database back-up sectie (.zip)
+                    Text(
+                        text = stringResource(R.string.latest_db_backup),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    if (latestDbBackup != null) {
                         val fmt = java.text.SimpleDateFormat("dd MMMM yyyy HH:mm", java.util.Locale.getDefault())
-                        val sizeKb = (latestBackupInfo.length() / 1024).coerceAtLeast(1)
+                        val sizeKb = (latestDbBackup.length() / 1024).coerceAtLeast(1)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
@@ -101,25 +115,82 @@ fun DataManagementScreen(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "Gevalideerd & Herstelbaar",
+                                text = stringResource(R.string.backup_validated_restorable),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF2E7D32)
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Tijdstip: ${fmt.format(java.util.Date(latestBackupInfo.lastModified()))} (${sizeKb} KB)",
+                            text = stringResource(R.string.backup_db_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Tijdstip: ${fmt.format(java.util.Date(latestDbBackup.lastModified()))} (${sizeKb} KB)",
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
-                            text = "Bestand: ${latestBackupInfo.name}",
+                            text = "Bestand: ${latestDbBackup.name}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
                         Text(
-                            text = "Nog geen automatische periodieke back-up aangetroffen in de lokale documentenmap. Je kunt hieronder direct een handmatige export/back-up aanmaken.",
+                            text = stringResource(R.string.no_db_backup_found),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Periodieke CSV export sectie (.csv)
+                    Text(
+                        text = stringResource(R.string.latest_csv_export),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    if (latestCsvExport != null) {
+                        val fmt = java.text.SimpleDateFormat("dd MMMM yyyy HH:mm", java.util.Locale.getDefault())
+                        val sizeKb = (latestCsvExport.length() / 1024).coerceAtLeast(1)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = stringResource(R.string.csv_export_readonly_badge),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = stringResource(R.string.csv_export_readonly_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Tijdstip: ${fmt.format(java.util.Date(latestCsvExport.lastModified()))} (${sizeKb} KB)",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = "Bestand: ${latestCsvExport.name}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.no_csv_export_found),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
