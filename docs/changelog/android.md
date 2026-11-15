@@ -11,6 +11,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 !!! info "Patch: Hamburgermenu Back-Stack & Selectie-indicator"
     * **Hamburgermenu / Drawer Back-Stack Herstel:** Schermen geopend via het hamburgermenu (Auto's, Brandstof, Klanten & Projecten, Instellingen, Help en Over) schonen de navigatiestack nu correct op tot de hoofdstartpagina (`popUpTo(startDestination)`). Hierdoor brengt de terugknop je altijd direct en voorspelbaar terug naar het Dashboard in plaats van te blijven rondhangen in eerdere tussenliggende tabs/schermen.
+    * **Klanten & Projectcodes Menuknop:** Het scherm 'Klanten & Projectcodes' toont nu conform de overige menuschermen een hamburgermenuknop om de navigatielade direct te openen in plaats van een terugknop.
     * **Actieve Menu-item Indicator:** De menu-items in de navigatielade tonen nu direct een visuele `selected`-indicator die past bij het geopende scherm.
 
 ## Versie 1.8.2

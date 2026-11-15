@@ -27,7 +27,8 @@ import com.cimdriver.app.ui.components.core.TopBarNavType
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClientsProjectCodesScreen(
-    onBack: () -> Unit,
+    onOpenDrawer: () -> Unit = {},
+    onBack: (() -> Unit)? = null,
     viewModel: ClientProjectViewModel = hiltViewModel()
 ) {
     val clients by viewModel.clients.collectAsState()
@@ -47,8 +48,8 @@ fun ClientsProjectCodesScreen(
         topBar = {
             CimDriverTopBar(
                 title = "Klanten & Projectcodes",
-                navType = TopBarNavType.BACK,
-                onNavClick = onBack,
+                navType = if (onBack != null) TopBarNavType.BACK else TopBarNavType.MENU,
+                onNavClick = onBack ?: onOpenDrawer,
                 actions = {
                     IconButton(onClick = { showAddClientDialog = true }) {
                         Icon(

@@ -2,5 +2,5 @@
   "versionCode": 43,
   "versionName": "1.8.3",
   "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.8.3.apk",
-  "releaseNotes": "Versie 1.8.3: Patch - Herstel van de back-stack navigatie voor het hamburgermenu (terugknop navigeert nu consequent naar het Dashboard) en visuele selectiestatus voor actieve menu-items."
+  "releaseNotes": "Versie 1.8.3: Patch - Herstel van de back-stack navigatie voor het hamburgermenu (terugknop navigeert nu consequent naar het Dashboard), Klanten & Projectcodes voorzien van een hamburgermenuknop, en visuele selectiestatus voor actieve menu-items."
 }

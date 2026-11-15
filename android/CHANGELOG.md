@@ -6,6 +6,7 @@ Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bi
 
 ### Gecorrigeerd & Verbeterd
 - **Hamburgermenu / Drawer Back-Stack Herstel:** Schermen geopend via de navigatielade (Auto's, Brandstof, Klanten & Projecten, Instellingen, Help en Over) poppen de navigatiestack nu correct af tot de startbestemming (`popUpTo(startDestination)`). Terugnavigatie (zowel via de topbar-terugknop als de Android-terugtoets) leidt hierdoor consequent en voorspelbaar terug naar het Dashboard in plaats van te blijven hangen in eerdere tussenliggende schermen.
+- **Klanten & Projectcodes Menuknop:** Het scherm 'Klanten & Projectcodes' toont nu conform de overige menuschermen een hamburgermenuknop om de navigatielade direct te openen in plaats van een terugknop.
 - **Actieve Menu-item Indicator:** Menu-items in de navigatielade tonen nu direct een visuele `selected`-indicator passend bij het geopende scherm.
 
 ## [1.8.2] - 2026-11-13

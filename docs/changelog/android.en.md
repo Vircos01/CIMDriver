@@ -9,6 +9,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 !!! info "Patch: Hamburger Menu Back-Stack & Selection Indicator"
     * **Hamburger Menu / Drawer Back-Stack Fix:** Screens opened via the navigation drawer (Vehicles, Fuel, Clients & Project Codes, Settings, Help, and About) now properly clean up the navigation stack back to the start destination (`popUpTo(startDestination)`). The back button now consistently navigates back to the Dashboard rather than returning to previous intermediate screens or tabs.
+    * **Clients & Project Codes Menu Button:** The 'Clients & Project Codes' screen now displays a hamburger menu button to open the drawer directly, consistent with other drawer screens, rather than a back button.
     * **Active Menu Item Indicator:** Navigation drawer items now show an active visual `selected` state corresponding to the active destination.
 
 ## Version 1.8.2
