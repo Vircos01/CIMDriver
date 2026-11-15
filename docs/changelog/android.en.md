@@ -4,17 +4,18 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.8.3 (Current Version)
+## Version 1.9.0 (Current Version)
 *Release date: November 15, 2026*
 
-!!! info "Patch: Hamburger Menu Back-Stack, Privacy Backups & Code Quality"
-    * **Hamburger Menu / Drawer Back-Stack Fix:** Screens opened via the navigation drawer (Vehicles, Fuel, Clients & Project Codes, Settings, Help, and About) now properly clean up the navigation stack back to the start destination (`popUpTo(startDestination)`). The back button now consistently navigates back to the Dashboard rather than returning to previous intermediate screens or tabs.
-    * **Clients & Project Codes Menu Button:** The 'Clients & Project Codes' screen now displays a hamburger menu button to open the drawer directly, consistent with other drawer screens, rather than a back button.
+!!! success "Phase 9: Tracking Architecture, Privacy-First Backup & Hardening"
+    * **Strict Release Signing Validation:** Release builds no longer silently fallback to debug signing; missing keystore credentials now fail the build explicitly during `validateSigningRelease`.
+    * **Privacy-First Backup Rules:** Local Room databases (`cimdriver_database`) and odometer photo proofs are explicitly excluded from Google Drive cloud backups, while direct device-to-device transfers remain enabled.
+    * **Legacy Widget Cleanup (Glance-first):** Removed the obsolete XML-based widget provider in favor of the modern Jetpack Glance interactive widget.
+    * **Unified Trip Classification:** Consolidated conflicting notification routes: all notification quick actions now run cleanly through `NotificationActionReceiver` with uniform constants (`Business Meeting`, `Home To Work`, `PRIVATE`).
+    * **TrackingService Modularization:** Decoupled notification handling and channel setup into an independent `TrackingNotificationHelper`.
+    * **Hamburger Menu / Drawer Back-Stack Fix:** Screens opened via the navigation drawer now clean up the navigation stack back to the start destination (`popUpTo(startDestination)`). The back button consistently navigates back to the Dashboard.
+    * **Clients & Project Codes Menu Button:** The 'Clients & Project Codes' screen now displays a hamburger menu button to open the drawer directly, matching all other drawer screens.
     * **Active Menu Item Indicator:** Navigation drawer items now show an active visual `selected` state corresponding to the active destination.
-    * **Strict Release Signing Validation:** Release builds no longer silently fallback to debug signing; missing keystore credentials now fail the build explicitly.
-    * **Privacy-First Backup Rules:** Local Room databases and odometer photo proofs are explicitly excluded from Google Drive cloud backups, while direct device-to-device transfers remain enabled.
-    * **Legacy Widget Cleanup:** Removed the obsolete XML-based widget provider in favor of the modern Jetpack Glance interactive widget.
-    * **Unified Trip Classification & Service Modularization:** All notification quick actions now run cleanly through `NotificationActionReceiver`, and notification handling is decoupled into a dedicated `TrackingNotificationHelper`.
 
 ## Version 1.8.2
 *Release date: November 13, 2026*

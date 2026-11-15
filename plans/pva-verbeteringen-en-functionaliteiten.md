@@ -410,6 +410,23 @@ flowchart TD
 
 ---
 
+### Fase 9: Tracking-Architectuur, Privacy-First Back-up & Hardening (v1.9.0 / iOS v0.0.15)
+
+#### 9.1 Strikte Release Signing Validatie
+- **Concept:** Release-builds vereisen nu expliciet een productiekeystore (`keystore.properties` of environment variables) en vallen niet langer stilzwijgend terug op debug keys.
+
+#### 9.2 Privacy-First Back-up Regels
+- **Concept:** Cloudback-up via Google Drive sluit de lokale Room-database (`cimdriver_database`) en tellerstand-fotobewijzen (`photos/`) expliciet uit. Apparaat-naar-apparaat overdracht (kabel/Wi-Fi Direct bij toestelwissel) blijft naadloos ondersteund.
+
+#### 9.3 Widget Modernisering & Sanering
+- **Concept:** Verwijdering van de oude XML/RemoteViews widgetprovider ten gunste van de moderne, interactieve Jetpack Glance widget (`CIMDriverWidgetReceiver`).
+
+#### 9.4 Eenduidige Ritclassificatie & TrackingService Modularisatie
+- **Concept:** Alle notificatie-snelle acties lopen via `NotificationActionReceiver` met consistente categorieën (`Business Meeting`, `Home To Work`, `PRIVATE`). Notificatiebeheer is ontkoppeld naar een zelfstandige `TrackingNotificationHelper`.
+- **Drawer Back-Stack:** Consistente navigatie met `popUpTo(startDestination)` zodat terugnavigatie altijd voorspelbaar leidt naar het Dashboard, inclusief actieve selectiestatus en uniforme hamburgermenuknop voor Klanten & Projectcodes.
+
+---
+
 ## 4. Prioriterings- en Impactmatrix
 
 | Taak / Verbetering | Fiscale Noodzaak | Gebruikersimpact | Complexiteit | Status / Sprint |
@@ -446,6 +463,7 @@ flowchart TD
 | **8.3 Odometer Fotobewijs in Historie & PDF-Bijlage** | 🔴 Zeer hoog | 🟢 Hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
 | **8.4 Multi-Voertuig Wagenpark-kaart op Dashboard** | ⚪ Laag | 🟢 Hoog | ⚡ Laag | ✅ Gerealiseerd (v1.8.0 / iOS v0.0.12) |
 | **8.5 UI-Consistentie & Design System Harmonisatie** | ⚪ Laag | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.8.2 / iOS v0.0.14) |
+| **9.1 Tracking-Architectuur, Privacy-First Back-up & Hardening** | 🔴 Hoog | 🟢 Zeer hoog | 🔶 Gemiddeld | ✅ Gerealiseerd (v1.9.0 / iOS v0.0.15) |
 
 ---
 

@@ -5,7 +5,7 @@ hide:
 
 # 📦 Installation: iOS (iPhone)
 
-The current stable preview is **Version 0.0.14 Alpha** (Build 10).
+The current stable preview is **Version 0.0.15 Alpha** (Build 11).
 
 This release brings the iOS app into full parity with Android Phase 8 (Fiscal Monthly Closing, Route Presets & Odometer Audit Evidence):
 - Local fiscal monthly closing & share notification on the 1st of the month (100% privacy-first)

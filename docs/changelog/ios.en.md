@@ -4,7 +4,15 @@ Stay up to date with the latest updates, new features, and bug fixes for the iOS
 
 ---
 
-## Version 0.0.14 Alpha (Current Version)
+## Version 0.0.15 Alpha (Current Version)
+*Release date: November 15, 2026*
+
+!!! success "Phase 9: Tracking Architecture & Stability (Android Feature Sync)"
+    * **Stability & Navigation Alignment:**
+        * **Tracking Architecture Synchronization:** Harmonization of trip classification pathways and consistent handling of `TO_REVIEW` trips.
+        * **Privacy-First Data Protection:** Aligned local data protection rules reflecting the updated Android privacy guidelines.
+
+## Version 0.0.14 Alpha
 *Release date: November 13, 2026*
 
 !!! success "UI Consistency & Design System Parity"

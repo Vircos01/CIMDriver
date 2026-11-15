@@ -4,7 +4,15 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor de i
 
 ---
 
-## Versie 0.0.14 Alpha (Huidige Versie)
+## Versie 0.0.15 Alpha (Huidige Versie)
+*Releasedatum: 15 november 2026*
+
+!!! success "Fase 9: Tracking-Architectuur & Stabiliteit (Android Feature Sync)"
+    * **Stabiliteit & Navigatie-uitlijning:**
+        * **Tracking Architectuur Synchronisatie:** Harmonisatie van de ritclassificatiemethoden en eenduidige afhandeling van ritten met status `TO_REVIEW`.
+        * **Privacy-First Data-extractie:** Expliciete bescherming van de lokale datalaag conform de verscherpte privacyregels op Android.
+
+## Versie 0.0.14 Alpha
 *Releasedatum: 13 november 2026*
 
 !!! success "UI-Consistentie & Design System Pariteit"
