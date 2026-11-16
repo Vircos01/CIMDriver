@@ -418,22 +418,35 @@ fun AddAddressScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                }
+            }
 
-                    if (addressType == "WERK" || existingAddress?.isWorkLocation == true) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Kantoor-Wi-Fi (Werkurenregistratie)", style = MaterialTheme.typography.titleSmall)
-                        Spacer(modifier = Modifier.height(4.dp))
+            // === Kantoor-Wi-Fi (Werkurenregistratie) ===
+            if (addressType == "WERK" || existingAddress?.isWorkLocation == true) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Filled.Wifi,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Kantoor-Wi-Fi (Werkuren)", style = MaterialTheme.typography.titleMedium)
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            "Koppel het Wi-Fi-netwerk van kantoor. Als je met de fiets of het OV reist, kan CIMDriver je aankomst en vertrek automatisch registreren zonder autorit.",
+                            "Koppel hier het Wi-Fi-netwerk van kantoor. Als je met de fiets, OV of te voet reist, registreert CIMDriver automatisch je werkuren zodra je verbinding maakt met dit netwerk.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         OutlinedTextField(
                             value = wifiSsid,
                             onValueChange = { wifiSsid = it },
                             label = { Text("Wi-Fi Netwerknaam (SSID)") },
-                            placeholder = { Text("bijv. Kantoor-Gast of Bedrijfsnetwerk") },
+                            placeholder = { Text("bijv. Bedrijfsnetwerk of Kantoor-Gast") },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true
                         )
@@ -455,8 +468,14 @@ fun AddAddressScreen(
                             Text("Koppel huidig verbonden Wi-Fi")
                         }
                     }
+                }
+            }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+            // === Notitie ===
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.note_optional), style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = notes,
                         onValueChange = { notes = it },

@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -49,6 +50,7 @@ fun WorkDaysEditorScreen(
     var toleranceMinutesStr by remember(initialSettings.workHoursToleranceMinutes) { mutableStateOf(initialSettings.workHoursToleranceMinutes.toString()) }
     var wifiWorkHoursEnabled by remember(initialSettings.wifiWorkHoursEnabled) { mutableStateOf(initialSettings.wifiWorkHoursEnabled) }
     var wifiBufferMinutesStr by remember(initialSettings.wifiDisconnectBufferMinutes) { mutableStateOf(initialSettings.wifiDisconnectBufferMinutes.toString()) }
+    val workAddresses by viewModel.workAddresses.collectAsState()
 
     Scaffold(
         topBar = {
@@ -140,6 +142,83 @@ fun WorkDaysEditorScreen(
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Kantoor-Wi-Fi per werklocatie:",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Koppel hieronder het Wi-Fi netwerk van jouw kantoor of vestiging.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        if (workAddresses.isEmpty()) {
+                            Text(
+                                text = "Nog geen werklocatie opgeslagen in het Adresboek. Voeg in het Adresboek eerst je kantooradres toe met adrestype 'Werk'.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        } else {
+                            workAddresses.forEach { addr ->
+                                var currentSsidInput by remember(addr.wifiSsid) { mutableStateOf(addr.wifiSsid ?: "") }
+                                Card(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text(
+                                            text = addr.label.ifBlank { addr.address },
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        if (addr.label.isNotBlank() && addr.address.isNotBlank()) {
+                                            Text(
+                                                text = addr.address,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        OutlinedTextField(
+                                            value = currentSsidInput,
+                                            onValueChange = {
+                                                currentSsidInput = it
+                                                viewModel.updateAddressWifi(addr.id, it)
+                                            },
+                                            label = { Text("Wi-Fi Netwerknaam (SSID)") },
+                                            placeholder = { Text("bijv. Kantoor-Gast of Bedrijfsnetwerk") },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            singleLine = true
+                                        )
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        OutlinedButton(
+                                            onClick = {
+                                                val activeSsid = com.cimdriver.app.service.WifiWorkHoursManager.getCurrentWifiSsid(context)
+                                                if (activeSsid != null) {
+                                                    currentSsidInput = activeSsid
+                                                    viewModel.updateAddressWifi(addr.id, activeSsid)
+                                                    Toast.makeText(context, "Huidige Wi-Fi gekoppeld: $activeSsid", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    Toast.makeText(context, "Geen actieve Wi-Fi-verbinding gevonden", Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Icon(Icons.Filled.Wifi, contentDescription = null, modifier = Modifier.size(16.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text("Koppel huidig verbonden Wi-Fi")
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

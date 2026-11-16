@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.cimdriver.app.data.local.AppDatabase
 import com.cimdriver.app.data.local.entity.Settings
 import com.cimdriver.app.data.local.entity.ClassificationRule
+import com.cimdriver.app.data.local.entity.SavedAddress
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +41,18 @@ class SettingsViewModel @Inject constructor(
 
     val classificationRules: StateFlow<List<ClassificationRule>> = classificationRuleDao.getAllRules()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val workAddresses: StateFlow<List<SavedAddress>> = database.savedAddressDao().getWorkLocations()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun updateAddressWifi(addressId: Long, wifiSsid: String?) {
+        viewModelScope.launch {
+            val addr = database.savedAddressDao().getAllAddressesSync().find { it.id == addressId }
+            if (addr != null) {
+                database.savedAddressDao().updateAddress(addr.copy(wifiSsid = wifiSsid?.takeIf { it.isNotBlank() }))
+            }
+        }
+    }
 
     fun updateThemeMode(mode: String) {
         viewModelScope.launch {
