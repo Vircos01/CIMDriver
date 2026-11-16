@@ -3,9 +3,11 @@ package com.cimdriver.app.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.*
@@ -423,6 +425,9 @@ fun AddAddressScreen(
 
             // === Kantoor-Wi-Fi (Werkurenregistratie) ===
             if (addressType == "WERK" || existingAddress?.isWorkLocation == true) {
+                val currentWifi = remember { com.cimdriver.app.service.WifiWorkHoursManager.getCurrentWifiSsid(context) }
+                val candidates = remember { com.cimdriver.app.service.WifiWorkHoursManager.getCandidateSsids(context) }
+
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -441,6 +446,84 @@ fun AddAddressScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+
+                        // 1. Optie om het huidig verbonden netwerk direct over te nemen
+                        if (currentWifi != null) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = "Nu verbonden met:",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                        )
+                                        Text(
+                                            text = currentWifi,
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                    }
+                                    Button(
+                                        onClick = {
+                                            wifiSsid = currentWifi
+                                            android.widget.Toast.makeText(context, "Wi-Fi ingesteld op: $currentWifi", android.widget.Toast.LENGTH_SHORT).show()
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                    ) {
+                                        Text("Overnemen", style = MaterialTheme.typography.labelMedium)
+                                    }
+                                }
+                            }
+                        }
+
+                        // 2. Bekende of gedetecteerde netwerken (Suggestiechips)
+                        if (candidates.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Kies uit gedetecteerde netwerken:",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            androidx.compose.foundation.lazy.LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                items(candidates) { candidate ->
+                                    val isSelected = candidate.equals(wifiSsid, ignoreCase = true)
+                                    SuggestionChip(
+                                        onClick = {
+                                            wifiSsid = candidate
+                                            android.widget.Toast.makeText(context, "Wi-Fi geselecteerd: $candidate", android.widget.Toast.LENGTH_SHORT).show()
+                                        },
+                                        label = { Text(candidate) },
+                                        icon = {
+                                            Icon(
+                                                imageVector = if (isSelected) Icons.Filled.Check else Icons.Filled.Wifi,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        },
+                                        colors = SuggestionChipDefaults.suggestionChipColors(
+                                            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                        // 3. Handmatig invoeren of aanpassen
                         Spacer(modifier = Modifier.height(12.dp))
                         OutlinedTextField(
                             value = wifiSsid,
@@ -448,25 +531,15 @@ fun AddAddressScreen(
                             label = { Text("Wi-Fi Netwerknaam (SSID)") },
                             placeholder = { Text("bijv. Bedrijfsnetwerk of Kantoor-Gast") },
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedButton(
-                            onClick = {
-                                val current = com.cimdriver.app.service.WifiWorkHoursManager.getCurrentWifiSsid(context)
-                                if (current != null) {
-                                    wifiSsid = current
-                                    android.widget.Toast.makeText(context, "Huidige Wi-Fi ingevuld: $current", android.widget.Toast.LENGTH_SHORT).show()
-                                } else {
-                                    android.widget.Toast.makeText(context, "Geen actieve Wi-Fi-verbinding gevonden", android.widget.Toast.LENGTH_SHORT).show()
+                            singleLine = true,
+                            trailingIcon = {
+                                if (wifiSsid.isNotBlank()) {
+                                    IconButton(onClick = { wifiSsid = "" }) {
+                                        Icon(Icons.Filled.Close, contentDescription = "Wissen")
+                                    }
                                 }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(Icons.Filled.Wifi, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Koppel huidig verbonden Wi-Fi")
-                        }
+                            }
+                        )
                     }
                 }
             }

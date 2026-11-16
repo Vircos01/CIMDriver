@@ -1,5 +1,7 @@
 package com.cimdriver.app.ui.screens.settings
 
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -185,6 +187,58 @@ fun WorkDaysEditorScreen(
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
+                                        val activeSsid = remember { com.cimdriver.app.service.WifiWorkHoursManager.getCurrentWifiSsid(context) }
+                                        val candidates = remember { com.cimdriver.app.service.WifiWorkHoursManager.getCandidateSsids(context) }
+
+                                        if (activeSsid != null) {
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Button(
+                                                onClick = {
+                                                    currentSsidInput = activeSsid
+                                                    viewModel.updateAddressWifi(addr.id, activeSsid)
+                                                    Toast.makeText(context, "Huidige Wi-Fi ingesteld: $activeSsid", Toast.LENGTH_SHORT).show()
+                                                },
+                                                modifier = Modifier.fillMaxWidth(),
+                                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                                            ) {
+                                                Icon(Icons.Filled.Wifi, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text("Huidig netwerk '$activeSsid' overnemen")
+                                            }
+                                        }
+
+                                        if (candidates.isNotEmpty()) {
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text("Kies uit gedetecteerde netwerken:", style = MaterialTheme.typography.labelSmall)
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            LazyRow(
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                items(candidates) { candidate ->
+                                                    val isSelected = candidate.equals(currentSsidInput, ignoreCase = true)
+                                                    SuggestionChip(
+                                                        onClick = {
+                                                            currentSsidInput = candidate
+                                                            viewModel.updateAddressWifi(addr.id, candidate)
+                                                            Toast.makeText(context, "Wi-Fi ingesteld op: $candidate", Toast.LENGTH_SHORT).show()
+                                                        },
+                                                        label = { Text(candidate, style = MaterialTheme.typography.labelSmall) },
+                                                        icon = {
+                                                            Icon(
+                                                                imageVector = if (isSelected) Icons.Filled.Check else Icons.Filled.Wifi,
+                                                                contentDescription = null,
+                                                                modifier = Modifier.size(14.dp)
+                                                            )
+                                                        },
+                                                        colors = SuggestionChipDefaults.suggestionChipColors(
+                                                            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        }
+
                                         Spacer(modifier = Modifier.height(8.dp))
                                         OutlinedTextField(
                                             value = currentSsidInput,
@@ -197,24 +251,6 @@ fun WorkDaysEditorScreen(
                                             modifier = Modifier.fillMaxWidth(),
                                             singleLine = true
                                         )
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        OutlinedButton(
-                                            onClick = {
-                                                val activeSsid = com.cimdriver.app.service.WifiWorkHoursManager.getCurrentWifiSsid(context)
-                                                if (activeSsid != null) {
-                                                    currentSsidInput = activeSsid
-                                                    viewModel.updateAddressWifi(addr.id, activeSsid)
-                                                    Toast.makeText(context, "Huidige Wi-Fi gekoppeld: $activeSsid", Toast.LENGTH_SHORT).show()
-                                                } else {
-                                                    Toast.makeText(context, "Geen actieve Wi-Fi-verbinding gevonden", Toast.LENGTH_SHORT).show()
-                                                }
-                                            },
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            Icon(Icons.Filled.Wifi, contentDescription = null, modifier = Modifier.size(16.dp))
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Koppel huidig verbonden Wi-Fi")
-                                        }
                                     }
                                 }
                             }

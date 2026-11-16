@@ -24,6 +24,7 @@ object WifiWorkHoursManager {
     const val PREF_LAST_DISCONNECT_TIME = "last_disconnect_time"
     const val PREF_LAST_DISCONNECT_SSID = "last_disconnect_ssid"
     const val PREF_ACTIVE_WIFI_WORK_SSID = "active_wifi_work_ssid"
+    const val PREF_SEEN_SSIDS = "seen_wifi_ssids"
     const val WORK_NAME_DISCONNECT_BUFFER = "wifi_disconnect_buffer_worker"
 
     fun getCurrentWifiSsid(context: Context): String? {
@@ -32,7 +33,9 @@ object WifiWorkHoursManager {
             val info = wifiManager?.connectionInfo
             val ssid = info?.ssid
             if (ssid != null && ssid != "<unknown ssid>" && ssid.isNotBlank()) {
-                cleanSsid(ssid)
+                val clean = cleanSsid(ssid)
+                rememberSsid(context, clean)
+                clean
             } else {
                 null
             }
@@ -42,6 +45,75 @@ object WifiWorkHoursManager {
         }
     }
 
+    fun rememberSsid(context: Context, ssid: String) {
+        val clean = cleanSsid(ssid)
+        if (clean.isBlank() || clean == "<unknown ssid>") return
+        try {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val currentSet = prefs.getStringSet(PREF_SEEN_SSIDS, emptySet())?.toMutableSet() ?: mutableSetOf()
+            if (currentSet.add(clean)) {
+                prefs.edit().putStringSet(PREF_SEEN_SSIDS, currentSet).apply()
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Error saving seen ssid", e)
+        }
+    }
+
+    fun getCandidateSsids(context: Context): List<String> {
+        val candidates = linkedSetOf<String>()
+
+        // 1. Currently connected
+        getCurrentWifiSsid(context)?.let { if (it.isNotBlank() && it != "<unknown ssid>") candidates.add(it) }
+
+        // 2. Previously remembered SSIDs
+        try {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.getStringSet(PREF_SEEN_SSIDS, emptySet())?.forEach {
+                val clean = cleanSsid(it)
+                if (clean.isNotBlank() && clean != "<unknown ssid>") candidates.add(clean)
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Error reading remembered SSIDs", e)
+        }
+
+        // 3. Best effort: configured networks (available on some OS versions / devices)
+        try {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+            wifiManager?.configuredNetworks?.forEach { config ->
+                config.SSID?.let { raw ->
+                    val clean = cleanSsid(raw)
+                    if (clean.isNotBlank() && clean != "<unknown ssid>") {
+                        rememberSsid(context, clean)
+                        candidates.add(clean)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Deprecated / restricted on Android 10+
+        }
+
+        // 4. Scan results (nearby visible Wi-Fi networks if location permission is granted)
+        try {
+            val hasLocation = androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (hasLocation) {
+                val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+                wifiManager?.scanResults?.forEach { scan ->
+                    val clean = cleanSsid(scan.SSID ?: "")
+                    if (clean.isNotBlank() && clean != "<unknown ssid>") {
+                        candidates.add(clean)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Error reading scan results", e)
+        }
+
+        return candidates.toList()
+    }
+
     fun cleanSsid(ssid: String): String {
         return ssid.trim().removeSurrounding("\"").trim()
     }
@@ -49,6 +121,7 @@ object WifiWorkHoursManager {
     fun handleWifiConnected(context: Context, rawSsid: String) {
         val clean = cleanSsid(rawSsid)
         if (clean.isBlank() || clean == "<unknown ssid>") return
+        rememberSsid(context, clean)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
