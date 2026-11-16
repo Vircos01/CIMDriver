@@ -16,7 +16,7 @@ Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bi
   - Visuele `📶 Wi-Fi registratie (Fiets/OV)` indicatiebadge in zowel het Werkurenscherm als op de kaarten in de Dagelijkse Inbox.
   - Veilige lokale opslag via Room Database migratie 50 ➔ 51 (volledig on-device en privacy-first).
 - **Herindeling Navigatiebalk:**
-  - De volgorde van de onderste navigatiebalk is geoptimaliseerd naar: **Dashboard**, **Ritten**, **Werkuren** en **Tanken / Laden**.
+  - De volgorde van de onderste navigatiebalk is geoptimaliseerd naar: **Dashboard**, **Ritten**, **Tanken / Laden** en **Werkuren**.
   - Het **Adresboek** is verplaatst naar het zijmenu (Drawer), direct onder Wagenpark.
 
 ## [1.9.1] - 2026-11-15

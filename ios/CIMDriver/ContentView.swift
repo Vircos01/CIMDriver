@@ -48,19 +48,19 @@ struct ContentView: View {
                 }
                 .tag(AppTab.trips)
             
-            WorkHoursView()
-                .id(workHoursNavigationID)
-                .tabItem {
-                    Label("Uren", systemImage: "clock.fill")
-                }
-                .tag(AppTab.workHours)
-            
             FuelView()
                 .id(fuelNavigationID)
                 .tabItem {
                     Label("Brandstof", systemImage: "fuelpump.fill")
                 }
                 .tag(AppTab.fuel)
+            
+            WorkHoursView()
+                .id(workHoursNavigationID)
+                .tabItem {
+                    Label("Uren", systemImage: "clock.fill")
+                }
+                .tag(AppTab.workHours)
             
             SettingsView()
                 .id(settingsNavigationID)

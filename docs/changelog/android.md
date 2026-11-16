@@ -14,7 +14,7 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
     * **Voorrang voor Autotracking:** Indien de achtergronddienst een autorit detecteert, heeft die altijd voorrang en treedt de Wi-Fi werkurenmanager direct terug.
     * **Slimme Pauzedetectie & Buffer:** Automatische aftrek van pauze op kantoor (> 4 uur) en automatische registratie van pauzes buiten de deur (lunchwandeling van 10–120 minuten) met een configureerbare bufferperiode (standaard 15 minuten) tegen onbedoelde afsluiting.
     * **Adresboek Wi-Fi Koppeling:** Koppel het kantoor-Wi-Fi netwerk direct via het Adresboek met één tik op de knop.
-    * **Herindeling Navigatiebalk:** De onderste menubalk is geoptimaliseerd met Dashboard, Ritten, Werkuren en Tanken / Laden. Het Adresboek is nu overzichtelijk geplaatst in het zijmenu (Drawer).
+    * **Herindeling Navigatiebalk:** De onderste menubalk is geoptimaliseerd met Dashboard, Ritten, Tanken / Laden en Werkuren. Het Adresboek is nu overzichtelijk geplaatst in het zijmenu (Drawer).
 
 ## Versie 1.9.1
 *Releasedatum: 15 november 2026*

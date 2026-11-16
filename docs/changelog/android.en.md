@@ -12,7 +12,7 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
     * **Vehicle Tracking Priority:** If the tracking service detects an active car trip, vehicle tracking immediately takes precedence over Wi-Fi presence.
     * **Smart Lunch Break Detection & Buffer:** Automatically accounts for on-site lunch breaks (> 4 hours) and off-site lunch walks (10–120 minutes) with a configurable buffer period (default 15 minutes) preventing accidental workday completion.
     * **Address Book Wi-Fi Pairing:** Easily pair an office Wi-Fi network in the Address Book with a single tap.
-    * **Navigation Bar Redesign:** Bottom navigation items updated to Dashboard, Trips, Work Hours, and Fuel. Address Book is now conveniently accessed via the side drawer.
+    * **Navigation Bar Redesign:** Bottom navigation items updated to Dashboard, Trips, Fuel, and Work Hours. Address Book is now conveniently accessed via the side drawer.
 
 ## Version 1.9.1
 *Release date: November 15, 2026*

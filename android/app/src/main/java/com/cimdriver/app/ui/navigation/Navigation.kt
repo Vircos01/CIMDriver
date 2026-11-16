@@ -107,8 +107,8 @@ sealed class Screen(val route: Any, @StringRes val titleRes: Int, val icon: Imag
 val bottomNavigationItems = listOf(
     Screen.Dashboard,
     Screen.Trips,
-    Screen.WorkHours,
-    Screen.Fuel
+    Screen.Fuel,
+    Screen.WorkHours
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

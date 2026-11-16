@@ -2,5 +2,5 @@
   "versionCode": 46,
   "versionName": "1.9.2",
   "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.2.apk",
-  "releaseNotes": "Versie 1.9.2: Patch-release met ondersteuning voor automatische werkurenregistratie via kantoor-Wi-Fi (voor fiets-, OV- en loopforensen inclusief slimme pauzedetectie) en een vernieuwde indeling van de onderste navigatiebalk (Dashboard, Ritten, Werkuren, Tanken / Laden met Adresboek in het zijmenu)."
+  "releaseNotes": "Versie 1.9.2: Patch-release met ondersteuning voor automatische werkurenregistratie via kantoor-Wi-Fi (voor fiets-, OV- en loopforensen inclusief slimme pauzedetectie) en een vernieuwde indeling van de onderste navigatiebalk (Dashboard, Ritten, Tanken / Laden, Werkuren met Adresboek in het zijmenu)."
 }
