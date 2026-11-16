@@ -4,7 +4,17 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.9.1 (Current Version)
+## Version 1.9.2 (Current Version)
+*Release date: November 16, 2026*
+
+!!! info "Patch: Office Wi-Fi Work Hours Tracking & Navigation Bar Redesign"
+    * **Automatic Work Hours Tracking via Office Wi-Fi:** Commuters cycling, taking public transit, or walking to work can now automatically start and finish their work hours based on office Wi-Fi presence, without creating phantom car trips.
+    * **Vehicle Tracking Priority:** If the tracking service detects an active car trip, vehicle tracking immediately takes precedence over Wi-Fi presence.
+    * **Smart Lunch Break Detection & Buffer:** Automatically accounts for on-site lunch breaks (> 4 hours) and off-site lunch walks (10–120 minutes) with a configurable buffer period (default 15 minutes) preventing accidental workday completion.
+    * **Address Book Wi-Fi Pairing:** Easily pair an office Wi-Fi network in the Address Book with a single tap.
+    * **Navigation Bar Redesign:** Bottom navigation items updated to Dashboard, Trips, Work Hours, and Fuel. Address Book is now conveniently accessed via the side drawer.
+
+## Version 1.9.1
 *Release date: November 15, 2026*
 
 !!! info "Patch: Restorable Database Backups & RFC 4180 CSV Escaping"

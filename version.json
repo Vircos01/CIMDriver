@@ -1,6 +1,6 @@
 {
-  "versionCode": 45,
-  "versionName": "1.9.1",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.1.apk",
-  "releaseNotes": "Versie 1.9.1: Patch-release voor veilige en betrouwbare data-exports en back-ups. Bevat automatische herstelbare SQLite-databaseback-ups (.zip), duidelijke scheiding tussen databaseback-up en rittenexport in Instellingen, volledige classificatie- en voertuigcontext bij periodieke exports en RFC 4180-conforme CSV-escaping van speciale tekens."
+  "versionCode": 46,
+  "versionName": "1.9.2",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.2.apk",
+  "releaseNotes": "Versie 1.9.2: Patch-release met ondersteuning voor automatische werkurenregistratie via kantoor-Wi-Fi (voor fiets-, OV- en loopforensen inclusief slimme pauzedetectie) en een vernieuwde indeling van de onderste navigatiebalk (Dashboard, Ritten, Werkuren, Tanken / Laden met Adresboek in het zijmenu)."
 }

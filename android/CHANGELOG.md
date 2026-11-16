@@ -2,6 +2,23 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.9.2] - 2026-11-16
+
+### Toegevoegd & Verbeterd
+- **Automatische Werkurenregistratie via Kantoor-Wi-Fi (Fiets / OV / Lopen):**
+  - Forenzen die met de fiets, het openbaar vervoer of lopend naar kantoor reizen kunnen werkuren nu automatisch laten starten en afronden op basis van kantoor-Wi-Fi aanwezigheid, zonder dat er loze of fantoomritten in de rittenregistratie worden aangemaakt (`registrationSource = "WIFI"`).
+  - Actieve autoritten behouden altijd voorrang: als de trackingservice een rit detecteert, staat de Wi-Fi registratie direct terug zodat de automatische rit- en aankomstlogica intact blijft.
+  - Eenvoudig koppelen van het gewenste kantoor-Wi-Fi netwerk in het Adresboek (`AddAddressScreen`) met de actieknop *"Koppel huidig verbonden Wi-Fi"*.
+  - **Slimme Pauzedetectie & Buffer:**
+    - Pauze op kantoor: bij aanwezigheid langer dan 4 uur wordt de geconfigureerde pauze (bijv. 30 min) automatisch verwerkt.
+    - Pauze buiten de deur (lunchwandeling): bij een tijdelijke Wi-Fi onderbreking tussen 10 en 120 minuten wordt de afwezige tijd automatisch berekend en als pauze geregistreerd.
+    - Instelbare disconnect-buffer (standaard 15 minuten in Instellingen > Werkuren) voorkomt dat een werkdag voortijdig wordt beëindigd bij een korte Wi-Fi hapering of wandeling.
+  - Visuele `📶 Wi-Fi registratie (Fiets/OV)` indicatiebadge in zowel het Werkurenscherm als op de kaarten in de Dagelijkse Inbox.
+  - Veilige lokale opslag via Room Database migratie 50 ➔ 51 (volledig on-device en privacy-first).
+- **Herindeling Navigatiebalk:**
+  - De volgorde van de onderste navigatiebalk is geoptimaliseerd naar: **Dashboard**, **Ritten**, **Werkuren** en **Tanken / Laden**.
+  - Het **Adresboek** is verplaatst naar het zijmenu (Drawer), direct onder Wagenpark.
+
 ## [1.9.1] - 2026-11-15
 
 ### Gecorrigeerd & Verbeterd
