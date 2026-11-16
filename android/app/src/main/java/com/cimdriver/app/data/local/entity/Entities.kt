@@ -145,7 +145,9 @@ data class Settings(
     val skippedUpdateVersionCode: Int = 0,
     val autoArchiveProjectDays: Int = 0, // 0 means disabled
     val zeppCompanionEnabled: Boolean = false,
-    @ColumnInfo(defaultValue = "NULL") val employmentStartDate: Long? = null
+    @ColumnInfo(defaultValue = "NULL") val employmentStartDate: Long? = null,
+    @ColumnInfo(defaultValue = "1") val wifiWorkHoursEnabled: Boolean = true,
+    @ColumnInfo(defaultValue = "15") val wifiDisconnectBufferMinutes: Int = 15
 )
 
 @Entity(tableName = "saved_addresses")
@@ -162,7 +164,8 @@ data class SavedAddress(
     val addressType: String? = null, // "THUIS", "WERK", "KLANT"
     val latitude: Double? = null,
     val longitude: Double? = null,
-    val defaultProjectCodeId: Long? = null
+    val defaultProjectCodeId: Long? = null,
+    @ColumnInfo(defaultValue = "NULL") val wifiSsid: String? = null
 )
 
 @Entity(tableName = "work_days")
@@ -179,7 +182,8 @@ data class WorkDay(
     val workLocationLabel: String?,
     val projectCode: String? = null,
     val status: String = "TO_REVIEW",
-    val projectCodeId: Long? = null
+    val projectCodeId: Long? = null,
+    @ColumnInfo(defaultValue = "'AUTO'") val registrationSource: String = "AUTO"
 )
 
 @Entity(tableName = "classification_rules")

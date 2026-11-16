@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,6 +43,7 @@ fun AddAddressScreen(
 ) {
     val addresses by viewModel.addresses.collectAsState()
     val classificationRules by settingsViewModel.classificationRules.collectAsState()
+    val context = LocalContext.current
     val existingAddress = addresses.find { it.id == addressId }
 
     var label by remember(existingAddress) { mutableStateOf(existingAddress?.label ?: "") }
@@ -66,6 +68,10 @@ fun AddAddressScreen(
         mutableStateOf(existingAddress?.defaultTripType ?: "")
     }
 
+    var wifiSsid by remember(existingAddress) {
+        mutableStateOf(existingAddress?.wifiSsid ?: "")
+    }
+
     Scaffold(
         topBar = {
             CimDriverTopBar(
@@ -85,16 +91,19 @@ fun AddAddressScreen(
                                 val finalNotes = notes.takeIf { it.isNotBlank() }
                                 val finalTripType = defaultTripType.takeIf { it.isNotBlank() }
                                 val finalAddressType = addressType.takeIf { it.isNotBlank() }
+                                val finalWifiSsid = wifiSsid.takeIf { it.isNotBlank() }
 
                                 if (existingAddress == null) {
                                     viewModel.addAddress(
                                         label, address, isWork, isHome, isCustomer,
-                                        finalTripType, finalProjectCode, finalNotes, finalAddressType
+                                        finalTripType, finalProjectCode, finalNotes, finalAddressType,
+                                        finalWifiSsid
                                     )
                                 } else {
                                     viewModel.updateAddress(
                                         existingAddress.id, label, address, isWork, isHome, isCustomer,
-                                        finalTripType, finalProjectCode, finalNotes, finalAddressType
+                                        finalTripType, finalProjectCode, finalNotes, finalAddressType,
+                                        finalWifiSsid
                                     )
                                 }
                                 onBack()
@@ -408,6 +417,43 @@ fun AddAddressScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+
+                    if (addressType == "WERK" || existingAddress?.isWorkLocation == true) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Kantoor-Wi-Fi (Werkurenregistratie)", style = MaterialTheme.typography.titleSmall)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "Koppel het Wi-Fi-netwerk van kantoor. Als je met de fiets of het OV reist, kan CIMDriver je aankomst en vertrek automatisch registreren zonder autorit.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = wifiSsid,
+                            onValueChange = { wifiSsid = it },
+                            label = { Text("Wi-Fi Netwerknaam (SSID)") },
+                            placeholder = { Text("bijv. Kantoor-Gast of Bedrijfsnetwerk") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = {
+                                val current = com.cimdriver.app.service.WifiWorkHoursManager.getCurrentWifiSsid(context)
+                                if (current != null) {
+                                    wifiSsid = current
+                                    android.widget.Toast.makeText(context, "Huidige Wi-Fi ingevuld: $current", android.widget.Toast.LENGTH_SHORT).show()
+                                } else {
+                                    android.widget.Toast.makeText(context, "Geen actieve Wi-Fi-verbinding gevonden", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Filled.Wifi, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Koppel huidig verbonden Wi-Fi")
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

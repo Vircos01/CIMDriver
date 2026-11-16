@@ -95,6 +95,18 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateWifiWorkHoursSettings(enabled: Boolean, bufferMinutes: Int = 15) {
+        viewModelScope.launch {
+            val currentSettings = settings.value ?: Settings()
+            settingsDao.insertSettings(
+                currentSettings.copy(
+                    wifiWorkHoursEnabled = enabled,
+                    wifiDisconnectBufferMinutes = bufferMinutes.coerceIn(5, 60)
+                )
+            )
+        }
+    }
+
     fun updateClassificationSettings(defaultCategory: String, homeWorkAsCommute: Boolean, customerAsBusiness: Boolean) {
         viewModelScope.launch {
             val currentSettings = settings.value ?: Settings()

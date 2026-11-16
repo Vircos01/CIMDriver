@@ -45,5 +45,31 @@ class CIMDriverApplication : Application() {
             ExistingPeriodicWorkPolicy.KEEP,
             closingWorkRequest
         )
+
+        // Register Wi-Fi presence network callback
+        registerWifiNetworkCallback()
+    }
+
+    private fun registerWifiNetworkCallback() {
+        try {
+            val cm = getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager ?: return
+            val request = android.net.NetworkRequest.Builder()
+                .addTransportType(android.net.NetworkCapabilities.TRANSPORT_WIFI)
+                .build()
+            cm.registerNetworkCallback(request, object : android.net.ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: android.net.Network) {
+                    val ssid = com.cimdriver.app.service.WifiWorkHoursManager.getCurrentWifiSsid(this@CIMDriverApplication)
+                    if (ssid != null) {
+                        com.cimdriver.app.service.WifiWorkHoursManager.handleWifiConnected(this@CIMDriverApplication, ssid)
+                    }
+                }
+
+                override fun onLost(network: android.net.Network) {
+                    com.cimdriver.app.service.WifiWorkHoursManager.handleWifiDisconnected(this@CIMDriverApplication, null)
+                }
+            })
+        } catch (e: Exception) {
+            android.util.Log.w("CIMDriverApp", "Failed to register Wi-Fi network callback", e)
+        }
     }
 }

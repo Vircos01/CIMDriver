@@ -77,7 +77,18 @@ class AddressBookViewModel @Inject constructor(
         }
     }
 
-    fun addAddress(label: String, address: String, isWorkLocation: Boolean, isHomeLocation: Boolean, isCustomerLocation: Boolean, defaultTripType: String?, projectCode: String?, notes: String?, addressType: String? = null) {
+    fun addAddress(
+        label: String, 
+        address: String, 
+        isWorkLocation: Boolean, 
+        isHomeLocation: Boolean, 
+        isCustomerLocation: Boolean, 
+        defaultTripType: String?, 
+        projectCode: String?, 
+        notes: String?, 
+        addressType: String? = null,
+        wifiSsid: String? = null
+    ) {
         viewModelScope.launch {
             val effectiveAddressType = addressType ?: when {
                 isHomeLocation -> "THUIS"
@@ -104,13 +115,26 @@ class AddressBookViewModel @Inject constructor(
                     notes = notes,
                     addressType = effectiveAddressType,
                     latitude = coords?.first,
-                    longitude = coords?.second
+                    longitude = coords?.second,
+                    wifiSsid = wifiSsid?.takeIf { it.isNotBlank() }
                 )
             )
         }
     }
 
-    fun updateAddress(id: Long, label: String, address: String, isWorkLocation: Boolean, isHomeLocation: Boolean, isCustomerLocation: Boolean, defaultTripType: String?, projectCode: String?, notes: String?, addressType: String? = null) {
+    fun updateAddress(
+        id: Long, 
+        label: String, 
+        address: String, 
+        isWorkLocation: Boolean, 
+        isHomeLocation: Boolean, 
+        isCustomerLocation: Boolean, 
+        defaultTripType: String?, 
+        projectCode: String?, 
+        notes: String?, 
+        addressType: String? = null,
+        wifiSsid: String? = null
+    ) {
         viewModelScope.launch {
             val effectiveAddressType = addressType ?: when {
                 isHomeLocation -> "THUIS"
@@ -144,7 +168,8 @@ class AddressBookViewModel @Inject constructor(
                     notes = notes,
                     addressType = effectiveAddressType,
                     latitude = coords?.first,
-                    longitude = coords?.second
+                    longitude = coords?.second,
+                    wifiSsid = wifiSsid?.takeIf { it.isNotBlank() }
                 )
             )
         }

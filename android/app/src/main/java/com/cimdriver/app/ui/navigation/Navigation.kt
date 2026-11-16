@@ -107,8 +107,8 @@ sealed class Screen(val route: Any, @StringRes val titleRes: Int, val icon: Imag
 val bottomNavigationItems = listOf(
     Screen.Dashboard,
     Screen.Trips,
-    Screen.AddressBook,
-    Screen.WorkHours
+    Screen.WorkHours,
+    Screen.Fuel
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -164,10 +164,10 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.fuel)) },
-                    selected = currentDestinationForDrawer?.hasRoute(FuelRoute::class) == true,
-                    onClick = { navigateFromDrawer(FuelRoute) },
-                    icon = { Icon(Screen.Fuel.icon, contentDescription = null) },
+                    label = { Text(stringResource(R.string.address_book)) },
+                    selected = currentDestinationForDrawer?.hasRoute(AddressBookRoute::class) == true,
+                    onClick = { navigateFromDrawer(AddressBookRoute) },
+                    icon = { Icon(Screen.AddressBook.icon, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
                 NavigationDrawerItem(

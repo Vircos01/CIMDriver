@@ -325,12 +325,23 @@ private fun InboxWorkDayItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = dateStr,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = dateStr,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (workDay.registrationSource == "WIFI") {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "📶 Wi-Fi",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
                 // Confidence badge
                 val badgeColor = if (suggestion.isHighConfidence) Color(0xFF16A34A) else Color(0xFFD97706)
                 Text(

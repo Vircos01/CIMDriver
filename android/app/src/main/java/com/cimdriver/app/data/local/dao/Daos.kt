@@ -168,6 +168,9 @@ interface SavedAddressDao {
     @Query("SELECT * FROM saved_addresses WHERE isWorkLocation = 1")
     suspend fun getWorkLocationsSync(): List<SavedAddress>
 
+    @Query("SELECT * FROM saved_addresses WHERE wifiSsid IS NOT NULL AND wifiSsid != ''")
+    suspend fun getAddressesWithWifiSync(): List<SavedAddress>
+
     @Query("SELECT * FROM saved_addresses WHERE isHomeLocation = 1 LIMIT 1")
     suspend fun getHomeLocationSync(): SavedAddress?
 

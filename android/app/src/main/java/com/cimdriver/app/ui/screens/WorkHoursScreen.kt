@@ -18,8 +18,10 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -349,6 +351,24 @@ fun WorkHoursScreen(
                                 Text(stringResource(R.string.break_minutes_label, effectiveBreakMinutes.toString()), style = MaterialTheme.typography.bodyMedium)
                                 if (workDay.workLocationLabel != null) {
                                     Text(stringResource(R.string.location_label, workDay.workLocationLabel), style = MaterialTheme.typography.bodySmall)
+                                }
+                                if (workDay.registrationSource == "WIFI") {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Wifi,
+                                            contentDescription = null,
+                                            tint = Color(0xFF0284C7),
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Wi-Fi registratie (Fiets/OV)",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(0xFF0284C7),
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
                                 }
                                 if (workDay.projectCode != null) {
                                     Text(stringResource(R.string.project_label, workDay.projectCode), style = MaterialTheme.typography.bodySmall)
