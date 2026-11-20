@@ -80,7 +80,8 @@ fun VehiclesScreen(
     onAddVehicle: () -> Unit = {},
     onEditVehicle: (Long) -> Unit = {},
     onViewOdometerChecks: (Long) -> Unit = {},
-    onViewGaps: (Long) -> Unit = {}
+    onViewGaps: (Long) -> Unit = {},
+    onNavigateToLeapmotorSync: (Long) -> Unit = {}
 ) {
     val vehicles by viewModel.vehicles.collectAsState(initial = emptyList())
     var vehicleToDelete by remember { mutableStateOf<Vehicle?>(null) }
@@ -144,6 +145,9 @@ fun VehiclesScreen(
                             },
                             onSetDefault = {
                                 viewModel.setAsDefaultVehicle(it)
+                            },
+                            onLeapmotorSync = {
+                                onNavigateToLeapmotorSync(it.id)
                             }
                         )
                     }

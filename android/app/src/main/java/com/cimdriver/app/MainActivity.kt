@@ -120,5 +120,17 @@ class MainActivity : ComponentActivity() {
             }
             intent.removeExtra("EXTRA_FILL_UP_ID")
         }
+
+        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
+            val imageUri = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(Intent.EXTRA_STREAM, android.net.Uri::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra<android.net.Uri>(Intent.EXTRA_STREAM)
+            }
+            if (imageUri != null) {
+                com.cimdriver.app.service.LeapmotorSyncStore.requestSync(imageUri = imageUri.toString())
+            }
+        }
     }
 }

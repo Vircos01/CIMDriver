@@ -1,6 +1,6 @@
 {
-  "versionCode": 49,
-  "versionName": "1.9.5",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.5.apk",
-  "releaseNotes": "Versie 1.9.5: Zuivere fiscale optelsom voor autowissel/inruil: wagenpark toont feitelijke privékilometers per auto (Polo 9,0 km, Leapmotor 16,9 km) en de gecombineerde fiscale 166 km norm sluit bovenin en beneden 100% sluitend aan."
+  "versionCode": 50,
+  "versionName": "1.9.6",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.6.apk",
+  "releaseNotes": "Versie 1.9.6: Introductie Leapmotor Boordcomputer Sync & Slimme Ritduur Matcher: importeer screenshots uit het weekoverzicht van de Leapmotor app via on-device ML Kit OCR, ontdek afwijkingen in ritduur (loze stilstand na motorstop, vertraagd vertrek), voeg gemiste korte ritten direct toe en leg officiële tellerstand-ijkpunten vast."
 }

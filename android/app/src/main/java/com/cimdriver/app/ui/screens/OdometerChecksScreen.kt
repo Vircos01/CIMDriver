@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ElectricCar
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material3.*
@@ -40,6 +41,7 @@ import java.util.Locale
 fun OdometerChecksScreen(
     vehicleId: Long,
     onNavigateBack: () -> Unit,
+    onNavigateToLeapmotorSync: ((Long) -> Unit)? = null,
     viewModel: VehiclesViewModel = hiltViewModel()
 ) {
     val vehicles by viewModel.vehicles.collectAsState(initial = emptyList())
@@ -60,6 +62,15 @@ fun OdometerChecksScreen(
                 onNavClick = onNavigateBack,
                 actions = {
                     if (vehicle != null) {
+                        if (vehicle.make.contains("Leapmotor", ignoreCase = true) || vehicle.model.contains("B10", ignoreCase = true)) {
+                            IconButton(onClick = { onNavigateToLeapmotorSync?.invoke(vehicle.id) }) {
+                                Icon(
+                                    Icons.Default.ElectricCar,
+                                    contentDescription = "Leapmotor boordcomputer sync",
+                                    tint = com.cimdriver.app.ui.theme.CIMDriverWhite
+                                )
+                            }
+                        }
                         IconButton(onClick = {
                             com.cimdriver.app.util.ExportUtil.shareExportedFile(
                                 context = context,

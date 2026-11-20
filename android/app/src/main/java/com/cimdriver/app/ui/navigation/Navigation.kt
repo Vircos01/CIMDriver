@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -260,7 +261,20 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
 
         // Monthly odometer verification dialog
         val odometerCheckRequest by com.cimdriver.app.service.OdometerCheckStore.request.collectAsState()
+        val leapmotorSyncRequest by com.cimdriver.app.service.LeapmotorSyncStore.request.collectAsState()
         val vehicles by vehiclesViewModel.vehicles.collectAsState(initial = emptyList())
+
+        LaunchedEffect(leapmotorSyncRequest) {
+            if (leapmotorSyncRequest.openScreen) {
+                navController.navigate(
+                    LeapmotorVerificationRoute(
+                        vehicleId = leapmotorSyncRequest.vehicleId,
+                        initialImageUri = leapmotorSyncRequest.imageUri
+                    )
+                )
+                com.cimdriver.app.service.LeapmotorSyncStore.dismiss()
+            }
+        }
 
         if (odometerCheckRequest.showDialog && odometerCheckRequest.vehicleId != null) {
             val checkVehicle = vehicles.find { it.id == odometerCheckRequest.vehicleId }
@@ -454,6 +468,9 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     },
                     onAddTrip = {
                         navController.navigate(AddTripRoute())
+                    },
+                    onNavigateToLeapmotorSync = { vehicleId ->
+                        navController.navigate(LeapmotorVerificationRoute(vehicleId = vehicleId))
                     }
                 ) 
             }
@@ -463,13 +480,23 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     onAddVehicle = { navController.navigate(AddVehicleRoute()) },
                     onEditVehicle = { vehicleId -> navController.navigate(AddVehicleRoute(vehicleId = vehicleId)) },
                     onViewOdometerChecks = { vehicleId -> navController.navigate(OdometerChecksRoute(vehicleId = vehicleId)) },
-                    onViewGaps = { vehicleId -> navController.navigate(OdometerGapReviewRoute(vehicleId = vehicleId)) }
+                    onViewGaps = { vehicleId -> navController.navigate(OdometerGapReviewRoute(vehicleId = vehicleId)) },
+                    onNavigateToLeapmotorSync = { vehicleId -> navController.navigate(LeapmotorVerificationRoute(vehicleId = vehicleId)) }
                 ) 
             }
             composable<OdometerChecksRoute> { backStackEntry ->
                 val args = backStackEntry.toRoute<OdometerChecksRoute>()
                 com.cimdriver.app.ui.screens.OdometerChecksScreen(
                     vehicleId = args.vehicleId,
+                    onNavigateBack = { navController.navigateUp() },
+                    onNavigateToLeapmotorSync = { vehicleId -> navController.navigate(LeapmotorVerificationRoute(vehicleId = vehicleId)) }
+                )
+            }
+            composable<LeapmotorVerificationRoute> { backStackEntry ->
+                val args = backStackEntry.toRoute<LeapmotorVerificationRoute>()
+                com.cimdriver.app.ui.screens.LeapmotorVerificationScreen(
+                    vehicleId = args.vehicleId,
+                    initialImageUri = args.initialImageUri,
                     onNavigateBack = { navController.navigateUp() }
                 )
             }

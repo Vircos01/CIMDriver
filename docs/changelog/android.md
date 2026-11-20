@@ -6,7 +6,18 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.9.5 (Huidige Versie)
+## Versie 1.9.6 (Huidige Versie)
+*Releasedatum: 20 november 2026*
+
+!!! info "Nieuwe Functie: Leapmotor Boordcomputer Sync & Slimme Ritduur Matcher"
+    * **Screenshot Scanner (On-Device OCR):** Importeer direct een screenshot van het weekoverzicht uit de Leapmotor app (*Energieverbruik per gereden afstand > Ritgegevens*). Alle ritten worden in één oogopslag herkend, ook als ze ingeklapt zijn.
+    * **Slimme Ritduur Afwijkingsanalyse:**
+        * *Stilstand na stop:* Herkent direct wanneer CIMDriver nog doortelde terwijl de motor al was uitgezet en knipt loze stoptijd met 1 klik af.
+        * *Vertraagd vertrek:* Signaleert als GPS later wakker werd dan de boordcomputer en herstelt de vertrektijd.
+    * **Gemiste Ritten Detecteren:** Korte ritjes (bijv. 2 min auto verzetten) die telefoonsensors kunnen missen, worden direct ontdekt en met 1 klik ingevoegd voor een 100% sluitende rittenregistratie.
+    * **Tellerstand IJkpunt:** Automatische herkenning van de actuele tellerstand (bijv. 308 km) met 1-klik bevestiging als officieel fysiek ijkpunt.
+
+## Versie 1.9.5
 *Releasedatum: 20 november 2026*
 
 !!! info "Patch: 100% Sluitende Fiscale Optelsom bij Inruil / Autowissel"

@@ -3,6 +3,7 @@ package com.cimdriver.app.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ElectricCar
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Speed
@@ -24,7 +25,8 @@ fun VehicleItem(
     onRecalculate: (Vehicle) -> Unit = {},
     onSetDefault: (Vehicle) -> Unit = {},
     onViewOdometerChecks: (Vehicle) -> Unit = {},
-    onViewGaps: (Vehicle) -> Unit = {}
+    onViewGaps: (Vehicle) -> Unit = {},
+    onLeapmotorSync: ((Vehicle) -> Unit)? = null
 ) {
     Card(
         modifier = Modifier
@@ -58,6 +60,16 @@ fun VehicleItem(
             }
 
             Row {
+                val isLeapmotor = vehicle.make.contains("Leapmotor", ignoreCase = true) || vehicle.model.contains("B10", ignoreCase = true)
+                if (isLeapmotor && onLeapmotorSync != null) {
+                    IconButton(onClick = { onLeapmotorSync(vehicle) }) {
+                        Icon(
+                            Icons.Filled.ElectricCar,
+                            contentDescription = "Leapmotor boordcomputer sync",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
                 // Gap review / chain integrity button
                 IconButton(onClick = { onViewGaps(vehicle) }) {
                     Icon(

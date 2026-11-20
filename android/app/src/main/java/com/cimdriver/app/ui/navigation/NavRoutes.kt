@@ -84,3 +84,9 @@ data class OdometerCheckAnalysisRoute(
 data class OdometerGapReviewRoute(
     val vehicleId: Long
 )
+
+@Serializable
+data class LeapmotorVerificationRoute(
+    val vehicleId: Long? = null,
+    val initialImageUri: String? = null
+)

@@ -2,6 +2,20 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.9.6] - 2026-11-20
+
+### Nieuwe Functies & Verbeteringen
+- **Leapmotor Boordcomputer Sync & Slimme Ritduur Matcher:**
+  - **Screenshot Scanner (On-Device OCR):** Importeer direct een screenshot van het weekoverzicht uit de Leapmotor app (*Energieverbruik per gereden afstand > Ritgegevens*). Google ML Kit leest alle ritten en tellerstanden lokaal en privé uit, zonder dat ritten handmatig opengeklapt hoeven te worden.
+  - **Slimme Ritduur Afwijkingsanalyse:**
+    - *Loze stilstand na motorstop:* Herkent wanneer CIMDriver doorgelopen is nadat de Leapmotor werd uitgeschakeld (bijv. napraten/bellen of grace period) en biedt een 1-klik knop om de overtollige stoptijd eraf te knippen.
+    - *Vertraagd vertrek:* Signaleert wanneer de GPS-detectie later startte dan de auto en herstelt de werkelijke starttijd conform de boordcomputer.
+    - *Plausibiliteitscontrole:* Controleert bij opengeklapte ritten de gemeten afstand tegen de boordcomputer en pieksnelheden tegen eventuele GPS-glitches.
+  - **Gemiste Ritten Vangen:** Korte ritten (bijv. 2 tot 4 minuten om de auto te verzetten of straatje te keren) die GPS/Bluetooth gemist hebben, worden direct gesignaleerd met een 1-klik knop *"Voeg gemiste rit toe"* met automatische overname van vertrek- en bestemmingsadressen.
+  - **Tellerstand IJkpunten:** Gedetecteerde kilometertellerstand uit het overzicht (bijv. 308 km) kan met 1 klik direct als officieel fysiek controle-ijkpunt (OdometerCheck) worden opgeslagen.
+  - **Directe Deelmogelijkheid:** Ondersteuning voor Android Share Sheet: deel screenshots vanuit de galerij of bestandsbeheerder direct naar CIMDriver om de verificatie te starten.
+  - **Snelle Toegang:** Direct bereikbaar via de topbalk in het rittenoverzicht bij selectie van de Leapmotor, via het voertuigkaartje in het wagenpark en via het km-controlescherm.
+
 ## [1.9.5] - 2026-11-20
 
 ### Gecorrigeerd & Verbeterd

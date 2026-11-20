@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.automirrored.filled.CallMerge
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.ElectricCar
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.LocationOn
 import com.cimdriver.app.ui.components.DistanceStackedChart
@@ -87,7 +88,8 @@ fun TripsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     addressBookViewModel: com.cimdriver.app.ui.viewmodel.AddressBookViewModel = hiltViewModel(),
     onTripClick: (Trip) -> Unit = {},
-    onAddTrip: () -> Unit = {}
+    onAddTrip: () -> Unit = {},
+    onNavigateToLeapmotorSync: ((Long?) -> Unit)? = null
 ) {
     val uiState by viewModel.tripsScreenUiState.collectAsState()
     
@@ -305,6 +307,19 @@ fun TripsScreen(
                         activeVehicleId = uiState.globalSelectedVehicleId ?: defaultVehicle?.id,
                         onVehicleSelected = { viewModel.setGlobalSelectedVehicleId(it) }
                     )
+                    val hasLeapmotor = remember(vehicles) {
+                        vehicles.any { it.make.contains("Leapmotor", ignoreCase = true) || it.model.contains("B10", ignoreCase = true) }
+                    }
+                    if (hasLeapmotor && onNavigateToLeapmotorSync != null) {
+                        val selectedVId = uiState.globalSelectedVehicleId ?: defaultVehicle?.id
+                        IconButton(onClick = { onNavigateToLeapmotorSync(selectedVId) }) {
+                            Icon(
+                                Icons.Filled.ElectricCar,
+                                contentDescription = "Leapmotor verificatie",
+                                tint = com.cimdriver.app.ui.theme.CIMDriverWhite
+                            )
+                        }
+                    }
                     Box {
                         IconButton(onClick = { showExportMenu = true }) {
                             Icon(Icons.Filled.Share, contentDescription = stringResource(R.string.export), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)

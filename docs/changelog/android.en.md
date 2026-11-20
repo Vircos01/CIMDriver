@@ -4,7 +4,18 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.9.5 (Current Version)
+## Version 1.9.6 (Current Version)
+*Release date: November 20, 2026*
+
+!!! info "New Feature: Leapmotor Telematics Sync & Smart Duration Matcher"
+    * **Screenshot Scanner (On-Device OCR):** Directly import a screenshot from the Leapmotor app's weekly overview (*Energy consumption per driven distance > Trip data*). All trips are parsed instantly using on-device ML Kit OCR, even when collapsed.
+    * **Smart Trip Duration Deviation Analysis:**
+        * *Idle after engine stop:* Automatically detects when CIMDriver continued tracking after the Leapmotor was turned off and removes excess idle time with one click.
+        * *Delayed start:* Alerts if phone GPS began tracking later than the car's ignition and aligns start times.
+    * **Catch Missing Short Trips:** Short repositioning trips (e.g. 2 minutes) missed by GPS are instantly surfaced with a one-tap *"Add Missing Trip"* action for a 100% airtight audit trail.
+    * **Odometer Anchor:** Automatically recognizes the displayed odometer reading (e.g. 308 km) with one-click physical checkpoint verification.
+
+## Version 1.9.5
 *Release date: November 20, 2026*
 
 !!! info "Patch: Consistent Fiscal Private Mileage Summation Across Vehicles"
