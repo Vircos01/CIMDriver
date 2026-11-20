@@ -13,10 +13,10 @@ data class Vehicle(
     val licensePlate: String,
     val make: String,
     val model: String,
-    val year: String?,
+    val year: String? = null,
     val odometerStart: Int,
     val odometerCurrent: Int,
-    val notes: String?,
+    val notes: String? = null,
     val isActive: Boolean = true,
     val privateKmYearlyLimit: Int = 500,
     val showPrivateKmWarning: Boolean = true,
@@ -26,7 +26,8 @@ data class Vehicle(
     val isDefault: Boolean = false,
     val odometerCorrectionStrategy: String = "CREATE_TRIP", // "CREATE_TRIP", "GAP_WITH_REASON", "LEAVE_GAP"
     val inServiceDate: Long? = null,
-    val endServiceDate: Long? = null
+    val endServiceDate: Long? = null,
+    @ColumnInfo(defaultValue = "NULL") val replacesVehicleId: Long? = null
 )
 
 @Entity(

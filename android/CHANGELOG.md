@@ -2,6 +2,23 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.9.3] - 2026-11-20
+
+### Gecorrigeerd & Verbeterd
+- **Beginstand tellerstand bewerken (`odometerStart`):**
+  - De beginstand (start contract) is nu vrij aanpasbaar voor bestaande auto's in `AddVehicleScreen`.
+  - Bij het wijzigen van de beginstand toont de app een bevestigingsdialoog met de keuze om alle bestaande ritten voor dit voertuig automatisch te herberekenen (`recalculateOdometerHistory`) of uitsluitend de beginstand aan te passen.
+  - Als een voertuig nog geen ritten heeft, wordt de actuele kilometerstand automatisch gesynchroniseerd met de nieuwe beginstand.
+- **Fiscale autowissel & Inruil (art. 13bis Wet op de loonbelasting):**
+  - Ondersteuning voor opeenvolgende auto's van de werkgever binnen hetzelfde belastingjaar via `replacesVehicleId` (Room databaseversie 52).
+  - Nieuwe selectie *"Vervangt eerdere auto (inruil/lease-wissel)"* in het autoscherm met duidelijke fiscale toelichting.
+  - **Gecombineerde pro-rata norm:** `calculateCombinedProRataLimit` berekent de fiscale norm over de aaneengesloten periode vanaf de startdatum van de voorganger(s) t/m de opvolger.
+  - **Overdracht privékilometers:** Privékilometers van de voorganger worden automatisch overgedragen en opgeteld bij de opvolger voor een correcte en zuivere fiscale jaarcontrole zonder valse waarschuwingen.
+  - **Wagenpark Overzicht Kaart:**
+    - Ingerruilde voertuigen tonen de statusbadge *"Ingeruild voor <auto>"* en *"Overgedragen naar <auto>"* in plaats van een overbodige waarschuwingsbalk.
+    - Opvolgende voertuigen tonen de statusbadge *"Vervangt <auto>"*, de gecombineerde pro-rata limiet en een heldere uitsplitsing tussen eigen privékilometers en overgedragen privékilometers.
+    - Auto's in het Wagenpark Overzicht zijn nu direct aantikbaar om direct naar het bewerkscherm van de desbetreffende auto te gaan.
+
 ## [1.9.2] - 2026-11-16
 
 ### Toegevoegd & Verbeterd

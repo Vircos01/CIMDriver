@@ -98,4 +98,150 @@ class DashboardStatsCalculatorTest {
         // YTD private distance: 20 km + 10 km detour = 30.0 km
         assertEquals(30.0, stats.ytdPriveKm, 0.001)
     }
+
+    @Test
+    fun `calculateCombinedProRataLimit combines period from September start across trade-in`() {
+        val cal = Calendar.getInstance()
+        val currentYear = cal.get(Calendar.YEAR)
+
+        // Predecessor (Polo): in service from Sep 1 to Oct 31 (start driving for business in September)
+        cal.set(currentYear, Calendar.SEPTEMBER, 1, 0, 0, 0)
+        val poloStart = cal.timeInMillis
+        cal.set(currentYear, Calendar.OCTOBER, 31, 23, 59, 59)
+        val poloEnd = cal.timeInMillis
+
+        val polo = Vehicle(
+            id = 1L,
+            name = "Volkswagen Polo",
+            licensePlate = "GHX-78-D",
+            make = "Volkswagen",
+            model = "Polo",
+            odometerStart = 30000,
+            odometerCurrent = 33379,
+            inServiceDate = poloStart,
+            endServiceDate = poloEnd,
+            privateKmYearlyLimit = 500
+        )
+
+        // Successor (Leapmotor): in service from Nov 1, replacing Polo
+        cal.set(currentYear, Calendar.NOVEMBER, 1, 0, 0, 0)
+        val leapmotorStart = cal.timeInMillis
+
+        val leapmotor = Vehicle(
+            id = 2L,
+            name = "Leapmotor B10",
+            licensePlate = "NFN-80-F",
+            make = "Leapmotor",
+            model = "B10",
+            odometerStart = 10,
+            odometerCurrent = 338,
+            inServiceDate = leapmotorStart,
+            endServiceDate = null,
+            replacesVehicleId = 1L,
+            privateKmYearlyLimit = 500
+        )
+
+        val vehicles = listOf(polo, leapmotor)
+
+        // Isolated pro-rata on leapmotor alone: Nov to Dec = 2 months -> 2/12 * 500 = 83 km
+        val isolatedLimit = DashboardStatsCalculator.calculateProRataLimit(500, leapmotorStart, null)
+        assertEquals(83, isolatedLimit)
+
+        // Combined fiscal limit from September (when business driving started) to Dec = 4 months -> 4/12 * 500 = 166 km
+        val combinedLimit = DashboardStatsCalculator.calculateCombinedProRataLimit(leapmotor, vehicles, 500)
+        assertEquals(166, combinedLimit)
+    }
+
+    @Test
+    fun `cumulative private km and YTD stats transfer from predecessor to successor on trade-in`() {
+        val cal = Calendar.getInstance()
+        val currentYear = cal.get(Calendar.YEAR)
+        cal.set(currentYear, Calendar.JANUARY, 1, 0, 0, 0)
+        val startOfYear = cal.timeInMillis
+
+        val polo = Vehicle(
+            id = 1L,
+            name = "Volkswagen Polo",
+            licensePlate = "GHX-78-D",
+            make = "Volkswagen",
+            model = "Polo",
+            odometerStart = 30000,
+            odometerCurrent = 33379,
+            inServiceDate = startOfYear,
+            endServiceDate = startOfYear + 1000L * 3600 * 24 * 180,
+            privateKmYearlyLimit = 500
+        )
+
+        val leapmotor = Vehicle(
+            id = 2L,
+            name = "Leapmotor B10",
+            licensePlate = "NFN-80-F",
+            make = "Leapmotor",
+            model = "B10",
+            odometerStart = 10,
+            odometerCurrent = 338,
+            inServiceDate = startOfYear + 1000L * 3600 * 24 * 181,
+            endServiceDate = null,
+            replacesVehicleId = 1L,
+            privateKmYearlyLimit = 500
+        )
+
+        val vehicles = listOf(polo, leapmotor)
+
+        // Polo: 9.0 km private trip
+        val poloTrip = Trip(
+            id = 201L,
+            vehicleId = 1L,
+            startTime = startOfYear + 1000L * 3600 * 24 * 30,
+            endTime = startOfYear + 1000L * 3600 * 24 * 30 + 1000 * 1800,
+            startAddress = "Home",
+            endAddress = "Shop",
+            distanceMeters = 9000,
+            tripType = "PRIVATE",
+            note = null,
+            status = TripStatus.DONE.value,
+            isManual = false,
+            odometerStart = 31000,
+            odometerEnd = 31009
+        )
+
+        // Leapmotor: 16.9 km private trip
+        val leapmotorTrip = Trip(
+            id = 202L,
+            vehicleId = 2L,
+            startTime = startOfYear + 1000L * 3600 * 24 * 200,
+            endTime = startOfYear + 1000L * 3600 * 24 * 200 + 1000 * 1800,
+            startAddress = "Home",
+            endAddress = "Family",
+            distanceMeters = 16900,
+            tripType = "PRIVATE",
+            note = null,
+            status = TripStatus.DONE.value,
+            isManual = false,
+            odometerStart = 100,
+            odometerEnd = 117
+        )
+
+        val allTrips = listOf(poloTrip, leapmotorTrip)
+
+        // 1. Helper calculateCumulativePrivateKm should sum both (9.0 + 16.9 = 25.9 km)
+        val cumulativeKm = DashboardStatsCalculator.calculateCumulativePrivateKm(
+            vehicle = leapmotor,
+            allVehicles = vehicles,
+            allTrips = allTrips,
+            startOfYear = startOfYear
+        )
+        assertEquals(25.9, cumulativeKm, 0.001)
+
+        // 2. calculateDashboardStats with Leapmotor selected should also have ytdPriveKm = 25.9 km
+        val stats = DashboardStatsCalculator.calculateDashboardStats(
+            tripList = allTrips,
+            timeFilter = TimeFilter.YEAR,
+            selectedVehicleId = 2L,
+            vehicleList = vehicles,
+            rules = emptyList(),
+            addresses = emptyList()
+        )
+        assertEquals(25.9, stats.ytdPriveKm, 0.001)
+    }
 }

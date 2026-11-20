@@ -28,7 +28,7 @@ import com.cimdriver.app.data.local.entity.*
         OdometerGapResolution::class,
         FuelFillUp::class
     ], 
-    version = 51,
+    version = 52,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -537,9 +537,29 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_51_52 = object : Migration(51, 52) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                try {
+                    db.execSQL("ALTER TABLE `vehicles` ADD COLUMN `replacesVehicleId` INTEGER DEFAULT NULL")
+                } catch (e: Exception) {
+                    android.util.Log.w("AppDatabase", "Column replacesVehicleId may already exist", e)
+                }
+                try {
+                    // Auto-link Leapmotor B10 to Volkswagen Polo if both exist and not yet linked
+                    db.execSQL("""
+                        UPDATE vehicles 
+                        SET replacesVehicleId = (SELECT id FROM vehicles WHERE UPPER(licensePlate) = 'GHX-78-D' LIMIT 1)
+                        WHERE UPPER(licensePlate) = 'NFN-80-F' AND replacesVehicleId IS NULL
+                    """.trimIndent())
+                } catch (e: Exception) {
+                    android.util.Log.w("AppDatabase", "Auto-link predecessor vehicle skipped", e)
+                }
+            }
+        }
+
 		fun getDatabase(context: Context): AppDatabase {
 			return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39, MIGRATION_39_40, MIGRATION_40_41, MIGRATION_41_42, MIGRATION_42_43, MIGRATION_43_44, MIGRATION_44_45, MIGRATION_45_46, MIGRATION_46_47, MIGRATION_47_48, MIGRATION_48_49, MIGRATION_49_50, MIGRATION_48_50, MIGRATION_50_51).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
+                val instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34, MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39, MIGRATION_39_40, MIGRATION_40_41, MIGRATION_41_42, MIGRATION_42_43, MIGRATION_43_44, MIGRATION_44_45, MIGRATION_45_46, MIGRATION_46_47, MIGRATION_47_48, MIGRATION_48_49, MIGRATION_49_50, MIGRATION_48_50, MIGRATION_50_51, MIGRATION_51_52).addCallback(object : RoomDatabase.Callback() { override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("INSERT INTO classification_rules (name, startAddressType, endAddressType, tripType, category) VALUES ('Thuis <-> Werk', 'THUIS', 'WERK', 'Home To Work', 'COMMUTE'), ('Woon-werk rit', NULL, NULL, 'COMMUTE', 'COMMUTE'), ('Klantbezoek', NULL, NULL, 'Customer Visit', 'BUSINESS'), ('Zakelijke afspraak', NULL, NULL, 'Business Meeting', 'BUSINESS'), ('Klant factureerbaar', NULL, NULL, 'Customer Billable', 'BUSINESS'), ('Opdracht CIMSOLUTIONS', NULL, NULL, 'Commissioned By CIMSOLUTIONS', 'BUSINESS'), ('Opleiding', NULL, NULL, 'Exam Course', 'BUSINESS'), ('Auto onderhoud', NULL, NULL, 'Car Maintenance', 'BUSINESS'), ('Privérit', NULL, NULL, 'PERSONAL', 'PRIVATE')") } }).build()
 
 				INSTANCE = instance
 				instance

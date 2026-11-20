@@ -102,7 +102,8 @@ fun DashboardScreen(
     onNavigateToDiagnostics: () -> Unit = {},
     onNavigateToGaps: (Long) -> Unit = {},
     onNavigateToFuelDraft: (Long) -> Unit = {},
-    onNavigateToHoursTargets: () -> Unit = {}
+    onNavigateToHoursTargets: () -> Unit = {},
+    onNavigateToEditVehicle: (Long) -> Unit = {}
 ) {
     val locale = currentAppLocale()
     val context = LocalContext.current
@@ -482,10 +483,10 @@ fun DashboardScreen(
                 val activeVehicle = vehicles.find { it.id == activeVehicleId }
 
                 if (activeVehicle?.showPrivateKmWarning == true) {
-                    val limit = DashboardStatsCalculator.calculateProRataLimit(
-                        yearlyLimit = activeVehicle.privateKmYearlyLimit,
-                        inServiceDate = activeVehicle.inServiceDate,
-                        endServiceDate = activeVehicle.endServiceDate
+                    val limit = DashboardStatsCalculator.calculateCombinedProRataLimit(
+                        vehicle = activeVehicle,
+                        allVehicles = vehicles,
+                        yearlyLimit = activeVehicle.privateKmYearlyLimit
                     )
                     val current = stats.ytdPriveKm.toFloat()
                     val progress = (current / limit.toFloat()).coerceIn(0f, 1f)
@@ -538,7 +539,17 @@ fun DashboardScreen(
                                 color = progressColor,
                                 trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                             )
-                            if (activeVehicle.inServiceDate != null || activeVehicle.endServiceDate != null) {
+                            val predecessors = remember(activeVehicle, vehicles) {
+                                DashboardStatsCalculator.getPredecessorVehicles(activeVehicle, vehicles)
+                            }
+                            if (predecessors.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Gezamenlijke fiscale norm (privé km van ${predecessors.joinToString(", ") { "${it.make} ${it.model}" }} overgedragen).",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            } else if (activeVehicle.inServiceDate != null || activeVehicle.endServiceDate != null) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = "Aangepaste grens (pro rata).",
@@ -811,7 +822,8 @@ fun DashboardScreen(
                     MultiVehicleFleetCard(
                         vehicles = activeVehicles,
                         allTrips = allTrips,
-                        locale = locale
+                        locale = locale,
+                        onEditVehicle = onNavigateToEditVehicle
                     )
                 } else if (activeVehicles.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(24.dp))
@@ -908,7 +920,8 @@ fun DashboardScreen(
 private fun MultiVehicleFleetCard(
     vehicles: List<com.cimdriver.app.data.local.entity.Vehicle>,
     allTrips: List<com.cimdriver.app.data.local.entity.Trip>,
-    locale: java.util.Locale
+    locale: java.util.Locale,
+    onEditVehicle: (Long) -> Unit = {}
 ) {
     val calendar = java.util.Calendar.getInstance()
     calendar.set(java.util.Calendar.DAY_OF_MONTH, 1)
@@ -984,29 +997,24 @@ private fun MultiVehicleFleetCard(
                 val yearPrivateKm = remember(yearPrivateTrips) {
                     yearPrivateTrips.sumOf { it.distanceMeters + it.privateDetourMeters } / 1000.0
                 }
-                val proRataLimit = remember(vehicle) {
-                    com.cimdriver.app.domain.DashboardStatsCalculator.calculateProRataLimit(
-                        yearlyLimit = if (vehicle.privateKmYearlyLimit > 0) vehicle.privateKmYearlyLimit else 500,
-                        inServiceDate = vehicle.inServiceDate,
-                        endServiceDate = vehicle.endServiceDate
-                    )
-                }
-                val isProRata = vehicle.inServiceDate != null || vehicle.endServiceDate != null
-                val privateProgress = if (proRataLimit > 0) (yearPrivateKm / proRataLimit.toDouble()).toFloat().coerceIn(0f, 1f) else 0f
-                val warningThreshold = proRataLimit * 0.8
-                val statusColor = when {
-                    yearPrivateKm > proRataLimit -> Color(0xFFE53935)
-                    yearPrivateKm >= warningThreshold -> Color(0xFFFFB300)
-                    else -> CIMDriverGreen
-                }
 
-                Column(modifier = Modifier.fillMaxWidth()) {
+                // Check trade-in relationships
+                val successor = remember(vehicle, vehicles) { vehicles.find { it.replacesVehicleId == vehicle.id } }
+                val predecessors = remember(vehicle, vehicles) { com.cimdriver.app.domain.DashboardStatsCalculator.getPredecessorVehicles(vehicle, vehicles) }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onEditVehicle(vehicle.id) }
+                        .padding(vertical = 4.dp)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.Top
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = "${vehicle.make} ${vehicle.model}",
                                 style = MaterialTheme.typography.bodyLarge,
@@ -1034,6 +1042,35 @@ private fun MultiVehicleFleetCard(
                                         color = MaterialTheme.colorScheme.primary
                                     )
                                 }
+                                if (successor != null) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = MaterialTheme.colorScheme.secondaryContainer
+                                    ) {
+                                        Text(
+                                            text = "Ingeruild voor ${successor.make} ${successor.model}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                        )
+                                    }
+                                } else if (predecessors.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = MaterialTheme.colorScheme.tertiaryContainer
+                                    ) {
+                                        Text(
+                                            text = "Vervangt ${predecessors.first().make} ${predecessors.first().model}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
 
@@ -1054,58 +1091,187 @@ private fun MultiVehicleFleetCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Privé Grens Progress Bar (naar rato)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (successor != null) {
+                        // Vehicle was replaced / traded in: km are transferred to successor
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                text = "Privé dit jaar:",
+                                text = "Privé gereden dit jaar:",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            if (isProRata) {
-                                Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${String.format(locale, "%.1f", yearPrivateKm)} km",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Overgedragen naar ${successor.make} ${successor.model} (${successor.licensePlate})",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else if (predecessors.isNotEmpty()) {
+                        // Successor vehicle: combine private km and joint limit
+                        val predecessorPrivateKm = remember(predecessors, allTrips, startOfYear) {
+                            val predIds = predecessors.map { it.id }.toSet()
+                            allTrips.filter {
+                                it.vehicleId in predIds && it.startTime >= startOfYear &&
+                                    (it.tripType == "PRIVATE" || it.tripType == com.cimdriver.app.util.TripClassification.DYNAMICS_PERSONAL)
+                            }.sumOf { it.distanceMeters + it.privateDetourMeters } / 1000.0
+                        }
+                        val totalCombinedPrivateKm = yearPrivateKm + predecessorPrivateKm
+                        val combinedLimit = remember(vehicle, vehicles) {
+                            com.cimdriver.app.domain.DashboardStatsCalculator.calculateCombinedProRataLimit(
+                                vehicle = vehicle,
+                                allVehicles = vehicles,
+                                yearlyLimit = if (vehicle.privateKmYearlyLimit > 0) vehicle.privateKmYearlyLimit else 500
+                            )
+                        }
+                        val maxStandardLimit = if (vehicle.privateKmYearlyLimit > 0) vehicle.privateKmYearlyLimit else 500
+                        val isProRata = combinedLimit < maxStandardLimit
+                        val privateProgress = if (combinedLimit > 0) (totalCombinedPrivateKm / combinedLimit.toDouble()).toFloat().coerceIn(0f, 1f) else 0f
+                        val warningThreshold = combinedLimit * 0.8
+                        val statusColor = when {
+                            totalCombinedPrivateKm > combinedLimit -> Color(0xFFE53935)
+                            totalCombinedPrivateKm >= warningThreshold -> Color(0xFFFFB300)
+                            else -> CIMDriverGreen
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = "(naar rato)",
+                                    text = "Privé dit jaar:",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
+                                if (isProRata) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "(naar rato)",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    )
+                                }
                             }
+                            Text(
+                                text = "${String.format(locale, "%.1f", totalCombinedPrivateKm)} / $combinedLimit km",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = statusColor
+                            )
+                        }
+                        if (predecessorPrivateKm > 0.0) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "(${String.format(locale, "%.1f", yearPrivateKm)} km eigen + ${String.format(locale, "%.1f", predecessorPrivateKm)} km ${predecessors.first().make})",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        LinearProgressIndicator(
+                            progress = { privateProgress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                            color = statusColor,
+                            trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        val statusHint = when {
+                            totalCombinedPrivateKm > combinedLimit -> "Fiscaal bijtellingsrisico (overschreden)"
+                            totalCombinedPrivateKm >= warningThreshold -> {
+                                val remaining = (combinedLimit - totalCombinedPrivateKm).toInt().coerceAtLeast(0)
+                                "Nog $remaining km tot fiscale bijtellingsgrens"
+                            }
+                            else -> if (isProRata) "Veilig binnen $combinedLimit km privé-norm (pro rata incl. inruil)" else "Veilig binnen $combinedLimit km privé-norm (incl. inruil)"
                         }
                         Text(
-                            text = "${String.format(locale, "%.1f", yearPrivateKm)} / $proRataLimit km",
+                            text = statusHint,
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = statusColor
+                            color = statusColor.copy(alpha = 0.9f)
+                        )
+                    } else {
+                        // Standalone vehicle (e.g. Ford Kuga)
+                        val proRataLimit = remember(vehicle) {
+                            com.cimdriver.app.domain.DashboardStatsCalculator.calculateProRataLimit(
+                                yearlyLimit = if (vehicle.privateKmYearlyLimit > 0) vehicle.privateKmYearlyLimit else 500,
+                                inServiceDate = vehicle.inServiceDate,
+                                endServiceDate = vehicle.endServiceDate
+                            )
+                        }
+                        val isProRata = vehicle.inServiceDate != null || vehicle.endServiceDate != null
+                        val privateProgress = if (proRataLimit > 0) (yearPrivateKm / proRataLimit.toDouble()).toFloat().coerceIn(0f, 1f) else 0f
+                        val warningThreshold = proRataLimit * 0.8
+                        val statusColor = when {
+                            yearPrivateKm > proRataLimit -> Color(0xFFE53935)
+                            yearPrivateKm >= warningThreshold -> Color(0xFFFFB300)
+                            else -> CIMDriverGreen
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Privé dit jaar:",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                if (isProRata) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "(naar rato)",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+                            Text(
+                                text = "${String.format(locale, "%.1f", yearPrivateKm)} / $proRataLimit km",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = statusColor
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        LinearProgressIndicator(
+                            progress = { privateProgress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                            color = statusColor,
+                            trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        val statusHint = when {
+                            yearPrivateKm > proRataLimit -> "Fiscaal bijtellingsrisico (overschreden)"
+                            yearPrivateKm >= warningThreshold -> {
+                                val remaining = (proRataLimit - yearPrivateKm).toInt().coerceAtLeast(0)
+                                "Nog $remaining km tot fiscale bijtellingsgrens"
+                            }
+                            else -> if (isProRata) "Veilig binnen $proRataLimit km privé-norm (pro rata)" else "Veilig binnen $proRataLimit km privé-norm"
+                        }
+                        Text(
+                            text = statusHint,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = statusColor.copy(alpha = 0.9f)
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    LinearProgressIndicator(
-                        progress = { privateProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(6.dp)
-                            .clip(RoundedCornerShape(3.dp)),
-                        color = statusColor,
-                        trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    val statusHint = when {
-                        yearPrivateKm > proRataLimit -> "Fiscaal bijtellingsrisico (overschreden)"
-                        yearPrivateKm >= warningThreshold -> {
-                            val remaining = (proRataLimit - yearPrivateKm).toInt().coerceAtLeast(0)
-                            "Nog $remaining km tot fiscale bijtellingsgrens"
-                        }
-                        else -> if (isProRata) "Veilig binnen $proRataLimit km privé-norm (pro rata)" else "Veilig binnen $proRataLimit km privé-norm"
-                    }
-                    Text(
-                        text = statusHint,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = statusColor.copy(alpha = 0.9f)
-                    )
                 }
             }
         }

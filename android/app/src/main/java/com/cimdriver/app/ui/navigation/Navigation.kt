@@ -423,6 +423,9 @@ fun MainScreen(tripsViewModel: TripsViewModel = hiltViewModel(), vehiclesViewMod
                     },
                     onNavigateToHoursTargets = {
                         navController.navigate(HoursTargetsRoute)
+                    },
+                    onNavigateToEditVehicle = { vehicleId ->
+                        navController.navigate(AddVehicleRoute(vehicleId = vehicleId))
                     }
                 ) 
             }

@@ -4,7 +4,15 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.9.2 (Current Version)
+## Version 1.9.3 (Current Version)
+*Release date: November 20, 2026*
+
+!!! info "Patch: Odometer Start Correction & Fiscal Vehicle Trade-In / Exchange"
+    * **Odometer Start Correction:** The contract start odometer field is now fully editable for existing vehicles, with an optional prompt to recalculate existing trip chains.
+    * **Fiscal Vehicle Trade-In / Exchange:** Full compliance with Dutch tax rules when switching company cars during a calendar year. Combines the pro-rata period across predecessor and successor vehicles and transfers private kilometers driven to the successor vehicle.
+    * **Fleet Overview Card Enhancements:** Clear trade-in badges, detailed breakdown of own vs transferred private kilometers, and direct one-tap editing from the fleet card.
+
+## Version 1.9.2
 *Release date: November 16, 2026*
 
 !!! info "Patch: Office Wi-Fi Work Hours Tracking & Navigation Bar Redesign"

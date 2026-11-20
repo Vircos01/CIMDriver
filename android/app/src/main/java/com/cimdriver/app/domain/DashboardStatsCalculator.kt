@@ -50,6 +50,77 @@ object DashboardStatsCalculator {
         return (monthsAvailable.toFloat() / 12f * yearlyLimit).toInt()
     }
 
+    fun getPredecessorVehicles(
+        vehicle: Vehicle?,
+        allVehicles: List<Vehicle>
+    ): List<Vehicle> {
+        if (vehicle == null) return emptyList()
+        val predecessors = mutableListOf<Vehicle>()
+        val visited = mutableSetOf(vehicle.id)
+        var currentId = vehicle.replacesVehicleId
+        while (currentId != null && !visited.contains(currentId)) {
+            visited.add(currentId)
+            val pred = allVehicles.find { it.id == currentId }
+            if (pred != null) {
+                predecessors.add(pred)
+                currentId = pred.replacesVehicleId
+            } else {
+                break
+            }
+        }
+        return predecessors
+    }
+
+    fun calculateCombinedProRataLimit(
+        vehicle: Vehicle,
+        allVehicles: List<Vehicle>,
+        yearlyLimit: Int = if (vehicle.privateKmYearlyLimit > 0) vehicle.privateKmYearlyLimit else 500
+    ): Int {
+        val predecessors = getPredecessorVehicles(vehicle, allVehicles)
+        if (predecessors.isEmpty()) {
+            return calculateProRataLimit(yearlyLimit, vehicle.inServiceDate, vehicle.endServiceDate)
+        }
+
+        val chain = listOf(vehicle) + predecessors
+        val cal = Calendar.getInstance()
+        val currentYear = cal.get(Calendar.YEAR)
+
+        val chainWithDates = chain.filter { it.inServiceDate != null }
+        val earliestStartMonth = if (chainWithDates.isEmpty()) {
+            1
+        } else {
+            chainWithDates.map { v ->
+                val startCal = Calendar.getInstance().apply { timeInMillis = v.inServiceDate!! }
+                if (startCal.get(Calendar.YEAR) < currentYear) 1
+                else startCal.get(Calendar.MONTH) + 1
+            }.minOrNull() ?: 1
+        }
+
+        val endMonth = if (vehicle.endServiceDate != null) {
+            val endCal = Calendar.getInstance().apply { timeInMillis = vehicle.endServiceDate }
+            if (endCal.get(Calendar.YEAR) > currentYear) 12
+            else endCal.get(Calendar.MONTH) + 1
+        } else 12
+
+        val monthsAvailable = (endMonth - earliestStartMonth + 1).coerceIn(0, 12)
+        return (monthsAvailable.toFloat() / 12f * yearlyLimit).toInt()
+    }
+
+    fun calculateCumulativePrivateKm(
+        vehicle: Vehicle,
+        allVehicles: List<Vehicle>,
+        allTrips: List<Trip>,
+        startOfYear: Long
+    ): Double {
+        val chain = listOf(vehicle) + getPredecessorVehicles(vehicle, allVehicles)
+        val chainIds = chain.map { it.id }.toSet()
+        val privateTrips = allTrips.filter {
+            it.vehicleId in chainIds && it.startTime >= startOfYear &&
+                (it.tripType == "PRIVATE" || it.tripType == com.cimdriver.app.util.TripClassification.DYNAMICS_PERSONAL)
+        }
+        return privateTrips.sumOf { it.distanceMeters + it.privateDetourMeters } / 1000.0
+    }
+
     fun classifyTrip(
         trip: Trip,
         addresses: List<SavedAddress>,
@@ -182,6 +253,32 @@ object DashboardStatsCalculator {
                             }
                         } else if (category == TripCategory.PRIVATE) {
                             prevPriveMeters += trip.distanceMeters
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (activeVehicle != null) {
+            val predecessors = getPredecessorVehicles(activeVehicle, vehicleList)
+            if (predecessors.isNotEmpty()) {
+                val predIds = predecessors.map { it.id }.toSet()
+                val predMap = predecessors.associateBy { it.id }
+                tripList.filter { it.vehicleId in predIds }.forEach { trip ->
+                    val status = TripStatus.from(trip.status)
+                    if (status == TripStatus.DONE || status == TripStatus.MERGED || status == TripStatus.TO_REVIEW) {
+                        val cal = Calendar.getInstance().apply { timeInMillis = trip.startTime }
+                        if (cal.get(Calendar.YEAR) == currentYear) {
+                            val pred = predMap[trip.vehicleId]
+                            val predStart = pred?.inServiceDate ?: 0L
+                            if (trip.startTime >= predStart) {
+                                val category = classifyTrip(trip, addresses, rules, settings)
+                                if (category == TripCategory.PRIVATE) {
+                                    ytdPriveMeters += trip.distanceMeters
+                                } else if (trip.privateDetourMeters > 0) {
+                                    ytdPriveMeters += trip.privateDetourMeters
+                                }
+                            }
                         }
                     }
                 }

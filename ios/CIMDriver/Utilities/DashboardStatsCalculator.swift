@@ -49,6 +49,70 @@ struct DashboardStatsCalculator {
         let monthsAvailable = max(0, min(12, endMonth - startMonth + 1))
         return Int((Float(monthsAvailable) / 12.0) * Float(yearlyLimit))
     }
+
+    static func getPredecessorVehicles(
+        vehicle: Vehicle?,
+        allVehicles: [Vehicle]
+    ) -> [Vehicle] {
+        guard let vehicle = vehicle else { return [] }
+        var predecessors: [Vehicle] = []
+        var visited: Set<UUID> = [vehicle.id]
+        var currentId = vehicle.replacesVehicleId
+        while let cid = currentId, !visited.contains(cid) {
+            visited.insert(cid)
+            if let pred = allVehicles.first(where: { $0.id == cid }) {
+                predecessors.append(pred)
+                currentId = pred.replacesVehicleId
+            } else {
+                break
+            }
+        }
+        return predecessors
+    }
+
+    static func calculateCombinedProRataLimit(
+        vehicle: Vehicle,
+        allVehicles: [Vehicle],
+        yearlyLimit: Int = 500
+    ) -> Int {
+        let predecessors = getPredecessorVehicles(vehicle: vehicle, allVehicles: allVehicles)
+        if predecessors.isEmpty {
+            return calculateProRataLimit(yearlyLimit: yearlyLimit, inServiceDate: vehicle.inServiceDate, endServiceDate: vehicle.endServiceDate)
+        }
+
+        let chain = [vehicle] + predecessors
+        let cal = Calendar.current
+        let currentYear = cal.component(.year, from: Date())
+
+        let chainWithDates = chain.filter { $0.inServiceDate != nil }
+        let earliestStartMonth: Int
+        if chainWithDates.isEmpty {
+            earliestStartMonth = 1
+        } else {
+            earliestStartMonth = chainWithDates.map { v in
+                guard let isd = v.inServiceDate else { return 1 }
+                if cal.component(.year, from: isd) < currentYear {
+                    return 1
+                } else {
+                    return cal.component(.month, from: isd)
+                }
+            }.min() ?? 1
+        }
+
+        let endMonth: Int
+        if let esd = vehicle.endServiceDate {
+            if cal.component(.year, from: esd) > currentYear {
+                endMonth = 12
+            } else {
+                endMonth = cal.component(.month, from: esd)
+            }
+        } else {
+            endMonth = 12
+        }
+
+        let monthsAvailable = max(0, min(12, endMonth - earliestStartMonth + 1))
+        return Int((Float(monthsAvailable) / 12.0) * Float(yearlyLimit))
+    }
     
     static func classifyTrip(
         trip: Trip,

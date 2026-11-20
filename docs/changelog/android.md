@@ -6,7 +6,15 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.9.2 (Huidige Versie)
+## Versie 1.9.3 (Huidige Versie)
+*Releasedatum: 20 november 2026*
+
+!!! info "Patch: Beginstand Tellerstand Corrigeren & Fiscale Autowissel / Inruil"
+    * **Beginstand Tellerstand Corrigeren:** Het veld voor de beginstand is nu ontgrendeld voor bestaande voertuigen. Bij het opslaan kun je kiezen om alle ritten van die auto automatisch opnieuw door te rekenen of enkel de beginstand bij te werken.
+    * **Fiscale Autowissel / Inruil (500 km-norm):** Volledige ondersteuning voor een wissel van leaseauto of inruil binnen hetzelfde belastingjaar. De pro-rata periode wordt gecombineerd over de totale periode van voorganger en opvolger, en de gereden privékilometers van de vorige auto worden overgedragen naar de opvolger conform de fiscale regels van de Belastingdienst.
+    * **Wagenpark Overzicht Vernieuwd:** Duidelijke statustags (*"Vervangt..."* en *"Ingeruild voor..."*), inzicht in gecombineerde kilometers en voertuigen kunnen direct vanuit de overzichtskaart worden geopend voor bewerking.
+
+## Versie 1.9.2
 *Releasedatum: 16 november 2026*
 
 !!! info "Patch: Kantoor-Wi-Fi Werkurenregistratie & Navigatie-Optimalisatie"

@@ -49,7 +49,7 @@ class VehiclesViewModel @Inject constructor(
     private val _selectedVehicle = MutableStateFlow<Vehicle?>(null)
     val selectedVehicle: StateFlow<Vehicle?> = _selectedVehicle.asStateFlow()
 
-    fun addVehicle(name: String, licensePlate: String, make: String, model: String, odometerStart: Int, odometerCurrent: Int, usageType: String, notes: String?, privateKmYearlyLimit: Int, showPrivateKmWarning: Boolean, odometerCorrectionStrategy: String, inServiceDate: Long?, endServiceDate: Long?, engineType: String) {
+    fun addVehicle(name: String, licensePlate: String, make: String, model: String, odometerStart: Int, odometerCurrent: Int, usageType: String, notes: String?, privateKmYearlyLimit: Int, showPrivateKmWarning: Boolean, odometerCorrectionStrategy: String, inServiceDate: Long?, endServiceDate: Long?, engineType: String, replacesVehicleId: Long? = null) {
         viewModelScope.launch {
             val newVehicle = Vehicle(
                 name = name,
@@ -58,7 +58,7 @@ class VehiclesViewModel @Inject constructor(
                 model = model,
                 year = null,
                 odometerStart = odometerStart,
-                odometerCurrent = odometerCurrent,
+                odometerCurrent = if (odometerCurrent == 0) odometerStart else odometerCurrent,
                 notes = notes,
                 usageType = usageType,
                 privateKmYearlyLimit = privateKmYearlyLimit,
@@ -66,21 +66,55 @@ class VehiclesViewModel @Inject constructor(
                 odometerCorrectionStrategy = odometerCorrectionStrategy,
                 inServiceDate = inServiceDate,
                 endServiceDate = endServiceDate,
-                engineType = engineType
+                engineType = engineType,
+                replacesVehicleId = replacesVehicleId
             )
             vehicleDao.insertVehicle(newVehicle)
+
+            // If this vehicle replaces an existing vehicle, and predecessor has no endServiceDate, sync it
+            if (replacesVehicleId != null && inServiceDate != null) {
+                val pred = vehicleDao.getVehicleById(replacesVehicleId)
+                if (pred != null && pred.endServiceDate == null) {
+                    vehicleDao.updateVehicle(pred.copy(endServiceDate = inServiceDate))
+                }
+            }
         }
     }
 
-    fun updateVehicle(vehicle: Vehicle, name: String, licensePlate: String, make: String, model: String, odometerStart: Int, odometerCurrent: Int, usageType: String, notes: String?, privateKmYearlyLimit: Int, showPrivateKmWarning: Boolean, odometerCorrectionStrategy: String, inServiceDate: Long?, endServiceDate: Long?, engineType: String) {
+    fun updateVehicle(
+        vehicle: Vehicle,
+        name: String,
+        licensePlate: String,
+        make: String,
+        model: String,
+        odometerStart: Int,
+        odometerCurrent: Int,
+        usageType: String,
+        notes: String?,
+        privateKmYearlyLimit: Int,
+        showPrivateKmWarning: Boolean,
+        odometerCorrectionStrategy: String,
+        inServiceDate: Long?,
+        endServiceDate: Long?,
+        engineType: String,
+        replacesVehicleId: Long? = null,
+        recalculateTrips: Boolean = false
+    ) {
         viewModelScope.launch {
+            val odoStartChanged = odometerStart != vehicle.odometerStart
+            val newCurrent = if (odoStartChanged && vehicle.odometerCurrent == vehicle.odometerStart) {
+                odometerStart
+            } else {
+                odometerCurrent
+            }
+
             val updatedVehicle = vehicle.copy(
                 name = name,
                 licensePlate = licensePlate,
                 make = make,
                 model = model,
                 odometerStart = odometerStart,
-                odometerCurrent = odometerCurrent,
+                odometerCurrent = newCurrent,
                 usageType = usageType,
                 notes = notes,
                 privateKmYearlyLimit = privateKmYearlyLimit,
@@ -88,9 +122,35 @@ class VehiclesViewModel @Inject constructor(
                 odometerCorrectionStrategy = odometerCorrectionStrategy,
                 inServiceDate = inServiceDate,
                 endServiceDate = endServiceDate,
-                engineType = engineType
+                engineType = engineType,
+                replacesVehicleId = replacesVehicleId
             )
             vehicleDao.updateVehicle(updatedVehicle)
+
+            if (odoStartChanged && recalculateTrips) {
+                val trips = tripDao.getTripsByVehicleSync(vehicle.id)
+                var currentOdo = odometerStart
+                for (trip in trips) {
+                    val distanceKm = Math.round(trip.distanceMeters / 1000.0).toInt()
+                    val updatedTrip = trip.copy(
+                        odometerStart = currentOdo,
+                        odometerEnd = currentOdo + distanceKm
+                    )
+                    tripDao.updateTrip(updatedTrip)
+                    currentOdo += distanceKm
+                }
+                if (trips.isNotEmpty()) {
+                    vehicleDao.updateVehicle(updatedVehicle.copy(odometerCurrent = currentOdo))
+                }
+            }
+
+            // If replacesVehicleId is set and predecessor has no endServiceDate, sync predecessor's endServiceDate
+            if (replacesVehicleId != null && inServiceDate != null) {
+                val pred = vehicleDao.getVehicleById(replacesVehicleId)
+                if (pred != null && pred.endServiceDate == null) {
+                    vehicleDao.updateVehicle(pred.copy(endServiceDate = inServiceDate))
+                }
+            }
         }
     }
 

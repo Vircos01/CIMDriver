@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import com.cimdriver.app.ui.dialogs.BluetoothPairDialog
@@ -27,6 +29,7 @@ import com.cimdriver.app.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.cimdriver.app.data.local.entity.Vehicle
 import com.cimdriver.app.domain.DashboardStatsCalculator
 import com.cimdriver.app.ui.components.core.CimDriverTopBar
 import com.cimdriver.app.ui.components.core.TopBarNavType
@@ -54,10 +57,12 @@ fun AddVehicleScreen(
     var showPrivateKmWarning by remember(existingVehicle) { mutableStateOf(existingVehicle?.showPrivateKmWarning ?: true) }
     var inServiceDate by remember(existingVehicle) { mutableStateOf(existingVehicle?.inServiceDate) }
     var endServiceDate by remember(existingVehicle) { mutableStateOf(existingVehicle?.endServiceDate) }
+    var replacesVehicleId by remember(existingVehicle) { mutableStateOf(existingVehicle?.replacesVehicleId) }
     var notes by remember(existingVehicle) { mutableStateOf(existingVehicle?.notes ?: "") }
 
     var showInServiceDatePicker by remember { mutableStateOf(false) }
     var showEndServiceDatePicker by remember { mutableStateOf(false) }
+    var showRecalculateOdometerDialog by remember { mutableStateOf(false) }
     var isRdwLoading by remember { mutableStateOf(false) }
     var rdwMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -100,13 +105,18 @@ fun AddVehicleScreen(
                             val odoCurrentInt = odometerCurrent.toIntOrNull() ?: 0
                             val privateKmYearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500
                             if (vehicleId == null) {
-                                viewModel.addVehicle(name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType)
+                                viewModel.addVehicle(name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType, replacesVehicleId)
+                                onBack()
                             } else {
                                 existingVehicle?.let {
-                                    viewModel.updateVehicle(it, name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType)
+                                    if (odoStartInt != it.odometerStart) {
+                                        showRecalculateOdometerDialog = true
+                                    } else {
+                                        viewModel.updateVehicle(it, name, plate, make, model, odoStartInt, odoCurrentInt, usageType, notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning, odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType, replacesVehicleId, recalculateTrips = false)
+                                        onBack()
+                                    }
                                 }
                             }
-                            onBack()
                         },
                         enabled = name.isNotBlank() && plate.isNotBlank()
                     ) {
@@ -252,13 +262,16 @@ fun AddVehicleScreen(
                     
                     OutlinedTextField(
                         value = odometerStart, 
-                        onValueChange = { odometerStart = it }, 
+                        onValueChange = { 
+                            odometerStart = it
+                            if (existingVehicle == null && odometerCurrent.isBlank()) {
+                                odometerCurrent = it
+                            }
+                        }, 
                         label = { Text("Begin km-stand (start contract)") }, 
                         singleLine = true,
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        readOnly = existingVehicle != null,
-                        enabled = existingVehicle == null
+                        modifier = Modifier.fillMaxWidth()
                     )
                     
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -360,6 +373,75 @@ fun AddVehicleScreen(
                             }
                         }
 
+                        val otherVehicles = remember(vehicles, existingVehicle) {
+                            vehicles.filter { it.id != existingVehicle?.id }
+                        }
+                        if (otherVehicles.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Inruil / Voertuigwissel", style = MaterialTheme.typography.titleSmall)
+                            
+                            var replacesDropdownExpanded by remember { mutableStateOf(false) }
+                            val selectedPredecessor = otherVehicles.find { it.id == replacesVehicleId }
+                            
+                            ExposedDropdownMenuBox(
+                                expanded = replacesDropdownExpanded,
+                                onExpandedChange = { replacesDropdownExpanded = !replacesDropdownExpanded }
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedPredecessor?.let { "${it.make} ${it.model} (${it.licensePlate})" } ?: "Geen (nieuwe of extra auto)",
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("Vervangt eerdere auto (inruil/lease-wissel)") },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = replacesDropdownExpanded) },
+                                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = replacesDropdownExpanded,
+                                    onDismissRequest = { replacesDropdownExpanded = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Geen (nieuwe of extra auto)") },
+                                        onClick = {
+                                            replacesVehicleId = null
+                                            replacesDropdownExpanded = false
+                                        }
+                                    )
+                                    otherVehicles.forEach { v ->
+                                        DropdownMenuItem(
+                                            text = { Text("${v.make} ${v.model} (${v.licensePlate})") },
+                                            onClick = {
+                                                replacesVehicleId = v.id
+                                                replacesDropdownExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            if (selectedPredecessor != null) {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Card(
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.Top) {
+                                        Icon(
+                                            Icons.Filled.DirectionsCar,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(18.dp).padding(top = 2.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Fiscale inruil: De privékilometers van de ${selectedPredecessor.make} ${selectedPredecessor.model} (${selectedPredecessor.licensePlate}) worden overgedragen en geteld bij deze auto. De fiscale 500 km-grens van de Belastingdienst geldt over de gezamenlijke periode.",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         if (usageType == "MIXED" || usageType == "PRIVATE_ONLY") {
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(text = "Waarschuwing Privégebruik", style = MaterialTheme.typography.titleSmall)
@@ -381,21 +463,40 @@ fun AddVehicleScreen(
                             )
 
                             if (showPrivateKmWarning) {
-                                val proRataLimit = DashboardStatsCalculator.calculateProRataLimit(
-                                    yearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500,
+                                val dummyVehicle = (existingVehicle ?: Vehicle(
+                                    name = name,
+                                    licensePlate = plate,
+                                    make = make,
+                                    model = model,
+                                    year = null,
+                                    odometerStart = 0,
+                                    odometerCurrent = 0,
+                                    notes = null
+                                )).copy(
+                                    replacesVehicleId = replacesVehicleId,
                                     inServiceDate = inServiceDate,
-                                    endServiceDate = endServiceDate
+                                    endServiceDate = endServiceDate,
+                                    privateKmYearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500
+                                )
+                                val proRataLimit = DashboardStatsCalculator.calculateCombinedProRataLimit(
+                                    vehicle = dummyVehicle,
+                                    allVehicles = vehicles,
+                                    yearlyLimit = dummyVehicle.privateKmYearlyLimit
                                 )
 
                                 Text(
-                                    text = "ℹ Berekende pro rata grens dit jaar: $proRataLimit km",
+                                    text = if (replacesVehicleId != null) "ℹ Berekende pro rata grens dit jaar: $proRataLimit km (gezamenlijke periode)" else "ℹ Berekende pro rata grens dit jaar: $proRataLimit km",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.padding(start = 4.dp, top = 4.dp)
                                 )
 
                                 Text(
-                                    text = "Let op: De fiscale grens geldt per persoon per auto. Heb je een auto halverwege het jaar gekregen (bijv. poolauto)? Dan tellen ritten van vorige bestuurders niet mee voor jouw grens. Gebruik de ingebruiknamedatum hierboven om jouw persoonlijke pro-rata grens te berekenen.",
+                                    text = if (replacesVehicleId != null) {
+                                        "Let op: Bij een autowissel binnen hetzelfde fiscale jaar telt de Belastingdienst opeenvolgende auto's van de werkgever samen voor de 500 km-grens. Zowel de termijn als de gereden privékilometers worden gecombineerd."
+                                    } else {
+                                        "Let op: De fiscale grens geldt per persoon per auto. Heb je een auto halverwege het jaar gekregen (bijv. poolauto)? Dan tellen ritten van vorige bestuurders niet mee voor jouw grens. Gebruik de ingebruiknamedatum hierboven om jouw persoonlijke pro-rata grens te berekenen."
+                                    },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(start = 4.dp, top = 8.dp)
@@ -583,5 +684,52 @@ fun AddVehicleScreen(
         ) {
             DatePicker(state = datePickerState)
         }
+    }
+
+    if (showRecalculateOdometerDialog && existingVehicle != null) {
+        val odoStartInt = odometerStart.toIntOrNull() ?: 0
+        val odoCurrentInt = odometerCurrent.toIntOrNull() ?: 0
+        val privateKmYearlyLimit = privateKmYearlyLimitStr.toIntOrNull() ?: 500
+        AlertDialog(
+            onDismissRequest = { showRecalculateOdometerDialog = false },
+            title = { Text("Beginstand gewijzigd") },
+            text = {
+                Text("Je hebt de beginstand gewijzigd van ${existingVehicle.odometerStart} km naar $odoStartInt km.\n\nWil je ook de kilometerstanden van alle bestaande ritten voor deze auto herberekenen op basis van de nieuwe beginstand?")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.updateVehicle(
+                        existingVehicle, name, plate, make, model, odoStartInt, odoCurrentInt, usageType,
+                        notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning,
+                        odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType,
+                        replacesVehicleId, recalculateTrips = true
+                    )
+                    showRecalculateOdometerDialog = false
+                    onBack()
+                }) {
+                    Text("Ja, herberekenen")
+                }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = { showRecalculateOdometerDialog = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(onClick = {
+                        viewModel.updateVehicle(
+                            existingVehicle, name, plate, make, model, odoStartInt, odoCurrentInt, usageType,
+                            notes.takeIf { it.isNotBlank() }, privateKmYearlyLimit, showPrivateKmWarning,
+                            odometerCorrectionStrategy, inServiceDate, endServiceDate, engineType,
+                            replacesVehicleId, recalculateTrips = false
+                        )
+                        showRecalculateOdometerDialog = false
+                        onBack()
+                    }) {
+                        Text("Alleen beginstand")
+                    }
+                }
+            }
+        )
     }
 }

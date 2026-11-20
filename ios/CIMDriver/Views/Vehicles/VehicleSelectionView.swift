@@ -323,6 +323,7 @@ struct VehicleEditView: View {
             v.make = make
             v.model = model
             v.engineType = engineType
+            v.odometerStart = Int(odometerStart) ?? v.odometerStart
             v.privateKmYearlyLimit = Int(privateKmYearlyLimit) ?? 500
             v.usageType = usageType
             v.odometerCorrectionStrategy = odometerCorrectionStrategy
