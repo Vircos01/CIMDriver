@@ -23,8 +23,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.roundToInt
+
+data class LeapmotorExecutedAction(
+    val id: String,
+    val tripKey: String,
+    val timestamp: Long = System.currentTimeMillis(),
+    val tripSummary: String,
+    val actionTitle: String,
+    val actionDetail: String,
+    val type: LeapmotorActionType,
+    val targetTripId: Long? = null
+)
 
 @HiltViewModel
 class LeapmotorVerificationViewModel @Inject constructor(
@@ -55,21 +67,40 @@ class LeapmotorVerificationViewModel @Inject constructor(
     private val _message = MutableStateFlow<String?>(null)
     val message: StateFlow<String?> = _message.asStateFlow()
 
+    // History of actions performed during this verification session
+    private val _executedActions = MutableStateFlow<List<LeapmotorExecutedAction>>(emptyList())
+    val executedActions: StateFlow<List<LeapmotorExecutedAction>> = _executedActions.asStateFlow()
+
+    // Trips in database already marked as Leapmotor verified/inserted
+    private val _previouslyVerifiedTrips = MutableStateFlow<List<Trip>>(emptyList())
+    val previouslyVerifiedTrips: StateFlow<List<Trip>> = _previouslyVerifiedTrips.asStateFlow()
+
     init {
         viewModelScope.launch {
             val all = vehicleDao.getAllVehiclesSync()
             _vehicles.value = all
-            // Default to Leapmotor if available, else first active vehicle
             val leapmotor = all.find { it.make.contains("Leapmotor", true) || it.model.contains("B10", true) }
                 ?: all.firstOrNull { it.isActive }
                 ?: all.firstOrNull()
             _selectedVehicle.value = leapmotor
+            if (leapmotor != null) {
+                loadPreviouslyVerifiedTrips(leapmotor.id)
+            }
         }
+    }
+
+    private suspend fun loadPreviouslyVerifiedTrips(vehicleId: Long) {
+        val trips = tripDao.getTripsByVehicleSync(vehicleId)
+        _previouslyVerifiedTrips.value = trips.filter {
+            !it.note.isNullOrBlank() && it.note.contains("Leapmotor", ignoreCase = true)
+        }.sortedByDescending { it.startTime }
     }
 
     fun selectVehicle(vehicle: Vehicle) {
         _selectedVehicle.value = vehicle
-        // Re-run matching if we already have a parse result
+        viewModelScope.launch {
+            loadPreviouslyVerifiedTrips(vehicle.id)
+        }
         _lastParseResult.value?.let { parseResult ->
             recalculateReport(vehicle, parseResult)
         }
@@ -155,37 +186,106 @@ class LeapmotorVerificationViewModel @Inject constructor(
                 detectedOdometerKm = parseResult.detectedOdometerKm
             )
             _report.value = newReport
+            loadPreviouslyVerifiedTrips(vehicle.id)
         }
     }
 
     fun applyFix(item: LeapmotorMatchItem) {
         val vehicle = _selectedVehicle.value ?: return
         val action = item.suggestedAction
+        val lm = item.lmTrip
+        val tripKey = "${lm.dateText}_${lm.startTimeText}"
 
         viewModelScope.launch {
+            var executedAction: LeapmotorExecutedAction? = null
+
             when (action.type) {
-                LeapmotorActionType.TRIM_END_TIME,
-                LeapmotorActionType.EXTEND_START_TIME,
-                LeapmotorActionType.ALIGN_TIMES,
+                LeapmotorActionType.TRIM_END_TIME -> {
+                    val tripId = action.targetTripId ?: return@launch
+                    val trip = tripDao.getTripById(tripId) ?: return@launch
+
+                    val noteSuffix = "[Geverifieerd met Leapmotor B10 - ${item.endDeltaMinutes}m stilstand gecorrigeerd]"
+                    val updatedTrip = trip.copy(
+                        endTime = action.newEndTime ?: trip.endTime,
+                        note = appendNote(trip.note, noteSuffix)
+                    )
+                    tripDao.updateTrip(updatedTrip)
+
+                    executedAction = LeapmotorExecutedAction(
+                        id = "exec_${System.currentTimeMillis()}_${item.id}",
+                        tripKey = tripKey,
+                        tripSummary = "${lm.dateText} ${lm.startTimeText} - ${lm.endTimeText}",
+                        actionTitle = "${item.endDeltaMinutes} min loze stilstand afgeknipt",
+                        actionDetail = "Eindtijd gecorrigeerd naar ${lm.endTimeText} conform motorstop Leapmotor",
+                        type = action.type,
+                        targetTripId = tripId
+                    )
+                }
+
+                LeapmotorActionType.EXTEND_START_TIME -> {
+                    val tripId = action.targetTripId ?: return@launch
+                    val trip = tripDao.getTripById(tripId) ?: return@launch
+
+                    val noteSuffix = "[Geverifieerd met Leapmotor B10 - vertrek ${item.startDeltaMinutes}m hersteld]"
+                    val updatedTrip = trip.copy(
+                        startTime = action.newStartTime ?: trip.startTime,
+                        note = appendNote(trip.note, noteSuffix)
+                    )
+                    tripDao.updateTrip(updatedTrip)
+
+                    executedAction = LeapmotorExecutedAction(
+                        id = "exec_${System.currentTimeMillis()}_${item.id}",
+                        tripKey = tripKey,
+                        tripSummary = "${lm.dateText} ${lm.startTimeText} - ${lm.endTimeText}",
+                        actionTitle = "Vertrektijd ${item.startDeltaMinutes}m hersteld",
+                        actionDetail = "Starttijd gecorrigeerd naar ${lm.startTimeText} conform motorstart Leapmotor",
+                        type = action.type,
+                        targetTripId = tripId
+                    )
+                }
+
+                LeapmotorActionType.ALIGN_TIMES -> {
+                    val tripId = action.targetTripId ?: return@launch
+                    val trip = tripDao.getTripById(tripId) ?: return@launch
+
+                    val noteSuffix = "[Geverifieerd met Leapmotor B10 - tijden gesynchroniseerd]"
+                    val updatedTrip = trip.copy(
+                        startTime = action.newStartTime ?: trip.startTime,
+                        endTime = action.newEndTime ?: trip.endTime,
+                        note = appendNote(trip.note, noteSuffix)
+                    )
+                    tripDao.updateTrip(updatedTrip)
+
+                    executedAction = LeapmotorExecutedAction(
+                        id = "exec_${System.currentTimeMillis()}_${item.id}",
+                        tripKey = tripKey,
+                        tripSummary = "${lm.dateText} ${lm.startTimeText} - ${lm.endTimeText}",
+                        actionTitle = "Start- en eindtijd gesynchroniseerd",
+                        actionDetail = "Tijdsvenster aangepast naar ${lm.startTimeText} - ${lm.endTimeText} (${lm.durationMinutes} min)",
+                        type = action.type,
+                        targetTripId = tripId
+                    )
+                }
+
                 LeapmotorActionType.CONFIRM_VERIFIED -> {
                     val tripId = action.targetTripId ?: return@launch
                     val trip = tripDao.getTripById(tripId) ?: return@launch
 
                     val noteSuffix = "[Geverifieerd met Leapmotor B10]"
-                    val updatedNote = if (trip.note.isNullOrBlank()) {
-                        noteSuffix
-                    } else if (!trip.note.contains("Leapmotor")) {
-                        "${trip.note} $noteSuffix"
-                    } else {
-                        trip.note
-                    }
-
                     val updatedTrip = trip.copy(
-                        startTime = action.newStartTime ?: trip.startTime,
-                        endTime = action.newEndTime ?: trip.endTime,
-                        note = updatedNote
+                        note = appendNote(trip.note, noteSuffix)
                     )
                     tripDao.updateTrip(updatedTrip)
+
+                    executedAction = LeapmotorExecutedAction(
+                        id = "exec_${System.currentTimeMillis()}_${item.id}",
+                        tripKey = tripKey,
+                        tripSummary = "${lm.dateText} ${lm.startTimeText} - ${lm.endTimeText}",
+                        actionTitle = "Rit bevestigd als geverifieerd",
+                        actionDetail = "Boordcomputertijden ${lm.startTimeText}-${lm.endTimeText} (${lm.durationMinutes} min) vastgelegd in administratie",
+                        type = action.type,
+                        targetTripId = tripId
+                    )
                 }
 
                 LeapmotorActionType.ADD_MISSING_TRIP -> {
@@ -216,19 +316,39 @@ class LeapmotorVerificationViewModel @Inject constructor(
                         odometerStart = startOdo,
                         odometerEnd = endOdo
                     )
-                    tripDao.insertTrip(newTrip)
+                    val insertedId = tripDao.insertTrip(newTrip)
+
+                    val kmStr = String.format(Locale.US, "%.1f", distanceM / 1000.0)
+                    executedAction = LeapmotorExecutedAction(
+                        id = "exec_${System.currentTimeMillis()}_${item.id}",
+                        tripKey = tripKey,
+                        tripSummary = "${lm.dateText} ${lm.startTimeText} - ${lm.endTimeText}",
+                        actionTitle = "Gemiste rit toegevoegd (${lm.durationMinutes} min)",
+                        actionDetail = "Nieuwe rit aangemaakt van ${lm.startTimeText} tot ${lm.endTimeText} ($kmStr km, $startAddress → $endAddress)",
+                        type = action.type,
+                        targetTripId = insertedId
+                    )
                 }
 
                 LeapmotorActionType.SPLIT_TRIP -> {
                     val tripId = action.targetTripId ?: return@launch
                     val trip = tripDao.getTripById(tripId) ?: return@launch
-                    // Trim the current trip to the first LM trip window
                     val updatedTrip = trip.copy(
                         startTime = action.newStartTime ?: trip.startTime,
                         endTime = action.newEndTime ?: trip.endTime,
-                        note = if (trip.note.isNullOrBlank()) "[Gesplitst via Leapmotor boordcomputer]" else "${trip.note} [Gesplitst via Leapmotor]"
+                        note = appendNote(trip.note, "[Gesplitst via Leapmotor boordcomputer]")
                     )
                     tripDao.updateTrip(updatedTrip)
+
+                    executedAction = LeapmotorExecutedAction(
+                        id = "exec_${System.currentTimeMillis()}_${item.id}",
+                        tripKey = tripKey,
+                        tripSummary = "${lm.dateText} ${lm.startTimeText} - ${lm.endTimeText}",
+                        actionTitle = "Rit gesplitst",
+                        actionDetail = "Rit begrensd op boordcomputervenster ${lm.startTimeText} - ${lm.endTimeText}",
+                        type = action.type,
+                        targetTripId = tripId
+                    )
                 }
 
                 LeapmotorActionType.MERGE_TRIPS -> {
@@ -237,12 +357,26 @@ class LeapmotorVerificationViewModel @Inject constructor(
                     val updatedTrip = trip.copy(
                         startTime = action.newStartTime ?: trip.startTime,
                         endTime = action.newEndTime ?: trip.endTime,
-                        note = if (trip.note.isNullOrBlank()) "[Samengevoegd via Leapmotor boordcomputer]" else "${trip.note} [Samengevoegd via Leapmotor]"
+                        note = appendNote(trip.note, "[Samengevoegd via Leapmotor boordcomputer]")
                     )
                     tripDao.updateTrip(updatedTrip)
+
+                    executedAction = LeapmotorExecutedAction(
+                        id = "exec_${System.currentTimeMillis()}_${item.id}",
+                        tripKey = tripKey,
+                        tripSummary = "${lm.dateText} ${lm.startTimeText} - ${lm.endTimeText}",
+                        actionTitle = "Ritten samengevoegd",
+                        actionDetail = "Samengevoegd tot 1 aaneengesloten rit van ${lm.startTimeText} tot ${lm.endTimeText}",
+                        type = action.type,
+                        targetTripId = tripId
+                    )
                 }
 
                 LeapmotorActionType.NONE -> {}
+            }
+
+            if (executedAction != null) {
+                _executedActions.value = _executedActions.value.filter { it.tripKey != tripKey } + executedAction
             }
 
             // Recalculate odometer chain for vehicle
@@ -253,19 +387,30 @@ class LeapmotorVerificationViewModel @Inject constructor(
         }
     }
 
+    private fun appendNote(existingNote: String?, newTag: String): String {
+        return if (existingNote.isNullOrBlank()) {
+            newTag
+        } else if (!existingNote.contains(newTag)) {
+            "$existingNote $newTag"
+        } else {
+            existingNote
+        }
+    }
+
     fun applyAllFixes() {
         val currentReport = _report.value ?: return
-        val vehicle = _selectedVehicle.value ?: return
 
         viewModelScope.launch {
+            var appliedCount = 0
             for (item in currentReport.items) {
                 if (item.suggestedAction.type != LeapmotorActionType.NONE &&
                     item.status != LeapmotorMatchStatus.EXACT_MATCH
                 ) {
                     applyFix(item)
+                    appliedCount++
                 }
             }
-            _message.value = "Alle aanbevolen correcties succesvol toegepast!"
+            _message.value = "$appliedCount correcties succesvol uitgevoerd en vastgelegd in actielog!"
         }
     }
 
@@ -289,6 +434,16 @@ class LeapmotorVerificationViewModel @Inject constructor(
             )
             vehicleDao.updateVehicle(updatedVehicle)
             _selectedVehicle.value = updatedVehicle
+
+            val action = LeapmotorExecutedAction(
+                id = "exec_odo_${System.currentTimeMillis()}",
+                tripKey = "odometer_$odometerKm",
+                tripSummary = "Kilometertellerstand $odometerKm km",
+                actionTitle = "Fysiek teller-ijkpunt geregistreerd: $odometerKm km",
+                actionDetail = "Opgeslagen als officiële OdometerCheck voor Belastingdienst audit-trail",
+                type = LeapmotorActionType.CONFIRM_VERIFIED
+            )
+            _executedActions.value = _executedActions.value + action
             _message.value = "Tellerstand $odometerKm km geregistreerd als fysiek ijkpunt."
         }
     }

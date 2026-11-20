@@ -451,9 +451,13 @@ fun TripDetailScreen(
                     Text("ℹ️ Ritaudit & Context", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
                     val auditPoints = buildList {
+                        val currentNote = trip?.note
                         if (trip!!.isManual) add("Handmatig ingevoerde rit")
                         else add("Automatisch geregistreerd via GPS-achtergrondservice")
                         if (trip!!.vehicleId != null) add("Gekoppeld aan actieve carkit / voertuig")
+                        if (!currentNote.isNullOrBlank() && currentNote.contains("Leapmotor", ignoreCase = true)) {
+                            add("⚡ Boordcomputer verificatie: $currentNote")
+                        }
                         if (!trip!!.appliedRuleName.isNullOrBlank()) add("Automatische regel: ${trip!!.appliedRuleName}")
                         if (trip!!.privateDetourMeters > 0) add("Privé-omrijden: ${String.format(locale, "%.1f km", trip!!.privateDetourMeters / 1000.0)} verwerkt")
                     }

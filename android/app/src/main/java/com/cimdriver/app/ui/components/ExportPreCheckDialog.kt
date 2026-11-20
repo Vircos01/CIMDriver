@@ -215,7 +215,6 @@ fun ExportPreCheckDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onDismiss()
                     onConfirmExport()
                 }
             ) {

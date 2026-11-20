@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ElectricCar
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -164,6 +165,32 @@ fun TripItem(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
+                    }
+                }
+                if (!trip.note.isNullOrBlank() && trip.note.contains("Leapmotor", ignoreCase = true)) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Surface(
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp),
+                        color = com.cimdriver.app.ui.theme.CIMDriverGreen.copy(alpha = 0.15f)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Filled.ElectricCar,
+                                contentDescription = null,
+                                tint = com.cimdriver.app.ui.theme.CIMDriverGreen,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (trip.note.contains("Ingevoegd", ignoreCase = true)) "Boordcomputer (toegevoegd)" else "Geverifieerd met Leapmotor B10",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = com.cimdriver.app.ui.theme.CIMDriverGreen,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            )
+                        }
                     }
                 }
                 if (trip.status == "TO_REVIEW") {

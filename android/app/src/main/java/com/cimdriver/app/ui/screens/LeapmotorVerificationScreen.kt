@@ -33,10 +33,14 @@ import com.cimdriver.app.ui.theme.CIMDriverGreen
 import com.cimdriver.app.ui.theme.CIMDriverOrange
 import com.cimdriver.app.ui.theme.CIMDriverRed
 import com.cimdriver.app.ui.theme.CIMDriverWhite
+import com.cimdriver.app.ui.viewmodel.LeapmotorExecutedAction
 import com.cimdriver.app.ui.viewmodel.LeapmotorVerificationViewModel
 import com.cimdriver.app.util.LeapmotorActionType
 import com.cimdriver.app.util.LeapmotorMatchItem
 import com.cimdriver.app.util.LeapmotorMatchStatus
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +56,8 @@ fun LeapmotorVerificationScreen(
     val isProcessing by viewModel.isProcessing.collectAsState()
     val report by viewModel.report.collectAsState()
     val message by viewModel.message.collectAsState()
+    val executedActions by viewModel.executedActions.collectAsState()
+    val previouslyVerifiedTrips by viewModel.previouslyVerifiedTrips.collectAsState()
 
     var showTextInputDialog by remember { mutableStateOf(false) }
     var pastedText by remember { mutableStateOf("") }
@@ -282,6 +288,68 @@ fun LeapmotorVerificationScreen(
                     }
                 }
 
+                // Dedicated Executed Actions Section (Audit Log of What Changed)
+                if (executedActions.isNotEmpty()) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = CIMDriverGreen.copy(alpha = 0.08f)),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, CIMDriverGreen.copy(alpha = 0.35f))
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = CIMDriverGreen,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Uitgevoerde acties in deze controle (${executedActions.size})",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = CIMDriverGreen
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                                executedActions.forEachIndexed { idx, act ->
+                                    if (idx > 0) {
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            color = CIMDriverGreen.copy(alpha = 0.2f)
+                                        )
+                                    }
+                                    Column {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "✅ ${act.actionTitle}",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = act.tripSummary,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = act.actionDetail,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Section title
                 item {
                     Text(
@@ -294,10 +362,81 @@ fun LeapmotorVerificationScreen(
 
                 // List of matched items
                 items(rep.items, key = { it.id }) { item ->
+                    val tripKey = "${item.lmTrip.dateText}_${item.lmTrip.startTimeText}"
+                    val executedForThis = executedActions.find { it.tripKey == tripKey }
                     LeapmotorMatchCard(
                         item = item,
+                        executedAction = executedForThis,
                         onApplyFix = { viewModel.applyFix(item) }
                     )
+                }
+            }
+
+            // Previously Verified Trips Section (Historical log)
+            if (previouslyVerifiedTrips.isNotEmpty()) {
+                item {
+                    var showHistory by remember { mutableStateOf(false) }
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showHistory = !showHistory },
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.History,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Reeds geverifieerde ritten in administratie (${previouslyVerifiedTrips.size})",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Icon(
+                                    if (showHistory) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                    contentDescription = null
+                                )
+                            }
+                            if (showHistory) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                val dateFormat = remember { SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()) }
+                                previouslyVerifiedTrips.take(15).forEach { vTrip ->
+                                    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                                        Text(
+                                            text = "🚗 ${dateFormat.format(Date(vTrip.startTime))} • ${(vTrip.distanceMeters / 1000.0).let { String.format(Locale.getDefault(), "%.1f", it) }} km",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Text(
+                                            text = "${vTrip.startAddress ?: "Start"} → ${vTrip.endAddress ?: "Bestemming"}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = vTrip.note ?: "",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = CIMDriverGreen,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                    HorizontalDivider(
+                                        modifier = Modifier.padding(vertical = 4.dp),
+                                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -376,6 +515,7 @@ private fun SummaryChip(
 @Composable
 private fun LeapmotorMatchCard(
     item: LeapmotorMatchItem,
+    executedAction: LeapmotorExecutedAction? = null,
     onApplyFix: () -> Unit
 ) {
     val lm = item.lmTrip
@@ -397,6 +537,44 @@ private fun LeapmotorMatchCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // If an action was executed on this trip during this session, display prominent confirmation banner
+            if (executedAction != null) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = CIMDriverGreen.copy(alpha = 0.12f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, CIMDriverGreen.copy(alpha = 0.35f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = CIMDriverGreen,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = "Actie uitgevoerd: ${executedAction.actionTitle}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = CIMDriverGreen
+                            )
+                            Text(
+                                text = executedAction.actionDetail,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+
             // Header: Date, Leapmotor time, status badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -472,7 +650,7 @@ private fun LeapmotorMatchCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 val cimDur = ((cim.effectiveEndTime() - cim.startTime) / 60000L).toInt().coerceAtLeast(1)
                 Text(
-                    text = "CIMDriver GPS: ${cim.startAddress ?: "Start"} → ${cim.endAddress ?: "Bestemming"} (${(cim.distanceMeters / 1000.0).let { String.format("%.1f", it) }} km, $cimDur min)",
+                    text = "CIMDriver GPS: ${cim.startAddress ?: "Start"} → ${cim.endAddress ?: "Bestemming"} (${(cim.distanceMeters / 1000.0).let { String.format(Locale.getDefault(), "%.1f", it) }} km, $cimDur min)",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -502,7 +680,7 @@ private fun LeapmotorMatchCard(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(item.suggestedAction.title)
                 }
-            } else if (item.status == LeapmotorMatchStatus.EXACT_MATCH) {
+            } else if (item.status == LeapmotorMatchStatus.EXACT_MATCH && executedAction == null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedButton(
                     onClick = onApplyFix,
