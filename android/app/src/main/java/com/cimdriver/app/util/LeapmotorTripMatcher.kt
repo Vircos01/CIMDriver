@@ -32,6 +32,7 @@ data class LeapmotorSuggestedAction(
     val title: String,
     val description: String,
     val targetTripId: Long? = null,
+    val candidateTripIds: List<Long> = emptyList(),
     val newStartTime: Long? = null,
     val newEndTime: Long? = null,
     val estimatedDistanceMeters: Int? = null
@@ -41,7 +42,9 @@ data class LeapmotorMatchItem(
     val id: String,
     val lmTrip: LeapmotorTelematicsTrip,
     val matchingTrip: Trip? = null,
+    val candidateTrips: List<Trip> = emptyList(),
     val status: LeapmotorMatchStatus,
+    val isAlreadyVerified: Boolean = false,
     val startDeltaMinutes: Int = 0,     // Positive: CIMDriver started later
     val endDeltaMinutes: Int = 0,       // Positive: CIMDriver ended later
     val durationDeltaMinutes: Int = 0,  // Positive: CIMDriver duration longer
@@ -70,6 +73,44 @@ object LeapmotorTripMatcher {
     }
 
     /**
+     * Strictly tests whether a CIMDriver trip belongs to a specific Leapmotor telematics trip.
+     * Prevents distant trips (e.g. 10-15 minutes later) from being falsely grouped together.
+     */
+    private fun isCandidateForLmTrip(cim: Trip, lm: LeapmotorTelematicsTrip): Boolean {
+        val cimStart = cim.startTime
+        val cimEnd = cim.effectiveEndTime()
+        val lmStart = lm.startTimestamp
+        val lmEnd = lm.endTimestamp
+
+        // A trip that ended more than 3 minutes before LM trip started cannot be part of it
+        if (cimEnd < lmStart - 3 * 60 * 1000L) return false
+
+        // A trip that started more than 3 minutes after LM trip ended cannot be part of it
+        if (cimStart > lmEnd + 3 * 60 * 1000L) return false
+
+        val overlapStart = maxOf(cimStart, lmStart)
+        val overlapEnd = minOf(cimEnd, lmEnd)
+        val overlapMs = maxOf(0L, overlapEnd - overlapStart)
+
+        val startDeltaMs = abs(cimStart - lmStart)
+        val endDeltaMs = abs(cimEnd - lmEnd)
+
+        // 1. Definite overlap of at least 30s
+        if (overlapMs >= 30 * 1000L) return true
+
+        // 2. Both start and end timestamps are very close (<= 3 min)
+        if (startDeltaMs <= 3 * 60 * 1000L && endDeltaMs <= 3 * 60 * 1000L) return true
+
+        // 3. Excess idle stop (car turned off, GPS ran up to 25 min longer)
+        if (startDeltaMs <= 3 * 60 * 1000L && cimEnd >= lmEnd && (cimEnd - lmEnd) <= 25 * 60 * 1000L) return true
+
+        // 4. Delayed GPS start (car started, GPS started within 15 min, both ended on time)
+        if (endDeltaMs <= 3 * 60 * 1000L && cimStart >= lmStart && (cimStart - lmStart) <= 15 * 60 * 1000L) return true
+
+        return false
+    }
+
+    /**
      * Matches extracted Leapmotor telematics trips against CIMDriver registered trips.
      */
     fun match(
@@ -91,23 +132,11 @@ object LeapmotorTripMatcher {
             val lmEnd = lm.endTimestamp
             val lmDur = lm.durationMinutes
 
-            // Find overlapping or near CIMDriver trips
-            val candidates = sortedCim.filter { cim ->
-                val cimStart = cim.startTime
-                val cimEnd = cim.effectiveEndTime()
-
-                val overlaps = cimStart < lmEnd && cimEnd > lmStart
-                val nearStart = abs(cimStart - lmStart) <= 15 * 60 * 1000L
-                val nearEnd = abs(cimEnd - lmEnd) <= 15 * 60 * 1000L
-
-                overlaps || nearStart || nearEnd
-            }
+            // Find candidates strictly within and overlapping this LM trip window
+            val candidates = sortedCim.filter { isCandidateForLmTrip(it, lm) }
 
             if (candidates.isEmpty()) {
                 // Completely missing trip in CIMDriver
-                val prevCim = sortedCim.lastOrNull { it.effectiveEndTime() <= lmStart }
-                val nextCim = sortedCim.firstOrNull { it.startTime >= lmEnd }
-
                 val estDistanceM = when {
                     lm.distanceKm != null -> (lm.distanceKm * 1000.0).roundToInt()
                     lmDur <= 2 -> 500 // short repositioning
@@ -120,7 +149,9 @@ object LeapmotorTripMatcher {
                         id = "missing_${lm.dateText}_${lm.startTimeText}",
                         lmTrip = lm,
                         matchingTrip = null,
+                        candidateTrips = emptyList(),
                         status = LeapmotorMatchStatus.MISSING_IN_CIMDRIVER,
+                        isAlreadyVerified = false,
                         startDeltaMinutes = 0,
                         endDeltaMinutes = 0,
                         durationDeltaMinutes = -lmDur,
@@ -147,27 +178,44 @@ object LeapmotorTripMatcher {
                 val endDelta = ((cimEnd - lmEnd) / 60000L).toInt()
                 val durDelta = cimDur - lmDur
 
+                val isAlreadyVerified = cim.note?.contains("Leapmotor", ignoreCase = true) == true
+
                 when {
-                    // Exact match: both within 2 min
-                    abs(startDelta) <= 2 && abs(endDelta) <= 2 -> {
+                    // Exact match: both within 2 min, OR already verified and within 3 min
+                    (abs(startDelta) <= 2 && abs(endDelta) <= 2) || (isAlreadyVerified && abs(startDelta) <= 3 && abs(endDelta) <= 3) -> {
                         items.add(
                             LeapmotorMatchItem(
                                 id = "exact_${cim.id}_${lm.startTimeText}",
                                 lmTrip = lm,
                                 matchingTrip = cim,
+                                candidateTrips = candidates,
                                 status = LeapmotorMatchStatus.EXACT_MATCH,
+                                isAlreadyVerified = isAlreadyVerified,
                                 startDeltaMinutes = startDelta,
                                 endDeltaMinutes = endDelta,
                                 durationDeltaMinutes = durDelta,
-                                explanation = "Volledig in sync met boordcomputer (duur: $lmDur min).",
-                                suggestedAction = LeapmotorSuggestedAction(
-                                    type = LeapmotorActionType.CONFIRM_VERIFIED,
-                                    title = "Markeer als geverifieerd",
-                                    description = "Boordcomputer en GPS bevestigen elkaar.",
-                                    targetTripId = cim.id,
-                                    newStartTime = lmStart,
-                                    newEndTime = lmEnd
-                                )
+                                explanation = if (isAlreadyVerified) {
+                                    "Volledig in sync en reeds geverifieerd met boordcomputer (duur: $lmDur min)."
+                                } else {
+                                    "Volledig in sync met boordcomputer (duur: $lmDur min)."
+                                },
+                                suggestedAction = if (isAlreadyVerified) {
+                                    LeapmotorSuggestedAction(
+                                        type = LeapmotorActionType.NONE,
+                                        title = "Reeds geverifieerd",
+                                        description = "Boordcomputer en GPS bevestigen elkaar. Reeds vastgelegd in administratie.",
+                                        targetTripId = cim.id
+                                    )
+                                } else {
+                                    LeapmotorSuggestedAction(
+                                        type = LeapmotorActionType.CONFIRM_VERIFIED,
+                                        title = "Markeer als geverifieerd",
+                                        description = "Boordcomputer en GPS bevestigen elkaar.",
+                                        targetTripId = cim.id,
+                                        newStartTime = lmStart,
+                                        newEndTime = lmEnd
+                                    )
+                                }
                             )
                         )
                     }
@@ -179,7 +227,9 @@ object LeapmotorTripMatcher {
                                 id = "excess_stop_${cim.id}",
                                 lmTrip = lm,
                                 matchingTrip = cim,
+                                candidateTrips = candidates,
                                 status = LeapmotorMatchStatus.EXCESS_STOP_IDLE,
+                                isAlreadyVerified = isAlreadyVerified,
                                 startDeltaMinutes = startDelta,
                                 endDeltaMinutes = endDelta,
                                 durationDeltaMinutes = durDelta,
@@ -202,7 +252,9 @@ object LeapmotorTripMatcher {
                                 id = "delayed_start_${cim.id}",
                                 lmTrip = lm,
                                 matchingTrip = cim,
+                                candidateTrips = candidates,
                                 status = LeapmotorMatchStatus.DELAYED_START,
+                                isAlreadyVerified = isAlreadyVerified,
                                 startDeltaMinutes = startDelta,
                                 endDeltaMinutes = endDelta,
                                 durationDeltaMinutes = durDelta,
@@ -225,7 +277,9 @@ object LeapmotorTripMatcher {
                                 id = "shifted_${cim.id}",
                                 lmTrip = lm,
                                 matchingTrip = cim,
+                                candidateTrips = candidates,
                                 status = LeapmotorMatchStatus.SHIFTED_TIME,
+                                isAlreadyVerified = isAlreadyVerified,
                                 startDeltaMinutes = startDelta,
                                 endDeltaMinutes = endDelta,
                                 durationDeltaMinutes = durDelta,
@@ -249,7 +303,9 @@ object LeapmotorTripMatcher {
                                 id = "mismatch_${cim.id}",
                                 lmTrip = lm,
                                 matchingTrip = cim,
+                                candidateTrips = candidates,
                                 status = LeapmotorMatchStatus.DURATION_MISMATCH,
+                                isAlreadyVerified = isAlreadyVerified,
                                 startDeltaMinutes = startDelta,
                                 endDeltaMinutes = endDelta,
                                 durationDeltaMinutes = durDelta,
@@ -267,24 +323,29 @@ object LeapmotorTripMatcher {
                     }
                 }
             } else {
-                // Multiple CIMDriver trips cover this single LM trip
+                // Multiple CIMDriver trips cover this single LM trip (duplicates or fragments)
+                val primaryTrip = candidates.first()
                 items.add(
                     LeapmotorMatchItem(
                         id = "split_${lm.dateText}_${lm.startTimeText}",
                         lmTrip = lm,
-                        matchingTrip = candidates.first(),
+                        matchingTrip = primaryTrip,
+                        candidateTrips = candidates,
                         status = LeapmotorMatchStatus.SPLIT_TRIP_CANDIDATE,
+                        isAlreadyVerified = false,
                         startDeltaMinutes = 0,
                         endDeltaMinutes = 0,
                         durationDeltaMinutes = candidates.sumOf { it.durationMinutes() } - lmDur,
-                        explanation = "Leapmotor toont 1 aaneengesloten rit ($lmDur min), maar CIMDriver heeft ${candidates.size} losse ritten geregistreerd.",
+                        explanation = "Leapmotor toont 1 aaneengesloten rit ($lmDur min), maar CIMDriver heeft ${candidates.size} ritten (duplicaten of fragmenten) geregistreerd.",
                         suggestedAction = LeapmotorSuggestedAction(
                             type = LeapmotorActionType.MERGE_TRIPS,
-                            title = "Voeg ${candidates.size} ritten samen",
-                            description = "Samenvoegen tot 1 aaneengesloten rit van ${lm.startTimeText} tot ${lm.endTimeText}.",
-                            targetTripId = candidates.first().id,
+                            title = "Voeg ${candidates.size} ritten samen & ruim duplicaten op",
+                            description = "Samenvoegen tot 1 rit van ${lm.startTimeText} tot ${lm.endTimeText} en overbodige ritten wissen.",
+                            targetTripId = primaryTrip.id,
+                            candidateTripIds = candidates.map { it.id },
                             newStartTime = lmStart,
-                            newEndTime = lmEnd
+                            newEndTime = lmEnd,
+                            estimatedDistanceMeters = lm.distanceKm?.let { (it * 1000.0).roundToInt() }
                         )
                     )
                 )

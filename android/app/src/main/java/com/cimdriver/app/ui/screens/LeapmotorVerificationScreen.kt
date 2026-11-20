@@ -267,7 +267,7 @@ fun LeapmotorVerificationScreen(
                                 }
                             }
 
-                            // Batch Apply Button
+                            // Batch Apply Button or Success Banner
                             val actionableCount = rep.items.count {
                                 it.status != LeapmotorMatchStatus.EXACT_MATCH &&
                                 it.suggestedAction.type != LeapmotorActionType.NONE
@@ -282,6 +282,33 @@ fun LeapmotorVerificationScreen(
                                     Icon(Icons.Default.AutoFixHigh, contentDescription = null)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text("Pas alle $actionableCount correcties in 1x toe")
+                                }
+                            } else if (rep.items.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = CIMDriverGreen.copy(alpha = 0.12f),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, CIMDriverGreen.copy(alpha = 0.35f)),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            tint = CIMDriverGreen,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Alle herkende ritten zijn volledig in sync met de administratie!",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = CIMDriverGreen
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -680,15 +707,39 @@ private fun LeapmotorMatchCard(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(item.suggestedAction.title)
                 }
-            } else if (item.status == LeapmotorMatchStatus.EXACT_MATCH && executedAction == null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedButton(
-                    onClick = onApplyFix,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.Verified, contentDescription = null, tint = CIMDriverGreen, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Geverifieerd in administratie vastleggen", color = CIMDriverGreen)
+            } else if (item.status == LeapmotorMatchStatus.EXACT_MATCH) {
+                if (item.isAlreadyVerified || item.matchingTrip?.note?.contains("Leapmotor", ignoreCase = true) == true) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = CIMDriverGreen.copy(alpha = 0.12f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, CIMDriverGreen.copy(alpha = 0.35f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = CIMDriverGreen, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Reeds geverifieerd in administratie",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = CIMDriverGreen,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                } else if (executedAction == null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onApplyFix,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Verified, contentDescription = null, tint = CIMDriverGreen, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Geverifieerd in administratie vastleggen", color = CIMDriverGreen)
+                    }
                 }
             }
         }

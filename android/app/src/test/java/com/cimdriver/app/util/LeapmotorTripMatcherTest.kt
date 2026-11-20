@@ -3,6 +3,7 @@ package com.cimdriver.app.util
 import com.cimdriver.app.data.local.entity.Trip
 import com.cimdriver.app.data.local.entity.Vehicle
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Calendar
 
@@ -153,5 +154,153 @@ class LeapmotorTripMatcherTest {
         assertEquals(LeapmotorMatchStatus.DELAYED_START, item.status)
         assertEquals(LeapmotorActionType.EXTEND_START_TIME, item.suggestedAction.type)
         assertEquals(4, item.startDeltaMinutes)
+    }
+
+    @Test
+    fun testSeparateConsecutiveTripsAreNotGrouped() {
+        // Two consecutive Leapmotor trips separated by a 10 min stop
+        val lmTrip1 = LeapmotorTelematicsTrip(
+            dateText = "2026/11/19",
+            startTimeText = "14:09",
+            endTimeText = "14:14",
+            startTimestamp = createTime(14, 9),
+            endTimestamp = createTime(14, 14),
+            durationMinutes = 5
+        )
+        val lmTrip2 = LeapmotorTelematicsTrip(
+            dateText = "2026/11/19",
+            startTimeText = "14:24",
+            endTimeText = "14:28",
+            startTimestamp = createTime(14, 24),
+            endTimestamp = createTime(14, 28),
+            durationMinutes = 4
+        )
+
+        // Two corresponding distinct CIMDriver trips
+        val cimTrip1 = Trip(
+            id = 301L,
+            vehicleId = 10L,
+            startTime = createTime(14, 9),
+            endTime = createTime(14, 14),
+            startAddress = "A",
+            endAddress = "B",
+            distanceMeters = 2000,
+            tripType = "BUSINESS",
+            note = null,
+            status = "DONE",
+            isManual = false,
+            odometerStart = 100,
+            odometerEnd = 102
+        )
+        val cimTrip2 = Trip(
+            id = 302L,
+            vehicleId = 10L,
+            startTime = createTime(14, 24),
+            endTime = createTime(14, 28),
+            startAddress = "B",
+            endAddress = "C",
+            distanceMeters = 1500,
+            tripType = "BUSINESS",
+            note = null,
+            status = "DONE",
+            isManual = false,
+            odometerStart = 102,
+            odometerEnd = 104
+        )
+
+        val report = LeapmotorTripMatcher.match(listOf(lmTrip1, lmTrip2), listOf(cimTrip1, cimTrip2), testVehicle)
+        assertEquals(2, report.items.size)
+        assertEquals(2, report.exactMatchesCount)
+        assertEquals(0, report.discrepancyCount)
+
+        // Item 0 matches cimTrip1 ONLY
+        assertEquals(301L, report.items[0].matchingTrip?.id)
+        assertEquals(LeapmotorMatchStatus.EXACT_MATCH, report.items[0].status)
+
+        // Item 1 matches cimTrip2 ONLY
+        assertEquals(302L, report.items[1].matchingTrip?.id)
+        assertEquals(LeapmotorMatchStatus.EXACT_MATCH, report.items[1].status)
+    }
+
+    @Test
+    fun testAlreadyVerifiedTripHasNoAction() {
+        val lmTrip = LeapmotorTelematicsTrip(
+            dateText = "2026/11/19",
+            startTimeText = "14:09",
+            endTimeText = "14:14",
+            startTimestamp = createTime(14, 9),
+            endTimestamp = createTime(14, 14),
+            durationMinutes = 5
+        )
+        val verifiedCimTrip = Trip(
+            id = 401L,
+            vehicleId = 10L,
+            startTime = createTime(14, 9),
+            endTime = createTime(14, 14),
+            startAddress = "A",
+            endAddress = "B",
+            distanceMeters = 2000,
+            tripType = "BUSINESS",
+            note = "[Geverifieerd met Leapmotor B10]",
+            status = "DONE",
+            isManual = false,
+            odometerStart = 100,
+            odometerEnd = 102
+        )
+
+        val report = LeapmotorTripMatcher.match(listOf(lmTrip), listOf(verifiedCimTrip), testVehicle)
+        val item = report.items.first()
+        assertEquals(LeapmotorMatchStatus.EXACT_MATCH, item.status)
+        assertTrue(item.isAlreadyVerified)
+        assertEquals(LeapmotorActionType.NONE, item.suggestedAction.type)
+        assertEquals("Reeds geverifieerd", item.suggestedAction.title)
+    }
+
+    @Test
+    fun testDuplicateTripsProduceMergeActionWithCandidateIds() {
+        val lmTrip = LeapmotorTelematicsTrip(
+            dateText = "2026/11/19",
+            startTimeText = "17:12",
+            endTimeText = "17:14",
+            startTimestamp = createTime(17, 12),
+            endTimestamp = createTime(17, 14),
+            durationMinutes = 2
+        )
+        val dup1 = Trip(
+            id = 501L,
+            vehicleId = 10L,
+            startTime = createTime(17, 12),
+            endTime = createTime(17, 14),
+            startAddress = "Home",
+            endAddress = "Locatie",
+            distanceMeters = 1500,
+            tripType = "BUSINESS",
+            note = null,
+            status = "DONE",
+            isManual = false,
+            odometerStart = 100,
+            odometerEnd = 102
+        )
+        val dup2 = Trip(
+            id = 502L,
+            vehicleId = 10L,
+            startTime = createTime(17, 12),
+            endTime = createTime(17, 14),
+            startAddress = "Home",
+            endAddress = "Locatie",
+            distanceMeters = 1500,
+            tripType = "BUSINESS",
+            note = "[Boordcomputer toegevoegd]",
+            status = "DONE",
+            isManual = true,
+            odometerStart = 100,
+            odometerEnd = 102
+        )
+
+        val report = LeapmotorTripMatcher.match(listOf(lmTrip), listOf(dup1, dup2), testVehicle)
+        val item = report.items.first()
+        assertEquals(LeapmotorMatchStatus.SPLIT_TRIP_CANDIDATE, item.status)
+        assertEquals(LeapmotorActionType.MERGE_TRIPS, item.suggestedAction.type)
+        assertEquals(listOf(501L, 502L), item.suggestedAction.candidateTripIds)
     }
 }
