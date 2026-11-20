@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+  {{ super() }}
+  <style>
+    .tx-hero {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      max-width: 100%;
+      background-color: var(--md-default-bg-color);
+      display: block;
+      line-height: 0;
+    }
+    .tx-hero img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Hide the top padding of the main container so content flows right after hero */
+    .md-main__inner {
+      margin-top: 2rem;
+    }
+    
+    /* Dynamically hide/show the correct hero based on the body data attribute */
+    body[data-md-color-scheme="slate"] .only-light { display: none !important; }
+    body[data-md-color-scheme="default"] .only-dark { display: none !important; }
+  </style>
+  <div class="tx-hero">
+    <img src="{{ 'assets/branding.jpg' | url }}" alt="CIMDriver Branding" class="only-light">
+    <img src="{{ 'assets/branding_dark.jpg' | url }}" alt="CIMDriver Branding Dark" class="only-dark">
+  </div>
+{% endblock %}
