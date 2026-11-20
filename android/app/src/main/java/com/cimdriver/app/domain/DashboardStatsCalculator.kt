@@ -143,6 +143,25 @@ object DashboardStatsCalculator {
         return (monthsAvailable.toFloat() / 12f * yearlyLimit).toInt()
     }
 
+    fun calculateVehiclePrivateKm(
+        vehicle: Vehicle,
+        allTrips: List<Trip>,
+        startOfYear: Long
+    ): Double {
+        val inService = vehicle.inServiceDate ?: startOfYear
+        val privateTrips = allTrips.filter {
+            it.vehicleId == vehicle.id && it.startTime >= inService &&
+                (it.tripType == "PRIVATE" || it.tripType == com.cimdriver.app.util.TripClassification.DYNAMICS_PERSONAL || it.privateDetourMeters > 0)
+        }
+        return privateTrips.sumOf {
+            if (it.tripType == "PRIVATE" || it.tripType == com.cimdriver.app.util.TripClassification.DYNAMICS_PERSONAL) {
+                it.distanceMeters + it.privateDetourMeters
+            } else {
+                it.privateDetourMeters
+            }
+        } / 1000.0
+    }
+
     fun calculateCumulativePrivateKm(
         vehicle: Vehicle,
         allVehicles: List<Vehicle>,
@@ -150,12 +169,9 @@ object DashboardStatsCalculator {
         startOfYear: Long
     ): Double {
         val chain = listOf(vehicle) + getPredecessorVehicles(vehicle, allVehicles)
-        val chainIds = chain.map { it.id }.toSet()
-        val privateTrips = allTrips.filter {
-            it.vehicleId in chainIds && it.startTime >= startOfYear &&
-                (it.tripType == "PRIVATE" || it.tripType == com.cimdriver.app.util.TripClassification.DYNAMICS_PERSONAL)
+        return chain.sumOf { v ->
+            calculateVehiclePrivateKm(v, allTrips, startOfYear)
         }
-        return privateTrips.sumOf { it.distanceMeters + it.privateDetourMeters } / 1000.0
     }
 
     fun classifyTrip(

@@ -224,7 +224,14 @@ class DashboardStatsCalculatorTest {
 
         val allTrips = listOf(poloTrip, leapmotorTrip)
 
-        // 1. Helper calculateCumulativePrivateKm should sum both (9.0 + 16.9 = 25.9 km)
+        // 1. Vehicle individual private km
+        val poloKm = DashboardStatsCalculator.calculateVehiclePrivateKm(polo, allTrips, startOfYear)
+        val leapmotorKm = DashboardStatsCalculator.calculateVehiclePrivateKm(leapmotor, allTrips, startOfYear)
+        assertEquals(9.0, poloKm, 0.001)
+        assertEquals(16.9, leapmotorKm, 0.001)
+        assertEquals(25.9, poloKm + leapmotorKm, 0.001)
+
+        // 2. Helper calculateCumulativePrivateKm should sum both (9.0 + 16.9 = 25.9 km)
         val cumulativeKm = DashboardStatsCalculator.calculateCumulativePrivateKm(
             vehicle = leapmotor,
             allVehicles = vehicles,
@@ -233,7 +240,7 @@ class DashboardStatsCalculatorTest {
         )
         assertEquals(25.9, cumulativeKm, 0.001)
 
-        // 2. calculateDashboardStats with Leapmotor selected should also have ytdPriveKm = 25.9 km
+        // 3. calculateDashboardStats with Leapmotor selected should also have ytdPriveKm = 25.9 km
         val stats = DashboardStatsCalculator.calculateDashboardStats(
             tripList = allTrips,
             timeFilter = TimeFilter.YEAR,

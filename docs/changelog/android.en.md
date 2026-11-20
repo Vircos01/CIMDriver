@@ -4,7 +4,15 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.9.4 (Current Version)
+## Version 1.9.5 (Current Version)
+*Release date: November 20, 2026*
+
+!!! info "Patch: Consistent Fiscal Private Mileage Summation Across Vehicles"
+    * **Clean Individual Mileage:** Each car in the fleet overview displays only the private miles actually logged in that specific vehicle (Polo: 9.0 km, Leapmotor: 16.9 km), eliminating double counting.
+    * **Single Fiscal Quota (166 km):** The traded-in Polo indicates *"Contract ended"*, while the active Leapmotor and the top dashboard card apply the joint 4-month pro-rata quota of 166 km (`25.9 / 166 km`).
+    * **100% Mathematical Consistency:** Numbers in the top card and the fleet overview now reconcile perfectly with zero discrepancy.
+
+## Version 1.9.4
 *Release date: November 20, 2026*
 
 !!! info "Patch: Clean Fleet Overview & Active Vehicle Default View"

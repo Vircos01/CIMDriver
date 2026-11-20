@@ -1,6 +1,6 @@
 {
-  "versionCode": 48,
-  "versionName": "1.9.4",
-  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.4.apk",
-  "releaseNotes": "Versie 1.9.4: Rustiger wagenparkoverzicht zonder overname-labels, standaardweergave van de actieve auto (166 km fiscale pro-rata norm) en robuuste automatische koppeling van ingeruilde auto's."
+  "versionCode": 49,
+  "versionName": "1.9.5",
+  "apkUrl": "https://raw.githubusercontent.com/Vircos01/CIMDriver/main/android/release/CIMDriver-v1.9.5.apk",
+  "releaseNotes": "Versie 1.9.5: Zuivere fiscale optelsom voor autowissel/inruil: wagenpark toont feitelijke privékilometers per auto (Polo 9,0 km, Leapmotor 16,9 km) en de gecombineerde fiscale 166 km norm sluit bovenin en beneden 100% sluitend aan."
 }

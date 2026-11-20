@@ -2,6 +2,19 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
+## [1.9.5] - 2026-11-20
+
+### Gecorrigeerd & Verbeterd
+- **100% Sluitende Fiscale Optelsom bij Inruil/Autowissel:**
+  - **Wagenpark Overzicht:** Voertuigen tonen nu feitelijk de privékilometers die in dát specifieke voertuig zijn gereden:
+    - *Volkswagen Polo (ingeruild):* Toont feitelijk `9,0 km` gereden met status *"Contract beëindigd (overgedragen)"*, zonder verwarrende losse normbalk.
+    - *Leapmotor B10 (actief):* Toont `16,9 / 166 km` met de gecombineerde 4-maands fiscale norm en een voortgangsbalk gebaseerd op de gezamenlijke privékilometers (25,9 / 166 km = 15,6%).
+    - De optelsom in het wagenpark is exact `9,0 km + 16,9 km = 25,9 km` (geen dubbeltelling meer naar 34,9 km).
+  - **Fiscaal Privégebruik Kaart Bovenin:**
+    - Toont de gecombineerde fiscale status van de auto van de zaak: `25,9 / 166 km`.
+    - Duidelijke fiscale toelichting: *"Aangepaste grens (pro rata: 16,9 km Leapmotor + 9,0 km Volkswagen)"*.
+    - Bovenin en beneden sluiten cijfermatig nu 100% sluitend en eenduidig op elkaar aan.
+
 ## [1.9.4] - 2026-11-20
 
 ### Gecorrigeerd & Verbeterd

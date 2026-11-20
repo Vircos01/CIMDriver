@@ -6,7 +6,15 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.9.4 (Huidige Versie)
+## Versie 1.9.5 (Huidige Versie)
+*Releasedatum: 20 november 2026*
+
+!!! info "Patch: 100% Sluitende Fiscale Optelsom bij Inruil / Autowissel"
+    * **Zuivere Optelsom in Wagenpark:** Elk voertuig toont feitelijk de privékilometers die in dát specifieke voertuig zijn geregistreerd (Polo: 9,0 km, Leapmotor: 16,9 km). Geen dubbeltelling meer.
+    * **Eenduidige Fiscale Norm (166 km):** De beëindigde Polo toont *"Contract beëindigd"*, terwijl de actieve Leapmotor en de kaart bovenin de gezamenlijke 4-maands norm van 166 km hanteren (`25,9 / 166 km`).
+    * **Perfecte Consistentie:** Bovenin en beneden in het wagenpark sluiten de getallen nu 100% logisch en fiscaal sluitend op elkaar aan.
+
+## Versie 1.9.4
 *Releasedatum: 20 november 2026*
 
 !!! info "Patch: Rustig Wagenpark Overzicht & Fiscale Standaardweergave"
