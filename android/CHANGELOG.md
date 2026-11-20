@@ -2,7 +2,17 @@
 
 Alle noemenswaardige wijzigingen aan dit project zullen in dit bestand worden bijgehouden.
 
-## [1.9.3] - 2026-11-20
+## [1.9.4] - 2026-11-20
+
+### Gecorrigeerd & Verbeterd
+- **Rustig en Uniform Wagenpark Overzicht:**
+  - De overzichtskaart van het wagenpark op het dashboard is ontdaan van drukke overname-labels en uitsplitsingen (*"Vervangt..."*, *"Ingeruild voor..."*, *"Overgedragen naar..."* en uitsplitsing van eigen t.o.v. eerdere privékilometers).
+  - Elk voertuig heeft een identieke, rustige en overzichtelijke weergave: kenteken, kilometerstand, maandritten, gecombineerde pro-rata privé-voortgang en statusindicator.
+- **Standaard Selectie Actief Voertuig:**
+  - Het dashboard en de rittenlijst initialiseren nu altijd direct op het actieve standaardvoertuig (bijv. de Leapmotor B10) in plaats van het eerste voertuig in de database.
+  - De privégrenskaart bovenaan toont direct de correcte gecombineerde fiscale norm (bijv. 166 km naar rato voor september t/m december) en cumulatieve privékilometers (25,9 km).
+- **Robuuste Koppeling Ingerruilde Voertuigen:**
+  - Fallback-detectie toegevoegd in `DashboardStatsCalculator` zodat gekoppelde voorganger-opvolger relaties altijd direct in-memory en via database-migratie 53 / `onOpen` gewaarborgd zijn.
 
 ### Gecorrigeerd & Verbeterd
 - **Beginstand tellerstand bewerken (`odometerStart`):**

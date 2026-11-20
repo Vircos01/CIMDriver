@@ -244,4 +244,56 @@ class DashboardStatsCalculatorTest {
         )
         assertEquals(25.9, stats.ytdPriveKm, 0.001)
     }
+
+    @Test
+    fun testLeapmotorFallbackPredecessorWhenReplacesVehicleIdIsNull() {
+        val cal = Calendar.getInstance()
+        val currentYear = cal.get(Calendar.YEAR)
+        cal.set(currentYear, Calendar.SEPTEMBER, 1, 0, 0, 0)
+        val poloStart = cal.timeInMillis
+        cal.set(currentYear, Calendar.NOVEMBER, 14, 0, 0, 0)
+        val leapmotorStart = cal.timeInMillis
+
+        val polo = Vehicle(
+            id = 10L,
+            name = "Volkswagen Polo",
+            licensePlate = "GHX-78-D",
+            make = "Volkswagen",
+            model = "Polo",
+            odometerStart = 31000,
+            odometerCurrent = 33379,
+            isActive = false,
+            isDefault = false,
+            inServiceDate = poloStart,
+            endServiceDate = leapmotorStart,
+            replacesVehicleId = null
+        )
+
+        // Leapmotor with replacesVehicleId = null (e.g. before migration runs)
+        val leapmotor = Vehicle(
+            id = 20L,
+            name = "Leapmotor B10",
+            licensePlate = "NFN-80-F",
+            make = "Leapmotor",
+            model = "B10",
+            odometerStart = 10,
+            odometerCurrent = 338,
+            isActive = true,
+            isDefault = true,
+            inServiceDate = leapmotorStart,
+            endServiceDate = null,
+            replacesVehicleId = null
+        )
+
+        val vehicles = listOf(polo, leapmotor)
+        val preds = DashboardStatsCalculator.getPredecessorVehicles(leapmotor, vehicles)
+        assertEquals(1, preds.size)
+        assertEquals(10L, preds.first().id)
+
+        val limit = DashboardStatsCalculator.calculateCombinedProRataLimit(leapmotor, vehicles)
+        assertEquals(166, limit)
+
+        val successor = DashboardStatsCalculator.getSuccessorVehicle(polo, vehicles)
+        assertEquals(20L, successor?.id)
+    }
 }

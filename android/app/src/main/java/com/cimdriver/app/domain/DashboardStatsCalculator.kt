@@ -50,6 +50,34 @@ object DashboardStatsCalculator {
         return (monthsAvailable.toFloat() / 12f * yearlyLimit).toInt()
     }
 
+    fun isLeapmotor(v: Vehicle?): Boolean {
+        if (v == null) return false
+        val plate = v.licensePlate.replace("-", "").replace(" ", "").trim()
+        return plate.equals("NFN80F", ignoreCase = true) ||
+            (v.make.contains("Leapmotor", ignoreCase = true) && v.model.contains("B10", ignoreCase = true))
+    }
+
+    fun isPolo(v: Vehicle?): Boolean {
+        if (v == null) return false
+        val plate = v.licensePlate.replace("-", "").replace(" ", "").trim()
+        return plate.equals("GHX78D", ignoreCase = true) ||
+            (v.make.contains("Volkswagen", ignoreCase = true) && v.model.contains("Polo", ignoreCase = true)) ||
+            v.model.contains("Polo", ignoreCase = true)
+    }
+
+    fun getSuccessorVehicle(
+        vehicle: Vehicle?,
+        allVehicles: List<Vehicle>
+    ): Vehicle? {
+        if (vehicle == null) return null
+        val explicit = allVehicles.find { it.replacesVehicleId == vehicle.id }
+        if (explicit != null) return explicit
+        if (isPolo(vehicle)) {
+            return allVehicles.find { isLeapmotor(it) }
+        }
+        return null
+    }
+
     fun getPredecessorVehicles(
         vehicle: Vehicle?,
         allVehicles: List<Vehicle>
@@ -58,6 +86,15 @@ object DashboardStatsCalculator {
         val predecessors = mutableListOf<Vehicle>()
         val visited = mutableSetOf(vehicle.id)
         var currentId = vehicle.replacesVehicleId
+
+        // Fallback for Leapmotor B10 replacing Volkswagen Polo if not yet set in database
+        if (currentId == null && isLeapmotor(vehicle)) {
+            val polo = allVehicles.find { isPolo(it) }
+            if (polo != null) {
+                currentId = polo.id
+            }
+        }
+
         while (currentId != null && !visited.contains(currentId)) {
             visited.add(currentId)
             val pred = allVehicles.find { it.id == currentId }

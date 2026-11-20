@@ -6,7 +6,15 @@ Blijf op de hoogte van de laatste updates, nieuwe functies en bugfixes voor CIMD
 
 ---
 
-## Versie 1.9.3 (Huidige Versie)
+## Versie 1.9.4 (Huidige Versie)
+*Releasedatum: 20 november 2026*
+
+!!! info "Patch: Rustig Wagenpark Overzicht & Fiscale Standaardweergave"
+    * **Rustig & Uniform Wagenpark Overzicht:** Verwijdering van overbodige overnamelabels (*"Vervangt..."*, *"Ingeruild voor..."*, *"Overgedragen naar..."* en dubbele uitsplitsingen) voor een rustig, professioneel en uniform dashboard.
+    * **Standaard Actief Voertuig:** Het dashboard toont standaard direct de gegevens en gecombineerde fiscale grens van het actieve standaardvoertuig (166 km naar rato voor september t/m december).
+    * **Robuuste Inruilkoppeling:** Gegarandeerde automatische koppeling van voorganger en opvolger via database-migratie 53 en in-memory fallback.
+
+## Versie 1.9.3
 *Releasedatum: 20 november 2026*
 
 !!! info "Patch: Beginstand Tellerstand Corrigeren & Fiscale Autowissel / Inruil"

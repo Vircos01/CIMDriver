@@ -295,9 +295,14 @@ fun TripsScreen(
                             Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.cancel), tint = com.cimdriver.app.ui.theme.CIMDriverWhite)
                         }
                     }
+                    val defaultVehicle = remember(vehicles) {
+                        vehicles.find { it.isDefault }
+                            ?: vehicles.firstOrNull { it.isActive && vehicles.none { v -> v.replacesVehicleId == it.id } }
+                            ?: vehicles.firstOrNull()
+                    }
                     VehicleSelectorTopBarAction(
                         vehicles = vehicles,
-                        activeVehicleId = uiState.globalSelectedVehicleId ?: vehicles.firstOrNull()?.id,
+                        activeVehicleId = uiState.globalSelectedVehicleId ?: defaultVehicle?.id,
                         onVehicleSelected = { viewModel.setGlobalSelectedVehicleId(it) }
                     )
                     Box {

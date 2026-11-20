@@ -4,7 +4,15 @@ Stay up to date with the latest updates, new features, and bug fixes for CIMDriv
 
 ---
 
-## Version 1.9.3 (Current Version)
+## Version 1.9.4 (Current Version)
+*Release date: November 20, 2026*
+
+!!! info "Patch: Clean Fleet Overview & Active Vehicle Default View"
+    * **Clean & Uniform Fleet Overview:** Removed cluttered trade-in badges (*"Replaces..."*, *"Traded in for..."*, *"Transferred to..."* and breakdown sub-texts) for a quiet, clean, and consistent dashboard design.
+    * **Active Vehicle Default:** The dashboard now properly defaults to the user's active default vehicle, immediately displaying the correct combined fiscal pro-rata limit (166 km for September through December).
+    * **Robust Predecessor Linking:** Guaranteed pairing of predecessor and successor vehicles through database migration 53 and in-memory fallback logic.
+
+## Version 1.9.3
 *Release date: November 20, 2026*
 
 !!! info "Patch: Odometer Start Correction & Fiscal Vehicle Trade-In / Exchange"
